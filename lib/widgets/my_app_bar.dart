@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar({
     super.key,
     required this.title,
+    this.userImage = const SizedBox(),
   });
 
   final String title;
+  final Widget userImage;
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +22,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       backgroundColor: Theme.of(context).colorScheme.primary,
       elevation: 0,
-      actions: [
-        GestureDetector(
-            onTap: () {
-              // navigate to profile page
-            },
-            child: const DisplayUserImage())
-      ],
+      actions: [userImage],
     );
   }
 

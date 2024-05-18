@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/risk_assessments_list.dart';
 import 'package:gemini_risk_assessor/widgets/search_field.dart';
@@ -15,7 +16,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const MyAppBar(title: Constants.riskAssessments),
+        appBar: MyAppBar(
+          title: Constants.riskAssessments,
+          userImage: GestureDetector(
+            onTap: () {
+              // navigate to profile page
+            },
+            child: const DisplayUserImage(),
+          ),
+        ),
         body: const Padding(
           padding: EdgeInsets.all(8.0),
           child: Column(

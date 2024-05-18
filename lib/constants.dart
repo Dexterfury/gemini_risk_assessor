@@ -8,6 +8,9 @@ class Constants {
   // search
   static const String search = 'Search';
 
+  // create assessment
+  static const String createAssessment = 'Create Assessment';
+
   // user model constants
   static const String uid = 'uid';
   static const String name = 'name';

@@ -11,10 +11,13 @@ class DisplayUserImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    return CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: getImageToShow(authProvider),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: CircleAvatar(
+        radius: 20,
+        backgroundColor: Colors.blue,
+        backgroundImage: getImageToShow(authProvider),
+      ),
     );
   }
 
