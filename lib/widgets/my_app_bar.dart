@@ -1,6 +1,5 @@
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar({
@@ -19,18 +18,15 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: Colors.grey[200],
         ),
       ),
+      centerTitle: true,
       backgroundColor: Theme.of(context).colorScheme.primary,
       elevation: 0,
       actions: [
-        IconButton(
-          icon: Icon(
-            Platform.isAndroid ? CupertinoIcons.settings_solid : Icons.settings,
-            color: Colors.grey[200],
-          ),
-          onPressed: () {
-            // settings
-          },
-        ),
+        GestureDetector(
+            onTap: () {
+              // navigate to profile page
+            },
+            child: const DisplayUserImage())
       ],
     );
   }

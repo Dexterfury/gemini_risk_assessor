@@ -8,6 +8,13 @@ class Constants {
   // search
   static const String search = 'Search';
 
+  // user model constants
+  static const String uid = 'uid';
+  static const String name = 'name';
+  static const String email = 'email';
+  static const String imageUrl = 'imageUrl';
+  static const String createdAt = 'createdAt';
+
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {
