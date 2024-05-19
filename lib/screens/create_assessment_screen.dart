@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
+import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,10 +17,6 @@ class CreateAssessmentScreen extends StatefulWidget {
 }
 
 class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
-  List<XFile>? imagesFileList = [];
-  bool _fromCamera = false;
-  int _maxImages = 10;
-
   void selectImages() async {
     final returnedFiles = await pickImages(
       fromCamera: _fromCamera,
@@ -176,38 +173,22 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
+    return const Scaffold(
+      appBar: MyAppBar(
         title: Constants.createAssessment,
       ),
       body: SafeArea(
           child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const Text('Add Project images'),
-              GestureDetector(
-                onTap: () {
-                  selectImages();
-                },
-                child: Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      width: 1,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  child: previewImages(),
-                ),
-              ),
-              const SizedBox(
+              Text('Add Project images'),
+              AssessmentImages(),
+              SizedBox(
                 height: 20,
               ),
-              const PpeGridViewWidget(),
+              PpeGridViewWidget(),
             ],
           ),
         ),
