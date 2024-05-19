@@ -181,7 +181,7 @@ final List<PpeModel> ppeIcons = [
     icon: const CircleAvatar(
       radius: 20,
       backgroundColor: Colors.blue,
-      child: Text('Other'),
+      child: Text(''),
     ),
   ),
 ];
