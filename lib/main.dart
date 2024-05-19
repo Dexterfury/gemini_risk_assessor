@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
@@ -9,6 +10,7 @@ void main() {
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => AuthProvider()),
+      ChangeNotifierProvider(create: (context) => AssessmentProvider()),
     ], child: const MyApp()),
   );
 }

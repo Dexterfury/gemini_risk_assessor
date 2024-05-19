@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -31,12 +30,14 @@ class AssessmentImages extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AddImage(onTap: () async {
-                    await assessmentProvider.selectImages(onError: (error) {
-                      showSnackBar(
+                    assessmentProvider.showBottomSheet(
                         context: context,
-                        message: error.toString(),
-                      );
-                    });
+                        onError: (error) {
+                          showSnackBar(
+                            context: context,
+                            message: error.toString(),
+                          );
+                        });
                   }),
                 ),
                 for (var image in assessmentProvider.imagesFileList!)
@@ -59,13 +60,7 @@ class AssessmentImages extends StatelessWidget {
                           child: GestureDetector(
                             onTap: () {
                               // remove image from list
-                              assessmentProvider.imagesFileList!
-                                  .removeWhere((file) => file == image);
-                              setState(() {
-                                // update maximum number of images
-                                _maxImages = _maxImages + 1;
-                                log('maxImages: $_maxImages');
-                              });
+                              assessmentProvider.removeFile(image: image);
                             },
                             child: Container(
                               decoration: const BoxDecoration(
