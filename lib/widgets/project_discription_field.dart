@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProjectDiscriptionField extends StatefulWidget {
   const ProjectDiscriptionField({super.key});
@@ -13,11 +15,18 @@ class _ProjectDiscriptionFieldState extends State<ProjectDiscriptionField> {
   Widget build(BuildContext context) {
     return TextField(
       decoration: InputDecoration(
-        labelText: 'Enter discription',
+        labelText: 'Enter description',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
         ),
       ),
+      maxLines: 3,
+      onChanged: (value) {
+        //Update discription value
+        context.read<AssessmentProvider>().setDescription(
+              value: value,
+            );
+      },
     );
   }
 }

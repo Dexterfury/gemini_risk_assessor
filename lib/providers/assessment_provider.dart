@@ -1,19 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AssessmentProvider extends ChangeNotifier {
+  List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
   bool _fromCamera = false;
   int _maxImages = 10;
+  int _numberOfPeople = 1;
+  String _description = '';
 
   // getters
+  List<PpeModel> get ppeModelList => _ppeModelList;
   List<XFile>? get imagesFileList => _imagesFileList;
   bool get fromCamera => _fromCamera;
   int get maxImages => _maxImages;
+  int get numberOfPeople => _numberOfPeople;
+  String get description => _description;
 
   // setters
 
@@ -26,6 +34,42 @@ class AssessmentProvider extends ChangeNotifier {
   // set max images
   void setMaxImages(int value) {
     _maxImages = value;
+    notifyListeners();
+  }
+
+  // increment number of people
+  void incrementNumberOfPeople() {
+    _numberOfPeople++;
+    notifyListeners();
+  }
+
+  // decreament number of people
+  void decrementNumberOfPeople() {
+    _numberOfPeople--;
+    notifyListeners();
+  }
+
+  // set number of people
+  void setNumberOfPeople({required int value}) {
+    _numberOfPeople = value;
+    notifyListeners();
+  }
+
+  // set description
+  void setDescription({required String value}) {
+    _description = value;
+    notifyListeners();
+  }
+
+  // add ppe model item
+  void addOrRemovePpeModelItem({required PpeModel ppeItem}) {
+    // check ppeModelList contains ppeItem
+    if (_ppeModelList.contains(ppeItem)) {
+      // remove ppeItem
+      _ppeModelList.remove(ppeItem);
+    } else {
+      _ppeModelList.add(ppeItem);
+    }
     notifyListeners();
   }
 
@@ -136,5 +180,10 @@ class AssessmentProvider extends ChangeNotifier {
         );
       },
     );
+  }
+
+  // get api key from env
+  getApiKey() {
+    return dotenv.env['APIKEY'];
   }
 }

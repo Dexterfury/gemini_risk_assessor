@@ -15,7 +15,7 @@ class AssessmentImages extends StatelessWidget {
         return Container(
           height: 120,
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: Theme.of(context).dialogBackgroundColor,
             borderRadius: BorderRadius.circular(5),
             border: Border.all(
               width: 1,

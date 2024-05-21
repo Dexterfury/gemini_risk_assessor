@@ -121,7 +121,7 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
   PpeModel(
-    id: 6,
+    id: 7,
     label: 'High Vis Clothing',
     icon: CircleAvatar(
       radius: 20,
@@ -132,7 +132,7 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
   PpeModel(
-    id: 7,
+    id: 8,
     label: 'Life Jacket',
     icon: CircleAvatar(
       radius: 20,
@@ -143,7 +143,7 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
   PpeModel(
-    id: 8,
+    id: 9,
     label: 'Protective Clothing',
     icon: CircleAvatar(
       radius: 20,
@@ -154,7 +154,7 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
   PpeModel(
-    id: 9,
+    id: 10,
     label: 'Safety Glasses',
     icon: CircleAvatar(
       radius: 20,
@@ -165,7 +165,7 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
   PpeModel(
-    id: 10,
+    id: 11,
     label: 'Safety Harness',
     icon: CircleAvatar(
       radius: 20,
@@ -176,7 +176,7 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
   PpeModel(
-    id: 11,
+    id: 12,
     label: 'Other',
     icon: const CircleAvatar(
       radius: 20,

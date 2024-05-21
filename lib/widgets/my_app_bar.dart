@@ -15,12 +15,9 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(
         title,
-        style: TextStyle(
-          color: Colors.grey[200],
-        ),
       ),
       centerTitle: true,
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,
       actions: [userImage],
     );

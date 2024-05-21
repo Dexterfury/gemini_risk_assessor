@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
+import 'package:gemini_risk_assessor/widgets/generate_button.dart';
+import 'package:gemini_risk_assessor/widgets/gradient_orb.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
@@ -16,42 +18,53 @@ class CreateAssessmentScreen extends StatefulWidget {
 class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: MyAppBar(
+    return Scaffold(
+      appBar: const MyAppBar(
         title: Constants.createAssessment,
       ),
       body: SafeArea(
           child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Add Project images'),
-              SizedBox(
+              const Text('Add Project images'),
+              const SizedBox(
                 height: 10,
               ),
-              AssessmentImages(),
-              SizedBox(
+              const AssessmentImages(),
+              const SizedBox(
                 height: 20,
               ),
-              Text('Select Personal Protective Equipment'),
-              SizedBox(
+              const Text('Select Personal Protective Equipment'),
+              const SizedBox(
                 height: 10,
               ),
-              PpeGridViewWidget(),
-              SizedBox(
+              const PpeGridViewWidget(),
+              const SizedBox(
                 height: 20,
               ),
-              NumberOfPeople(),
-              SizedBox(
+              const NumberOfPeople(),
+              const SizedBox(
                 height: 20,
               ),
-              Text('What do you want to do?'),
-              SizedBox(
+              const Text('What do you want to do?'),
+              const SizedBox(
                 height: 10,
               ),
-              ProjectDiscriptionField()
+              const ProjectDiscriptionField(),
+              const SizedBox(
+                height: 30,
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: GenerateButton(
+                  widget: const Icon(Icons.create),
+                  label: 'Generate Assessment',
+                  onTap: () {},
+                ),
+              )
             ],
           ),
         ),

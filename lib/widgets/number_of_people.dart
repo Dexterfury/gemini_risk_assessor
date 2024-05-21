@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:provider/provider.dart';
 
 class NumberOfPeople extends StatelessWidget {
   const NumberOfPeople({super.key});
@@ -7,7 +9,7 @@ class NumberOfPeople extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).dialogBackgroundColor,
         borderRadius: BorderRadius.circular(5),
         border: Border.all(
           width: 1,
@@ -20,22 +22,32 @@ class NumberOfPeople extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Number of People'),
-            Card(
-              child: Row(
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        print('pressed -');
-                      },
-                      icon: const Icon(Icons.remove_circle)),
-                  Text('1'),
-                  IconButton(
-                      onPressed: () {
-                        print('pressed +');
-                      },
-                      icon: const Icon(Icons.add_circle))
-                ],
-              ),
+            Consumer<AssessmentProvider>(
+              builder: (context, assessmentProvider, child) {
+                final numberOfPeople = assessmentProvider.numberOfPeople;
+                return Card(
+                  child: Row(
+                    children: [
+                      IconButton(
+                          onPressed: numberOfPeople == 1
+                              ? null
+                              : () {
+                                  assessmentProvider.decrementNumberOfPeople();
+                                },
+                          icon: const Icon(Icons.remove_circle)),
+                      Text(
+                        numberOfPeople.toString(),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            assessmentProvider.incrementNumberOfPeople();
+                          },
+                          icon: const Icon(Icons.add_circle))
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),
