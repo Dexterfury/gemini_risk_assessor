@@ -61,6 +61,11 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // get labels from ppeModelList
+  List<String> getPpeLabels() {
+    return _ppeModelList.map((ppe) => ppe.label).toList();
+  }
+
   // add ppe model item
   void addOrRemovePpeModelItem({required PpeModel ppeItem}) {
     // check ppeModelList contains ppeItem
@@ -186,4 +191,27 @@ class AssessmentProvider extends ChangeNotifier {
   getApiKey() {
     return dotenv.env['APIKEY'];
   }
+
+  String get mainPrompt {
+    return '''
+You are a Safety officer who ensures safe work practices.
+
+Generate a risk assessment based on the data information provided below.
+The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
+If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
+
+Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
+I have the following personal protective equipements: $getPpeLabels
+The number of people is: $_numberOfPeople
+
+After providing the assessment, add an descriptions that creatively explains why the recipe is good based on only the ingredients used in the recipe.  Tell a short story of a travel experience that inspired the recipe.
+List out any ingredients that are potential allergens.
+Provide a summary of how many people the recipe will serve and the the nutritional information per serving.
+
+${_description.isNotEmpty ? _description : ''}
+''';
+  }
+
+  String noRiskFound =
+      "No risks identified based on information and images provided";
 }
