@@ -235,24 +235,16 @@ ${_description.isNotEmpty ? _description : ''}
 Return the recipe as valid JSON using the following structure:
 {
   "id": \$uniqueId,
-  "title": \$recipeTitle,
-  "ingredients": \$ingredients,
-  "description": \$description,
-  "instructions": \$instructions,
-  "cuisine": \$cuisineType,
-  "allergens": \$allergens,
-  "servings": \$servings,
-  "nutritionInformation": {
-    "calories": "\$calories",
-    "fat": "\$fat",
-    "carbohydrates": "\$carbohydrates",
-    "protein": "\$protein",
-  },
+  "title": \$assessmentTitle,
+  "taskToAchieve": \$taskToAchieve,
+  "equipments": \$equipments,
+  "hazards": \$hazards,
+  "risks": \$risks,
+  "control": \$control,
+  "summary": \$summary,
 }
   
-uniqueId should be unique and of type String. 
-title, description, cuisine, allergens, and servings should be of String type. 
-ingredients and instructions should be of type List<String>.
-nutritionInformation should be of type Map<String, String>.
+uniqueId should be unique and of type String.
+all data should be of string type.
 ''';
 }
