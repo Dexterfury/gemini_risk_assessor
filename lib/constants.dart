@@ -18,6 +18,13 @@ class Constants {
   static const String imageUrl = 'imageUrl';
   static const String createdAt = 'createdAt';
 
+  // constants for promptDataModel
+  static const String images = 'images';
+  static const String textInput = 'textInput';
+  static const String numberOfPeople = 'numberOfPeople';
+  static const String selectedPpe = 'selectedPpe';
+  static const String additionalTextInputs = 'additionalTextInputs';
+
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {
