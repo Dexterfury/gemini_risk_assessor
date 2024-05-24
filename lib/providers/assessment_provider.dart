@@ -1,10 +1,13 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
+import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
+import 'package:gemini_risk_assessor/service/gemini.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -12,6 +15,7 @@ class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
   bool _fromCamera = false;
+  bool _isLoading = false;
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
@@ -24,7 +28,40 @@ class AssessmentProvider extends ChangeNotifier {
   int get numberOfPeople => _numberOfPeople;
   String get description => _description;
 
-  // setters
+  // function to set the model based on bool - isTextOnly
+  Future<GenerativeModel> getModel() async {
+    if (_maxImages < 10) {
+      return GenerativeModel(
+        model: 'gemini-pro-vision',
+        apiKey: const String.fromEnvironment('API_KEY'),
+        generationConfig: GenerationConfig(
+          temperature: 0.4,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 4096,
+        ),
+        safetySettings: [
+          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+        ],
+      );
+    } else {
+      return GenerativeModel(
+        model: 'gemini-pro',
+        apiKey: const String.fromEnvironment('API_KEY'),
+        generationConfig: GenerationConfig(
+          temperature: 0.4,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 4096,
+        ),
+        safetySettings: [
+          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+        ],
+      );
+    }
+  }
 
   // set from camera
   Future<void> setFromCamera(bool value) async {
@@ -189,8 +226,8 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // get api key from env
-  getApiKey() {
-    return dotenv.env['APIKEY'];
+  String getApiKey() {
+    return dotenv.env['API_KEY'].toString();
   }
 
   String getSelectedPpe() {
@@ -205,6 +242,43 @@ class AssessmentProvider extends ChangeNotifier {
       selectedPpe: getSelectedPpe.toString(),
       additionalTextInputs: [format],
     );
+  }
+
+  // reset prompt data
+  void resetPromptData() {
+    _imagesFileList = [];
+    _maxImages = 10;
+    _numberOfPeople = 1;
+    _ppeModelList = [];
+  }
+
+  Future<void> submitPrompt() async {
+    _isLoading = true;
+    notifyListeners();
+    // get model to use text or vision
+    var model = await getModel();
+    final prompt = getPromptData();
+
+    try {
+      final content = await GeminiService.generateContent(model, prompt);
+
+      // handle no image or image of not-food
+      if (content.text != null && content.text!.contains(noRiskFound)) {
+        // show error message
+      } else {
+        log('content: $content');
+      }
+    } catch (error) {
+      // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
+      if (kDebugMode) {
+        print(error);
+      }
+      _isLoading = false;
+    }
+
+    _isLoading = false;
+    resetPromptData();
+    notifyListeners();
   }
 
   String get mainPrompt {
@@ -245,6 +319,6 @@ Return the recipe as valid JSON using the following structure:
 }
   
 uniqueId should be unique and of type String.
-all data should be of string type.
+equipments, hazards and risks should be of type List<String>.
 ''';
 }

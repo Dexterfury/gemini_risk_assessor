@@ -25,6 +25,20 @@ class Constants {
   static const String selectedPpe = 'selectedPpe';
   static const String additionalTextInputs = 'additionalTextInputs';
 
+  // assessment model constants
+  static const String id = 'id';
+  static const String title = 'title';
+  static const String taskToAchieve = 'taskToAchieve';
+  static const String equipments = 'equipments';
+  static const String hazards = 'hazards';
+  static const String risks = 'risks';
+  static const String signatures = 'signatures';
+  static const String approvers = 'approvers';
+  static const String ppe = 'ppe';
+  static const String control = 'control';
+  static const String summary = 'summary';
+  static const String createdBy = 'createdBy';
+
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {
