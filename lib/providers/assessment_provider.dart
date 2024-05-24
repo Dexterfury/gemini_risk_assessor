@@ -265,11 +265,13 @@ class AssessmentProvider extends ChangeNotifier {
       // handle no image or image of not-food
       if (content.text != null && content.text!.contains(noRiskFound)) {
         // show error message
+        log('content error: $content');
       } else {
         log('content: $content');
       }
     } catch (error) {
       // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
+      log('just error: $error');
       if (kDebugMode) {
         print(error);
       }
