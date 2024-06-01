@@ -3,6 +3,15 @@ import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:image_picker/image_picker.dart';
 
+String cleanJson(String maybeInvalidJson) {
+  if (maybeInvalidJson.contains('```')) {
+    final withoutLeading = maybeInvalidJson.split('```json').last;
+    final withoutTrailing = withoutLeading.split('```').first;
+    return withoutTrailing;
+  }
+  return maybeInvalidJson;
+}
+
 Future<List<XFile>?> pickImages({
   required bool fromCamera,
   required int maxImages,

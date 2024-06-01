@@ -19,6 +19,7 @@ class AssessmentProvider extends ChangeNotifier {
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
+  String _creatorName = '';
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
@@ -27,6 +28,7 @@ class AssessmentProvider extends ChangeNotifier {
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
   String get description => _description;
+  String get creatorName => _creatorName;
 
   // function to set the model based on bool - isTextOnly
   Future<GenerativeModel> getModel() async {
@@ -96,6 +98,12 @@ class AssessmentProvider extends ChangeNotifier {
   // set description
   void setDescription({required String value}) {
     _description = value;
+    notifyListeners();
+  }
+
+  // set creator name
+  void setCreatorName({required String value}) {
+    _creatorName = value;
     notifyListeners();
   }
 

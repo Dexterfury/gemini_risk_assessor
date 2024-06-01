@@ -1,31 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:provider/provider.dart';
 
-class ProjectDiscriptionField extends StatefulWidget {
-  const ProjectDiscriptionField({super.key});
+class ProjectDiscriptionField extends StatelessWidget {
+  const ProjectDiscriptionField({
+    super.key,
+    required this.labelText,
+    required this.hintText,
+  });
 
-  @override
-  State<ProjectDiscriptionField> createState() =>
-      _ProjectDiscriptionFieldState();
-}
+  final String labelText;
+  final String hintText;
 
-class _ProjectDiscriptionFieldState extends State<ProjectDiscriptionField> {
   @override
   Widget build(BuildContext context) {
+    final isNameInput = labelText == Constants.enterYourName;
     return TextField(
       decoration: InputDecoration(
-        labelText: 'Enter description',
+        labelText: labelText,
+        hintText: hintText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
         ),
       ),
-      maxLines: 3,
+      maxLines: isNameInput ? 1 : 3,
       onChanged: (value) {
-        //Update discription value
-        context.read<AssessmentProvider>().setDescription(
-              value: value,
-            );
+        if (isNameInput) {
+          // set creator name
+          context.read<AssessmentProvider>().setCreatorName(
+                value: value,
+              );
+        } else {
+          //Update discription value
+          context.read<AssessmentProvider>().setDescription(
+                value: value,
+              );
+        }
       },
     );
   }

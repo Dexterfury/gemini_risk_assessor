@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class AssessmentModel {
   String id;
@@ -31,6 +35,51 @@ class AssessmentModel {
     required this.createdBy,
     required this.createdAt,
   });
+
+  factory AssessmentModel.fromGeneratedContent(
+    GenerateContentResponse content,
+    String creatorName,
+    DateTime createdAt,
+  ) {
+    /// failures should be handled when the response is received
+    assert(content.text != null);
+
+    final validJson = cleanJson(content.text!);
+    final json = jsonDecode(validJson);
+
+    if (json
+        case {
+          Constants.id: String id,
+          Constants.title: String title,
+          Constants.taskToAchieve: String taskToAchieve,
+          Constants.equipments: List<String> equipments,
+          Constants.hazards: List<String> hazards,
+          Constants.risks: List<String> risks,
+          Constants.signatures: List<String> signatures,
+          Constants.approvers: List<String> approvers,
+          Constants.ppe: List<String> ppe,
+          Constants.control: String control,
+          Constants.summary: String summary,
+        }) {
+      return AssessmentModel(
+        id: id,
+        title: title,
+        tastToAchieve: taskToAchieve,
+        equipments: equipments.map((i) => i.toString()).toList(),
+        hazards: hazards.map((i) => i.toString()).toList(),
+        risks: risks.map((i) => i.toString()).toList(),
+        signatures: signatures.map((i) => i.toString()).toList(),
+        approvers: approvers.map((i) => i.toString()).toList(),
+        ppe: ppe.map((i) => i.toString()).toList(),
+        control: control,
+        summary: summary,
+        createdBy: creatorName,
+        createdAt: createdAt,
+      );
+    }
+
+    throw JsonUnsupportedObjectError(json);
+  }
 
   // factory method
   factory AssessmentModel.fromJson(Map<String, dynamic> json) {

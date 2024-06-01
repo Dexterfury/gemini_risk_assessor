@@ -39,6 +39,10 @@ class Constants {
   static const String summary = 'summary';
   static const String createdBy = 'createdBy';
 
+  static const String enterYourName = 'Enter your name';
+  static const String signInToAutoFillName = 'Sign In to auto fill name';
+  static const String enterDescription = 'Enter Description';
+
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {
