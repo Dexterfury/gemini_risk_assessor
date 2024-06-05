@@ -3,8 +3,8 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:provider/provider.dart';
 
-class ProjectDiscriptionField extends StatelessWidget {
-  const ProjectDiscriptionField({
+class InputField extends StatelessWidget {
+  const InputField({
     super.key,
     required this.labelText,
     required this.hintText,

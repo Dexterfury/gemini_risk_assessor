@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini.dart';
@@ -20,6 +21,7 @@ class AssessmentProvider extends ChangeNotifier {
   int _numberOfPeople = 1;
   String _description = '';
   String _creatorName = '';
+  AssessmentModel? _assessmentModel;
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
@@ -29,13 +31,14 @@ class AssessmentProvider extends ChangeNotifier {
   int get numberOfPeople => _numberOfPeople;
   String get description => _description;
   String get creatorName => _creatorName;
+  AssessmentModel? get assessmentModel => _assessmentModel;
 
   // function to set the model based on bool - isTextOnly
   Future<GenerativeModel> getModel() async {
     if (_maxImages < 10) {
       return GenerativeModel(
         model: 'gemini-pro-vision',
-        apiKey: const String.fromEnvironment('API_KEY'),
+        apiKey: getApiKey(),
         generationConfig: GenerationConfig(
           temperature: 0.4,
           topK: 32,
@@ -50,7 +53,7 @@ class AssessmentProvider extends ChangeNotifier {
     } else {
       return GenerativeModel(
         model: 'gemini-pro',
-        apiKey: const String.fromEnvironment('API_KEY'),
+        apiKey: getApiKey(),
         generationConfig: GenerationConfig(
           temperature: 0.4,
           topK: 32,
@@ -122,6 +125,11 @@ class AssessmentProvider extends ChangeNotifier {
       _ppeModelList.add(ppeItem);
     }
     notifyListeners();
+  }
+
+  // get api key from env
+  String getApiKey() {
+    return dotenv.env['GEMINI_API_KEY'].toString();
   }
 
   // remove file
@@ -233,11 +241,6 @@ class AssessmentProvider extends ChangeNotifier {
     );
   }
 
-  // get api key from env
-  String getApiKey() {
-    return dotenv.env['API_KEY'].toString();
-  }
-
   String getSelectedPpe() {
     return _ppeModelList.map((ppe) => ppe.label).join(', ');
   }
@@ -274,8 +277,13 @@ class AssessmentProvider extends ChangeNotifier {
       if (content.text != null && content.text!.contains(noRiskFound)) {
         // show error message
         log('content error: $content');
+        _isLoading = false;
       } else {
         log('content: $content');
+        _assessmentModel = AssessmentModel.fromGeneratedContent(
+            content, _creatorName, DateTime.now());
+        _isLoading = false;
+        notifyListeners();
       }
     } catch (error) {
       // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';

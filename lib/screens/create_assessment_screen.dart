@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
 import 'package:gemini_risk_assessor/widgets/generate_button.dart';
@@ -7,7 +8,7 @@ import 'package:gemini_risk_assessor/widgets/gradient_orb.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
-import 'package:gemini_risk_assessor/widgets/project_discription_field.dart';
+import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/title_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -39,6 +40,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 10,
               ),
+              // assessment images
               const AssessmentImages(),
               const SizedBox(
                 height: 20,
@@ -49,6 +51,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 10,
               ),
+              // assessment ppe
               const PpeGridViewWidget(),
               const SizedBox(
                 height: 20,
@@ -63,20 +66,23 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 10,
               ),
-              const ProjectDiscriptionField(
+              // creator name field
+              const InputField(
                 labelText: Constants.enterYourName,
                 hintText: Constants.enterYourName,
               ),
               const SizedBox(
                 height: 10,
               ),
-              const ProjectDiscriptionField(
+              // assessment description field
+              const InputField(
                 labelText: Constants.enterDescription,
                 hintText: Constants.enterDescription,
               ),
               const SizedBox(
                 height: 30,
               ),
+              // create assessment button
               Align(
                 alignment: Alignment.centerRight,
                 child: GenerateButton(
@@ -85,27 +91,23 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                   onTap: () async {
                     await assessmentProvider.submitPrompt().then((_) async {
                       if (!context.mounted) return;
-                      // if (viewModel.recipe != null) {
-                      //   bool? shouldSave = await showDialog<bool>(
-                      //     context: context,
-                      //     barrierDismissible: false,
-                      //     builder: (context) => RecipeDialogScreen(
-                      //       recipe: viewModel.recipe!,
-                      //       actions: [
-                      //         MarketplaceButton(
-                      //           onPressed: () {
-                      //             Navigator.of(context).pop(true);
-                      //           },
-                      //           buttonText: "Save Recipe",
-                      //           icon: Symbols.save,
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   );
-                      //   if (shouldSave != null && shouldSave) {
-                      //     viewModel.saveRecipe();
-                      //   }
-                      // }
+                      if (assessmentProvider.assessmentModel != null) {
+                        // display the risk assessment details screen
+                        PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                          opaque: false,
+                          pageBuilder: (BuildContext context, animation,
+                                  secondaryAnimation) =>
+                              AssessmentDetailsScreen(
+                            assessmentModel:
+                                assessmentProvider.assessmentModel!,
+                          ),
+                        );
+                        bool shouldSave =
+                            await Navigator.of(context).push(pageRouteBuilder);
+                        if (shouldSave) {
+                          // TODO save the risk assessment to database
+                        }
+                      }
                     });
                   },
                 ),
@@ -115,5 +117,19 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
         ),
       )),
     );
+  }
+}
+
+class AssessmentDetailsScreen extends StatelessWidget {
+  const AssessmentDetailsScreen({
+    super.key,
+    required this.assessmentModel,
+  });
+
+  final AssessmentModel assessmentModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }
