@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/screens/risk_assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
 import 'package:gemini_risk_assessor/widgets/generate_button.dart';
@@ -110,7 +111,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           opaque: false,
                           pageBuilder: (BuildContext context, animation,
                                   secondaryAnimation) =>
-                              AssessmentDetailsScreen(
+                              RiskAssessmentDetailsScreen(
                             assessmentModel:
                                 assessmentProvider.assessmentModel!,
                             animation: animation,
@@ -154,46 +155,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
           ),
         ),
       )),
-    );
-  }
-}
-
-class AssessmentDetailsScreen extends StatelessWidget {
-  const AssessmentDetailsScreen({
-    super.key,
-    required this.assessmentModel,
-    required this.animation,
-  });
-
-  final AssessmentModel assessmentModel;
-  final Animation<double> animation;
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: Tween(begin: 3.0, end: 1.0).animate(animation),
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(assessmentModel.control.toString()),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                      child: Text('Close'))
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

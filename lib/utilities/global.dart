@@ -62,138 +62,142 @@ showSnackBar({
 }
 
 // list of ppe icons
-final List<PpeModel> ppeIcons = [
-  PpeModel(
-    id: 1,
-    label: 'Dust Mask',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.dustMask,
+List<PpeModel> ppeIcons({
+  double radius = 20,
+}) {
+  return [
+    PpeModel(
+      id: 1,
+      label: 'Dust Mask',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.dustMask,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 2,
-    label: 'Ear Protection',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.earProtection,
+    PpeModel(
+      id: 2,
+      label: 'Ear Protection',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.earProtection,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 3,
-    label: 'Face Shield',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.faceShield,
+    PpeModel(
+      id: 3,
+      label: 'Face Shield',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.faceShield,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 4,
-    label: 'Foot Protection',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.footProtection,
+    PpeModel(
+      id: 4,
+      label: 'Foot Protection',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.footProtection,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 5,
-    label: 'Hand Protection',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.handProtection,
+    PpeModel(
+      id: 5,
+      label: 'Hand Protection',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.handProtection,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 6,
-    label: 'Head Protection',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.headProtection,
+    PpeModel(
+      id: 6,
+      label: 'Head Protection',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.headProtection,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 7,
-    label: 'High Vis Clothing',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.highVisClothing,
+    PpeModel(
+      id: 7,
+      label: 'High Vis Clothing',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.highVisClothing,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 8,
-    label: 'Life Jacket',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.lifeJacket,
+    PpeModel(
+      id: 8,
+      label: 'Life Jacket',
+      icon: CircleAvatar(
+        radius: 20,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.lifeJacket,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 9,
-    label: 'Protective Clothing',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.protectiveClothing,
+    PpeModel(
+      id: 9,
+      label: 'Protective Clothing',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.protectiveClothing,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 10,
-    label: 'Safety Glasses',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.safetyGlasses,
+    PpeModel(
+      id: 10,
+      label: 'Safety Glasses',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.safetyGlasses,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 11,
-    label: 'Safety Harness',
-    icon: CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      backgroundImage: AssetImage(
-        AssetsManager.safetyHarness,
+    PpeModel(
+      id: 11,
+      label: 'Safety Harness',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        backgroundImage: AssetImage(
+          AssetsManager.safetyHarness,
+        ),
       ),
     ),
-  ),
-  PpeModel(
-    id: 12,
-    label: 'Other',
-    icon: const CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.blue,
-      child: Text(''),
+    PpeModel(
+      id: 12,
+      label: 'Other',
+      icon: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.blue,
+        child: const Text(''),
+      ),
     ),
-  ),
-];
+  ];
+}
 
 // animated dialog
 void showMyAnimatedDialog({

@@ -24,10 +24,10 @@ class PpeGridViewWidget extends StatelessWidget {
             crossAxisCount: 3,
             childAspectRatio: 1.5,
           ),
-          itemCount: ppeIcons.length,
+          itemCount: ppeIcons().length,
           itemBuilder: (context, index) {
             // get the first word of the game time
-            final ppeItem = ppeIcons[index];
+            final ppeItem = ppeIcons()[index];
 
             return PpeItem(ppeItem: ppeItem);
           }),
