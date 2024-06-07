@@ -276,14 +276,18 @@ class AssessmentProvider extends ChangeNotifier {
       // handle no image or image of not-food
       if (content.text != null && content.text!.contains(noRiskFound)) {
         // show error message
-        log('content error: $content');
+        log('content error: ${content.text}');
         _isLoading = false;
       } else {
-        log('content: $content');
+        log('content: ${content.text}');
         _assessmentModel = AssessmentModel.fromGeneratedContent(
-            content, _creatorName, DateTime.now());
+          content,
+          _creatorName,
+          DateTime.now(),
+        );
         _isLoading = false;
         notifyListeners();
+        log('assessmentMode: $_assessmentModel');
       }
     } catch (error) {
       // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
@@ -338,5 +342,92 @@ Return the recipe as valid JSON using the following structure:
   
 uniqueId should be unique and of type String.
 equipments, hazards and risks should be of type List<String>.
+''';
+
+  Future<void> submitTestAssessment() async {
+    _isLoading = true;
+    _assessmentModel = AssessmentModel.fromTestString(
+      testAssessment,
+      _creatorName,
+      DateTime.now(),
+    );
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  final testAssessment = '''
+{
+        "id": "50807458-2475-4134-8402-000000000001",
+        "title": "Clearing of Rubble",
+        "taskToAchieve": "To clear rubble from the site",
+        "equipments": [
+          "gloves",
+          "boots",
+          "hard hat",
+          "safety glasses",
+          "respirator",
+          "shovel",
+          "rake",
+          "wheelbarrow",
+          "dump truck"
+        ],
+        "hazards": [
+          "sharp objects",
+          "heavy objects",
+          "dust",
+          "noise",
+          "vibration",
+          "heat",
+          "cold",
+          "rain",
+          "lightning",
+          "fire",
+          "electricity",
+          "hazardous materials"
+        ],
+        "risks": [
+          "cuts",
+          "bruises",
+          "sprains",
+          "strains",
+          "back injuries",
+          "head injuries",
+          "eye injuries",
+          "respiratory problems",
+          "hearing loss",
+          "heat stress",
+          "cold stress",
+          "sunburn",
+          "frostbite",
+          "drowning",
+          "electrocution",
+          "burns",
+          "chemical exposure"
+        ],
+        "control": [
+          "use proper personal protective equipment",
+          "be aware of your surroundings",
+          "use safe work practices",
+          "follow all safety procedures",
+          "report any unsafe conditions",
+          "use the buddy system",
+          "take breaks often",
+          "stay hydrated",
+          "dress appropriately for the weather",
+          "be careful of sharp objects",
+          "be careful of heavy objects",
+          "be careful of dust",
+          "be careful of noise",
+          "be careful of vibration",
+          "be careful of heat",
+          "be careful of cold",
+          "be careful of rain",
+          "be careful of lightning",
+          "be careful of fire",
+          "be careful of electricity",
+          "be careful of hazardous materials"
+        ],
+        "summary": "The risk assessment has been completed for the task of clearing rubble from the site. The hazards and risks have been identified and control measures have been proposed. The risks are low and can be mitigated by following the control measures."
+      }
 ''';
 }

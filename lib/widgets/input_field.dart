@@ -24,6 +24,10 @@ class InputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(5),
         ),
       ),
+      textCapitalization: TextCapitalization.sentences,
+      keyboardType: isNameInput ? TextInputType.text : TextInputType.multiline,
+      textInputAction:
+          isNameInput ? TextInputAction.next : TextInputAction.done,
       maxLines: isNameInput ? 1 : 3,
       onChanged: (value) {
         if (isNameInput) {

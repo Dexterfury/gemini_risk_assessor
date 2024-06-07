@@ -194,3 +194,52 @@ final List<PpeModel> ppeIcons = [
     ),
   ),
 ];
+
+// animated dialog
+void showMyAnimatedDialog({
+  required BuildContext context,
+  required String title,
+  required String content,
+  Widget? loadingIndicator,
+  List<Widget>? actions,
+}) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierLabel: '',
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (context, animation1, animation2) {
+      return Container();
+    },
+    transitionBuilder: (context, animation1, animation2, child) {
+      return ScaleTransition(
+          scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: AlertDialog(
+                title: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                ),
+                content: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      content,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: loadingIndicator ?? const SizedBox()),
+                  ],
+                ),
+                actions: actions),
+          ));
+    },
+  );
+}

@@ -29,32 +29,40 @@ class PpeItem extends StatelessWidget {
           },
           child: Card(
             color: isAdded ? Theme.of(context).highlightColor : null,
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ppeItem.icon,
-                      Text(
-                        ppeItem.label,
-                        style: const TextStyle(
-                          fontSize: 12,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 4.0,
+                right: 4.0,
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ppeItem.icon,
+                        FittedBox(
+                          child: Text(
+                            ppeItem.label,
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                isAdded
-                    ? const Positioned(
-                        top: 5.0,
-                        right: 5.0,
-                        child: Icon(
-                          Icons.check,
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ],
+                  isAdded
+                      ? const Positioned(
+                          top: 5.0,
+                          right: 5.0,
+                          child: Icon(
+                            Icons.check,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ],
+              ),
             ),
           ),
         );

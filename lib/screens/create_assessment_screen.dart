@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
 import 'package:gemini_risk_assessor/widgets/generate_button.dart';
-import 'package:gemini_risk_assessor/widgets/gradient_orb.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
@@ -31,6 +31,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
           child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -89,7 +90,19 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                   widget: const Icon(Icons.create),
                   label: 'Generate Assessment',
                   onTap: () async {
-                    await assessmentProvider.submitPrompt().then((_) async {
+                    // show my alert dialog for loading
+                    showMyAnimatedDialog(
+                      context: context,
+                      title: 'Generating',
+                      content:
+                          'Please while Risk Assessment is beign generated',
+                      loadingIndicator: const CircularProgressIndicator(),
+                    );
+                    await assessmentProvider
+                        .submitTestAssessment()
+                        .then((_) async {
+                      // pop the the dialog
+                      Navigator.pop(context);
                       if (!context.mounted) return;
                       if (assessmentProvider.assessmentModel != null) {
                         // display the risk assessment details screen
@@ -100,6 +113,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                               AssessmentDetailsScreen(
                             assessmentModel:
                                 assessmentProvider.assessmentModel!,
+                            animation: animation,
                           ),
                         );
                         bool shouldSave =
@@ -109,6 +123,30 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                         }
                       }
                     });
+
+                    // await assessmentProvider.submitPrompt().then((_) async {
+                    //   // pop the the dialog
+                    //   Navigator.pop(context);
+                    //   if (!context.mounted) return;
+                    //   if (assessmentProvider.assessmentModel != null) {
+                    //     // display the risk assessment details screen
+                    //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                    //       opaque: false,
+                    //       pageBuilder: (BuildContext context, animation,
+                    //               secondaryAnimation) =>
+                    //           AssessmentDetailsScreen(
+                    //         assessmentModel:
+                    //             assessmentProvider.assessmentModel!,
+                    //         animation: animation,
+                    //       ),
+                    //     );
+                    //     bool shouldSave =
+                    //         await Navigator.of(context).push(pageRouteBuilder);
+                    //     if (shouldSave) {
+                    //       // TODO save the risk assessment to database
+                    //     }
+                    //   }
+                    // });
                   },
                 ),
               )
@@ -124,12 +162,38 @@ class AssessmentDetailsScreen extends StatelessWidget {
   const AssessmentDetailsScreen({
     super.key,
     required this.assessmentModel,
+    required this.animation,
   });
 
   final AssessmentModel assessmentModel;
+  final Animation<double> animation;
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return ScaleTransition(
+      scale: Tween(begin: 3.0, end: 1.0).animate(animation),
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(assessmentModel.control.toString()),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      child: Text('Close'))
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
