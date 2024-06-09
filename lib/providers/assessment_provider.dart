@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/enums/weather.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
@@ -22,6 +23,7 @@ class AssessmentProvider extends ChangeNotifier {
   String _description = '';
   String _creatorName = '';
   AssessmentModel? _assessmentModel;
+  Weather _weather = Weather.sunny;
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
@@ -32,6 +34,13 @@ class AssessmentProvider extends ChangeNotifier {
   String get description => _description;
   String get creatorName => _creatorName;
   AssessmentModel? get assessmentModel => _assessmentModel;
+  Weather get weather => _weather;
+
+  // set weather
+  void setWeather({required Weather newWeather}) {
+    _weather = newWeather;
+    notifyListeners();
+  }
 
   // function to set the model based on bool - isTextOnly
   Future<GenerativeModel> getModel() async {
@@ -313,6 +322,7 @@ If there are no images attached, or if the image does not contain any identifiab
 
 Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
 The number of people is: $_numberOfPeople
+The weather is: ${_weather.name}
 
 After providing the assessment, advice the equipment and tools to be used if required.
 Advise about the dangers that could injure people or harm the enviroment, the hazards and risks involved.

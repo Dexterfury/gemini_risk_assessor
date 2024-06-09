@@ -94,7 +94,15 @@ class RiskAssessmentDetailsScreen extends StatelessWidget {
                     height: 10,
                   ),
 
-                  DataListWidget(dataList: assessmentModel.control),
+                  Column(
+                    children: [
+                      const Text(
+                        'Control Messueres',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      DataListWidget(dataList: assessmentModel.control),
+                    ],
+                  ),
 
                   const SizedBox(
                     height: 20,
