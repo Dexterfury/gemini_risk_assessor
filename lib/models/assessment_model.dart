@@ -7,6 +7,7 @@ class AssessmentModel {
   final String id;
   final String title;
   final String taskToAchieve;
+  final List<String> images;
   final List<String> equipments;
   final List<String> hazards;
   final List<String> risks;
@@ -22,6 +23,7 @@ class AssessmentModel {
     required this.id,
     required this.title,
     required this.taskToAchieve,
+    required this.images,
     required this.equipments,
     required this.hazards,
     required this.risks,
@@ -37,6 +39,7 @@ class AssessmentModel {
   factory AssessmentModel.fromTestString(
     String testString,
     String creatorName,
+    List<String> testImages,
     DateTime createdAt,
   ) {
     final validJson = cleanJson(testString);
@@ -47,6 +50,7 @@ class AssessmentModel {
         id: json[Constants.id] ?? '',
         title: json[Constants.title] ?? '',
         taskToAchieve: json[Constants.taskToAchieve] ?? '',
+        images: testImages,
         equipments: List<String>.from(json[Constants.equipments] ?? []),
         hazards: List<String>.from(json[Constants.hazards] ?? []),
         risks: List<String>.from(json[Constants.risks] ?? []),
@@ -66,6 +70,7 @@ class AssessmentModel {
   factory AssessmentModel.fromGeneratedContent(
     GenerateContentResponse content,
     String creatorName,
+    List<String> images,
     DateTime createdAt,
   ) {
     assert(content.text != null);
@@ -78,6 +83,7 @@ class AssessmentModel {
         id: json[Constants.id] ?? '',
         title: json[Constants.title] ?? '',
         taskToAchieve: json[Constants.taskToAchieve] ?? '',
+        images: images,
         equipments: List<String>.from(json[Constants.equipments] ?? []),
         hazards: List<String>.from(json[Constants.hazards] ?? []),
         risks: List<String>.from(json[Constants.risks] ?? []),
@@ -99,6 +105,7 @@ class AssessmentModel {
       id: json[Constants.id] ?? '',
       title: json[Constants.title] ?? '',
       taskToAchieve: json[Constants.taskToAchieve] ?? '',
+      images: List<String>.from(json[Constants.images] ?? []),
       equipments: List<String>.from(json[Constants.equipments] ?? []),
       hazards: List<String>.from(json[Constants.hazards] ?? []),
       risks: List<String>.from(json[Constants.risks] ?? []),
@@ -117,6 +124,7 @@ class AssessmentModel {
       Constants.id: id,
       Constants.title: title,
       Constants.taskToAchieve: taskToAchieve,
+      Constants.images: images,
       Constants.equipments: equipments,
       Constants.hazards: hazards,
       Constants.risks: risks,

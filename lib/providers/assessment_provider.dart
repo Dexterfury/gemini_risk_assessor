@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:gemini_risk_assessor/enums/weather.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
@@ -122,6 +122,33 @@ class AssessmentProvider extends ChangeNotifier {
   // get labels from ppeModelList
   List<String> getPpeLabels() {
     return _ppeModelList.map((ppe) => ppe.label).toList();
+  }
+
+  // remove item from list
+  Future<void> removeItem({
+    required ListHeader label,
+    required String data,
+  }) async {
+    switch (label) {
+      case ListHeader.equipments:
+        _assessmentModel!.equipments.remove(data);
+        notifyListeners();
+        break;
+      case ListHeader.hazards:
+        _assessmentModel!.hazards.remove(data);
+        notifyListeners();
+        break;
+      case ListHeader.risks:
+        _assessmentModel!.risks.remove(data);
+        notifyListeners();
+        break;
+      case ListHeader.control:
+        _assessmentModel!.control.remove(data);
+        notifyListeners();
+        break;
+      default:
+        break;
+    }
   }
 
   // add ppe model item
@@ -289,9 +316,16 @@ class AssessmentProvider extends ChangeNotifier {
         _isLoading = false;
       } else {
         log('content: ${content.text}');
+        final List<String> images = [];
+        if (_imagesFileList != null) {
+          for (var image in _imagesFileList!) {
+            images.add(image.path);
+          }
+        }
         _assessmentModel = AssessmentModel.fromGeneratedContent(
           content,
           _creatorName,
+          images,
           DateTime.now(),
         );
         _isLoading = false;
@@ -356,9 +390,16 @@ equipments, hazards and risks should be of type List<String>.
 
   Future<void> submitTestAssessment() async {
     _isLoading = true;
+    final List<String> images = [];
+    if (_imagesFileList != null) {
+      for (var image in _imagesFileList!) {
+        images.add(image.path);
+      }
+    }
     _assessmentModel = AssessmentModel.fromTestString(
       testAssessment,
       _creatorName,
+      images,
       DateTime.now(),
     );
     _isLoading = false;

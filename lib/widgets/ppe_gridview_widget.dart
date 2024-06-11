@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_item.dart';
+import 'package:provider/provider.dart';
 
 class PpeGridViewWidget extends StatelessWidget {
   const PpeGridViewWidget({
@@ -29,7 +31,21 @@ class PpeGridViewWidget extends StatelessWidget {
             // get the first word of the game time
             final ppeItem = ppeIcons()[index];
 
-            return PpeItem(ppeItem: ppeItem);
+            return Consumer<AssessmentProvider>(
+              builder: (context, assessmentProvider, child) {
+                final isAdded =
+                    assessmentProvider.ppeModelList.contains(ppeItem);
+                return PpeItem(
+                  ppeItem: ppeItem,
+                  isAdded: isAdded,
+                  onTap: () {
+                    assessmentProvider.addOrRemovePpeModelItem(
+                      ppeItem: ppeItem,
+                    );
+                  },
+                );
+              },
+            );
           }),
     );
   }

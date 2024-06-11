@@ -111,7 +111,10 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       title: 'Generating',
                       content:
                           'Please while Risk Assessment is beign generated',
-                      loadingIndicator: const CircularProgressIndicator(),
+                      loadingIndicator: const SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: CircularProgressIndicator()),
                     );
                     await assessmentProvider
                         .submitTestAssessment()

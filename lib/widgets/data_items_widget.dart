@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/data_list_widget.dart';
 
 class DataItemsWidget extends StatelessWidget {
@@ -7,7 +9,7 @@ class DataItemsWidget extends StatelessWidget {
       required this.label,
       required this.dataList,
       this.width = 0.45});
-  final String label;
+  final ListHeader label;
   final List<String> dataList;
   final double width;
 
@@ -19,7 +21,7 @@ class DataItemsWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
+            getLabel(label),
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -27,6 +29,7 @@ class DataItemsWidget extends StatelessWidget {
           ),
           // list of items
           DataListWidget(
+            label: label,
             dataList: dataList,
           ),
         ],

@@ -1,15 +1,14 @@
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
+import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
 import 'package:gemini_risk_assessor/widgets/data_items_widget.dart';
-import 'package:gemini_risk_assessor/widgets/data_list_widget.dart';
+import 'package:gemini_risk_assessor/widgets/generate_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_items_widget.dart';
-import 'package:gemini_risk_assessor/widgets/title_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -54,34 +53,41 @@ class RiskAssessmentDetailsScreen extends StatelessWidget {
                 ),
                 Text(assessmentModel.taskToAchieve),
                 const SizedBox(height: 10),
+
+                const AssessmentImages(
+                  isViewOnly: true,
+                ),
+
+                const SizedBox(height: 10),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     DataItemsWidget(
-                      label: 'Equipments:',
+                      label: ListHeader.equipments,
                       dataList: assessmentModel.equipments,
                     ),
                     DataItemsWidget(
-                      label: 'Hazards:',
+                      label: ListHeader.hazards,
                       dataList: assessmentModel.hazards,
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 DataItemsWidget(
-                  label: 'Risks:',
+                  label: ListHeader.risks,
                   dataList: assessmentModel.risks,
                   width: 100,
                 ),
                 const SizedBox(height: 10),
                 DataItemsWidget(
-                  label: 'Control Measures:',
+                  label: ListHeader.control,
                   dataList: assessmentModel.control,
                   width: 100,
                 ),
                 const SizedBox(height: 10),
                 PpeItemsWidget(
-                  label: 'Personal Protective Equipment (PPE):',
+                  label: ListHeader.ppe,
                   ppeModelList:
                       context.watch<AssessmentProvider>().ppeModelList,
                 ),
@@ -99,55 +105,59 @@ class RiskAssessmentDetailsScreen extends StatelessWidget {
                 ),
                 Text('Created at: $formattedTime'),
                 const SizedBox(height: 10),
-                const Text(
-                  'Approvers:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                ...assessmentModel.approvers.map((approver) => Text(approver)),
-                const SizedBox(height: 10),
-                const Text(
-                  'Add Signature:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Container(
-                  height: 100,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      border: Border.all(
-                        width: 0.1,
-                      ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: const Center(
-                    child: Text('Signature Box'),
-                  ),
+                // const Text(
+                //   'Approvers:',
+                //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                // ),
+                // ...assessmentModel.approvers.map((approver) => Text(approver)),
+                // const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GenerateButton(
+                        widget: const Icon(Icons.fingerprint),
+                        label: "Add Signature",
+                        onTap: () {
+                          // show signature dialog
+                        }),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GenerateButton(
+                        widget: const Icon(Icons.save),
+                        label: "Save Assessment",
+                        onTap: () {
+                          // save assessment
+                        }),
+                  ],
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ActionButton(
-                      label: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                    ),
-                    ActionButton(
-                      label: const Text(
-                        'Save Accessment',
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(true);
-                      },
-                    ),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     ActionButton(
+                //       label: const Text(
+                //         'Cancel',
+                //         style: TextStyle(
+                //           color: Colors.red,
+                //         ),
+                //       ),
+                //       onPressed: () {
+                //         Navigator.of(context).pop(false);
+                //       },
+                //     ),
+                //     ActionButton(
+                //       label: const Text(
+                //         'Save Assessment',
+                //       ),
+                //       onPressed: () {
+                //         Navigator.of(context).pop(true);
+                //       },
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),

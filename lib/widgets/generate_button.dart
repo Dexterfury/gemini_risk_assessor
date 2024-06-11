@@ -14,13 +14,13 @@ class GenerateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Theme.of(context).dialogBackgroundColor,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(15),
             border: Border.all(
               width: 1,
               color: Colors.grey,
@@ -30,6 +30,9 @@ class GenerateButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               widget,
+              const SizedBox(
+                width: 10,
+              ),
               Text(label),
             ],
           ),

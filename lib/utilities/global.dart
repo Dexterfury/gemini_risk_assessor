@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/enums/weather.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
@@ -202,6 +202,26 @@ List<PpeModel> ppeIcons({
   ];
 }
 
+// get label
+getLabel(ListHeader label) {
+  switch (label) {
+    case ListHeader.equipments:
+      return 'Equipments:';
+    case ListHeader.hazards:
+      return 'Hazards:';
+    case ListHeader.risks:
+      return 'Risks:';
+    case ListHeader.control:
+      return 'Control Measures:';
+    case ListHeader.ppe:
+      return 'Personal Project Equipment (PPE):';
+    case ListHeader.signatures:
+      return 'Signatures:';
+    default:
+      return 'Unknown';
+  }
+}
+
 // animated dialog
 void showMyAnimatedDialog({
   required BuildContext context,
@@ -239,10 +259,7 @@ void showMyAnimatedDialog({
                     const SizedBox(
                       height: 10,
                     ),
-                    SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: loadingIndicator ?? const SizedBox()),
+                    loadingIndicator ?? const SizedBox(),
                   ],
                 ),
                 actions: actions),
