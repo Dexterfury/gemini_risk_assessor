@@ -10,7 +10,7 @@ import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/title_widget.dart';
-import 'package:gemini_risk_assessor/widgets/weather_row.dart';
+import 'package:gemini_risk_assessor/widgets/weather_buttons.dart';
 import 'package:provider/provider.dart';
 
 class CreateAssessmentScreen extends StatefulWidget {
@@ -68,7 +68,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 10,
               ),
-              WeatherRow(assessmentProvider: assessmentProvider),
+              WeatherButtons(assessmentProvider: assessmentProvider),
               const SizedBox(
                 height: 20,
               ),

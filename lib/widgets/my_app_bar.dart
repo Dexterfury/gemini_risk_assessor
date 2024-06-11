@@ -4,15 +4,18 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar({
     super.key,
     required this.title,
+    this.leading,
     this.userImage = const SizedBox(),
   });
 
   final String title;
+  final Widget? leading;
   final Widget userImage;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      leading: leading,
       title: Text(
         title,
       ),

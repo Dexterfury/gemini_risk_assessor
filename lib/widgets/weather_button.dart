@@ -6,7 +6,6 @@ class WeatherButton extends StatelessWidget {
     required this.title,
     required this.value,
     required this.iconData,
-    // required this.groupValue,
     required this.onChanged,
   });
 
@@ -27,19 +26,26 @@ class WeatherButton extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(6.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Icon(iconData),
-              const SizedBox(
-                width: 4,
-              ),
-              Text(capitalizedTitle),
-              const SizedBox(
-                width: 4,
-              ),
-              value ? const Icon(Icons.check) : const SizedBox(),
-            ],
+          child: FittedBox(
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Icon(iconData),
+                const SizedBox(
+                  width: 4,
+                ),
+                Text(capitalizedTitle),
+                const SizedBox(
+                  width: 4,
+                ),
+                value
+                    ? const Icon(
+                        Icons.check,
+                        size: 15,
+                      )
+                    : const SizedBox(),
+              ],
+            ),
           ),
         ),
       ),
