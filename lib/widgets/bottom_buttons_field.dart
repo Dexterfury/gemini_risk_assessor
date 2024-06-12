@@ -86,15 +86,32 @@ class BottonButtonsField extends StatelessWidget {
                 widget: const Icon(Icons.save),
                 label: "Save Assessment",
                 onTap: () async {
-                  // save assessment
-                  if (assessmentProvider.signatureImage != null) {
-                    assessmentProvider
-                        .createPdfAssessmentFile()
-                        .whenComplete(() async {
-                      await OpenFile.open(
-                          (assessmentProvider.pdfAssessmentFile!.path));
-                    });
+                  if (assessmentProvider.signatureImage == null) {
+                    showSnackBar(
+                      context: context,
+                      message: 'Please sign the document first.',
+                    );
+                    return;
                   }
+
+                  // show my alert dialog for loading
+                  showMyAnimatedDialog(
+                    context: context,
+                    title: 'Generating PDF file',
+                    content: 'Please wait...',
+                    loadingIndicator: const SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: CircularProgressIndicator()),
+                  );
+                  // create the pdf file and save to local storage
+                  assessmentProvider
+                      .createPdfAssessmentFile()
+                      .whenComplete(() async {
+                    Navigator.pop(context);
+                    await OpenFile.open(
+                        (assessmentProvider.pdfAssessmentFile!.path));
+                  });
                 }),
           ],
         );

@@ -308,8 +308,10 @@ class AssessmentProvider extends ChangeNotifier {
                 await setFromCamera(true);
                 await selectImages(
                   onSuccess: () {
-                    // pop the bottom sheet
-                    Navigator.pop(context);
+                    if (context.mounted) {
+                      // pop the bottom sheet
+                      Navigator.pop(context);
+                    }
                   },
                   onError: (error) => onError(error),
                 );
@@ -322,8 +324,10 @@ class AssessmentProvider extends ChangeNotifier {
                 await setFromCamera(false);
                 await selectImages(
                   onSuccess: () {
-                    // pop the bottom sheet
-                    Navigator.pop(context);
+                    if (context.mounted) {
+                      // pop the bottom sheet
+                      Navigator.pop(context);
+                    }
                   },
                   onError: (error) => onError(error),
                 );

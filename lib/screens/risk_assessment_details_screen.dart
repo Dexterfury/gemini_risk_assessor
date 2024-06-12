@@ -52,13 +52,10 @@ class RiskAssessmentDetailsScreen extends StatelessWidget {
                 ),
                 Text(assessmentModel.taskToAchieve),
                 const SizedBox(height: 10),
-
                 const AssessmentImages(
                   isViewOnly: true,
                 ),
-
                 const SizedBox(height: 10),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -104,12 +101,6 @@ class RiskAssessmentDetailsScreen extends StatelessWidget {
                 ),
                 Text('Created at: $formattedTime'),
                 const SizedBox(height: 10),
-                // const Text(
-                //   'Approvers:',
-                //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                // ),
-                // ...assessmentModel.approvers.map((approver) => Text(approver)),
-                // const SizedBox(height: 10),
                 const BottonButtonsField(),
                 const SizedBox(
                   height: 20,

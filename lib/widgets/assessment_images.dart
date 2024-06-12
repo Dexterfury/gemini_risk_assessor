@@ -25,7 +25,7 @@ class AssessmentImages extends StatelessWidget {
                   color: isViewOnly
                       ? null
                       : Theme.of(context).dialogBackgroundColor,
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                   border: isViewOnly
                       ? null
                       : Border.all(

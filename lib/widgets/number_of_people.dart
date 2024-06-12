@@ -10,7 +10,7 @@ class NumberOfPeople extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).dialogBackgroundColor,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           width: 1,
           color: Colors.grey,

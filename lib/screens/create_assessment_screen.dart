@@ -76,9 +76,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 20,
               ),
-              const HeadingTitleWidget(
-                title: 'What do you want to do?',
-              ),
               const SizedBox(
                 height: 10,
               ),
@@ -88,7 +85,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                 hintText: Constants.enterYourName,
               ),
               const SizedBox(
-                height: 10,
+                height: 20,
               ),
               // assessment description field
               const InputField(

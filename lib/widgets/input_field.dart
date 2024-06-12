@@ -21,7 +21,7 @@ class InputField extends StatelessWidget {
         labelText: labelText,
         hintText: hintText,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
       textCapitalization: TextCapitalization.sentences,

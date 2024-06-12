@@ -23,7 +23,7 @@ class DisplayUserImage extends StatelessWidget {
 
   getImageToShow(AuthProvider authProvider) {
     if (authProvider.isSignedIn) {
-      return NetworkImage(authProvider.userModel!.imageUrl!);
+      return NetworkImage(authProvider.userModel!.imageUrl);
     } else {
       return AssetImage(AssetsManager.userIcon);
     }

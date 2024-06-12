@@ -55,7 +55,7 @@ class _DataListWidgetState extends State<DataListWidget> {
     return Container(
       height: 200,
       decoration: BoxDecoration(
-          border: Border.all(), borderRadius: BorderRadius.circular(5)),
+          border: Border.all(), borderRadius: BorderRadius.circular(10)),
       child: Stack(
         children: [
           Padding(
