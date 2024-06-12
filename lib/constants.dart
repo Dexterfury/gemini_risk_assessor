@@ -36,6 +36,7 @@ class Constants {
   static const String approvers = 'approvers';
   static const String ppe = 'ppe';
   static const String control = 'control';
+  static const String weather = 'weather';
   static const String summary = 'summary';
   static const String createdBy = 'createdBy';
 

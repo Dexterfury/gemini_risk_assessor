@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         appBar: MyAppBar(
           title: Constants.riskAssessments,
-          userImage: GestureDetector(
+          actions: GestureDetector(
             onTap: () {
               // navigate to profile page
             },

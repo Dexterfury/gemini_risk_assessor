@@ -43,6 +43,15 @@ class _DataListWidgetState extends State<DataListWidget> {
     }
   }
 
+  // scroll to the bottom of the list
+  void _scrollToBottom() {
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+    setState(() {
+      _isBottom = true;
+    });
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
@@ -121,11 +130,17 @@ class _DataListWidgetState extends State<DataListWidget> {
             ),
           ),
           if (_isBottom == false && widget.dataList.length * 30 > 200)
-            const Positioned(
+            Positioned(
               bottom: 8,
               right: 8,
-              child: Icon(
-                Icons.arrow_downward_rounded,
+              child: GestureDetector(
+                onTap: () {
+                  // scroll to the bottom of teh list
+                  _scrollToBottom();
+                },
+                child: const Icon(
+                  Icons.arrow_downward_rounded,
+                ),
               ),
             ),
         ],

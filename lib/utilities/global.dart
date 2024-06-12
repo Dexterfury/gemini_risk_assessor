@@ -222,6 +222,16 @@ getLabel(ListHeader label) {
   }
 }
 
+IconData getWeatherIcon(Weather weather) {
+  return weather == Weather.sunny
+      ? Icons.wb_sunny_outlined
+      : weather == Weather.rain
+          ? Icons.shower
+          : weather == Weather.windy
+              ? Icons.wind_power
+              : Icons.snowing;
+}
+
 // animated dialog
 void showMyAnimatedDialog({
   required BuildContext context,

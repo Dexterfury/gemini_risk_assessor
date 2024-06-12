@@ -15,6 +15,7 @@ class AssessmentModel {
   final List<String> approvers;
   final List<String> ppe;
   final List<String> control;
+  final String weather;
   final String summary;
   final String createdBy;
   final DateTime createdAt;
@@ -31,6 +32,7 @@ class AssessmentModel {
     required this.approvers,
     required this.ppe,
     required this.control,
+    required this.weather,
     required this.summary,
     required this.createdBy,
     required this.createdAt,
@@ -39,6 +41,7 @@ class AssessmentModel {
   factory AssessmentModel.fromTestString(
     String testString,
     String creatorName,
+    String weather,
     List<String> testImages,
     DateTime createdAt,
   ) {
@@ -58,6 +61,7 @@ class AssessmentModel {
         approvers: List<String>.from(json[Constants.approvers] ?? []),
         ppe: List<String>.from(json[Constants.ppe] ?? []),
         control: List<String>.from(json[Constants.control] ?? []),
+        weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorName,
         createdAt: createdAt,
@@ -70,6 +74,7 @@ class AssessmentModel {
   factory AssessmentModel.fromGeneratedContent(
     GenerateContentResponse content,
     String creatorName,
+    String weather,
     List<String> images,
     DateTime createdAt,
   ) {
@@ -91,6 +96,7 @@ class AssessmentModel {
         approvers: List<String>.from(json[Constants.approvers] ?? []),
         ppe: List<String>.from(json[Constants.ppe] ?? []),
         control: List<String>.from(json[Constants.control] ?? []),
+        weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorName,
         createdAt: createdAt,
@@ -113,6 +119,7 @@ class AssessmentModel {
       approvers: List<String>.from(json[Constants.approvers] ?? []),
       ppe: List<String>.from(json[Constants.ppe] ?? []),
       control: List<String>.from(json[Constants.control] ?? []),
+      weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
@@ -132,6 +139,7 @@ class AssessmentModel {
       Constants.approvers: approvers,
       Constants.ppe: ppe,
       Constants.control: control,
+      Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,

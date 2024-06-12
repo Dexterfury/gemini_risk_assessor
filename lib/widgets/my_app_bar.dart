@@ -5,12 +5,12 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.leading,
-    this.userImage = const SizedBox(),
+    this.actions = const SizedBox(),
   });
 
   final String title;
   final Widget? leading;
-  final Widget userImage;
+  final Widget actions;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,
-      actions: [userImage],
+      actions: [actions],
     );
   }
 

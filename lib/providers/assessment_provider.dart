@@ -25,7 +25,7 @@ class AssessmentProvider extends ChangeNotifier {
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
-  String _creatorName = '';
+  String _creatorName = 'Dexter';
   AssessmentModel? _assessmentModel;
   Weather _weather = Weather.sunny;
   File? _pdfAssessmentFile;
@@ -387,6 +387,7 @@ class AssessmentProvider extends ChangeNotifier {
         _assessmentModel = AssessmentModel.fromGeneratedContent(
           content,
           _creatorName,
+          _weather.name,
           images,
           DateTime.now(),
         );
@@ -447,7 +448,7 @@ Return the recipe as valid JSON using the following structure:
 }
   
 uniqueId should be unique and of type String.
-equipments, hazards and risks should be of type List<String>.
+equipments, hazards and risks should be of type List<String> with a max length of 10 or less items.
 ''';
 
   Future<void> submitTestAssessment() async {
@@ -461,6 +462,7 @@ equipments, hazards and risks should be of type List<String>.
     _assessmentModel = AssessmentModel.fromTestString(
       testAssessment,
       _creatorName,
+      _weather.name,
       images,
       DateTime.now(),
     );
