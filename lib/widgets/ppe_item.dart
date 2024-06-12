@@ -43,21 +43,12 @@ class PpeItem extends StatelessWidget {
                 ),
               ),
               isAdded
-                  ? Positioned(
+                  ? const Positioned(
                       top: 5.0,
                       right: 5.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Colors.greenAccent,
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(2.0),
-                          child: Icon(
-                            Icons.check,
-                            size: 16,
-                          ),
-                        ),
+                      child: Icon(
+                        Icons.check,
+                        size: 16,
                       ),
                     )
                   : const SizedBox.shrink(),

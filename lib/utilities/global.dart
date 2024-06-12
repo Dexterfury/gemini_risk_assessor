@@ -227,7 +227,8 @@ void showMyAnimatedDialog({
   required BuildContext context,
   required String title,
   required String content,
-  Widget? loadingIndicator,
+  Widget? loadingIndicator, // loading indicator
+  Widget? signatureInput, // signature field
   List<Widget>? actions,
 }) {
   showGeneralDialog(
@@ -244,25 +245,27 @@ void showMyAnimatedDialog({
           child: FadeTransition(
             opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
             child: AlertDialog(
-                title: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                ),
-                content: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      content,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    loadingIndicator ?? const SizedBox(),
-                  ],
-                ),
-                actions: actions),
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+              ),
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    content,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  loadingIndicator ?? const SizedBox(),
+                  signatureInput ?? const SizedBox(),
+                ],
+              ),
+              actions: actions,
+            ),
           ));
     },
   );

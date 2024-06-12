@@ -1,8 +1,11 @@
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/api/pdf_api.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
@@ -12,6 +15,7 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
@@ -24,6 +28,10 @@ class AssessmentProvider extends ChangeNotifier {
   String _creatorName = '';
   AssessmentModel? _assessmentModel;
   Weather _weather = Weather.sunny;
+  File? _pdfAssessmentFile;
+  bool _hasSigned = false;
+  Uint8List? _signatureImage;
+  final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
@@ -35,6 +43,56 @@ class AssessmentProvider extends ChangeNotifier {
   String get creatorName => _creatorName;
   AssessmentModel? get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
+  File? get pdfAssessmentFile => _pdfAssessmentFile;
+  bool get hasSigned => _hasSigned;
+  Uint8List? get signatureImage => _signatureImage;
+  GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
+
+  // set loading
+  void setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  // create pdf assessment file
+  Future<void> createPdfAssessmentFile() async {
+    // set loading
+    _isLoading = true;
+    notifyListeners();
+    final file = await PdfApi.generatePdf(
+      assessmentModel: _assessmentModel!,
+      signatureImage: _signatureImage!,
+    );
+    // remove loading
+    _isLoading = false;
+
+    _pdfAssessmentFile = file;
+    notifyListeners();
+  }
+
+  // set has signed
+  void setHasSigned(bool hasSigned) {
+    _hasSigned = hasSigned;
+    notifyListeners();
+  }
+
+  // save the signature image
+  Future<void> saveSignature() async {
+    final data =
+        await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
+    final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+    _signatureImage = bytes!.buffer.asUint8List();
+    // return has signed back to false
+    _hasSigned = false;
+    notifyListeners();
+  }
+
+  void resetSignature() {
+    _signatureImage = null;
+    // return has signed back to false
+    _hasSigned = false;
+    notifyListeners();
+  }
 
   // set weather
   void setWeather({required Weather newWeather}) {

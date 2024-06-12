@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
+import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/widgets/data_items_widget.dart';
-import 'package:gemini_risk_assessor/widgets/generate_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_items_widget.dart';
 import 'package:intl/intl.dart';
@@ -111,53 +110,10 @@ class RiskAssessmentDetailsScreen extends StatelessWidget {
                 // ),
                 // ...assessmentModel.approvers.map((approver) => Text(approver)),
                 // const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GenerateButton(
-                        widget: const Icon(Icons.fingerprint),
-                        label: "Add Signature",
-                        onTap: () {
-                          // show signature dialog
-                        }),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GenerateButton(
-                        widget: const Icon(Icons.save),
-                        label: "Save Assessment",
-                        onTap: () {
-                          // save assessment
-                        }),
-                  ],
-                ),
+                const BottonButtonsField(),
                 const SizedBox(
                   height: 20,
                 ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     ActionButton(
-                //       label: const Text(
-                //         'Cancel',
-                //         style: TextStyle(
-                //           color: Colors.red,
-                //         ),
-                //       ),
-                //       onPressed: () {
-                //         Navigator.of(context).pop(false);
-                //       },
-                //     ),
-                //     ActionButton(
-                //       label: const Text(
-                //         'Save Assessment',
-                //       ),
-                //       onPressed: () {
-                //         Navigator.of(context).pop(true);
-                //       },
-                //     ),
-                //   ],
-                // ),
               ],
             ),
           ),

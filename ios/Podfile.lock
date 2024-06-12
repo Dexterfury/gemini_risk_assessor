@@ -5,6 +5,8 @@ PODS:
     - TOCropViewController (~> 2.7.3)
   - image_picker_ios (0.0.1):
     - Flutter
+  - open_file_plus (1.0.0):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -14,6 +16,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - open_file_plus (from `.symlinks/plugins/open_file_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 SPEC REPOS:
@@ -27,6 +30,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  open_file_plus:
+    :path: ".symlinks/plugins/open_file_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
@@ -34,6 +39,7 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   image_cropper: 2c150b3d63f4feaad31054d20381ddac0a460e63
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
+  open_file_plus: 05737718530c14cf02868e3b7754d7fe4df76d8b
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   TOCropViewController: b9b2905938c0424f289ea2d9964993044913fac6
 
