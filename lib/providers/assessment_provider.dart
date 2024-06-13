@@ -104,7 +104,7 @@ class AssessmentProvider extends ChangeNotifier {
   Future<GenerativeModel> getModel() async {
     if (_maxImages < 10) {
       return GenerativeModel(
-        model: 'gemini-pro-vision',
+        model: 'gemini-1.5-flash',
         apiKey: getApiKey(),
         generationConfig: GenerationConfig(
           temperature: 0.4,
@@ -448,7 +448,7 @@ Return the recipe as valid JSON using the following structure:
 }
   
 uniqueId should be unique and of type String.
-equipments, hazards and risks should be of type List<String> with a max length of 10 or less items.
+equipments, hazards and risks should be of type List<String> with a max length of 10 or less.
 ''';
 
   Future<void> submitTestAssessment() async {
@@ -493,8 +493,6 @@ equipments, hazards and risks should be of type List<String> with a max length o
           "noise",
           "vibration",
           "heat",
-          "cold",
-          "rain",
           "lightning",
           "fire",
           "electricity",
@@ -503,28 +501,17 @@ equipments, hazards and risks should be of type List<String> with a max length o
         "risks": [
           "cuts",
           "bruises",
-          "sprains",
-          "strains",
           "back injuries",
           "head injuries",
-          "eye injuries",
           "respiratory problems",
           "hearing loss",
           "heat stress",
-          "cold stress",
-          "sunburn",
-          "frostbite",
-          "drowning",
           "electrocution",
           "burns",
           "chemical exposure"
         ],
         "control": [
-          "use proper personal protective equipment",
-          "be aware of your surroundings",
-          "use safe work practices",
           "follow all safety procedures",
-          "report any unsafe conditions",
           "use the buddy system",
           "take breaks often",
           "stay hydrated",
@@ -532,14 +519,7 @@ equipments, hazards and risks should be of type List<String> with a max length o
           "be careful of sharp objects",
           "be careful of heavy objects",
           "be careful of dust",
-          "be careful of noise",
-          "be careful of vibration",
           "be careful of heat",
-          "be careful of cold",
-          "be careful of rain",
-          "be careful of lightning",
-          "be careful of fire",
-          "be careful of electricity",
           "be careful of hazardous materials"
         ],
         "summary": "The risk assessment has been completed for the task of clearing rubble from the site. The hazards and risks have been identified and control measures have been proposed. The risks are low and can be mitigated by following the control measures."
