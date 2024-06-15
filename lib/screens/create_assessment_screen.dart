@@ -4,7 +4,7 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
-import 'package:gemini_risk_assessor/widgets/generate_button.dart';
+import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
@@ -98,7 +98,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               // create assessment button
               Align(
                 alignment: Alignment.centerRight,
-                child: GenerateButton(
+                child: MainAppButton(
                   widget: const Icon(Icons.create),
                   label: 'Generate Assessment',
                   onTap: () async {

@@ -34,3 +34,19 @@ ThemeData darkTheme = ThemeData(
   ),
   useMaterial3: true,
 );
+
+// text styles
+const textStyle28w500 = TextStyle(
+  fontSize: 28,
+  fontWeight: FontWeight.w500,
+);
+
+const textStyle18w500 = TextStyle(
+  fontSize: 18,
+  fontWeight: FontWeight.w500,
+);
+
+const textStyle16w500 = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.w500,
+);

@@ -1,14 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/authentication/landing_screen.dart';
+import 'package:gemini_risk_assessor/authentication/login_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_thesmes.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MultiProvider(providers: [
@@ -25,10 +31,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: Constants.riskAssessments,
-      theme: lightTheme,
-      debugShowCheckedModeBanner: false,
-      home: const CreateAssessmentScreen(),
-    );
+        title: Constants.riskAssessments,
+        theme: lightTheme,
+        debugShowCheckedModeBanner: false,
+        initialRoute: Constants.logingRoute,
+        routes: {
+          Constants.landingRoute: (context) => const LandingScreen(),
+          Constants.logingRoute: (context) => const LoginScreen(),
+        });
   }
 }

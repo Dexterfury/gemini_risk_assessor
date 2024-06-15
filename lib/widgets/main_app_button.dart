@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GenerateButton extends StatelessWidget {
-  const GenerateButton({
+class MainAppButton extends StatelessWidget {
+  const MainAppButton({
     super.key,
     required this.widget,
     required this.label,

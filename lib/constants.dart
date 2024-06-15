@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 class Constants {
   // app name
   static const String appName = 'Gemini Risk Assessor';
@@ -11,10 +13,22 @@ class Constants {
   // create assessment
   static const String createAssessment = 'Create Assessment';
 
+  // navigation routes
+  static const String homeRoute = '/home';
+  static const String createAssessmentRoute = '/createAssessment';
+  static const String assessmentDetailsRoute = '/assessmentDetails';
+  static const String profileRoute = '/profile';
+  static const String logingRoute = '/login';
+  static const String landingRoute = '/landing';
+  static const String userInformationRoute = '/userInformation';
+
+  static const String verificationId = 'verificationId';
+  static const String phoneNumber = 'phoneNumber';
+
   // user model constants
   static const String uid = 'uid';
   static const String name = 'name';
-  static const String email = 'email';
+  static const String phone = 'phone';
   static const String imageUrl = 'imageUrl';
   static const String createdAt = 'createdAt';
 
@@ -43,6 +57,11 @@ class Constants {
   static const String enterYourName = 'Enter your name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
   static const String enterDescription = 'Enter Description';
+
+  // firestore collections
+  static const String usersCollection = 'users';
+  static const String promptsCollection = 'prompts';
+  static const String assessmentsCollection = 'assessments';
 
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [

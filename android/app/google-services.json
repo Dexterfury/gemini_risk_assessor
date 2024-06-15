@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "257849877914",
+    "project_id": "gemini-risk-assessor",
+    "storage_bucket": "gemini-risk-assessor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257849877914:android:1c6083731f777a581f0623",
+        "android_client_info": {
+          "package_name": "com.raphaeldaka.geminiriskassessor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXxCnVjEp4crK0AWscaf2nDjGJ5xHkAmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

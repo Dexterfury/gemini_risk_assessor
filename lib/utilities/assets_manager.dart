@@ -3,11 +3,16 @@ class AssetsManager {
 
   static const String _iconsPath = 'assets/icons/';
 
+  static const String _lottiePath = 'assets/lottie/';
+
   // google logo
   static String googleLogo = '${_imagesPath}google.jpg';
 
   // user icon
   static String userIcon = '${_imagesPath}user_icon.png';
+
+  // clipbaord animation
+  static String clipboardAnimation = '${_lottiePath}clipboard_animation.json';
 
   // ppe icons
   static String dustMask = '${_iconsPath}dust_mask.jpg';

@@ -1,30 +1,41 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
-  AuthProvider({
-    bool isSignedIn = false,
-    UserModel? userModel,
-  }) {
-    _isSignedIn = isSignedIn;
-    _userModel = userModel;
-    notifyListeners();
-  }
-
-  // private variables
   bool _isSignedIn = false;
   UserModel? _userModel;
   bool _isLoading = false;
+  bool _isSuccessful = false;
+  int? _resendToken;
+  String? _uid;
+  String? _phoneNumber;
+  Timer? _timer;
+  int _secondsRemaing = 60;
 
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
-  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // final CollectionReference _usersCollection =
-  //     FirebaseFirestore.instance.collection(Constants.userCollection);
+  File? _finalFileImage;
+  String _userImage = '';
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CollectionReference _usersCollection =
+      FirebaseFirestore.instance.collection(Constants.usersCollection);
 
   // getters
   bool get isSignedIn => _isSignedIn;
   UserModel? get userModel => _userModel;
   bool get isLoading => _isLoading;
+  bool get isSuccessful => _isSuccessful;
+  int? get resendToken => _resendToken;
+  String? get uid => _uid;
+  String? get phoneNumber => _phoneNumber;
+  Timer? get timer => _timer;
+  int get secondsRemaing => _secondsRemaing;
 
   // setters
 

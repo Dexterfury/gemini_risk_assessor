@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/display_signature.dart';
-import 'package:gemini_risk_assessor/widgets/generate_button.dart';
+import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -21,7 +21,7 @@ class BottonButtonsField extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             assessmentProvider.signatureImage == null
-                ? GenerateButton(
+                ? MainAppButton(
                     widget: const Icon(Icons.fingerprint),
                     label: "Add Signature",
                     onTap: () {
@@ -82,7 +82,7 @@ class BottonButtonsField extends StatelessWidget {
             const SizedBox(
               width: 10,
             ),
-            GenerateButton(
+            MainAppButton(
                 widget: const Icon(Icons.save),
                 label: "Save Assessment",
                 onTap: () async {
