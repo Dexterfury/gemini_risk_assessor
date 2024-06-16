@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_thesmes.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
@@ -35,32 +36,14 @@ class _OTPScreenState extends State<OTPScreen> {
 
     final authProvider = context.watch<AuthProvider>();
 
-    final defaultPinTheme = PinTheme(
-      width: 56,
-      height: 60,
-      textStyle: const TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade200,
-        border: Border.all(
-          color: Colors.transparent,
-        ),
-      ),
-    );
     return Scaffold(
       appBar: MyAppBar(
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
-          ),
-        ),
-        title: 'OTP Verification',
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: backIcon()),
+        title: 'Verification',
       ),
       body: SafeArea(
         child: Padding(
@@ -72,102 +55,116 @@ class _OTPScreenState extends State<OTPScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 50),
-                const Text(
-                  'Verification',
-                  style: textStyle28w500,
-                ),
-                const SizedBox(height: 50),
+
                 const Text(
                   'Enter the 6-digit code sent the number',
                   textAlign: TextAlign.center,
                   style: textStyle18w500,
                 ),
+
                 const SizedBox(height: 10),
+
+                // phone number text
                 Text(phoneNumber,
                     textAlign: TextAlign.center, style: textStyle18w500),
+
                 const SizedBox(height: 30),
-                SizedBox(
-                  height: 68,
-                  child: Pinput(
-                    length: 6,
-                    controller: controller,
-                    focusNode: focusNode,
-                    defaultPinTheme: defaultPinTheme,
-                    onCompleted: (pin) {
-                      setState(() {
-                        otpCode = pin;
-                      });
-                      // verify otp code
-                      verifyOTPCode(
-                        verificationId: verificationId,
-                        otpCode: otpCode!,
-                      );
-                    },
-                    focusedPinTheme: defaultPinTheme.copyWith(
-                      height: 68,
-                      width: 64,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade200,
-                        border: Border.all(
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                    ),
-                    errorPinTheme: defaultPinTheme.copyWith(
-                      height: 68,
-                      width: 64,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade200,
-                        border: Border.all(
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+
+                // pinPutField
+                pinPutField(verificationId),
+
                 const SizedBox(height: 30),
-                authProvider.isLoading
-                    ? const CircularProgressIndicator()
-                    : const SizedBox.shrink(),
-                authProvider.isSuccessful
-                    ? Container(
-                        height: 50,
-                        width: 50,
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.done,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-                authProvider.isLoading
-                    ? const SizedBox.shrink()
-                    : const Text(
-                        'Didn\'t receive the code?',
-                        style: TextStyle(fontSize: 16),
-                      ),
+
+                // resend CodeField
+                resendCodeField(authProvider, phoneNumber),
+
                 const SizedBox(height: 10),
-                authProvider.isLoading
-                    ? const SizedBox.shrink()
-                    : TextButton(
-                        onPressed: authProvider.secondsRemaing == 0
-                            ? () {
-                                // reset the code to send again
-                                // authProvider.resendCode(
-                                //   context: context,
-                                //   phone: phoneNumber,
-                                // );
-                              }
-                            : null,
-                        child:
-                            const Text('Resend Code', style: textStyle18w500)),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget resendCodeField(AuthProvider authProvider, String phoneNumber) {
+    if (authProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (authProvider.isSuccessful) {
+      return Container(
+        height: 50,
+        width: 50,
+        decoration: const BoxDecoration(
+          color: Colors.green,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          Icons.done,
+          color: Colors.white,
+          size: 30,
+        ),
+      );
+    } else {
+      return Column(
+        children: [
+          const Text(
+            'Didn\'t receive the code?',
+            style: TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 10),
+          TextButton(
+              onPressed: authProvider.secondsRemaing == 0
+                  ? () {
+                      // reset the code to send again
+                      authProvider.resendCode(
+                        context: context,
+                        phone: phoneNumber,
+                      );
+                    }
+                  : null,
+              child: const Text('Resend Code', style: textStyle18w500)),
+        ],
+      );
+    }
+  }
+
+  Widget pinPutField(String verificationId) {
+    return SizedBox(
+      height: 68,
+      child: Pinput(
+        length: 6,
+        controller: controller,
+        focusNode: focusNode,
+        defaultPinTheme: defaultPinTheme,
+        onCompleted: (pin) {
+          setState(() {
+            otpCode = pin;
+          });
+          // verify otp code
+          verifyOTPCode(
+            verificationId: verificationId,
+            otpCode: otpCode!,
+          );
+        },
+        focusedPinTheme: defaultPinTheme.copyWith(
+          height: 68,
+          width: 64,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade200,
+            border: Border.all(
+              color: Colors.deepPurple,
+            ),
+          ),
+        ),
+        errorPinTheme: defaultPinTheme.copyWith(
+          height: 68,
+          width: 64,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade200,
+            border: Border.all(
+              color: Colors.red,
             ),
           ),
         ),
@@ -180,31 +177,31 @@ class _OTPScreenState extends State<OTPScreen> {
     required String otpCode,
   }) async {
     final authProvider = context.read<AuthProvider>();
-    // authProvider.verifyOTPCode(
-    //   verificationId: verificationId,
-    //   otpCode: otpCode,
-    //   context: context,
-    //   onSuccess: () async {
-    //     // 1. check if user exists in firestore
-    //     bool userExists = await authProvider.checkUserExists();
+    authProvider.verifyOTPCode(
+      verificationId: verificationId,
+      otpCode: otpCode,
+      context: context,
+      onSuccess: () async {
+        // 1. check if user exists in firestore
+        bool userExists = await authProvider.checkUserExists();
 
-    //     if (userExists) {
-    //       // 2. if user exists,
+        if (userExists) {
+          // 2. if user exists,
 
-    //       // * get user information from firestore
-    //       await authProvider.getUserDataFromFireStore();
+          // * get user information from firestore
+          await authProvider.getUserDataFromFireStore();
 
-    //       // * save user information to provider / shared preferences
-    //       await authProvider.saveUserDataToSharedPreferences();
+          // * save user information to provider / shared preferences
+          await authProvider.saveUserDataToSharedPreferences();
 
-    //       // * navigate to home screen
-    //       navigate(userExits: true);
-    //     } else {
-    //       // 3. if user doesn't exist, navigate to user information screen
-    //       navigate(userExits: false);
-    //     }
-    //   },
-    // );
+          // * navigate to home screen
+          navigate(userExits: true);
+        } else {
+          // 3. if user doesn't exist, navigate to user information screen
+          navigate(userExits: false);
+        }
+      },
+    );
   }
 
   void navigate({required bool userExits}) {

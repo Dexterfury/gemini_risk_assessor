@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -12,24 +15,24 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   @override
   void initState() {
-    //checkAthentication();
+    checkAthentication();
     super.initState();
   }
 
-  // void checkAthentication() async {
-  //   final authProvider = context.read<AuthProvider>();
-  //   bool isAuthenticated = await authProvider.checkAuthenticationState();
+  void checkAthentication() async {
+    final authProvider = context.read<AuthProvider>();
+    bool isAuthenticated = await authProvider.checkAuthenticationState();
 
-  //   navigate(isAuthenticated: isAuthenticated);
-  // }
+    navigate(isAuthenticated: isAuthenticated);
+  }
 
-  // navigate({required bool isAuthenticated}) {
-  //   if (isAuthenticated) {
-  //     Navigator.pushReplacementNamed(context, Constants.homeScreen);
-  //   } else {
-  //     Navigator.pushReplacementNamed(context, Constants.loginScreen);
-  //   }
-  // }
+  navigate({required bool isAuthenticated}) {
+    if (isAuthenticated) {
+      Navigator.pushReplacementNamed(context, Constants.homeRoute);
+    } else {
+      Navigator.pushReplacementNamed(context, Constants.logingRoute);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

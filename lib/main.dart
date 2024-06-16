@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/landing_screen.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
+import 'package:gemini_risk_assessor/authentication/opt_screen.dart';
+import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
@@ -36,13 +38,16 @@ class MyApp extends StatelessWidget {
         title: Constants.riskAssessments,
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
-        initialRoute: Constants.screensControllerRoute,
+        initialRoute: Constants.landingRoute,
         routes: {
           Constants.landingRoute: (context) => const LandingScreen(),
           Constants.logingRoute: (context) => const LoginScreen(),
           Constants.homeRoute: (context) => const HomeScreen(),
           Constants.screensControllerRoute: (context) =>
               const ScreensController(),
+          Constants.optRoute: (context) => const OTPScreen(),
+          Constants.userInformationRoute: (context) =>
+              const UserInformationScreen(),
         });
   }
 }

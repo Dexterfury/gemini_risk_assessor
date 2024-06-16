@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pinput/pinput.dart';
 
 // light theme
 ThemeData lightTheme = ThemeData(
@@ -49,4 +50,21 @@ const textStyle18w500 = TextStyle(
 const textStyle16w500 = TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w500,
+);
+
+// pinput theme
+final defaultPinTheme = PinTheme(
+  width: 56,
+  height: 60,
+  textStyle: const TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
+  ),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(8),
+    color: Colors.grey.shade200,
+    border: Border.all(
+      color: Colors.transparent,
+    ),
+  ),
 );

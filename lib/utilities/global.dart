@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
@@ -384,4 +385,23 @@ void imagePickerAnimatedDialog({
           ));
     },
   );
+}
+
+// general bacl icon
+Widget backIcon() {
+  return Icon(
+    Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
+  );
+}
+
+// store file to storage and return file url
+Future<String> storeFileToStorage({
+  required File file,
+  required String reference,
+}) async {
+  UploadTask uploadTask =
+      FirebaseStorage.instance.ref().child(reference).putFile(file);
+  TaskSnapshot taskSnapshot = await uploadTask;
+  String fileUrl = await taskSnapshot.ref.getDownloadURL();
+  return fileUrl;
 }

@@ -25,6 +25,7 @@ class Constants {
   static const String landingRoute = '/landing';
   static const String userInformationRoute = '/userInformation';
   static const String screensControllerRoute = '/screensController';
+  static const String optRoute = '/opt';
 
   static const String verificationId = 'verificationId';
   static const String phoneNumber = 'phoneNumber';
@@ -34,7 +35,11 @@ class Constants {
   static const String name = 'name';
   static const String phone = 'phone';
   static const String imageUrl = 'imageUrl';
+  static const String token = 'token';
+  static const String aboutMe = 'aboutMe';
   static const String createdAt = 'createdAt';
+  static const String userModel = 'userModel';
+  static const String userImages = 'userImages';
 
   // constants for promptDataModel
   static const String images = 'images';

@@ -1,31 +1,93 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:provider/provider.dart';
 
+// class DisplayUserImage extends StatelessWidget {
+//   const DisplayUserImage({
+//     super.key,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final authProvider = context.watch<AuthProvider>();
+//     return Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: CircleAvatar(
+//         radius: 20,
+//         backgroundColor: Colors.blue,
+//         backgroundImage: getImageToShow(authProvider),
+//       ),
+//     );
+//   }
+
+//   getImageToShow(AuthProvider authProvider) {
+//     if (authProvider.isSignedIn) {
+//       return NetworkImage(authProvider.userModel!.imageUrl);
+//     } else {
+//       return AssetImage(AssetsManager.userIcon);
+//     }
+//   }
+// }
+
 class DisplayUserImage extends StatelessWidget {
   const DisplayUserImage({
     super.key,
+    required this.radius,
+    required this.isViewOnly,
+    required this.onPressed,
   });
+  final double radius;
+  final bool isViewOnly;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: CircleAvatar(
-        radius: 20,
-        backgroundColor: Colors.blue,
-        backgroundImage: getImageToShow(authProvider),
-      ),
+    return Stack(
+      children: [
+        CircleAvatar(
+            radius: radius, backgroundImage: getImageToShow(authProvider)),
+        isViewOnly
+            ? const SizedBox()
+            : Positioned(
+                bottom: 0,
+                right: 0,
+                child: InkWell(
+                  onTap: onPressed,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Theme.of(context).primaryColor,
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+      ],
     );
   }
 
   getImageToShow(AuthProvider authProvider) {
-    if (authProvider.isSignedIn) {
-      return NetworkImage(authProvider.userModel!.imageUrl);
+    if (authProvider.userModel != null) {
+      if (authProvider.userModel!.imageUrl.isNotEmpty) {
+        return NetworkImage(authProvider.userModel!.imageUrl);
+      } else if (authProvider.finalFileImage != null) {
+        return FileImage(File(authProvider.finalFileImage!.path))
+            as ImageProvider;
+      } else {
+        AssetImage(AssetsManager.userIcon);
+      }
     } else {
-      return AssetImage(AssetsManager.userIcon);
+      if (authProvider.finalFileImage == null) {
+        return AssetImage(AssetsManager.userIcon);
+      } else {
+        return FileImage(File(authProvider.finalFileImage!.path))
+            as ImageProvider;
+      }
     }
   }
 }

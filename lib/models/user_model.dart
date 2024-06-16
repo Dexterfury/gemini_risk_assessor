@@ -5,6 +5,8 @@ class UserModel {
   String name;
   String phone;
   String imageUrl;
+  String token;
+  String aboutMe;
   String createdAt;
 
   // constructor
@@ -13,6 +15,8 @@ class UserModel {
     required this.name,
     required this.phone,
     required this.imageUrl,
+    required this.token,
+    required this.aboutMe,
     required this.createdAt,
   });
 
@@ -23,6 +27,8 @@ class UserModel {
       name: json[Constants.name] ?? '',
       phone: json[Constants.phone] ?? '',
       imageUrl: json[Constants.imageUrl] ?? '',
+      token: json[Constants.token] ?? '',
+      aboutMe: json[Constants.aboutMe] ?? '',
       createdAt: json[Constants.createdAt] ?? '',
     );
   }
@@ -34,6 +40,8 @@ class UserModel {
       Constants.name: name,
       Constants.phone: phone,
       Constants.imageUrl: imageUrl,
+      Constants.token: token,
+      Constants.aboutMe: aboutMe,
       Constants.createdAt: createdAt,
     };
   }

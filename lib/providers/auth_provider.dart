@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isSignedIn = false;
@@ -137,213 +142,301 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // check if user is signed in
-  // static Future<bool> checkUserSignedIn() async {
-  //   final User? user = FirebaseAuth.instance.currentUser;
-  //   if (user != null) {
-  //     return true;
-  //   }
-  //   {
-  //     return false;
-  //   }
-  // }
+  // check authentication state
+  Future<bool> checkAuthenticationState() async {
+    bool isSignedIn = false;
+    await Future.delayed(const Duration(seconds: 2));
 
-  // // save user to firestore
-  // Future<void> saveUserToFirestore(UserModel user) async {
-  //   try {
-  //     await _usersCollection.doc(user.uid).set(user.toJson());
-  //     // update name
-  //     await _auth.currentUser!.updateDisplayName(user.name);
-  //     // update photo url
-  //     await _auth.currentUser!.updatePhotoURL(user.imageUrl);
-  //   } on FirebaseException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   } on PlatformException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   }
-  // }
+    if (_auth.currentUser != null) {
+      _uid = _auth.currentUser!.uid;
+      // get user data from firestore
+      await getUserDataFromFireStore();
 
-  // // get user from firestore
-  // static Future<UserModel> getUserDataFromFireStore(String uid) async {
-  //   final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-  //       .collection(Constants.userCollection)
-  //       .doc(uid)
-  //       .get();
-  //   return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
-  // }
+      // save user data to shared preferences
+      await saveUserDataToSharedPreferences();
 
-  // // check if user exists in firestore
-  // Future<bool> checkUserExistsInFirestore(String uid) async {
-  //   try {
-  //     final DocumentSnapshot documentSnapshot =
-  //         await _usersCollection.doc(uid).get();
-  //     if (documentSnapshot.exists) {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   } on FirebaseException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //     return false;
-  //   } on PlatformException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //     return false;
-  //   }
-  // }
+      notifyListeners();
 
-  // // save user data to shared preferences
-  // Future<void> saveUserDataToSharedPreference(UserModel user) async {
-  //   // save user data to shared preferences
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setString(Constants.userModel, jsonEncode(user.toJson()));
-  // }
+      isSignedIn = true;
+    } else {
+      isSignedIn = false;
+    }
 
-  // // get user from shared preferences
-  // static Future<UserModel?> getUserDataFromSharedPrefences() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final String userString = prefs.getString(Constants.userModel) ?? '';
-  //   return UserModel.fromJson(jsonDecode(userString));
-  // }
+    return isSignedIn;
+  }
 
-  // // sign in with google
-  // Future<User?> signInWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleSignInAccount =
-  //         await GoogleSignIn().signIn();
+  // chech if user exists
+  Future<bool> checkUserExists() async {
+    DocumentSnapshot documentSnapshot =
+        await _firestore.collection(Constants.usersCollection).doc(_uid).get();
+    if (documentSnapshot.exists) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  //     if (googleSignInAccount == null) {
-  //       return null;
-  //     }
+  // get user data from firestore
+  Future<void> getUserDataFromFireStore() async {
+    DocumentSnapshot documentSnapshot =
+        await _firestore.collection(Constants.usersCollection).doc(_uid).get();
+    _userModel =
+        UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+    notifyListeners();
+  }
 
-  //     final GoogleSignInAuthentication googleSignInAuthentication =
-  //         await googleSignInAccount.authentication;
-  //     final AuthCredential credential = GoogleAuthProvider.credential(
-  //       accessToken: googleSignInAuthentication.accessToken,
-  //       idToken: googleSignInAuthentication.idToken,
-  //     );
+  // save user data to shared preferences
+  Future<void> saveUserDataToSharedPreferences() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString(
+        Constants.userModel, jsonEncode(userModel!.toJson()));
+  }
 
-  //     final UserCredential userCredential =
-  //         await _auth.signInWithCredential(credential);
+  // get data from shared preferences
+  Future<void> getUserDataFromSharedPreferences() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String userModelString =
+        sharedPreferences.getString(Constants.userModel) ?? '';
+    _userModel = UserModel.fromJson(jsonDecode(userModelString));
+    _uid = _userModel!.uid;
+    notifyListeners();
+  }
 
-  //     final User? user = userCredential.user;
+  // save user data to firestore
+  void saveUserDataToFireStore({
+    required UserModel userModel,
+    required Function onSuccess,
+    required Function onFail,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
 
-  //     return user;
-  //   } on FirebaseException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //     // set loading to false
-  //     setIsLoading(false);
-  //     return null;
-  //   } on PlatformException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //     // set loading to false
-  //     setIsLoading(false);
-  //     return null;
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //     // set loading to false
-  //     setIsLoading(false);
-  //     return null;
-  //   }
-  // }
+    try {
+      if (_finalFileImage != null) {
+        // upload image to storage
+        String imageUrl = await storeFileToStorage(
+            file: _finalFileImage!,
+            reference: '${Constants.userImages}/${userModel.uid}.jpg');
 
-  // // sign in user
-  // Future<void> signInUser({
-  //   required SignInType signInType,
-  // }) async {
-  //   try {
-  //     // start loading
-  //     setIsLoading(true);
-  //     switch (signInType) {
-  //       case SignInType.google:
-  //         final User? user = await signInWithGoogle();
-  //         if (user != null) {
-  //           // check if user exists in firestore
-  //           final bool userExistsInFirestore =
-  //               await checkUserExistsInFirestore(user.uid);
-  //           if (userExistsInFirestore) {
-  //             // get user data from firestore
-  //             _userModel = await getUserDataFromFireStore(user.uid);
-  //             notifyListeners();
-  //           } else {
-  //             // create user model
-  //             _userModel = UserModel(
-  //               uid: user.uid,
-  //               name: user.displayName ?? '',
-  //               email: user.email ?? '',
-  //               imageUrl: user.photoURL ?? '',
-  //               levelPoints: 0.0,
-  //               ctreatedAt: DateTime.now().toString(),
-  //             );
-  //             notifyListeners();
-  //             // save user to firestore
-  //             await saveUserToFirestore(_userModel!);
-  //           }
-  //           // save user data to shared preferences
-  //           await saveUserDataToSharedPreference(_userModel!);
-  //           // set signed in to true
-  //           setIsSignedIn(true);
-  //         }
-  //         break;
-  //       case SignInType.email:
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
+        userModel.imageUrl = imageUrl;
+      }
+      userModel.createdAt = DateTime.now().microsecondsSinceEpoch.toString();
 
-  // // sign out
-  // Future<void> signOut() async {
-  //   try {
-  //     await _auth.signOut();
-  //     // set signed in to false
-  //     setIsSignedIn(false);
-  //     // set user model to null
-  //     _userModel = null;
-  //     // remove user data from shared preferences
-  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     await prefs.remove(Constants.userModel);
-  //   } on FirebaseException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   } on PlatformException catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       log('Error occured: $e');
-  //     }
-  //   }
-  // }
+      _userModel = userModel;
+      _uid = userModel.uid;
+
+      // save user data to firestore
+      await _firestore
+          .collection(Constants.usersCollection)
+          .doc(userModel.uid)
+          .set(userModel.toJson());
+
+      _isLoading = false;
+      onSuccess();
+      notifyListeners();
+    } on FirebaseException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      onFail(e.toString());
+    }
+  }
+
+  // check if user exists in firestore
+  Future<bool> checkUserExistsInFirestore(String uid) async {
+    try {
+      final DocumentSnapshot documentSnapshot =
+          await _usersCollection.doc(uid).get();
+      if (documentSnapshot.exists) {
+        return true;
+      } else {
+        return false;
+      }
+    } on FirebaseException catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+      return false;
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+      return false;
+    }
+  }
+
+  // sign in with phone number
+  Future<void> signInWithPhoneNumber({
+    required String phoneNumber,
+    required BuildContext context,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.signInWithCredential(credential).then((value) async {
+          _uid = value.user!.uid;
+          _phoneNumber = value.user!.phoneNumber;
+          _isSuccessful = true;
+          _isLoading = false;
+          notifyListeners();
+        });
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        _isSuccessful = false;
+        _isLoading = false;
+        notifyListeners();
+        showSnackBar(context: context, message: e.toString());
+        log('Error: ${e.toString()}');
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        _isLoading = false;
+        _resendToken = resendToken;
+        _secondsRemaing = 60;
+        _startTimer();
+        notifyListeners();
+        // navigate to otp screen
+        Navigator.of(context).pushNamed(
+          Constants.optRoute,
+          arguments: {
+            Constants.verificationId: verificationId,
+            Constants.phoneNumber: phoneNumber,
+          },
+        );
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+      timeout: const Duration(seconds: 60),
+      forceResendingToken: resendToken,
+    );
+  }
+
+  void _startTimer() {
+    // cancel timer if any exist
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaing > 0) {
+        _secondsRemaing--;
+        notifyListeners();
+      } else {
+        // cancel timer
+        _timer?.cancel();
+        notifyListeners();
+      }
+    });
+  }
+
+  // dispose timer
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  // resend code
+  Future<void> resendCode({
+    required BuildContext context,
+    required String phone,
+  }) async {
+    if (_secondsRemaing == 0 || _resendToken != null) {
+      // allow user to resend code only if timer is not running and resend token exists
+      _isLoading = true;
+      notifyListeners();
+      _isLoading = true;
+      notifyListeners();
+
+      await _auth.verifyPhoneNumber(
+        phoneNumber: phone,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _auth.signInWithCredential(credential).then((value) async {
+            _uid = value.user!.uid;
+            _phoneNumber = value.user!.phoneNumber;
+            _isSuccessful = true;
+            _isLoading = false;
+            notifyListeners();
+          });
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          _isSuccessful = false;
+          _isLoading = false;
+          notifyListeners();
+          showSnackBar(context: context, message: e.toString());
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          _isLoading = false;
+          _resendToken = resendToken;
+          notifyListeners();
+          showSnackBar(context: context, message: 'Successful sent code');
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+        timeout: const Duration(seconds: 60),
+        forceResendingToken: resendToken,
+      );
+    } else {
+      showSnackBar(
+          context: context,
+          message: 'Please wait $_secondsRemaing seconds to resend');
+    }
+  }
+
+  // verify otp code
+  Future<void> verifyOTPCode({
+    required String verificationId,
+    required String otpCode,
+    required BuildContext context,
+    required Function onSuccess,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: otpCode,
+    );
+
+    await _auth.signInWithCredential(credential).then((value) async {
+      _uid = value.user!.uid;
+      _phoneNumber = value.user!.phoneNumber;
+      _isSuccessful = true;
+      _isLoading = false;
+      onSuccess();
+      notifyListeners();
+    }).catchError((e) {
+      _isSuccessful = false;
+      _isLoading = false;
+      notifyListeners();
+      showSnackBar(context: context, message: e.toString());
+    });
+  }
+
+  // sign out
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      // set signed in to false
+      setIsSignedIn(false);
+      // set user model to null
+      _userModel = null;
+      // remove user data from shared preferences
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove(Constants.userModel);
+    } on FirebaseException catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+    }
+  }
 }

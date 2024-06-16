@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/risk_assessments_list.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,7 +20,11 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {},
             icon: const Icon(Icons.search),
           ),
-          actions: const DisplayUserImage(),
+          actions: DisplayUserImage(
+            radius: 30,
+            isViewOnly: true,
+            onPressed: () {},
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(
