@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isSignedIn = false;
@@ -36,6 +38,8 @@ class AuthProvider extends ChangeNotifier {
   String? get phoneNumber => _phoneNumber;
   Timer? get timer => _timer;
   int get secondsRemaing => _secondsRemaing;
+  File? get finalFileImage => _finalFileImage;
+  String get userImage => _userImage;
 
   // setters
 
@@ -49,6 +53,88 @@ class AuthProvider extends ChangeNotifier {
   void setIsSignedIn(bool value) {
     _isSignedIn = value;
     notifyListeners();
+  }
+
+  void setfinalFileImage(File? file) {
+    _finalFileImage = file;
+    notifyListeners();
+  }
+
+  void showImagePickerDialog({
+    required BuildContext context,
+    required Function() onSuccess,
+  }) {
+    imagePickerAnimatedDialog(
+      context: context,
+      title: 'Select Photo',
+      content: 'Choose an Option',
+      onPressed: (value) {
+        if (value) {
+          selectImage(
+            fromCamera: value,
+            onSuccess: () {
+              // pop the bottom sheet and call the onSuccess function
+              Navigator.pop(context);
+              onSuccess();
+            },
+            onError: (String error) {
+              showSnackBar(context: context, message: error);
+            },
+          );
+        } else {
+          selectImage(
+            fromCamera: value,
+            onSuccess: () {
+              // pop the bottom sheet and call the onSuccess function
+              Navigator.pop(context);
+              onSuccess();
+            },
+            onError: (String error) {
+              showSnackBar(context: context, message: error);
+            },
+          );
+        }
+      },
+    );
+  }
+
+  void selectImage({
+    required bool fromCamera,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
+    _finalFileImage = await pickUserImage(
+      fromCamera: fromCamera,
+      onFail: (String message) => onError(message),
+    );
+
+    if (_finalFileImage == null) {
+      return;
+    }
+
+    // crop image
+    await cropImage(
+      filePath: finalFileImage!.path,
+      onSuccess: onSuccess,
+    );
+  }
+
+  Future<void> cropImage({
+    required String filePath,
+    required Function() onSuccess,
+  }) async {
+    setfinalFileImage(File(filePath));
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: filePath,
+      maxHeight: 800,
+      maxWidth: 800,
+      compressQuality: 90,
+    );
+
+    if (croppedFile != null) {
+      setfinalFileImage(File(croppedFile.path));
+      onSuccess();
+    }
   }
 
   // check if user is signed in

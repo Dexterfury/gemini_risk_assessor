@@ -1,9 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
-import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
-import 'package:gemini_risk_assessor/widgets/weather_button.dart';
+import 'package:gemini_risk_assessor/widgets/image_picker_item.dart';
 import 'package:image_picker/image_picker.dart';
 
 String cleanJson(String maybeInvalidJson) {
@@ -15,7 +15,44 @@ String cleanJson(String maybeInvalidJson) {
   return maybeInvalidJson;
 }
 
-Future<List<XFile>?> pickImages({
+// picp image from gallery or camera
+Future<File?> pickUserImage({
+  required bool fromCamera,
+  required Function(String) onFail,
+}) async {
+  File? fileImage;
+  if (fromCamera) {
+    // get picture from camera
+    try {
+      final pickedFile =
+          await ImagePicker().pickImage(source: ImageSource.camera);
+      if (pickedFile == null) {
+        onFail('No image selected');
+      } else {
+        fileImage = File(pickedFile.path);
+      }
+    } catch (e) {
+      onFail(e.toString());
+    }
+  } else {
+    // get picture from gallery
+    try {
+      final pickedFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) {
+        onFail('No image selected');
+      } else {
+        fileImage = File(pickedFile.path);
+      }
+    } catch (e) {
+      onFail(e.toString());
+    }
+  }
+
+  return fileImage;
+}
+
+Future<List<XFile>?> pickPromptImages({
   required bool fromCamera,
   required int maxImages,
   required Function(String) onError,
@@ -275,6 +312,74 @@ void showMyAnimatedDialog({
                 ],
               ),
               actions: actions,
+            ),
+          ));
+    },
+  );
+}
+
+// animated dialog
+void imagePickerAnimatedDialog({
+  required BuildContext context,
+  required String title,
+  required String content,
+  required Function(bool) onPressed,
+}) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: '',
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (context, animation1, animation2) {
+      return Container();
+    },
+    transitionBuilder: (context, animation1, animation2, child) {
+      return ScaleTransition(
+          scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: AlertDialog(
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+              ),
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    content,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ImagePickerItem(
+                        label: 'Camera',
+                        iconData: Icons.camera_alt,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onPressed(true);
+                        },
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      ImagePickerItem(
+                        label: 'Gallery',
+                        iconData: Icons.image,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onPressed(false);
+                        },
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
           ));
     },

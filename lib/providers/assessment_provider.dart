@@ -238,7 +238,7 @@ class AssessmentProvider extends ChangeNotifier {
     required Function() onSuccess,
     required Function(String) onError,
   }) async {
-    final returnedFiles = await pickImages(
+    final returnedFiles = await pickPromptImages(
       fromCamera: _fromCamera,
       maxImages: _maxImages,
       onError: (error) {
