@@ -3,47 +3,47 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/risk_assessments_list.dart';
-import 'package:gemini_risk_assessor/widgets/search_field.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
         appBar: MyAppBar(
-          title: Constants.riskAssessments,
-          actions: GestureDetector(
-            onTap: () {
-              // navigate to profile page
-            },
-            child: const DisplayUserImage(),
+          title: 'Home',
+          leading: IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search),
           ),
-        ),
-        body: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              SearchField(),
-              Expanded(
-                child:
-                    RistAssessmentsList(), // list view view of risk assessments
+          actions: const DisplayUserImage(),
+          bottom: const TabBar(
+            tabs: [
+              Tab(
+                icon: Icon(Icons.assignment_add),
+                text: Constants.dailyTaskInstructions,
+              ),
+              Tab(
+                icon: Icon(Icons.assignment_late_outlined),
+                text: Constants.riskAssessments,
               ),
             ],
           ),
         ),
-        // float action button to add new risk assessment
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // navigate to create new risk assessment screen
-            //Navigator.pushNamed(context, Constants.createRiskAssessmentRoute);
-          },
-          child: const Icon(Icons.add),
-        ));
+        body: const TabBarView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Text('DSTI'),
+              ),
+            ),
+            RistAssessmentsList(),
+          ],
+        ),
+      ),
+    );
   }
 }

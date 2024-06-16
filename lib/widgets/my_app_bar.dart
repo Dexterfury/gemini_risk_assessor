@@ -6,11 +6,13 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.leading,
     this.actions = const SizedBox(),
+    this.bottom,
   });
 
   final String title;
   final Widget? leading;
   final Widget actions;
+  final PreferredSizeWidget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +25,16 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,
       actions: [actions],
+      bottom: bottom,
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(56.0);
+  Size get preferredSize {
+    if (bottom != null) {
+      return Size.fromHeight(56.0 + bottom!.preferredSize.height);
+    } else {
+      return const Size.fromHeight(56.0);
+    }
+  }
 }

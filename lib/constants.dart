@@ -7,6 +7,9 @@ class Constants {
   // risk assessment
   static const String riskAssessments = 'Risk Assessments';
 
+  // daily task instructions
+  static const String dailyTaskInstructions = 'Daily Task Instructions';
+
   // search
   static const String search = 'Search';
 
@@ -21,6 +24,7 @@ class Constants {
   static const String logingRoute = '/login';
   static const String landingRoute = '/landing';
   static const String userInformationRoute = '/userInformation';
+  static const String screensControllerRoute = '/screensController';
 
   static const String verificationId = 'verificationId';
   static const String phoneNumber = 'phoneNumber';

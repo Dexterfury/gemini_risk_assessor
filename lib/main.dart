@@ -6,6 +6,8 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/screens/home_screen.dart';
+import 'package:gemini_risk_assessor/screens/screens_controller.dart';
 import 'package:gemini_risk_assessor/themes/my_thesmes.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -34,10 +36,13 @@ class MyApp extends StatelessWidget {
         title: Constants.riskAssessments,
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
-        initialRoute: Constants.logingRoute,
+        initialRoute: Constants.screensControllerRoute,
         routes: {
           Constants.landingRoute: (context) => const LandingScreen(),
           Constants.logingRoute: (context) => const LoginScreen(),
+          Constants.homeRoute: (context) => const HomeScreen(),
+          Constants.screensControllerRoute: (context) =>
+              const ScreensController(),
         });
   }
 }
