@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 class Constants {
   // app name
   static const String appName = 'Gemini Risk Assessor';
