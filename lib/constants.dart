@@ -39,6 +39,8 @@ class Constants {
   static const String userModel = 'userModel';
   static const String userImages = 'userImages';
 
+  static const String pdfFiles = 'pdfFiles';
+
   // constants for promptDataModel
   static const String images = 'images';
   static const String textInput = 'textInput';
@@ -60,6 +62,8 @@ class Constants {
   static const String weather = 'weather';
   static const String summary = 'summary';
   static const String createdBy = 'createdBy';
+  static const String organisationID = 'organisationID';
+  static const String pdfUrl = 'pdfUrl';
 
   static const String enterYourName = 'Enter your name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';

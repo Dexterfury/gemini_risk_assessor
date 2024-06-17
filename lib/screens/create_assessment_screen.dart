@@ -187,7 +187,10 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     // });
 
                     await assessmentProvider
-                        .submitPrompt(creatorID: _creatorID)
+                        .submitPrompt(
+                      creatorID: _creatorID,
+                      description: _descriptionController.text,
+                    )
                         .then((_) async {
                       // pop the the dialog
                       Navigator.pop(context);

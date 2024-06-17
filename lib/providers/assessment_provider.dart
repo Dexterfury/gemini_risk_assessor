@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
@@ -22,6 +23,7 @@ class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
   bool _isLoading = false;
+  bool _isPersonal = true;
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
@@ -30,20 +32,41 @@ class AssessmentProvider extends ChangeNotifier {
   File? _pdfAssessmentFile;
   bool _hasSigned = false;
   Uint8List? _signatureImage;
+  String _organisationID = '';
+  String _uid = '';
   final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
   List<XFile>? get imagesFileList => _imagesFileList;
+  bool get isLoading => _isLoading;
+  bool get isPersonal => _isPersonal;
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
-  String get description => _description;
   AssessmentModel? get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
   File? get pdfAssessmentFile => _pdfAssessmentFile;
   bool get hasSigned => _hasSigned;
   Uint8List? get signatureImage => _signatureImage;
+  String get organisationID => _organisationID;
+  String get uid => _uid;
   GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
+
+  // set organisationID
+  void setOrganisationID({
+    required String companyID,
+    required bool isPersonal,
+  }) async {
+    _organisationID = companyID;
+    _isPersonal = isPersonal;
+    notifyListeners();
+  }
+
+  Future<void> setDescription(String desc, String creatorID) async {
+    _description = desc;
+    _uid = creatorID;
+    notifyListeners();
+  }
 
   // set loading
   void setLoading(bool value) {
@@ -60,10 +83,21 @@ class AssessmentProvider extends ChangeNotifier {
       assessmentModel: _assessmentModel!,
       signatureImage: _signatureImage!,
     );
-    // remove loading
-    _isLoading = false;
 
     _pdfAssessmentFile = file;
+    notifyListeners();
+    await saveAssmentToFirestore(file);
+  }
+
+  // save assement to firetore
+  Future<void> saveAssmentToFirestore(File file) async {
+    final id = _isPersonal ? _uid : _organisationID;
+    // upload image to storage
+    String fileUrl = await storeFileToStorage(
+        file: file,
+        reference: '${Constants.pdfFiles}/$id/${assessmentModel!.id}');
+
+    assessmentModel!.pdfUrl = fileUrl;
     notifyListeners();
   }
 
@@ -322,11 +356,17 @@ class AssessmentProvider extends ChangeNotifier {
 
   Future<void> submitPrompt({
     required String creatorID,
+    required String description,
   }) async {
     _isLoading = true;
     notifyListeners();
     // get model to use text or vision
     var model = await getModel();
+
+    // set description to use in prompt
+    await setDescription(description, creatorID);
+
+    // get promtDara
     final prompt = getPromptData();
 
     try {

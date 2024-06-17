@@ -4,23 +4,25 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class AssessmentModel {
-  final String id;
-  final String title;
-  final String taskToAchieve;
-  final List<String> images;
-  final List<String> equipments;
-  final List<String> hazards;
-  final List<String> risks;
-  final List<String> signatures;
-  final List<String> approvers;
-  final List<String> ppe;
-  final List<String> control;
-  final String weather;
-  final String summary;
-  final String createdBy;
-  final DateTime createdAt;
+  String id;
+  String title;
+  String taskToAchieve;
+  List<String> images;
+  List<String> equipments;
+  List<String> hazards;
+  List<String> risks;
+  List<String> signatures;
+  List<String> approvers;
+  List<String> ppe;
+  List<String> control;
+  String weather;
+  String summary;
+  String createdBy;
+  String organisationID;
+  String pdfUrl;
+  DateTime createdAt;
 
-  const AssessmentModel({
+  AssessmentModel({
     required this.id,
     required this.title,
     required this.taskToAchieve,
@@ -35,12 +37,14 @@ class AssessmentModel {
     required this.weather,
     required this.summary,
     required this.createdBy,
+    required this.organisationID,
+    required this.pdfUrl,
     required this.createdAt,
   });
 
   factory AssessmentModel.fromTestString(
     String testString,
-    String creatorName,
+    String creatorID,
     String weather,
     List<String> testImages,
     DateTime createdAt,
@@ -63,7 +67,9 @@ class AssessmentModel {
         control: List<String>.from(json[Constants.control] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
-        createdBy: creatorName,
+        createdBy: creatorID,
+        organisationID: json[Constants.organisationID] ?? '',
+        pdfUrl: Constants.pdfUrl,
         createdAt: createdAt,
       );
     }
@@ -73,7 +79,7 @@ class AssessmentModel {
 
   factory AssessmentModel.fromGeneratedContent(
     GenerateContentResponse content,
-    String creatorName,
+    String creatorID,
     String weather,
     List<String> images,
     DateTime createdAt,
@@ -98,7 +104,9 @@ class AssessmentModel {
         control: List<String>.from(json[Constants.control] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
-        createdBy: creatorName,
+        createdBy: creatorID,
+        organisationID: json[Constants.organisationID] ?? '',
+        pdfUrl: json[Constants.pdfUrl] ?? '',
         createdAt: createdAt,
       );
     }
@@ -122,6 +130,8 @@ class AssessmentModel {
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
+      organisationID: json[Constants.organisationID] ?? '',
+      pdfUrl: json[Constants.pdfUrl] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
     );
   }
@@ -142,6 +152,8 @@ class AssessmentModel {
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
+      Constants.organisationID: organisationID,
+      Constants.pdfUrl: pdfUrl,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }
