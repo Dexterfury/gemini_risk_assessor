@@ -67,7 +67,6 @@ class AuthProvider extends ChangeNotifier {
 
   void showImagePickerDialog({
     required BuildContext context,
-    required Function() onSuccess,
   }) {
     imagePickerAnimatedDialog(
       context: context,
@@ -77,11 +76,6 @@ class AuthProvider extends ChangeNotifier {
         if (value) {
           selectImage(
             fromCamera: value,
-            onSuccess: () {
-              // pop the bottom sheet and call the onSuccess function
-              Navigator.pop(context);
-              onSuccess();
-            },
             onError: (String error) {
               showSnackBar(context: context, message: error);
             },
@@ -89,11 +83,6 @@ class AuthProvider extends ChangeNotifier {
         } else {
           selectImage(
             fromCamera: value,
-            onSuccess: () {
-              // pop the bottom sheet and call the onSuccess function
-              Navigator.pop(context);
-              onSuccess();
-            },
             onError: (String error) {
               showSnackBar(context: context, message: error);
             },
@@ -105,7 +94,6 @@ class AuthProvider extends ChangeNotifier {
 
   void selectImage({
     required bool fromCamera,
-    required Function() onSuccess,
     required Function(String) onError,
   }) async {
     _finalFileImage = await pickUserImage(
@@ -120,13 +108,11 @@ class AuthProvider extends ChangeNotifier {
     // crop image
     await cropImage(
       filePath: finalFileImage!.path,
-      onSuccess: onSuccess,
     );
   }
 
   Future<void> cropImage({
     required String filePath,
-    required Function() onSuccess,
   }) async {
     setfinalFileImage(File(filePath));
     CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -138,7 +124,6 @@ class AuthProvider extends ChangeNotifier {
 
     if (croppedFile != null) {
       setfinalFileImage(File(croppedFile.path));
-      onSuccess();
     }
   }
 
@@ -165,17 +150,6 @@ class AuthProvider extends ChangeNotifier {
     return isSignedIn;
   }
 
-  // chech if user exists
-  Future<bool> checkUserExists() async {
-    DocumentSnapshot documentSnapshot =
-        await _firestore.collection(Constants.usersCollection).doc(_uid).get();
-    if (documentSnapshot.exists) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   // get user data from firestore
   Future<void> getUserDataFromFireStore() async {
     DocumentSnapshot documentSnapshot =
@@ -188,6 +162,8 @@ class AuthProvider extends ChangeNotifier {
   // save user data to shared preferences
   Future<void> saveUserDataToSharedPreferences() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    _isLoading = true;
+    notifyListeners();
     await sharedPreferences.setString(
         Constants.userModel, jsonEncode(userModel!.toJson()));
   }
@@ -242,10 +218,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // check if user exists in firestore
-  Future<bool> checkUserExistsInFirestore(String uid) async {
+  Future<bool> checkUserExistsInFirestore() async {
     try {
       final DocumentSnapshot documentSnapshot =
-          await _usersCollection.doc(uid).get();
+          await _usersCollection.doc(_uid).get();
       if (documentSnapshot.exists) {
         return true;
       } else {
@@ -269,6 +245,49 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // sign in unnomymous
+  Future<void> signInAnonymously({
+    required Function() onSuccess,
+    required Function(String) onFail,
+  }) async {
+    _isLoading = true;
+    _isSuccessful = false;
+    notifyListeners();
+    try {
+      // check if user is already signed in and sign them out first
+      if (_auth.currentUser != null) {
+        _uid = _auth.currentUser!.uid;
+        notifyListeners();
+        onSuccess();
+        return;
+      }
+
+      await FirebaseAuth.instance.signInAnonymously().then((value) async {
+        _uid = value.user!.uid;
+        _phoneNumber = value.user!.phoneNumber;
+        onSuccess();
+        notifyListeners();
+      });
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case "operation-not-allowed":
+          print("Anonymous auth hasn't been enabled for this project.");
+          _isLoading = false;
+          notifyListeners();
+          onFail(e.code);
+          break;
+        default:
+          _isLoading = false;
+          notifyListeners();
+          onFail(e.code);
+          print("Unknown error.");
+      }
+    } finally {
+      _isSuccessful = true;
+      notifyListeners();
+    }
+  }
+
   // sign in with phone number
   Future<void> signInWithPhoneNumber({
     required String phoneNumber,
@@ -280,13 +299,33 @@ class AuthProvider extends ChangeNotifier {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential).then((value) async {
-          _uid = value.user!.uid;
-          _phoneNumber = value.user!.phoneNumber;
-          _isSuccessful = true;
-          _isLoading = false;
-          notifyListeners();
-        });
+        User? currentUser = _auth.currentUser;
+
+        if (currentUser != null && currentUser.isAnonymous) {
+          // Link the anonymous user with the phone credential
+          await currentUser.linkWithCredential(credential).then((value) async {
+            _uid = value.user!.uid;
+            _phoneNumber = value.user!.phoneNumber;
+            _isSuccessful = true;
+            _isLoading = false;
+            notifyListeners();
+          }).catchError((e) {
+            _isSuccessful = false;
+            _isLoading = false;
+            notifyListeners();
+            showSnackBar(context: context, message: e.toString());
+            log('Error: ${e.toString()}');
+          });
+        } else {
+          // Sign in with the phone credential if no user is signed in anonymously
+          await _auth.signInWithCredential(credential).then((value) async {
+            _uid = value.user!.uid;
+            _phoneNumber = value.user!.phoneNumber;
+            _isSuccessful = true;
+            _isLoading = false;
+            notifyListeners();
+          });
+        }
       },
       verificationFailed: (FirebaseAuthException e) {
         _isSuccessful = false;

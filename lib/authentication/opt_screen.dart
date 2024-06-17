@@ -3,6 +3,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_thesmes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
@@ -182,7 +183,7 @@ class _OTPScreenState extends State<OTPScreen> {
       context: context,
       onSuccess: () async {
         // 1. check if user exists in firestore
-        bool userExists = await authProvider.checkUserExists();
+        bool userExists = await authProvider.checkUserExistsInFirestore();
 
         if (userExists) {
           // 2. if user exists,
@@ -193,30 +194,25 @@ class _OTPScreenState extends State<OTPScreen> {
           // * save user information to provider / shared preferences
           await authProvider.saveUserDataToSharedPreferences();
 
-          // * navigate to home screen
-          navigate(userExits: true);
+          // * save user information to provider / shared preferences
+          await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
+            // * navigate to home screen
+            navigationController(
+              context: context,
+              route: Constants.homeRoute,
+            );
+          });
         } else {
           // 3. if user doesn't exist, navigate to user information screen
-          navigate(userExits: false);
+          await Future.delayed(const Duration(milliseconds: 200))
+              .whenComplete(() {
+            navigationController(
+              context: context,
+              route: Constants.userInformationRoute,
+            );
+          });
         }
       },
     );
-  }
-
-  void navigate({required bool userExits}) {
-    if (userExits) {
-      // navigate to home and remove all previous routes
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        Constants.homeRoute,
-        (route) => false,
-      );
-    } else {
-      // navigate to user information screen
-      Navigator.pushNamed(
-        context,
-        Constants.userInformationRoute,
-      );
-    }
   }
 }

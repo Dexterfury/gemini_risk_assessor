@@ -10,6 +10,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
+import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/service/gemini.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -162,18 +163,6 @@ class AssessmentProvider extends ChangeNotifier {
   // set number of people
   void setNumberOfPeople({required int value}) {
     _numberOfPeople = value;
-    notifyListeners();
-  }
-
-  // set description
-  void setDescription({required String value}) {
-    _description = value;
-    notifyListeners();
-  }
-
-  // set creator name
-  void setCreatorName({required String value}) {
-    _creatorName = value;
     notifyListeners();
   }
 
@@ -359,9 +348,12 @@ class AssessmentProvider extends ChangeNotifier {
     _maxImages = 10;
     _numberOfPeople = 1;
     _ppeModelList = [];
+    notifyListeners();
   }
 
-  Future<void> submitPrompt() async {
+  Future<void> submitPrompt({
+    required UserModel userModel,
+  }) async {
     _isLoading = true;
     notifyListeners();
     // get model to use text or vision

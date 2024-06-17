@@ -1,7 +1,11 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -81,7 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   _phoneNumberController.text = value;
                 });
                 if (_phoneNumberController.text.length > 9) {
-                  authProvider.setIsLoading(true);
+                  final phoneNumber = '+${selectedCountry.phoneCode}$value';
+                  // sign in with phone number
+                  authProvider.signInWithPhoneNumber(
+                    phoneNumber: phoneNumber,
+                    context: context,
+                  );
                 } else {
                   authProvider.setIsLoading(false);
                 }
@@ -139,8 +148,68 @@ class _LoginScreenState extends State<LoginScreen> {
             MainAppButton(
               widget: const Icon(Icons.person),
               label: 'Continue as Guest',
-              onTap: () {
-                if (!authProvider.isLoading) {}
+              onTap: () async {
+                if (!authProvider.isLoading) {
+                  authProvider.signInAnonymously(
+                    onSuccess: () async {
+                      bool userExists =
+                          await authProvider.checkUserExistsInFirestore();
+                      if (userExists) {
+                        // 2. if user exists,
+
+                        // * get user information from firestore
+                        await authProvider.getUserDataFromFireStore();
+
+                        // * save user information to provider / shared preferences
+                        await authProvider
+                            .saveUserDataToSharedPreferences()
+                            .whenComplete(() {
+                          // * navigate to home screen
+                          navigationController(
+                            context: context,
+                            route: Constants.homeRoute,
+                          );
+                        });
+                      } else {
+                        // we generate a random name here
+                        final name =
+                            "User${(1000 + (DateTime.now().millisecondsSinceEpoch % 9000))}";
+                        UserModel userModel = UserModel(
+                          uid: authProvider.uid!,
+                          name: name,
+                          phone: '',
+                          imageUrl: '',
+                          token: '',
+                          aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+                          createdAt: '',
+                        );
+                        authProvider.saveUserDataToFireStore(
+                          userModel: userModel,
+                          onSuccess: () async {
+                            // save user data to shared preferences
+                            await authProvider
+                                .saveUserDataToSharedPreferences()
+                                .whenComplete(() {
+                              // navigate to home screen
+                              navigationController(
+                                context: context,
+                                route: Constants.homeRoute,
+                              );
+                            });
+                          },
+                          onFail: () async {
+                            showSnackBar(
+                                context: context,
+                                message: 'Failed to save user data');
+                          },
+                        );
+                      }
+                    },
+                    onFail: (error) {
+                      showSnackBar(context: context, message: error);
+                    },
+                  );
+                }
               },
             ),
           ],

@@ -43,12 +43,17 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             DisplayUserImage(
               radius: 50,
               isViewOnly: false,
-              onPressed: () {},
+              onPressed: () {
+                authProvider.showImagePickerDialog(
+                  context: context,
+                );
+              },
             ),
             const SizedBox(height: 30),
             TextField(
               controller: _nameController,
               maxLength: 20,
+              enabled: authProvider.isLoading == false,
               decoration: const InputDecoration(
                 hintText: 'Enter your name',
                 labelText: 'Enter your name',
@@ -60,25 +65,23 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
               ),
             ),
             const SizedBox(height: 40),
-            MainAppButton(
-              widget: const Icon(Icons.login),
-              label: 'Continue',
-              onTap: () {
-                authProvider.isLoading
-                    ? null
-                    : () {
-                        if (_nameController.text.isEmpty ||
-                            _nameController.text.length < 3) {
-                          showSnackBar(
-                              context: context,
-                              message: 'Please enter your name');
-                          return;
-                        }
-                        // save user data to firestore
-                        saveUserDataToFireStore();
-                      };
-              },
-            ),
+            authProvider.isLoading
+                ? const CircularProgressIndicator()
+                : MainAppButton(
+                    widget: const Icon(Icons.login),
+                    label: 'Continue',
+                    onTap: () {
+                      if (_nameController.text.isEmpty ||
+                          _nameController.text.length < 3) {
+                        showSnackBar(
+                            context: context,
+                            message: 'Please enter your name');
+                        return;
+                      }
+                      // save user data to firestore
+                      saveUserDataToFireStore();
+                    },
+                  ),
           ],
         ),
       )),

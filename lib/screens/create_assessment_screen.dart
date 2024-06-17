@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
@@ -21,6 +22,30 @@ class CreateAssessmentScreen extends StatefulWidget {
 }
 
 class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
+  // name controller
+  final TextEditingController _nameController = TextEditingController();
+  // description controller
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getUsersDataFromProvider();
+    super.initState();
+  }
+
+  getUsersDataFromProvider() {
+    // wait for until screen build
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      final authProvider = context.read<AuthProvider>();
+      final userName = authProvider.userModel!.name;
+      setState(() {
+        // set name controller
+        _nameController.text = userName;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final assessmentProvider = context.watch<AssessmentProvider>();
@@ -80,17 +105,19 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                 height: 10,
               ),
               // creator name field
-              const InputField(
+              InputField(
                 labelText: Constants.enterYourName,
                 hintText: Constants.enterYourName,
+                controller: _nameController,
               ),
               const SizedBox(
                 height: 20,
               ),
               // assessment description field
-              const InputField(
+              InputField(
                 labelText: Constants.enterDescription,
                 hintText: Constants.enterDescription,
+                controller: _descriptionController,
               ),
               const SizedBox(
                 height: 30,
