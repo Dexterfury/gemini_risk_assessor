@@ -21,7 +21,6 @@ import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
-  bool _fromCamera = false;
   bool _isLoading = false;
   int _maxImages = 10;
   int _numberOfPeople = 1;
@@ -37,7 +36,6 @@ class AssessmentProvider extends ChangeNotifier {
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
   List<XFile>? get imagesFileList => _imagesFileList;
-  bool get fromCamera => _fromCamera;
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
   String get description => _description;
@@ -136,12 +134,6 @@ class AssessmentProvider extends ChangeNotifier {
     }
   }
 
-  // set from camera
-  Future<void> setFromCamera(bool value) async {
-    _fromCamera = value;
-    notifyListeners();
-  }
-
   // set max images
   void setMaxImages(int value) {
     _maxImages = value;
@@ -224,11 +216,11 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   Future<void> selectImages({
-    required Function() onSuccess,
+    required bool fromCamera,
     required Function(String) onError,
   }) async {
     final returnedFiles = await pickPromptImages(
-      fromCamera: _fromCamera,
+      fromCamera: fromCamera,
       maxImages: _maxImages,
       onError: (error) {
         // return error to onError
@@ -238,11 +230,10 @@ class AssessmentProvider extends ChangeNotifier {
     // check if files were selected
     if (returnedFiles != null) {
       // check if taken from camera
-      if (_fromCamera) {
+      if (fromCamera) {
         // this is only one image so crop it
         await cropImage(
           path: returnedFiles.first.path,
-          onSuccess: onSuccess,
         );
       } else {
         // add each image into imagesFileList
@@ -253,7 +244,6 @@ class AssessmentProvider extends ChangeNotifier {
         // update maximum number of images
         _maxImages = _maxImages - returnedFiles.length;
         notifyListeners();
-        onSuccess();
       }
     }
   }
@@ -261,7 +251,6 @@ class AssessmentProvider extends ChangeNotifier {
   // crop image
   Future<void> cropImage({
     required String path,
-    required Function() onSuccess,
   }) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
@@ -276,54 +265,36 @@ class AssessmentProvider extends ChangeNotifier {
       // update maximum number of images
       _maxImages = _maxImages - 1;
       notifyListeners();
-      onSuccess();
     }
   }
 
-  void showBottomSheet({
+  void showImagePickerDialog({
     required BuildContext context,
-    required Function(String) onError,
   }) {
-    showModalBottomSheet(
+    imagePickerAnimatedDialog(
       context: context,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
-              onTap: () async {
-                await setFromCamera(true);
-                await selectImages(
-                  onSuccess: () {
-                    if (context.mounted) {
-                      // pop the bottom sheet
-                      Navigator.pop(context);
-                    }
-                  },
-                  onError: (error) => onError(error),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text('Gallery'),
-              onTap: () async {
-                await setFromCamera(false);
-                await selectImages(
-                  onSuccess: () {
-                    if (context.mounted) {
-                      // pop the bottom sheet
-                      Navigator.pop(context);
-                    }
-                  },
-                  onError: (error) => onError(error),
-                );
-              },
-            ),
-          ],
-        );
+      title: 'Select Photo',
+      content: 'Choose an Option',
+      onPressed: (value) {
+        if (value) {
+          selectImages(
+            fromCamera: value,
+            onError: (String error) {
+              if (context.mounted) {
+                showSnackBar(context: context, message: error);
+              }
+            },
+          );
+        } else {
+          selectImages(
+            fromCamera: value,
+            onError: (String error) {
+              if (context.mounted) {
+                showSnackBar(context: context, message: error);
+              }
+            },
+          );
+        }
       },
     );
   }

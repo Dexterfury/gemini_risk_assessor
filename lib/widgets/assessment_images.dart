@@ -43,14 +43,9 @@ class AssessmentImages extends StatelessWidget {
                           : Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: AddImage(onTap: () async {
-                                assessmentProvider.showBottomSheet(
-                                    context: context,
-                                    onError: (error) {
-                                      showSnackBar(
-                                        context: context,
-                                        message: error.toString(),
-                                      );
-                                    });
+                                assessmentProvider.showImagePickerDialog(
+                                  context: context,
+                                );
                               }),
                             ),
                       for (var image in assessmentProvider.imagesFileList!)
