@@ -27,7 +27,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.watch<AuthProvider>();
     return Scaffold(
       appBar: MyAppBar(
         title: 'User Information',

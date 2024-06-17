@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
             icon: const Icon(Icons.search),
           ),
           actions: DisplayUserImage(
-            radius: 30,
+            radius: 20,
             isViewOnly: true,
             onPressed: () {},
           ),
@@ -39,7 +39,7 @@ class HomeScreen extends StatelessWidget {
         body: const TabBarView(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Center(
                 child: Text('DSTI'),
               ),

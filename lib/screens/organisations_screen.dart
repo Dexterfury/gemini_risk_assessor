@@ -15,7 +15,7 @@ class OrganisationsGridScreen extends StatelessWidget {
           icon: const Icon(Icons.search),
         ),
         actions: DisplayUserImage(
-          radius: 30,
+          radius: 20,
           isViewOnly: true,
           onPressed: () {},
         ),

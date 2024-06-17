@@ -28,7 +28,7 @@ class _LandingScreenState extends State<LandingScreen> {
 
   navigate({required bool isAuthenticated}) {
     if (isAuthenticated) {
-      Navigator.pushReplacementNamed(context, Constants.homeRoute);
+      Navigator.pushReplacementNamed(context, Constants.screensControllerRoute);
     } else {
       Navigator.pushReplacementNamed(context, Constants.logingRoute);
     }

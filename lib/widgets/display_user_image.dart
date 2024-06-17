@@ -10,18 +10,25 @@ class DisplayUserImage extends StatelessWidget {
     required this.radius,
     required this.isViewOnly,
     required this.onPressed,
+    this.avatarPadding = 8.0,
   });
   final double radius;
   final bool isViewOnly;
   final VoidCallback onPressed;
+  final double avatarPadding;
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     return Stack(
       children: [
-        CircleAvatar(
-            radius: radius, backgroundImage: getImageToShow(authProvider)),
+        Padding(
+          padding: EdgeInsets.all(avatarPadding),
+          child: CircleAvatar(
+            radius: radius,
+            backgroundImage: getImageToShow(authProvider),
+          ),
+        ),
         isViewOnly
             ? const SizedBox()
             : Positioned(
@@ -45,22 +52,31 @@ class DisplayUserImage extends StatelessWidget {
   }
 
   getImageToShow(AuthProvider authProvider) {
-    if (authProvider.userModel != null) {
-      if (authProvider.userModel!.imageUrl.isNotEmpty) {
-        return NetworkImage(authProvider.userModel!.imageUrl);
-      } else if (authProvider.finalFileImage != null) {
-        return FileImage(File(authProvider.finalFileImage!.path))
-            as ImageProvider;
-      } else {
-        AssetImage(AssetsManager.userIcon);
-      }
+    if (authProvider.finalFileImage != null) {
+      return FileImage(File(authProvider.finalFileImage!.path))
+          as ImageProvider<Object>;
+    } else if (authProvider.userModel!.imageUrl.isNotEmpty) {
+      return NetworkImage(authProvider.userModel!.imageUrl);
     } else {
-      if (authProvider.finalFileImage == null) {
-        return AssetImage(AssetsManager.userIcon);
-      } else {
-        return FileImage(File(authProvider.finalFileImage!.path))
-            as ImageProvider;
-      }
+      return AssetImage(AssetsManager.userIcon);
     }
+
+    // if (authProvider.userModel != null) {
+    //   if (authProvider.userModel!.imageUrl.isNotEmpty) {
+    //     return NetworkImage(authProvider.userModel!.imageUrl);
+    //   } else if (authProvider.finalFileImage != null) {
+    //     return FileImage(File(authProvider.finalFileImage!.path))
+    //         as ImageProvider;
+    //   } else {
+    //     AssetImage(AssetsManager.userIcon);
+    //   }
+    // } else {
+    //   if (authProvider.finalFileImage == null) {
+    //     return AssetImage(AssetsManager.userIcon);
+    //   } else {
+    //     return FileImage(File(authProvider.finalFileImage!.path))
+    //         as ImageProvider;
+    //   }
+    // }
   }
 }
