@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -52,6 +53,12 @@ class AssessmentProvider extends ChangeNotifier {
   String get uid => _uid;
   GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CollectionReference assessmentCollection =
+      FirebaseFirestore.instance.collection(Constants.assessmentCollection);
+  final CollectionReference organisationCollection =
+      FirebaseFirestore.instance.collection(Constants.organisationCollection);
+
   // set organisationID
   void setOrganisationID({
     required String companyID,
@@ -99,6 +106,21 @@ class AssessmentProvider extends ChangeNotifier {
 
     assessmentModel!.pdfUrl = fileUrl;
     notifyListeners();
+
+    if (_isPersonal) {
+      // save to user's database
+      await assessmentCollection.doc(_uid).set(assessmentModel!.toJson());
+      // save to user's database end.
+    } else {
+      // add organisationID
+      assessmentModel!.organisationID = _organisationID;
+      notifyListeners();
+      // save to organisation's database
+      await organisationCollection
+          .doc(_organisationID)
+          .set(assessmentModel!.toJson());
+      // save to organisation's database end.
+    }
   }
 
   // set has signed

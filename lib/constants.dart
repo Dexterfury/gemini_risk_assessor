@@ -71,9 +71,9 @@ class Constants {
 
   // firestore collections
   static const String usersCollection = 'users';
-  static const String promptsCollection = 'prompts';
-  static const String assessmentsCollection = 'assessments';
-
+  static const String promptCollection = 'prompts';
+  static const String assessmentCollection = 'assessments';
+  static const String organisationCollection = 'organisations';
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {
