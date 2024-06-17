@@ -20,8 +20,6 @@ class InputField extends StatelessWidget {
   Widget build(BuildContext context) {
     // check if its name imput
     final isNameInput = labelText == Constants.enterYourName;
-    // check if its enabled
-    final enabled = authProvider != null && !authProvider!.isLoading;
     return TextField(
       controller: controller,
       textCapitalization: TextCapitalization.sentences,
@@ -30,14 +28,28 @@ class InputField extends StatelessWidget {
           isNameInput ? TextInputAction.next : TextInputAction.done,
       maxLength: isNameInput ? 20 : 500,
       maxLines: isNameInput ? 1 : 3,
-      enabled: enabled,
+      enabled: getEnabled(),
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
+        counterText: '',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
+  }
+
+  // get enabled state - enable or disable input field
+  getEnabled() {
+    if (authProvider != null) {
+      if (authProvider!.isLoading) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/display_signature.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
@@ -108,7 +110,15 @@ class BottonButtonsField extends StatelessWidget {
                   assessmentProvider
                       .createPdfAssessmentFile()
                       .whenComplete(() async {
+                    // close the loading dialog
                     Navigator.pop(context);
+
+                    // navigate to home screen
+                    navigationController(
+                      context: context,
+                      route: Constants.screensControllerRoute,
+                    );
+
                     await OpenFile.open(
                         (assessmentProvider.pdfAssessmentFile!.path));
                   });

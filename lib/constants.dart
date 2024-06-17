@@ -12,7 +12,7 @@ class Constants {
   static const String search = 'Search';
 
   // create assessment
-  static const String createAssessment = 'Create Assessment';
+  static const String createAssessment = 'New Assessment';
 
   // navigation routes
   static const String homeRoute = '/home';

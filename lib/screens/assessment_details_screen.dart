@@ -13,8 +13,8 @@ import 'package:gemini_risk_assessor/widgets/weather_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class RiskAssessmentDetailsScreen extends StatelessWidget {
-  RiskAssessmentDetailsScreen({
+class AssessmentDetailsScreen extends StatelessWidget {
+  AssessmentDetailsScreen({
     super.key,
     required this.assessmentModel,
     required this.animation,

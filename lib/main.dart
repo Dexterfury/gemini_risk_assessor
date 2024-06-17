@@ -8,6 +8,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
 import 'package:gemini_risk_assessor/themes/my_thesmes.dart';
@@ -48,6 +49,8 @@ class MyApp extends StatelessWidget {
           Constants.optRoute: (context) => const OTPScreen(),
           Constants.userInformationRoute: (context) =>
               const UserInformationScreen(),
+          Constants.createAssessmentRoute: (context) =>
+              const CreateAssessmentScreen(),
         });
   }
 }

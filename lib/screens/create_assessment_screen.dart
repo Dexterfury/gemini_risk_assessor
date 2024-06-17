@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/screens/risk_assessment_details_screen.dart';
+import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
@@ -160,33 +160,9 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           width: 40,
                           child: CircularProgressIndicator()),
                     );
-                    await assessmentProvider
-                        .submitTestAssessment(creatorID: _creatorID)
-                        .then((_) async {
-                      // pop the the dialog
-                      Navigator.pop(context);
-                      if (!context.mounted) return;
-                      if (assessmentProvider.assessmentModel != null) {
-                        // display the risk assessment details screen
-                        PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                          opaque: false,
-                          pageBuilder: (BuildContext context, animation,
-                                  secondaryAnimation) =>
-                              RiskAssessmentDetailsScreen(
-                            assessmentModel:
-                                assessmentProvider.assessmentModel!,
-                            animation: animation,
-                          ),
-                        );
-                        bool shouldSave =
-                            await Navigator.of(context).push(pageRouteBuilder);
-                        if (shouldSave) {
-                          // TODO save the risk assessment to database
-                        }
-                      }
-                    });
-
-                    // await assessmentProvider.submitPrompt().then((_) async {
+                    // await assessmentProvider
+                    //     .submitTestAssessment(creatorID: _creatorID)
+                    //     .then((_) async {
                     //   // pop the the dialog
                     //   Navigator.pop(context);
                     //   if (!context.mounted) return;
@@ -196,7 +172,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     //       opaque: false,
                     //       pageBuilder: (BuildContext context, animation,
                     //               secondaryAnimation) =>
-                    //           AssessmentDetailsScreen(
+                    //           RiskAssessmentDetailsScreen(
                     //         assessmentModel:
                     //             assessmentProvider.assessmentModel!,
                     //         animation: animation,
@@ -209,9 +185,39 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     //     }
                     //   }
                     // });
+
+                    await assessmentProvider
+                        .submitPrompt(creatorID: _creatorID)
+                        .then((_) async {
+                      // pop the the dialog
+                      Navigator.pop(context);
+                      if (!context.mounted) return;
+                      if (assessmentProvider.assessmentModel != null) {
+                        // display the risk assessment details screen
+                        PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                          opaque: false,
+                          pageBuilder: (BuildContext context, animation,
+                                  secondaryAnimation) =>
+                              AssessmentDetailsScreen(
+                            assessmentModel:
+                                assessmentProvider.assessmentModel!,
+                            animation: animation,
+                          ),
+                        );
+                        bool shouldSave =
+                            await Navigator.of(context).push(pageRouteBuilder);
+                        if (shouldSave) {
+                          // TODO save the risk assessment to database
+                        }
+                      }
+                    });
                   },
                 ),
-              )
+              ),
+
+              const SizedBox(
+                height: 20,
+              ),
             ],
           ),
         ),

@@ -367,7 +367,7 @@ void imagePickerAnimatedDialog({
                         },
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 20,
                       ),
                       ImagePickerItem(
                         label: 'Gallery',

@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 
 navigationController({required BuildContext context, required String route}) {
   switch (route) {
-    case Constants.homeRoute:
+    case Constants.screensControllerRoute:
       Navigator.pushNamedAndRemoveUntil(
         context,
         route,

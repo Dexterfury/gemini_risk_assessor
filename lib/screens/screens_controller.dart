@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
 
@@ -47,7 +48,7 @@ class _ScreensControllerState extends State<ScreensController> {
           : FloatingActionButton(
               onPressed: () {
                 // navigate to create new risk assessment screen
-                //Navigator.pushNamed(context, Constants.createRiskAssessmentRoute);
+                Navigator.pushNamed(context, Constants.createAssessmentRoute);
               },
               child: const Icon(Icons.add),
             ),
