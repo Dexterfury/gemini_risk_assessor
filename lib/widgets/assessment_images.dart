@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
 import 'package:provider/provider.dart';
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
@@ -9,15 +8,20 @@ class InputField extends StatelessWidget {
     required this.labelText,
     required this.hintText,
     required this.controller,
+    this.authProvider,
   });
 
   final String labelText;
   final String hintText;
   final TextEditingController controller;
+  final AuthProvider? authProvider;
 
   @override
   Widget build(BuildContext context) {
+    // check if its name imput
     final isNameInput = labelText == Constants.enterYourName;
+    // check if its enabled
+    final enabled = authProvider != null && !authProvider!.isLoading;
     return TextField(
       controller: controller,
       textCapitalization: TextCapitalization.sentences,
@@ -26,6 +30,7 @@ class InputField extends StatelessWidget {
           isNameInput ? TextInputAction.next : TextInputAction.done,
       maxLength: isNameInput ? 20 : 500,
       maxLines: isNameInput ? 1 : 3,
+      enabled: enabled,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
@@ -33,20 +38,6 @@ class InputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-
-      // onChanged: (value) {
-      //   if (isNameInput) {
-      //     // set creator name
-      //     context.read<AssessmentProvider>().setCreatorName(
-      //           value: value,
-      //         );
-      //   } else {
-      //     //Update discription value
-      //     context.read<AssessmentProvider>().setDescription(
-      //           value: value,
-      //         );
-      //   }
-      // },
     );
   }
 }

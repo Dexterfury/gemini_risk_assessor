@@ -25,7 +25,6 @@ class AssessmentProvider extends ChangeNotifier {
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
-  String _creatorName = 'Dexter';
   AssessmentModel? _assessmentModel;
   Weather _weather = Weather.sunny;
   File? _pdfAssessmentFile;
@@ -39,7 +38,6 @@ class AssessmentProvider extends ChangeNotifier {
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
   String get description => _description;
-  String get creatorName => _creatorName;
   AssessmentModel? get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
   File? get pdfAssessmentFile => _pdfAssessmentFile;
@@ -323,7 +321,7 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   Future<void> submitPrompt({
-    required UserModel userModel,
+    required String creatorID,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -349,7 +347,7 @@ class AssessmentProvider extends ChangeNotifier {
         }
         _assessmentModel = AssessmentModel.fromGeneratedContent(
           content,
-          _creatorName,
+          creatorID,
           _weather.name,
           images,
           DateTime.now(),
@@ -414,7 +412,9 @@ uniqueId should be unique and of type String.
 equipments, hazards and risks should be of type List<String> with a max length of 10 or less.
 ''';
 
-  Future<void> submitTestAssessment() async {
+  Future<void> submitTestAssessment({
+    required String creatorID,
+  }) async {
     _isLoading = true;
     final List<String> images = [];
     if (_imagesFileList != null) {
@@ -424,7 +424,7 @@ equipments, hazards and risks should be of type List<String> with a max length o
     }
     _assessmentModel = AssessmentModel.fromTestString(
       testAssessment,
-      _creatorName,
+      creatorID,
       _weather.name,
       images,
       DateTime.now(),

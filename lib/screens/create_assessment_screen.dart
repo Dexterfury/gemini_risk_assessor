@@ -27,9 +27,10 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
   // description controller
   final TextEditingController _descriptionController = TextEditingController();
 
+  String _creatorID = '';
+
   @override
   void initState() {
-    // TODO: implement initState
     getUsersDataFromProvider();
     super.initState();
   }
@@ -39,9 +40,11 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       final authProvider = context.read<AuthProvider>();
       final userName = authProvider.userModel!.name;
+      final creatorID = authProvider.userModel!.uid;
       setState(() {
         // set name controller
         _nameController.text = userName;
+        _creatorID = creatorID;
       });
     });
   }
@@ -129,19 +132,36 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                   widget: const Icon(Icons.create),
                   label: 'Generate Assessment',
                   onTap: () async {
+                    // check if name field is not empty and name length is more 3 characters or more
+
+                    if (_nameController.text.isEmpty ||
+                        _nameController.text.length < 3) {
+                      showSnackBar(
+                          context: context,
+                          message: 'Name must be atleast 3 characters');
+                      return;
+                    }
+                    // check if description field is not empty and description length is more 10 characters or more
+                    if (_descriptionController.text.isEmpty ||
+                        _descriptionController.text.length < 10) {
+                      showSnackBar(
+                          context: context,
+                          message: 'Description must be atleast 10 characters');
+                      return;
+                    }
+
                     // show my alert dialog for loading
                     showMyAnimatedDialog(
                       context: context,
                       title: 'Generating',
-                      content:
-                          'Please while Risk Assessment is beign generated',
+                      content: 'Please wait while we generate your assessment',
                       loadingIndicator: const SizedBox(
                           height: 40,
                           width: 40,
                           child: CircularProgressIndicator()),
                     );
                     await assessmentProvider
-                        .submitTestAssessment()
+                        .submitTestAssessment(creatorID: _creatorID)
                         .then((_) async {
                       // pop the the dialog
                       Navigator.pop(context);

@@ -4,6 +4,7 @@ import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
+import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -50,21 +51,17 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
               },
             ),
             const SizedBox(height: 30),
-            TextField(
+
+            // name input field
+            InputField(
+              labelText: Constants.enterYourName,
+              hintText: Constants.enterYourName,
               controller: _nameController,
-              maxLength: 20,
-              enabled: authProvider.isLoading == false,
-              decoration: const InputDecoration(
-                hintText: 'Enter your name',
-                labelText: 'Enter your name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8),
-                  ),
-                ),
-              ),
+              authProvider: authProvider,
             ),
+
             const SizedBox(height: 40),
+
             authProvider.isLoading
                 ? const CircularProgressIndicator()
                 : MainAppButton(
