@@ -25,3 +25,10 @@ enum ListHeader {
   approvers,
   ppe,
 }
+
+// generationType
+enum GenerationType {
+  tool,
+  dsti,
+  riskAssessment,
+}

@@ -6,7 +6,7 @@ class Constants {
   static const String riskAssessments = 'Risk Assessments';
 
   // daily task instructions
-  static const String dailyTaskInstructions = 'Daily Task Instructions';
+  static const String dailyTaskInstructions = 'Daily Safety Task Instructions';
 
   // search
   static const String search = 'Search';
