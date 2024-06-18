@@ -55,7 +55,8 @@ class DisplayUserImage extends StatelessWidget {
     if (authProvider.finalFileImage != null) {
       return FileImage(File(authProvider.finalFileImage!.path))
           as ImageProvider<Object>;
-    } else if (authProvider.userModel!.imageUrl.isNotEmpty) {
+    } else if (authProvider.userModel != null &&
+        authProvider.userModel!.imageUrl.isNotEmpty) {
       return NetworkImage(authProvider.userModel!.imageUrl);
     } else {
       return AssetImage(AssetsManager.userIcon);

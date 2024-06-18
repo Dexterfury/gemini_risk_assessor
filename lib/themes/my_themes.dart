@@ -17,6 +17,12 @@ ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
   ),
   useMaterial3: true,
+).copyWith(
+  pageTransitionsTheme: const PageTransitionsTheme(
+    builders: <TargetPlatform, PageTransitionsBuilder>{
+      TargetPlatform.android: ZoomPageTransitionsBuilder(),
+    },
+  ),
 );
 
 // dark theme
@@ -34,6 +40,12 @@ ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
   ),
   useMaterial3: true,
+).copyWith(
+  pageTransitionsTheme: const PageTransitionsTheme(
+    builders: <TargetPlatform, PageTransitionsBuilder>{
+      TargetPlatform.android: ZoomPageTransitionsBuilder(),
+    },
+  ),
 );
 
 // text styles

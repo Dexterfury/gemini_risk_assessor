@@ -297,6 +297,7 @@ class AssessmentProvider extends ChangeNotifier {
         }
         // update maximum number of images
         _maxImages = _maxImages - returnedFiles.length;
+        log("images: ${_imagesFileList.toString()}");
         notifyListeners();
       }
     }
@@ -397,10 +398,8 @@ class AssessmentProvider extends ChangeNotifier {
       // handle no image or image of not-food
       if (content.text != null && content.text!.contains(noRiskFound)) {
         // show error message
-        log('content error: ${content.text}');
         _isLoading = false;
       } else {
-        log('content: ${content.text}');
         final List<String> images = [];
         if (_imagesFileList != null) {
           for (var image in _imagesFileList!) {
@@ -416,7 +415,6 @@ class AssessmentProvider extends ChangeNotifier {
         );
         _isLoading = false;
         notifyListeners();
-        log('assessmentMode: $_assessmentModel');
       }
     } catch (error) {
       // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
@@ -428,7 +426,6 @@ class AssessmentProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    resetPromptData();
     notifyListeners();
   }
 

@@ -3,6 +3,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
@@ -103,21 +104,16 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       userModel: userModel,
       onSuccess: () async {
         // save user data to shared preferences
-        await authProvider.saveUserDataToSharedPreferences();
-
-        navigateToHomeScreen();
+        await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
+          navigationController(
+            context: context,
+            route: Constants.screensControllerRoute,
+          );
+        });
       },
       onFail: () async {
         showSnackBar(context: context, message: 'Failed to save user data');
       },
-    );
-  }
-
-  void navigateToHomeScreen() {
-    // navigate to home screen and remove all previous screens
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Constants.homeRoute,
-      (route) => false,
     );
   }
 }

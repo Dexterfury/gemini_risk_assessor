@@ -1,5 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
 
@@ -45,13 +47,33 @@ class _ScreensControllerState extends State<ScreensController> {
       // float action button to add new risk assessment
       floatingActionButton: _selectedIndex == 1
           ? null
-          : FloatingActionButton(
-              onPressed: () {
-                // navigate to create new risk assessment screen
-                Navigator.pushNamed(context, Constants.createAssessmentRoute);
+          : OpenContainer(
+              closedShape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(56.0),
+                ),
+              ),
+              transitionType: ContainerTransitionType.fade,
+              transitionDuration: const Duration(milliseconds: 500),
+              closedColor: Theme.of(context).colorScheme.primary,
+              closedBuilder: (context, openContainer) {
+                return FloatingActionButton(
+                  onPressed: openContainer,
+                  child: const Icon(Icons.add),
+                );
               },
-              child: const Icon(Icons.add),
+              openBuilder: (context, _) {
+                return const CreateAssessmentScreen();
+              },
             ),
+
+      // FloatingActionButton(
+      //     onPressed: () {
+      //       // navigate to create new risk assessment screen
+      //       Navigator.pushNamed(context, Constants.createAssessmentRoute);
+      //     },
+      //     child: const Icon(Icons.add),
+      //   ),
     );
   }
 }
