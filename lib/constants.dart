@@ -24,6 +24,7 @@ class Constants {
   static const String userInformationRoute = '/userInformation';
   static const String screensControllerRoute = '/screensController';
   static const String optRoute = '/opt';
+  static const String createToolRoute = '/createTool';
 
   static const String verificationId = 'verificationId';
   static const String phoneNumber = 'phoneNumber';
@@ -40,6 +41,8 @@ class Constants {
   static const String userImages = 'userImages';
 
   static const String pdfFiles = 'pdfFiles';
+  static const String toolPdf = 'toolPdf';
+  static const String description = 'description';
 
   // constants for promptDataModel
   static const String images = 'images';

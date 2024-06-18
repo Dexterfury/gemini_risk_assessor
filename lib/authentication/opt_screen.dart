@@ -38,11 +38,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
     return Scaffold(
       appBar: MyAppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: backIcon()),
+        leading: backIcon(context),
         title: 'Verification',
       ),
       body: SafeArea(

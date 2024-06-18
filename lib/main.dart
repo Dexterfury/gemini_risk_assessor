@@ -8,7 +8,9 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/tools_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
+import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -25,6 +27,7 @@ void main() async {
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
+      ChangeNotifierProvider(create: (context) => ToolsProvider()),
     ], child: const MyApp()),
   );
 }
@@ -51,6 +54,7 @@ class MyApp extends StatelessWidget {
               const UserInformationScreen(),
           Constants.createAssessmentRoute: (context) =>
               const CreateAssessmentScreen(),
+          Constants.createToolRoute: (context) => const CreateExplainerScreen(),
         });
   }
 }

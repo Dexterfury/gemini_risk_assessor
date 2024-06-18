@@ -54,6 +54,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     final assessmentProvider = context.watch<AssessmentProvider>();
     return Scaffold(
       appBar: const MyAppBar(
+        leading: BackButton(),
         title: Constants.createAssessment,
       ),
       body: SafeArea(
