@@ -20,6 +20,17 @@ class AssessmentImages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    getImagesToDisplay() {
+      if (assessmentProvider != null) {
+        // return assessment images
+        if (assessmentProvider!.imagesFileList!.isEmpty) {
+          return const Text('No Assessment images added');
+        }
+      } else {
+        // return tool images
+      }
+    }
+
     return Consumer<AssessmentProvider>(
       builder: (context, assessmentProvider, _) {
         return isViewOnly && assessmentProvider.imagesFileList!.isEmpty
