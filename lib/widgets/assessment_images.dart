@@ -4,13 +4,19 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/tool_provider.dart';
+
 class AssessmentImages extends StatelessWidget {
   const AssessmentImages({
     super.key,
     this.isViewOnly = false,
+    this.assessmentProvider,
+    this.toolProvider,
   });
 
   final bool isViewOnly;
+  final AssessmentProvider? assessmentProvider;
+  final ToolProvider? toolProvider;
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
@@ -53,5 +54,46 @@ class GeminiService {
         '${mainText.text} \n $additionalTextParts',
       )
     ]);
+  }
+
+
+  // function to set the model based on if images are present
+  static Future<GenerativeModel> getModel({required int images}) async {
+    if (images < 10) {
+      return GenerativeModel(
+        model: 'gemini-1.5-flash',
+        apiKey: getApiKey(),
+        generationConfig: GenerationConfig(
+          temperature: 0.4,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 4096,
+        ),
+        safetySettings: [
+          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+        ],
+      );
+    } else {
+      return GenerativeModel(
+        model: 'gemini-pro',
+        apiKey: getApiKey(),
+        generationConfig: GenerationConfig(
+          temperature: 0.4,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 4096,
+        ),
+        safetySettings: [
+          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+        ],
+      );
+    }
+  }
+
+  // get api key from env
+  static String getApiKey() {
+    return dotenv.env['GEMINI_API_KEY'].toString();
   }
 }

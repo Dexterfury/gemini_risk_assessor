@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -23,7 +22,7 @@ class AuthProvider extends ChangeNotifier {
   String? _uid;
   String? _phoneNumber;
   Timer? _timer;
-  int _secondsRemaing = 60;
+  int _secondsRemaining = 60;
 
   File? _finalFileImage;
   String _userImage = '';
@@ -42,7 +41,7 @@ class AuthProvider extends ChangeNotifier {
   String? get uid => _uid;
   String? get phoneNumber => _phoneNumber;
   Timer? get timer => _timer;
-  int get secondsRemaing => _secondsRemaing;
+  int get secondsRemaining => _secondsRemaining;
   File? get finalFileImage => _finalFileImage;
   String get userImage => _userImage;
 
@@ -245,7 +244,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // sign in unnomymous
+  // sign in anonymous
   Future<void> signInAnonymously({
     required Function() onSuccess,
     required Function(String) onFail,
@@ -337,7 +336,7 @@ class AuthProvider extends ChangeNotifier {
       codeSent: (String verificationId, int? resendToken) async {
         _isLoading = false;
         _resendToken = resendToken;
-        _secondsRemaing = 60;
+        _secondsRemaining = 60;
         _startTimer();
         notifyListeners();
         // navigate to otp screen
@@ -359,8 +358,8 @@ class AuthProvider extends ChangeNotifier {
     // cancel timer if any exist
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaing > 0) {
-        _secondsRemaing--;
+      if (_secondsRemaining > 0) {
+        _secondsRemaining--;
         notifyListeners();
       } else {
         // cancel timer
@@ -382,7 +381,7 @@ class AuthProvider extends ChangeNotifier {
     required BuildContext context,
     required String phone,
   }) async {
-    if (_secondsRemaing == 0 || _resendToken != null) {
+    if (_secondsRemaining == 0 || _resendToken != null) {
       // allow user to resend code only if timer is not running and resend token exists
       _isLoading = true;
       notifyListeners();
@@ -419,7 +418,7 @@ class AuthProvider extends ChangeNotifier {
     } else {
       showSnackBar(
           context: context,
-          message: 'Please wait $_secondsRemaing seconds to resend');
+          message: 'Please wait $_secondsRemaining seconds to resend');
     }
   }
 

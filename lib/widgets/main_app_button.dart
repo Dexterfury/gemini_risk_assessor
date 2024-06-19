@@ -5,11 +5,13 @@ class MainAppButton extends StatelessWidget {
     super.key,
     required this.widget,
     required this.label,
+    this.color = Colors.white,
     required this.onTap,
   });
 
   final Widget widget;
   final String label;
+  final Color color;
   final Function() onTap;
 
   @override
@@ -19,7 +21,7 @@ class MainAppButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Theme.of(context).dialogBackgroundColor,
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
               width: 1,
@@ -33,7 +35,7 @@ class MainAppButton extends StatelessWidget {
               const SizedBox(
                 width: 10,
               ),
-              Text(label),
+              Text(label, style: TextStyle(color: color,),),
             ],
           ),
         ));

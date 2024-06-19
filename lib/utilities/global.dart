@@ -1,11 +1,16 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/widgets/image_picker_item.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../providers/tool_provider.dart';
+import '../themes/my_themes.dart';
+import '../widgets/main_app_button.dart';
 
 String cleanJson(String maybeInvalidJson) {
   if (maybeInvalidJson.contains('```')) {
@@ -407,4 +412,114 @@ Future<String> storeFileToStorage({
   TaskSnapshot taskSnapshot = await uploadTask;
   String fileUrl = await taskSnapshot.ref.getDownloadURL();
   return fileUrl;
+}
+
+Widget previewImages({
+  required BuildContext context,
+  required ToolProvider toolsProvider,
+  required PageController pageController
+}) {
+  final imagesCount = toolsProvider.imagesFileList!.length;
+  if (toolsProvider.imagesFileList!.isNotEmpty) {
+    return Stack(
+      children: [
+        PageView.builder(
+          controller: pageController,
+          itemCount: imagesCount,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            final image = toolsProvider.imagesFileList![index];
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.60,
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15.0),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Image.file(
+                          File(image.path),
+                        fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        right: 10,
+                        top: 10,
+                        child: GestureDetector(
+                          onTap: () {
+                            // remove image from list
+                            toolsProvider.removeFile(
+                                image: image);
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.remove_circle,
+                              color: Colors.red.shade400,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        // add images button
+        Positioned(
+          left: 20,
+          bottom: 20,
+          child: MainAppButton(
+            widget: const Icon(Icons.camera_alt_rounded, color: Colors.white, ),
+            label: '+',
+            onTap: () {
+              toolsProvider.showImagePickerDialog(context: context,);
+            },
+          ),
+        )
+      ],
+    );
+  } else {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15.0),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.60,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.grey.shade200,
+          child: Center(
+            child: GestureDetector(
+              onTap: (){
+                toolsProvider.showImagePickerDialog(context: context,);
+              },
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_photo_alternate_outlined,
+                    size: 100,
+                  ),
+                  SizedBox(
+                    height: 10,),
+                  Text(
+                    "Click here to add images",
+                    textAlign: TextAlign.center,
+                    style: textStyle18w500,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

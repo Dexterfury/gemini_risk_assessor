@@ -1,10 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/providers/tools_provider.dart';
+import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/widgets/input_field.dart';
+import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../providers/auth_provider.dart';
 
 class CreateExplainerScreen extends StatefulWidget {
   const CreateExplainerScreen({super.key});
@@ -14,55 +17,138 @@ class CreateExplainerScreen extends StatefulWidget {
 }
 
 class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
-  Widget previewImages(ToolsProvider toolsProvider) {
-    if (toolsProvider.imagesFileList!.isNotEmpty) {
-      return ListView.builder(
-          itemCount: toolsProvider.imagesFileList!.length,
-          itemBuilder: (context, index) {
-            return Image.file(File(toolsProvider.imagesFileList![index].path));
-          });
-    } else {
-      return const Center(
-          child: Text(
-        "No image selected",
-        textAlign: TextAlign.center,
-      ));
-    }
+  // description controller
+  final TextEditingController _descriptionController = TextEditingController();
+  final PageController _pageController = PageController();
+
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    _pageController.dispose();
+    super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
-    final tooProvider = context.watch<ToolsProvider>();
+    final toolProvider = context.watch<ToolProvider>();
+    final images = toolProvider.imagesFileList!;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: MyAppBar(
         leading: backIcon(context),
         title: 'Tool Explainer',
       ),
-      body: Column(
-        children: [
-          Container(
-            height: screenHeight * 0.65,
-            color: Colors.grey,
-            child: previewImages(tooProvider),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text('Select Images'),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: screenHeight * 0.60,
+              width: MediaQuery.of(context).size.width,
+              child: previewImages(
+                context: context,
+                toolsProvider: toolProvider,
+                pageController: _pageController,
               ),
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text('Create Explainer'),
-              )
-            ],
-          )
-        ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+
+            images.isNotEmpty ?
+
+            // smoothPageIndicator
+            SmoothPageIndicator(
+              controller: _pageController,
+              count: images.length,
+              effect: const WormEffect(
+                dotHeight: 16,
+                dotWidth: 16,
+                type: WormType.normal,
+              ),
+            ) : const SizedBox(),
+
+            const SizedBox(
+              height: 10,
+            ),
+        
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  InputField(
+                    labelText: 'Enter description [optional]',
+                    hintText: 'Description',
+                    controller: _descriptionController,),
+        
+                  const SizedBox(
+                    height: 20,
+                  ),
+        
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: MainAppButton(
+                      widget: const Icon(Icons.create, color: Colors.white,),
+                      label: 'Generate Explainer',
+                      onTap: () async {
+                        //check if images are added
+                        if(toolProvider.imagesFileList!.isEmpty) {
+                          showSnackBar(context: context, message: 'Please add images');
+                          return;
+                        }
+
+                        // show my alert dialog for loading
+                        showMyAnimatedDialog(
+                          context: context,
+                          title: 'Generating',
+                          content: 'Please wait...',
+                          loadingIndicator: const SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: CircularProgressIndicator()),
+                        );
+        
+                        final authProvider = context.read<AuthProvider>();
+                        final description = _descriptionController.text;
+        
+                        await toolProvider.submitPrompt(
+                          creatorID: authProvider.userModel!.uid,
+                          description: description,).then((_) {
+                            // hide my alert dialog
+                          Navigator.pop(context);
+                          // show snackBar
+                          if (!context.mounted) return;
+                          // display the results
+                          if (toolProvider.toolModel != null) {
+                            // display the risk assessment details screen
+                            PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                              opaque: false,
+                              pageBuilder: (BuildContext context, animation,
+                                  secondaryAnimation) =>
+                                  AssessmentDetailsScreen(
+                                    assessmentModel:
+                                    assessmentProvider.assessmentModel!,
+                                    animation: animation,
+                                  ),
+                            );
+                            bool shouldSave =
+                                await Navigator.of(context).push(pageRouteBuilder);
+                            if (shouldSave) {
+                              // TODO save the risk assessment to database
+                            }
+                          }
+                        });
+                      },
+        
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        
+          ],
+        ),
       ),
     );
   }

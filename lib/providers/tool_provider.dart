@@ -10,7 +10,7 @@ import '../models/prompt_data_model.dart';
 import '../service/gemini.dart';
 import '../utilities/global.dart';
 
-class ToolsProvider extends ChangeNotifier {
+class ToolProvider extends ChangeNotifier {
   bool _isLoading = false;
   int _maxImages = 10;
   String _description = '';

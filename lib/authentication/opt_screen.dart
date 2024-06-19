@@ -109,7 +109,7 @@ class _OTPScreenState extends State<OTPScreen> {
           ),
           const SizedBox(height: 10),
           TextButton(
-              onPressed: authProvider.secondsRemaing == 0
+              onPressed: authProvider.secondsRemaining == 0
                   ? () {
                       // reset the code to send again
                       authProvider.resendCode(

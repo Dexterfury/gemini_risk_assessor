@@ -35,6 +35,13 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     super.initState();
   }
 
+  @override
+  dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   getUsersDataFromProvider() {
     // wait for until screen build
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
@@ -196,6 +203,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       // pop the the dialog
                       Navigator.pop(context);
                       if (!context.mounted) return;
+                      // display the results
                       if (assessmentProvider.assessmentModel != null) {
                         // display the risk assessment details screen
                         PageRouteBuilder pageRouteBuilder = PageRouteBuilder(

@@ -5,17 +5,14 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
-import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/service/gemini.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -93,11 +90,11 @@ class AssessmentProvider extends ChangeNotifier {
 
     _pdfAssessmentFile = file;
     notifyListeners();
-    await saveAssmentToFirestore(file);
+    await saveAssessmentToFirestore(file);
   }
 
   // save assement to firetore
-  Future<void> saveAssmentToFirestore(File file) async {
+  Future<void> saveAssessmentToFirestore(File file) async {
     final id = _isPersonal ? _uid : _organisationID;
     // upload image to storage
     String fileUrl = await storeFileToStorage(
@@ -151,41 +148,6 @@ class AssessmentProvider extends ChangeNotifier {
   void setWeather({required Weather newWeather}) {
     _weather = newWeather;
     notifyListeners();
-  }
-
-  // function to set the model based on bool - isTextOnly
-  Future<GenerativeModel> getModel() async {
-    if (_maxImages < 10) {
-      return GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: getApiKey(),
-        generationConfig: GenerationConfig(
-          temperature: 0.4,
-          topK: 32,
-          topP: 1,
-          maxOutputTokens: 4096,
-        ),
-        safetySettings: [
-          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-        ],
-      );
-    } else {
-      return GenerativeModel(
-        model: 'gemini-pro',
-        apiKey: getApiKey(),
-        generationConfig: GenerationConfig(
-          temperature: 0.4,
-          topK: 32,
-          topP: 1,
-          maxOutputTokens: 4096,
-        ),
-        safetySettings: [
-          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-        ],
-      );
-    }
   }
 
   // set max images
@@ -254,11 +216,6 @@ class AssessmentProvider extends ChangeNotifier {
       _ppeModelList.add(ppeItem);
     }
     notifyListeners();
-  }
-
-  // get api key from env
-  String getApiKey() {
-    return dotenv.env['GEMINI_API_KEY'].toString();
   }
 
   // remove file
@@ -384,12 +341,12 @@ class AssessmentProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     // get model to use text or vision
-    var model = await getModel();
+    var model = await GeminiService.getModel(images: _maxImages);
 
     // set description to use in prompt
     await setDescription(description, creatorID);
 
-    // get promtDara
+    // get promptDara
     final prompt = getPromptData();
 
     try {
@@ -455,7 +412,7 @@ ${_description.isNotEmpty ? _description : ''}
       "No risks identified based on information and images provided";
 
   final String format = '''
-Return the recipe as valid JSON using the following structure:
+Return the assessment as valid JSON using the following structure:
 {
   "id": \$uniqueId,
   "title": \$assessmentTitle,
