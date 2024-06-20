@@ -4,7 +4,7 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
+import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
@@ -81,7 +81,9 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               ),
 
               // assessment images
-              const AssessmentImages(),
+              ImagesDisplay(
+                assessmentProvider: assessmentProvider,
+              ),
 
               const SizedBox(
                 height: 20,
@@ -137,7 +139,10 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: MainAppButton(
-                  widget: const Icon(Icons.create),
+                  widget: const Icon(
+                    Icons.create,
+                    color: Colors.white,
+                  ),
                   label: 'Generate Assessment',
                   onTap: () async {
                     // check if name field is not empty and name length is more 3 characters or more
@@ -211,8 +216,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           pageBuilder: (BuildContext context, animation,
                                   secondaryAnimation) =>
                               AssessmentDetailsScreen(
-                            assessmentModel:
-                                assessmentProvider.assessmentModel!,
                             animation: animation,
                           ),
                         );

@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/widgets/assessment_images.dart';
+import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/widgets/data_items_widget.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
@@ -16,33 +14,47 @@ import 'package:provider/provider.dart';
 class AssessmentDetailsScreen extends StatelessWidget {
   AssessmentDetailsScreen({
     super.key,
-    required this.assessmentModel,
     required this.animation,
   }) : _scrollController = ScrollController();
 
-  final AssessmentModel assessmentModel;
   final Animation<double> animation;
   final ScrollController _scrollController;
 
   @override
   Widget build(BuildContext context) {
+    // assessment provider
+    final assessmentProvider = context.watch<AssessmentProvider>();
+    // get time
+    final time = assessmentProvider.assessmentModel!.createdAt;
+    // get title
+    final title = assessmentProvider.assessmentModel!.title;
+    // weather
+    final weather = assessmentProvider.assessmentModel!.weather;
+    // task to archieve
+    final task = assessmentProvider.assessmentModel!.taskToAchieve;
+    // equipments
+    final equipments = assessmentProvider.assessmentModel!.equipments;
+    // hazards
+    final hazards = assessmentProvider.assessmentModel!.hazards;
+    // risks
+    final risks = assessmentProvider.assessmentModel!.risks;
+    // control
+    final control = assessmentProvider.assessmentModel!.control;
+    // summary
+    final summary = assessmentProvider.assessmentModel!.summary;
+    // createdBy
+    final createdBy = assessmentProvider.assessmentModel!.createdBy;
+
     // Format the datetime using Intl package
-    String formattedTime =
-        DateFormat.yMMMEd().format(assessmentModel.createdAt);
+    String formattedTime = DateFormat.yMMMEd().format(time);
+
     return SafeArea(
       child: ScaleTransition(
         scale: Tween(begin: 3.0, end: 1.0).animate(animation),
         child: Scaffold(
           appBar: MyAppBar(
-            title: assessmentModel.title,
-            leading: IconButton(
-              icon: Icon(
-                Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
+            title: title,
+            leading: backIcon(context: context),
             actions: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
@@ -87,20 +99,23 @@ class AssessmentDetailsScreen extends StatelessWidget {
                       child: SizedBox(
                         width: 100,
                         child: WeatherButton(
-                            title: assessmentModel.weather,
+                            title: weather,
                             value: true,
                             iconData: getWeatherIcon(
-                                WeatherExtension.fromString(
-                                    assessmentModel.weather)),
+                              WeatherExtension.fromString(
+                                weather,
+                              ),
+                            ),
                             onChanged: () {}),
                       ),
                     ),
                   ],
                 ),
-                Text(assessmentModel.taskToAchieve),
+                Text(task),
                 const SizedBox(height: 10),
-                const AssessmentImages(
+                ImagesDisplay(
                   isViewOnly: true,
+                  assessmentProvider: assessmentProvider,
                 ),
                 const SizedBox(height: 10),
                 Row(
@@ -108,24 +123,24 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   children: [
                     DataItemsWidget(
                       label: ListHeader.equipments,
-                      dataList: assessmentModel.equipments,
+                      dataList: equipments,
                     ),
                     DataItemsWidget(
                       label: ListHeader.hazards,
-                      dataList: assessmentModel.hazards,
+                      dataList: hazards,
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 DataItemsWidget(
                   label: ListHeader.risks,
-                  dataList: assessmentModel.risks,
+                  dataList: risks,
                   width: 100,
                 ),
                 const SizedBox(height: 10),
                 DataItemsWidget(
                   label: ListHeader.control,
-                  dataList: assessmentModel.control,
+                  dataList: control,
                   width: 100,
                 ),
                 const SizedBox(height: 10),
@@ -139,10 +154,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   'Summary:',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                Text(assessmentModel.summary),
+                Text(summary),
                 const SizedBox(height: 10),
                 Text(
-                  'Created by: ${assessmentModel.createdBy}',
+                  'Created by: $createdBy',
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 16),
                 ),

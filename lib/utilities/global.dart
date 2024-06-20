@@ -393,9 +393,9 @@ void imagePickerAnimatedDialog({
 }
 
 // general bacl icon
-Widget backIcon(BuildContext context) {
+Widget backIcon({required BuildContext context, bool value = false}) {
   return IconButton(
-    onPressed: () => Navigator.pop(context),
+    onPressed: () => Navigator.of(context).pop(value),
     icon: Icon(
       Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
     ),
@@ -414,11 +414,10 @@ Future<String> storeFileToStorage({
   return fileUrl;
 }
 
-Widget previewImages({
-  required BuildContext context,
-  required ToolProvider toolsProvider,
-  required PageController pageController
-}) {
+Widget previewImages(
+    {required BuildContext context,
+    required ToolProvider toolsProvider,
+    required PageController pageController}) {
   final imagesCount = toolsProvider.imagesFileList!.length;
   if (toolsProvider.imagesFileList!.isNotEmpty) {
     return Stack(
@@ -441,7 +440,7 @@ Widget previewImages({
                       Positioned.fill(
                         child: Image.file(
                           File(image.path),
-                        fit: BoxFit.cover,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       Positioned(
@@ -450,8 +449,7 @@ Widget previewImages({
                         child: GestureDetector(
                           onTap: () {
                             // remove image from list
-                            toolsProvider.removeFile(
-                                image: image);
+                            toolsProvider.removeFile(image: image);
                           },
                           child: Container(
                             decoration: const BoxDecoration(
@@ -477,10 +475,15 @@ Widget previewImages({
           left: 20,
           bottom: 20,
           child: MainAppButton(
-            widget: const Icon(Icons.camera_alt_rounded, color: Colors.white, ),
+            widget: const Icon(
+              Icons.camera_alt_rounded,
+              color: Colors.white,
+            ),
             label: '+',
             onTap: () {
-              toolsProvider.showImagePickerDialog(context: context,);
+              toolsProvider.showImagePickerDialog(
+                context: context,
+              );
             },
           ),
         )
@@ -497,8 +500,10 @@ Widget previewImages({
           color: Colors.grey.shade200,
           child: Center(
             child: GestureDetector(
-              onTap: (){
-                toolsProvider.showImagePickerDialog(context: context,);
+              onTap: () {
+                toolsProvider.showImagePickerDialog(
+                  context: context,
+                );
               },
               child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -508,7 +513,8 @@ Widget previewImages({
                     size: 100,
                   ),
                   SizedBox(
-                    height: 10,),
+                    height: 10,
+                  ),
                   Text(
                     "Click here to add images",
                     textAlign: TextAlign.center,

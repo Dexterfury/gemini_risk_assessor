@@ -24,7 +24,10 @@ class BottonButtonsField extends StatelessWidget {
           children: [
             assessmentProvider.signatureImage == null
                 ? MainAppButton(
-                    widget: const Icon(Icons.fingerprint),
+                    widget: const Icon(
+                      Icons.fingerprint,
+                      color: Colors.white,
+                    ),
                     label: "Add Signature",
                     onTap: () {
                       // show signature dialog
@@ -85,7 +88,10 @@ class BottonButtonsField extends StatelessWidget {
               width: 10,
             ),
             MainAppButton(
-                widget: const Icon(Icons.save),
+                widget: const Icon(
+                  Icons.save,
+                  color: Colors.white,
+                ),
                 label: "Save Assessment",
                 onTap: () async {
                   if (assessmentProvider.signatureImage == null) {

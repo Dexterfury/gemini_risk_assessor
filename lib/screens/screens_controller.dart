@@ -19,7 +19,7 @@ class _ScreensControllerState extends State<ScreensController>
   int _selectedIndex = 0;
   final List<Widget> _tabs = [
     const HomeScreen(),
-    const OrganisationsGridScreen(),
+    const OrganisationsScreen(),
   ];
 
   late Animation<double> _animation;
@@ -53,6 +53,12 @@ class _ScreensControllerState extends State<ScreensController>
   //     },
   //   );
   // }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

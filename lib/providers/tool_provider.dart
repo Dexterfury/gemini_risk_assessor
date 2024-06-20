@@ -1,7 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,6 +30,18 @@ class ToolProvider extends ChangeNotifier {
   String get uid => _uid;
   List<XFile>? get imagesFileList => _imagesFileList;
   ToolModel? get toolModel => _toolModel;
+
+  final CollectionReference toolsCollection =
+      FirebaseFirestore.instance.collection(Constants.toolsCollection);
+
+  // save tool to firestore
+  Future<void> saveToolToFirestore() async {
+    if (_toolModel != null) {
+      await toolsCollection
+          .doc(_toolModel!.createdBy)
+          .set(_toolModel!.toJson());
+    }
+  }
 
   // set max images
   void setMaxImages(int value) {
@@ -146,6 +161,26 @@ class ToolProvider extends ChangeNotifier {
   void resetPromptData() {
     _imagesFileList = [];
     _maxImages = 10;
+    notifyListeners();
+  }
+
+  Future<void> testPrompt() async {
+    final Map<String, dynamic> dataMap = {
+      Constants.id: '774b4250-0628-4381-a921-636009b3941c',
+      Constants.name: 'Brick Trowel Set',
+      Constants.description:
+          'This set of three brick trowels is perfect for any masonry project. The largest trowel is ideal for spreading mortar and leveling bricks, while the smaller trowels are perfect for finishing work and applying grout. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles. To use the trowels, simply dip the blade into the mortar and spread it evenly onto the surface. Then, use the trowel to level the mortar and place the bricks. Once the bricks are in place, use the trowel to apply grout to the joints. When using the trowels, be sure to wear safety glasses and gloves to protect yourself from debris and mortar. Always use a firm grip on the handle and avoid using excessive force.',
+      Constants.summary:
+          'This set of three brick trowels is perfect for any masonry project. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles.',
+      Constants.toolPdf: '',
+      Constants.images: [
+        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000019.jpg'
+      ],
+      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
+      Constants.createdAt: 1718868958685,
+    };
+
+    _toolModel = ToolModel.fromJson(dataMap);
     notifyListeners();
   }
 

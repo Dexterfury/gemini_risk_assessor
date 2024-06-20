@@ -5,6 +5,9 @@ class Constants {
   // risk assessment
   static const String riskAssessments = 'Risk Assessments';
 
+  // tools
+  static const String tools = 'Tools';
+
   // daily task instructions
   static const String dailyTaskInstructions = 'Daily Safety Task Instructions';
 
@@ -77,6 +80,7 @@ class Constants {
   static const String promptCollection = 'prompts';
   static const String assessmentCollection = 'assessments';
   static const String organisationCollection = 'organisations';
+  static const String toolsCollection = 'tools';
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {
