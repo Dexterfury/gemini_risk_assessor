@@ -21,6 +21,7 @@ class ToolProvider extends ChangeNotifier {
   String _uid = '';
   List<XFile>? _imagesFileList = [];
   ToolModel? _toolModel;
+  List<ToolModel> _toolsList = [];
 
   // getters
   bool get isLoading => _isLoading;
@@ -30,6 +31,7 @@ class ToolProvider extends ChangeNotifier {
   String get uid => _uid;
   List<XFile>? get imagesFileList => _imagesFileList;
   ToolModel? get toolModel => _toolModel;
+  List<ToolModel> get toolsList => _toolsList;
 
   final CollectionReference toolsCollection =
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
@@ -37,10 +39,57 @@ class ToolProvider extends ChangeNotifier {
   // save tool to firestore
   Future<void> saveToolToFirestore() async {
     if (_toolModel != null) {
-      await toolsCollection
-          .doc(_toolModel!.createdBy)
-          .set(_toolModel!.toJson());
+      await toolsCollection.add(_toolModel!.toJson());
     }
+  }
+
+  setTestToolsList() {
+    final Map<String, dynamic> dataMap = {
+      Constants.id: '774b4250-0628-4381-a921-636009b3941c',
+      Constants.name: 'Brick Trowel Set',
+      Constants.description:
+          'This set of three brick trowels is perfect for any masonry project. The largest trowel is ideal for spreading mortar and leveling bricks, while the smaller trowels are perfect for finishing work and applying grout. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles. To use the trowels, simply dip the blade into the mortar and spread it evenly onto the surface. Then, use the trowel to level the mortar and place the bricks. Once the bricks are in place, use the trowel to apply grout to the joints. When using the trowels, be sure to wear safety glasses and gloves to protect yourself from debris and mortar. Always use a firm grip on the handle and avoid using excessive force.',
+      Constants.summary:
+          'This set of three brick trowels is perfect for any masonry project. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles.',
+      Constants.toolPdf: '',
+      Constants.images: [
+        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000019.jpg'
+      ],
+      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
+      Constants.createdAt: 1718868958685,
+    };
+
+    _toolModel = ToolModel.fromJson(dataMap);
+
+    _toolsList = [];
+
+    // make alist of 10 tools
+    for (int i = 0; i < 10; i++) {
+      _toolsList.add(_toolModel!);
+    }
+    log('testTools');
+    notifyListeners();
+  }
+
+  // get tools list from firestore
+  Future<void> getToolsListFromFirestore() async {
+    final querySnapshot =
+        await toolsCollection.where(Constants.createdBy, isEqualTo: _uid).get();
+    _toolsList = [];
+    if (querySnapshot.docs.isNotEmpty) {
+      for (var doc in querySnapshot.docs) {
+        _toolsList.add(ToolModel.fromJson(doc.data() as Map<String, dynamic>));
+      }
+    }
+
+    notifyListeners();
+  }
+
+  // stream my tools from firestore
+  Stream<QuerySnapshot> streamMyTools() {
+    return toolsCollection
+        .where(Constants.createdBy, isEqualTo: _uid)
+        .snapshots();
   }
 
   // set max images

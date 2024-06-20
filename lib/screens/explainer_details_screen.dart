@@ -54,7 +54,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                 // descpription
                 Text(
                   toolProvider.toolModel!.description,
-                  style: textStyle16w500,
+                  style: textStyle16w600,
                 ),
                 const SizedBox(
                   height: 20,
