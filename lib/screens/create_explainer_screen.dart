@@ -30,10 +30,17 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     super.dispose();
   }
 
+  _getImages(ToolProvider provider) {
+    if (provider.isViewOnly) {
+      return provider.toolModel!.images;
+    }
+    return provider.imagesFileList!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final toolProvider = context.watch<ToolProvider>();
-    final images = toolProvider.imagesFileList!;
+    final images = _getImages(toolProvider);
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: MyAppBar(
@@ -55,17 +62,10 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             const SizedBox(
               height: 10,
             ),
-            images.isNotEmpty
-                ? SmoothPageIndicator(
-                    controller: _pageController,
-                    count: images.length,
-                    effect: const WormEffect(
-                      dotHeight: 16,
-                      dotWidth: 16,
-                      type: WormType.normal,
-                    ),
-                  )
-                : const SizedBox(),
+            PageIndicator(
+              pageController: _pageController,
+              images: images,
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -195,5 +195,37 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
         color: Colors.black87,
       ),
     );
+  }
+}
+
+class PageIndicator extends StatelessWidget {
+  const PageIndicator({
+    super.key,
+    required PageController pageController,
+    required this.images,
+  }) : _pageController = pageController;
+
+  final PageController _pageController;
+  final List<dynamic> images;
+
+  @override
+  Widget build(BuildContext context) {
+    return images.isEmpty
+        ? const SizedBox()
+        : Padding(
+            padding: const EdgeInsets.only(
+              left: 8.0,
+              right: 8.0,
+            ),
+            child: SmoothPageIndicator(
+              controller: _pageController,
+              count: images.length,
+              effect: const WormEffect(
+                dotHeight: 16,
+                dotWidth: 16,
+                type: WormType.normal,
+              ),
+            ),
+          );
   }
 }
