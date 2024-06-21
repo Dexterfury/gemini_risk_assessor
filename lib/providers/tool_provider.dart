@@ -37,13 +37,14 @@ class ToolProvider extends ChangeNotifier {
   final CollectionReference toolsCollection =
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
 
-  void setViewOnly(bool value) {
+  Future<void> setViewOnly(bool value) async {
     _isViewOnly = value;
     notifyListeners();
   }
 
   // set tool
   Future<void> setTool(ToolModel tool) async {
+    setViewOnly(true);
     _toolModel = tool;
     notifyListeners();
   }
