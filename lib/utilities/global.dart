@@ -419,6 +419,7 @@ Widget previewImages({
   required BuildContext context,
   required List<dynamic> images,
   required PageController pageController,
+  required bool isViewOnly,
 }) {
   final toolsProvider = context.read<ToolsProvider>();
   if (images.isNotEmpty) {
@@ -440,10 +441,15 @@ Widget previewImages({
                   child: Stack(
                     children: [
                       Positioned.fill(
-                        child: Image.file(
-                          File(image.path),
-                          fit: BoxFit.cover,
-                        ),
+                        child: isViewOnly
+                            ? Image.network(
+                                image,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.file(
+                                File(image.path),
+                                fit: BoxFit.cover,
+                              ),
                       ),
                       Positioned(
                         right: 10,

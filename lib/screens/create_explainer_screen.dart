@@ -57,6 +57,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                 context: context,
                 images: images,
                 pageController: _pageController,
+                isViewOnly: toolProvider.isViewOnly,
               ),
             ),
             const SizedBox(
