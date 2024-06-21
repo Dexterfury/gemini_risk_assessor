@@ -103,7 +103,7 @@ class _ScreensControllerState extends State<ScreensController>
                   onPress: () {
                     _animationController.reverse();
                     context
-                        .read<ToolProvider>()
+                        .read<ToolsProvider>()
                         .setViewOnly(false)
                         .whenComplete(() {
                       navigationController(

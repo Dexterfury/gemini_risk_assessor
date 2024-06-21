@@ -27,7 +27,7 @@ void main() async {
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
-      ChangeNotifierProvider(create: (context) => ToolProvider()),
+      ChangeNotifierProvider(create: (context) => ToolsProvider()),
     ], child: const MyApp()),
   );
 }

@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               // TODO remove this later
               //context.read<ToolProvider>().setMacTestToolsList();
-              context.read<ToolProvider>().setWindowsTestToolsList();
+              context.read<ToolsProvider>().setWindowsTestToolsList();
             },
             icon: const Icon(Icons.search),
           ),

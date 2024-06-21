@@ -21,7 +21,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // toolProvider
-    final toolProvider = context.watch<ToolProvider>();
+    final toolProvider = context.watch<ToolsProvider>();
     // time
     final time = toolProvider.toolModel!.createdAt;
     // title

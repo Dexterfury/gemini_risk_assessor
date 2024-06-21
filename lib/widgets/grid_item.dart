@@ -24,7 +24,7 @@ class GridItem extends StatelessWidget {
           return InkWell(
             onTap: () {
               // set the selected tool
-              context.read<ToolProvider>().setTool(tool).whenComplete(() {
+              context.read<ToolsProvider>().setTool(tool).whenComplete(() {
                 Navigator.pushNamed(context, Constants.createToolRoute);
               });
             },

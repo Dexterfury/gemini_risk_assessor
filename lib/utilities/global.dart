@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/widgets/image_picker_item.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/tool_provider.dart';
 import '../themes/my_themes.dart';
@@ -414,20 +415,21 @@ Future<String> storeFileToStorage({
   return fileUrl;
 }
 
-Widget previewImages(
-    {required BuildContext context,
-    required ToolProvider toolsProvider,
-    required PageController pageController}) {
-  final imagesCount = toolsProvider.imagesFileList!.length;
-  if (toolsProvider.imagesFileList!.isNotEmpty) {
+Widget previewImages({
+  required BuildContext context,
+  required List<dynamic> images,
+  required PageController pageController,
+}) {
+  final toolsProvider = context.read<ToolsProvider>();
+  if (images.isNotEmpty) {
     return Stack(
       children: [
         PageView.builder(
           controller: pageController,
-          itemCount: imagesCount,
+          itemCount: images.length,
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
-            final image = toolsProvider.imagesFileList![index];
+            final image = images[index];
             return SizedBox(
               height: MediaQuery.of(context).size.height * 0.60,
               width: MediaQuery.of(context).size.width,

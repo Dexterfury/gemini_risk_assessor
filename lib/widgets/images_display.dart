@@ -14,7 +14,7 @@ class ImagesDisplay extends StatelessWidget {
 
   final bool isViewOnly;
   final AssessmentProvider? assessmentProvider;
-  final ToolProvider? toolProvider;
+  final ToolsProvider? toolProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +97,7 @@ class ImagesDisplay extends StatelessWidget {
 
   getProvider(
     AssessmentProvider? assessmentProvider,
-    ToolProvider? toolProvider,
+    ToolsProvider? toolProvider,
   ) {
     if (assessmentProvider != null) {
       return assessmentProvider;

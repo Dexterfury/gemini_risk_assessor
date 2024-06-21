@@ -8,7 +8,7 @@ class ToolsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toolProvider = context.watch<ToolProvider>();
+    final toolProvider = context.watch<ToolsProvider>();
     return SafeArea(
         child: Padding(
       padding: const EdgeInsets.all(8.0),

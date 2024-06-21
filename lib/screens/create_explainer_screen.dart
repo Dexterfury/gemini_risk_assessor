@@ -30,7 +30,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     super.dispose();
   }
 
-  _getImages(ToolProvider provider) {
+  _getImages(ToolsProvider provider) {
     if (provider.isViewOnly) {
       return provider.toolModel!.images;
     }
@@ -39,7 +39,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final toolProvider = context.watch<ToolProvider>();
+    final toolProvider = context.watch<ToolsProvider>();
     final images = _getImages(toolProvider);
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -55,7 +55,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
               width: MediaQuery.of(context).size.width,
               child: previewImages(
                 context: context,
-                toolsProvider: toolProvider,
+                images: images,
                 pageController: _pageController,
               ),
             ),
@@ -78,7 +78,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     );
   }
 
-  buildInputGenerationBtn(ToolProvider toolProvider, BuildContext context) {
+  buildInputGenerationBtn(ToolsProvider toolProvider, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -187,7 +187,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     );
   }
 
-  buildToolDescriptionText(ToolProvider toolProvider) {
+  buildToolDescriptionText(ToolsProvider toolProvider) {
     return Text(
       toolProvider.toolModel!.description,
       style: const TextStyle(
