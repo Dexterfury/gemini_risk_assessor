@@ -15,39 +15,44 @@ class GridItem extends StatelessWidget {
     return Card(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final imageHeight = constraints.maxHeight * 0.7;
-          final textHeight = constraints.maxHeight * 0.3;
+          final imageHeight = constraints.maxHeight * 0.8;
+          final textHeight = constraints.maxHeight * 0.2;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: imageHeight,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0),
-                  ),
-                  child: Image.file(
-                    File(tool.images.first),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              SizedBox(
-                  height: textHeight * 0.1), // Spacing between image and text
-              SizedBox(
-                height: textHeight * 0.9,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    tool.name,
-                    style: textStyle16w600,
-                    overflow: TextOverflow.ellipsis,
+          return InkWell(
+            onTap: () {
+              // set the selected tool
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: imageHeight,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10.0),
+                      topRight: Radius.circular(10.0),
+                    ),
+                    child: Image.file(
+                      File(tool.images.first),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(
+                    height: textHeight * 0.1), // Spacing between image and text
+                SizedBox(
+                  height: textHeight * 0.9,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      tool.name,
+                      style: textStyle16w600,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

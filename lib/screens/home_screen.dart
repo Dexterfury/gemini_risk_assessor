@@ -21,7 +21,8 @@ class HomeScreen extends StatelessWidget {
           leading: IconButton(
             onPressed: () {
               // TODO remove this later
-              context.read<ToolProvider>().setTestToolsList();
+              //context.read<ToolProvider>().setMacTestToolsList();
+              context.read<ToolProvider>().setWindowsTestToolsList();
             },
             icon: const Icon(Icons.search),
           ),

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -15,6 +14,7 @@ import '../utilities/global.dart';
 
 class ToolProvider extends ChangeNotifier {
   bool _isLoading = false;
+  bool _isViewOnly = false;
   int _maxImages = 10;
   String _description = '';
   File? _pdfToolFile;
@@ -25,6 +25,7 @@ class ToolProvider extends ChangeNotifier {
 
   // getters
   bool get isLoading => _isLoading;
+  bool get isViewOnly => _isViewOnly;
   int get maxImages => _maxImages;
   String get description => _description;
   File? get pdfToolFile => _pdfToolFile;
@@ -36,6 +37,17 @@ class ToolProvider extends ChangeNotifier {
   final CollectionReference toolsCollection =
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
 
+  void setViewOnly(bool value) {
+    _isViewOnly = value;
+    notifyListeners();
+  }
+
+  // set tool
+  Future<void> setTool(ToolModel tool) async {
+    _toolModel = tool;
+    notifyListeners();
+  }
+
   // save tool to firestore
   Future<void> saveToolToFirestore() async {
     if (_toolModel != null) {
@@ -43,7 +55,7 @@ class ToolProvider extends ChangeNotifier {
     }
   }
 
-  setTestToolsList() {
+  setMacTestToolsList() {
     final Map<String, dynamic> dataMap = {
       Constants.id: '774b4250-0628-4381-a921-636009b3941c',
       Constants.name: 'Brick Trowel Set',
@@ -54,6 +66,34 @@ class ToolProvider extends ChangeNotifier {
       Constants.toolPdf: '',
       Constants.images: [
         '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000019.jpg'
+      ],
+      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
+      Constants.createdAt: 1718868958685,
+    };
+
+    _toolModel = ToolModel.fromJson(dataMap);
+
+    _toolsList = [];
+
+    // make alist of 10 tools
+    for (int i = 0; i < 10; i++) {
+      _toolsList.add(_toolModel!);
+    }
+    log('testTools');
+    notifyListeners();
+  }
+
+  setWindowsTestToolsList() {
+    final Map<String, dynamic> dataMap = {
+      Constants.id: 'd9320635-5a71-4437-a526-172957038b92',
+      Constants.name: 'Claw Hammer',
+      Constants.description:
+          'A claw hammer is a versatile tool used for driving nails and removing them. It consists of a wooden or fiberglass handle attached to a metal head with a hammer face on one side and a claw on the other. To drive a nail, hold the hammer near the end of the handle for more force or closer to the head for more control. Swing the hammer in a smooth arc, striking the nail head squarely. To remove a nail, place the claw under the nail head and rock the hammer back and forth until the nail is loose. Be careful not to damage the surrounding material when removing nails. ',
+      Constants.summary:
+          'A claw hammer is a common tool used for driving and removing nails in various applications, from construction and carpentry to home repairs.',
+      Constants.toolPdf: '',
+      Constants.images: [
+        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000033.jpg'
       ],
       Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
       Constants.createdAt: 1718868958685,
@@ -213,7 +253,7 @@ class ToolProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> testPrompt() async {
+  Future<void> macTestPrompt() async {
     final Map<String, dynamic> dataMap = {
       Constants.id: '774b4250-0628-4381-a921-636009b3941c',
       Constants.name: 'Brick Trowel Set',
@@ -224,6 +264,26 @@ class ToolProvider extends ChangeNotifier {
       Constants.toolPdf: '',
       Constants.images: [
         '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000019.jpg'
+      ],
+      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
+      Constants.createdAt: 1718868958685,
+    };
+
+    _toolModel = ToolModel.fromJson(dataMap);
+    notifyListeners();
+  }
+
+  Future<void> windowstestPrompt() async {
+    final Map<String, dynamic> dataMap = {
+      Constants.id: 'd9320635-5a71-4437-a526-172957038b92',
+      Constants.name: 'Claw Hammer',
+      Constants.description:
+          'A claw hammer is a versatile tool used for driving nails and removing them. It consists of a wooden or fiberglass handle attached to a metal head with a hammer face on one side and a claw on the other. To drive a nail, hold the hammer near the end of the handle for more force or closer to the head for more control. Swing the hammer in a smooth arc, striking the nail head squarely. To remove a nail, place the claw under the nail head and rock the hammer back and forth until the nail is loose. Be careful not to damage the surrounding material when removing nails. ',
+      Constants.summary:
+          'A claw hammer is a common tool used for driving and removing nails in various applications, from construction and carpentry to home repairs.',
+      Constants.toolPdf: '',
+      Constants.images: [
+        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000033.jpg'
       ],
       Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
       Constants.createdAt: 1718868958685,
@@ -268,6 +328,9 @@ class ToolProvider extends ChangeNotifier {
           images,
           DateTime.now(),
         );
+        log('imageURL: $images');
+        log('tool : $_toolModel');
+        log('RESPONSE : ${content.text}');
         _isLoading = false;
         notifyListeners();
       }

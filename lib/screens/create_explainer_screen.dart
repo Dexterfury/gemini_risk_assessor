@@ -56,10 +56,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
               height: 10,
             ),
             images.isNotEmpty
-                ?
-
-                // smoothPageIndicator
-                SmoothPageIndicator(
+                ? SmoothPageIndicator(
                     controller: _pageController,
                     count: images.length,
                     effect: const WormEffect(
@@ -72,116 +69,130 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             const SizedBox(
               height: 10,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  InputField(
-                    labelText: 'Enter description [optional]',
-                    hintText: 'Description',
-                    controller: _descriptionController,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: MainAppButton(
-                      widget: const Icon(
-                        Icons.create,
-                        color: Colors.white,
-                      ),
-                      label: 'Generate Explainer',
-                      onTap: () async {
-                        //check if images are added
-                        if (toolProvider.imagesFileList!.isEmpty) {
-                          showSnackBar(
-                              context: context, message: 'Please add images');
-                          return;
-                        }
-
-                        await toolProvider.testPrompt();
-                        if (!context.mounted) return;
-                        // display the results
-                        if (toolProvider.toolModel != null) {
-                          // display the risk assessment details screen
-                          PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                            opaque: false,
-                            pageBuilder: (BuildContext context, animation,
-                                    secondaryAnimation) =>
-                                ExplainerDetailsScreen(
-                              animation: animation,
-                            ),
-                          );
-                          bool saved = await Navigator.of(context)
-                              .push(pageRouteBuilder);
-                          if (saved) {
-                            // reset the data
-                            toolProvider.resetPromptData();
-
-                            setState(() {
-                              _descriptionController.clear();
-                            });
-                            Future.delayed(const Duration(milliseconds: 200))
-                                .whenComplete(() {
-                              showSnackBar(
-                                  context: context,
-                                  message: 'Tool successfully saved');
-                            });
-                          }
-                        }
-
-                        // // show my alert dialog for loading
-                        // showMyAnimatedDialog(
-                        //   context: context,
-                        //   title: 'Generating',
-                        //   content: 'Please wait...',
-                        //   loadingIndicator: const SizedBox(
-                        //       height: 40,
-                        //       width: 40,
-                        //       child: CircularProgressIndicator()),
-                        // );
-
-                        // final authProvider = context.read<AuthProvider>();
-                        // final description = _descriptionController.text;
-
-                        // await toolProvider
-                        //     .submitPrompt(
-                        //   creatorID: authProvider.userModel!.uid,
-                        //   description: description,
-                        // )
-                        //     .then((_) async {
-                        //   // hide my alert dialog
-                        //   Navigator.pop(context);
-
-                        //   if (!context.mounted) return;
-                        //   // display the results
-                        //   if (toolProvider.toolModel != null) {
-                        //     // display the risk assessment details screen
-                        //     PageRouteBuilder pageRouteBuilder =
-                        //         PageRouteBuilder(
-                        //       opaque: false,
-                        //       pageBuilder: (BuildContext context, animation,
-                        //               secondaryAnimation) =>
-                        //           ExplainerDetailsScreen(
-                        //         animation: animation,
-                        //       ),
-                        //     );
-                        //     bool shouldSave = await Navigator.of(context)
-                        //         .push(pageRouteBuilder);
-                        //     if (shouldSave) {
-                        //       // TODO save the risk assessment to database
-                        //     }
-                        //   }
-                        // });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            toolProvider.isViewOnly
+                ? buildToolDescriptionText(toolProvider)
+                : buildInputGenerationBtn(toolProvider, context),
           ],
         ),
+      ),
+    );
+  }
+
+  buildInputGenerationBtn(ToolProvider toolProvider, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          InputField(
+            labelText: 'Enter description [optional]',
+            hintText: 'Description',
+            controller: _descriptionController,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: MainAppButton(
+              widget: const Icon(
+                Icons.create,
+                color: Colors.white,
+              ),
+              label: 'Generate Explainer',
+              onTap: () async {
+                //check if images are added
+                if (toolProvider.imagesFileList!.isEmpty) {
+                  showSnackBar(context: context, message: 'Please add images');
+                  return;
+                }
+
+                await toolProvider.windowstestPrompt();
+                if (!context.mounted) return;
+                // display the results
+                if (toolProvider.toolModel != null) {
+                  // display the risk assessment details screen
+                  PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                    opaque: false,
+                    pageBuilder:
+                        (BuildContext context, animation, secondaryAnimation) =>
+                            ExplainerDetailsScreen(
+                      animation: animation,
+                    ),
+                  );
+                  bool saved =
+                      await Navigator.of(context).push(pageRouteBuilder);
+                  if (saved) {
+                    // reset the data
+                    toolProvider.resetPromptData();
+
+                    setState(() {
+                      _descriptionController.clear();
+                    });
+                    Future.delayed(const Duration(milliseconds: 200))
+                        .whenComplete(() {
+                      showSnackBar(
+                          context: context, message: 'Tool successfully saved');
+                    });
+                  }
+                }
+
+                // show my alert dialog for loading
+                // showMyAnimatedDialog(
+                //   context: context,
+                //   title: 'Generating',
+                //   content: 'Please wait...',
+                //   loadingIndicator: const SizedBox(
+                //       height: 40,
+                //       width: 40,
+                //       child: CircularProgressIndicator()),
+                // );
+
+                // final authProvider = context.read<AuthProvider>();
+                // final description = _descriptionController.text;
+
+                // await toolProvider
+                //     .submitPrompt(
+                //   creatorID: authProvider.userModel!.uid,
+                //   description: description,
+                // )
+                //     .then((_) async {
+                //   // hide my alert dialog
+                //   Navigator.pop(context);
+
+                //   if (!context.mounted) return;
+                //   // display the results
+                //   if (toolProvider.toolModel != null) {
+                //     // display the risk assessment details screen
+                //     PageRouteBuilder pageRouteBuilder =
+                //         PageRouteBuilder(
+                //       opaque: false,
+                //       pageBuilder: (BuildContext context, animation,
+                //               secondaryAnimation) =>
+                //           ExplainerDetailsScreen(
+                //         animation: animation,
+                //       ),
+                //     );
+                //     bool shouldSave = await Navigator.of(context)
+                //         .push(pageRouteBuilder);
+                //     if (shouldSave) {
+                //       // TODO save the risk assessment to database
+                //     }
+                //   }
+                // });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  buildToolDescriptionText(ToolProvider toolProvider) {
+    return Text(
+      toolProvider.toolModel!.description,
+      style: const TextStyle(
+        fontSize: 16,
+        color: Colors.black87,
       ),
     );
   }
