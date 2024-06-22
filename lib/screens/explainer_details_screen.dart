@@ -35,7 +35,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
         child: Scaffold(
           appBar: MyAppBar(
             title: title,
-            leading: backIcon(context: context),
+            leading: backIcon(context),
           ),
           body: SingleChildScrollView(
             controller: _scrollController,

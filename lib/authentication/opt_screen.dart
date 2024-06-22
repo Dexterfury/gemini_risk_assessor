@@ -38,7 +38,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
     return Scaffold(
       appBar: MyAppBar(
-        leading: backIcon(context: context),
+        leading: backIcon(context),
         title: 'Verification',
       ),
       body: SafeArea(

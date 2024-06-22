@@ -32,7 +32,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     return Scaffold(
       appBar: MyAppBar(
         title: 'User Information',
-        leading: backIcon(context: context),
+        leading: backIcon(context),
       ),
       body: Center(
           child: Padding(

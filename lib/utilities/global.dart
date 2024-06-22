@@ -394,9 +394,9 @@ void imagePickerAnimatedDialog({
 }
 
 // general bacl icon
-Widget backIcon({required BuildContext context, bool value = false}) {
+Widget backIcon(BuildContext context) {
   return IconButton(
-    onPressed: () => Navigator.of(context).pop(value),
+    onPressed: () => Navigator.pop(context),
     icon: Icon(
       Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
     ),

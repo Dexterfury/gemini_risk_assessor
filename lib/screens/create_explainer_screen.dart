@@ -45,7 +45,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: MyAppBar(
-        leading: backIcon(context: context),
+        leading: backIcon(context),
         title: 'Tool Explainer',
       ),
       body: SingleChildScrollView(
