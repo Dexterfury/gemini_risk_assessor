@@ -102,15 +102,10 @@ class _ScreensControllerState extends State<ScreensController>
                       const TextStyle(fontSize: 16, color: Colors.white),
                   onPress: () {
                     _animationController.reverse();
-                    context
-                        .read<ToolsProvider>()
-                        .setViewOnly(false)
-                        .whenComplete(() {
-                      navigationController(
-                        context: context,
-                        route: Constants.createToolRoute,
-                      );
-                    });
+                    navigationController(
+                      context: context,
+                      route: Constants.createToolRoute,
+                    );
                   },
                 ),
                 Bubble(

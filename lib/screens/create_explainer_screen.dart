@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
@@ -12,7 +14,9 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../providers/auth_provider.dart';
 
 class CreateExplainerScreen extends StatefulWidget {
-  const CreateExplainerScreen({super.key});
+  const CreateExplainerScreen({super.key, this.tool});
+
+  final ToolModel? tool;
 
   @override
   State<CreateExplainerScreen> createState() => _CreateExplainerScreenState();
@@ -32,8 +36,8 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
   }
 
   _getImages(ToolsProvider provider) {
-    if (provider.isViewOnly) {
-      return provider.toolModel!.images;
+    if (widget.tool != null) {
+      return widget.tool!.images;
     }
     return provider.imagesFileList!;
   }
@@ -42,6 +46,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
   Widget build(BuildContext context) {
     final toolProvider = context.watch<ToolsProvider>();
     final images = _getImages(toolProvider);
+    final bool isViewOnly = widget.tool != null;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: MyAppBar(
@@ -58,7 +63,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                 context: context,
                 images: images,
                 pageController: _pageController,
-                isViewOnly: toolProvider.isViewOnly,
+                isViewOnly: isViewOnly,
               ),
             ),
             const SizedBox(
@@ -71,8 +76,8 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             const SizedBox(
               height: 10,
             ),
-            toolProvider.isViewOnly
-                ? buildToolDescriptionText(toolProvider)
+            isViewOnly
+                ? buildToolDescriptionText(widget.tool!)
                 : buildInputGenerationBtn(toolProvider, context),
           ],
         ),
@@ -80,7 +85,10 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     );
   }
 
-  buildInputGenerationBtn(ToolsProvider toolProvider, BuildContext context) {
+  buildInputGenerationBtn(
+    ToolsProvider toolProvider,
+    BuildContext context,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -189,12 +197,22 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     );
   }
 
-  buildToolDescriptionText(ToolsProvider toolProvider) {
-    return Text(
-      toolProvider.toolModel!.description,
-      style: const TextStyle(
-        fontSize: 16,
-        color: Colors.black87,
+  buildToolDescriptionText(ToolModel tool) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tool.name,
+            style: textStyle18w500,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            tool.description,
+            style: textStyle18w500,
+          ),
+        ],
       ),
     );
   }

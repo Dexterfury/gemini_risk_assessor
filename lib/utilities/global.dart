@@ -442,8 +442,13 @@ Widget previewImages({
                     children: [
                       Positioned.fill(
                         child: isViewOnly
-                            ? Image.network(
-                                image,
+                            ?
+                            // Image.network(
+                            //     image,
+                            //     fit: BoxFit.cover,
+                            //   )
+                            Image.file(
+                                File(image),
                                 fit: BoxFit.cover,
                               )
                             : Image.file(

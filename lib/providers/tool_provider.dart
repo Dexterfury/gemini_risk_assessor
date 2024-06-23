@@ -14,7 +14,6 @@ import '../utilities/global.dart';
 
 class ToolsProvider extends ChangeNotifier {
   bool _isLoading = false;
-  bool _isViewOnly = false;
   int _maxImages = 10;
   String _description = '';
   File? _pdfToolFile;
@@ -25,7 +24,6 @@ class ToolsProvider extends ChangeNotifier {
 
   // getters
   bool get isLoading => _isLoading;
-  bool get isViewOnly => _isViewOnly;
   int get maxImages => _maxImages;
   String get description => _description;
   File? get pdfToolFile => _pdfToolFile;
@@ -36,18 +34,6 @@ class ToolsProvider extends ChangeNotifier {
 
   final CollectionReference toolsCollection =
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
-
-  Future<void> setViewOnly(bool value) async {
-    _isViewOnly = value;
-    notifyListeners();
-  }
-
-  // set tool
-  Future<void> setTool(ToolModel tool) async {
-    setViewOnly(true);
-    _toolModel = tool;
-    notifyListeners();
-  }
 
   // save tool to firestore
   Future<void> saveToolToFirestore() async {

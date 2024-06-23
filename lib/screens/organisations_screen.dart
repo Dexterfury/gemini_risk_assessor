@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:provider/provider.dart';
 
 class OrganisationsScreen extends StatelessWidget {
   const OrganisationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    bool isAnonymous = context.watch<AuthProvider>().isUserAnonymous();
     return Scaffold(
       appBar: MyAppBar(
         title: 'Organisations',
@@ -20,9 +23,15 @@ class OrganisationsScreen extends StatelessWidget {
           onPressed: () {},
         ),
       ),
-      body: const Center(
-        child: Text('Organisations'),
-      ),
+      body: isAnonymous
+          ? const Center(
+              child: Text(
+                'Please login to view organisations',
+              ),
+            )
+          : const Center(
+              child: Text('Organisations'),
+            ),
     );
   }
 }

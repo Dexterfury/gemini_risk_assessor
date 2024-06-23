@@ -287,6 +287,14 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // check if signed in user is anonymous or not
+  bool isUserAnonymous() {
+    if (_auth.currentUser != null) {
+      return _auth.currentUser!.isAnonymous;
+    }
+    return false;
+  }
+
   // sign in with phone number
   Future<void> signInWithPhoneNumber({
     required String phoneNumber,

@@ -81,6 +81,7 @@ class Constants {
   static const String assessmentCollection = 'assessments';
   static const String organisationCollection = 'organisations';
   static const String toolsCollection = 'tools';
+  static const String dstiCollections = 'dsti';
   // dummy list of risk assessments
   static const List<Map<String, dynamic>> riskAssessmentsList = [
     {

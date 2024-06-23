@@ -55,6 +55,8 @@ class AssessmentProvider extends ChangeNotifier {
       FirebaseFirestore.instance.collection(Constants.assessmentCollection);
   final CollectionReference organisationCollection =
       FirebaseFirestore.instance.collection(Constants.organisationCollection);
+  final CollectionReference dstiCollection =
+      FirebaseFirestore.instance.collection(Constants.dstiCollections);
 
   // set organisationID
   void setOrganisationID({
@@ -118,6 +120,13 @@ class AssessmentProvider extends ChangeNotifier {
           .set(assessmentModel!.toJson());
       // save to organisation's database end.
     }
+  }
+
+  // stream dsti's from firestore
+  Stream<QuerySnapshot> dstiStream() {
+    return dstiCollection
+        .where(Constants.createdBy, isEqualTo: _uid)
+        .snapshots();
   }
 
   // set has signed

@@ -56,7 +56,9 @@ class GridItem extends StatelessWidget {
                 ],
               ),
             ),
-            openBuilder: (context, action) => const CreateExplainerScreen(),
+            openBuilder: (context, action) => CreateExplainerScreen(
+              tool: tool,
+            ),
             transitionType: ContainerTransitionType.fadeThrough,
             transitionDuration: const Duration(milliseconds: 500),
             closedElevation: 0,
