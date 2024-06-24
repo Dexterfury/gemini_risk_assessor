@@ -141,8 +141,8 @@ Date: $dateTime''';
     final headerRow4 = grid4.headers.add(1)[0];
     // Make this a header and put the summary
     final headerRow5 = grid5.headers.add(1)[0];
-    // Make this a header for PPE Images
-    final headerRowPPE = ppeGrid.headers.add(1)[0];
+    // Remove the header row for PPE images
+    // final headerRowPPE = ppeGrid.headers.add(1)[0];
 
     // Create a list of header rows
     final headerRowList = [
@@ -151,7 +151,7 @@ Date: $dateTime''';
       headerRow3,
       headerRow4,
       headerRow5,
-      headerRowPPE,
+      // headerRowPPE,
     ];
 
     // Get the header style for the grid
@@ -226,9 +226,9 @@ Date: $dateTime''';
     }
     grids.add(grid4);
 
-    // Add PPE images to ppeGrid
-    headerRowPPE.cells[0].value = "PERSONAL PROTECTIVE EQUIPMENT (PPE)";
-    headerRowPPE.cells[0].style.stringFormat = await centerHeaderTitle();
+    // Add PPE images to ppeGrid without a header
+    // headerRowPPE.cells[0].value = "PERSONAL PROTECTIVE EQUIPMENT (PPE)";
+    // headerRowPPE.cells[0].style.stringFormat = await centerHeaderTitle();
 
     // Add images to the ppeGrid
     final ppeRow = ppeGrid.rows.add();
@@ -241,6 +241,9 @@ Date: $dateTime''';
         alignment: PdfTextAlignment.center,
         lineAlignment: PdfVerticalAlignment.middle,
       );
+      // Add padding to the cells
+      ppeRow.cells[i].style.cellPadding =
+          PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
       applyCellPaddingToRow(ppeRow, false);
     }
     grids.add(ppeGrid);
