@@ -16,6 +16,7 @@ class Constants {
 
   // create assessment
   static const String createAssessment = 'New Assessment';
+  static const String createDsti = 'New DSTI';
 
   // navigation routes
   static const String homeRoute = '/home';

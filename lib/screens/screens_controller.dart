@@ -1,13 +1,9 @@
-import 'package:animations/animations.dart';
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/tool_provider.dart';
-import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
-import 'package:provider/provider.dart';
 
 class ScreensController extends StatefulWidget {
   const ScreensController({super.key});
@@ -120,6 +116,7 @@ class _ScreensControllerState extends State<ScreensController>
                     navigationController(
                       context: context,
                       route: Constants.createAssessmentRoute,
+                      argument: Constants.createAssessment,
                     );
                   },
                 ),
@@ -132,6 +129,11 @@ class _ScreensControllerState extends State<ScreensController>
                       const TextStyle(fontSize: 16, color: Colors.white),
                   onPress: () {
                     _animationController.reverse();
+                    navigationController(
+                      context: context,
+                      route: Constants.createAssessmentRoute,
+                      argument: Constants.createDsti,
+                    );
                   },
                 ),
               ],

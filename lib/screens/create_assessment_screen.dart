@@ -22,47 +22,25 @@ class CreateAssessmentScreen extends StatefulWidget {
 }
 
 class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
-  // name controller
-  final TextEditingController _nameController = TextEditingController();
   // description controller
   final TextEditingController _descriptionController = TextEditingController();
 
-  String _creatorID = '';
-
-  @override
-  void initState() {
-    getUsersDataFromProvider();
-    super.initState();
-  }
-
   @override
   dispose() {
-    _nameController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
-  getUsersDataFromProvider() {
-    // wait for until screen build
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      final authProvider = context.read<AuthProvider>();
-      final userName = authProvider.userModel!.name;
-      final creatorID = authProvider.userModel!.uid;
-      setState(() {
-        // set name controller
-        _nameController.text = userName;
-        _creatorID = creatorID;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    // get the arguments
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+    final title = args[Constants.title] as String;
     final assessmentProvider = context.watch<AssessmentProvider>();
     return Scaffold(
-      appBar: const MyAppBar(
-        leading: BackButton(),
-        title: Constants.createAssessment,
+      appBar: MyAppBar(
+        leading: const BackButton(),
+        title: title,
       ),
       body: SafeArea(
           child: Padding(
@@ -114,18 +92,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 20,
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              // creator name field
-              InputField(
-                labelText: Constants.enterYourName,
-                hintText: Constants.enterYourName,
-                controller: _nameController,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
+
               // assessment description field
               InputField(
                 labelText: Constants.enterDescription,
@@ -145,15 +112,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                   ),
                   label: 'Generate Assessment',
                   onTap: () async {
-                    // check if name field is not empty and name length is more 3 characters or more
-
-                    if (_nameController.text.isEmpty ||
-                        _nameController.text.length < 3) {
-                      showSnackBar(
-                          context: context,
-                          message: 'Name must be atleast 3 characters');
-                      return;
-                    }
                     // check if description field is not empty and description length is more 10 characters or more
                     if (_descriptionController.text.isEmpty ||
                         _descriptionController.text.length < 10) {
@@ -162,6 +120,9 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           message: 'Description must be atleast 10 characters');
                       return;
                     }
+
+                    final authProvider = context.read<AuthProvider>();
+                    final creatorID = authProvider.userModel!.uid;
 
                     // show my alert dialog for loading
                     showMyAnimatedDialog(
@@ -174,7 +135,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           child: CircularProgressIndicator()),
                     );
                     // await assessmentProvider
-                    //     .submitTestAssessment(creatorID: _creatorID)
+                    //     .submitTestAssessment(creatorID: creatorID)
                     //     .then((_) async {
                     //   // pop the the dialog
                     //   Navigator.pop(context);
@@ -201,7 +162,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
 
                     await assessmentProvider
                         .submitPrompt(
-                      creatorID: _creatorID,
+                      creatorID: creatorID,
                       description: _descriptionController.text,
                     )
                         .then((_) async {

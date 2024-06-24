@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
-import 'package:gemini_risk_assessor/widgets/risk_assessments_list.dart';
+import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
         body: const TabBarView(
           children: [
             DSTIScreen(),
-            RistAssessmentsList(),
+            RistAssessmentsScreen(),
             ToolsScreen(),
           ],
         ),

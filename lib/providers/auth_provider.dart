@@ -48,7 +48,7 @@ class AuthProvider extends ChangeNotifier {
   // setters
 
   // set loading
-  void setIsLoading(bool value) {
+  void setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }

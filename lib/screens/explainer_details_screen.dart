@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
