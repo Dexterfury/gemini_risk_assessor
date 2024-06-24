@@ -45,7 +45,9 @@ class AssessmentModel {
   factory AssessmentModel.fromTestString(
     String testString,
     String creatorID,
+    String organisationID,
     String weather,
+    List<String> testppe,
     List<String> testImages,
     DateTime createdAt,
   ) {
@@ -63,12 +65,12 @@ class AssessmentModel {
         risks: List<String>.from(json[Constants.risks] ?? []),
         signatures: List<String>.from(json[Constants.signatures] ?? []),
         approvers: List<String>.from(json[Constants.approvers] ?? []),
-        ppe: List<String>.from(json[Constants.ppe] ?? []),
+        ppe: testppe,
         control: List<String>.from(json[Constants.control] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
-        organisationID: json[Constants.organisationID] ?? '',
+        organisationID: organisationID,
         pdfUrl: Constants.pdfUrl,
         createdAt: createdAt,
       );
@@ -80,7 +82,9 @@ class AssessmentModel {
   factory AssessmentModel.fromGeneratedContent(
     GenerateContentResponse content,
     String creatorID,
+    String organisationID,
     String weather,
+    List<String> ppe,
     List<String> images,
     DateTime createdAt,
   ) {
@@ -100,12 +104,12 @@ class AssessmentModel {
         risks: List<String>.from(json[Constants.risks] ?? []),
         signatures: List<String>.from(json[Constants.signatures] ?? []),
         approvers: List<String>.from(json[Constants.approvers] ?? []),
-        ppe: List<String>.from(json[Constants.ppe] ?? []),
+        ppe: ppe,
         control: List<String>.from(json[Constants.control] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
-        organisationID: json[Constants.organisationID] ?? '',
+        organisationID: organisationID,
         pdfUrl: json[Constants.pdfUrl] ?? '',
         createdAt: createdAt,
       );
@@ -132,7 +136,8 @@ class AssessmentModel {
       createdBy: json[Constants.createdBy] ?? '',
       organisationID: json[Constants.organisationID] ?? '',
       pdfUrl: json[Constants.pdfUrl] ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
+      createdAt:
+          DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt] ?? 0),
     );
   }
 

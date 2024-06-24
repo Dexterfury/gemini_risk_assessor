@@ -25,7 +25,9 @@ class AssessmentProvider extends ChangeNotifier {
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
-  AssessmentModel? _assessmentModel;
+  String _pdfHeading = '';
+  AssessmentModel _assessmentModel =
+      AssessmentModel.fromJson(<String, dynamic>{});
   Weather _weather = Weather.sunny;
   File? _pdfAssessmentFile;
   bool _hasSigned = false;
@@ -41,6 +43,8 @@ class AssessmentProvider extends ChangeNotifier {
   bool get isPersonal => _isPersonal;
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
+  String get pdfHeading => _pdfHeading;
+  String get description => _description;
   AssessmentModel? get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
   File? get pdfAssessmentFile => _pdfAssessmentFile;
@@ -58,6 +62,31 @@ class AssessmentProvider extends ChangeNotifier {
   final CollectionReference dstiCollection =
       FirebaseFirestore.instance.collection(Constants.dstiCollections);
 
+  // create an empty AssessmentModel
+  // AssessmentModel _assessmentModel = AssessmentModel(
+  //   id: '',
+  //   companyId: '',
+  //   ppeList: [],
+  //   imagesFileList: [],
+  //   maxImages: 0,
+  //   numberOfPeople: 0,
+  //   pdfHeading: '',
+  //   description: '',
+  //   weather: Weather.unknown,
+  //   signatureImage: null,
+  //   pdfAssessmentFile: null,
+  //   hasSigned: false,
+  //   uid: '',
+  //   assessmentModel: null,
+  //   signatureGlobalKey: GlobalKey<SfSignaturePadState>(),
+  // );
+
+  // void emptyAssessmentModel() {
+  //   final map = <String, dynamic>{};
+  //   _assessmentModel = AssessmentModel.fromJson(map);
+  //   notifyListeners();
+  // }
+
   // set organisationID
   void setOrganisationID({
     required String companyID,
@@ -68,10 +97,24 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setDescription(String desc, String creatorID) async {
+  Future<void> setDescription(
+    String desc,
+    String creatorID,
+    String docTitle,
+  ) async {
     _description = desc;
     _uid = creatorID;
+    _pdfHeading = getDoctTitle(docTitle);
+    log('id: $_uid');
     notifyListeners();
+  }
+
+  String getDoctTitle(String docTitle) {
+    if (docTitle == Constants.createAssessment) {
+      return 'Risk Assessment';
+    } else {
+      return 'Daily Safety Task Instruction';
+    }
   }
 
   // set loading
@@ -82,17 +125,19 @@ class AssessmentProvider extends ChangeNotifier {
 
   // create pdf assessment file
   Future<void> createPdfAssessmentFile() async {
+    log('PPE HERE: ${_assessmentModel.ppe}');
     // set loading
     _isLoading = true;
     notifyListeners();
     final file = await PdfApi.generatePdf(
       assessmentModel: _assessmentModel!,
       signatureImage: _signatureImage!,
+      heading: _pdfHeading,
     );
 
     _pdfAssessmentFile = file;
     notifyListeners();
-    await saveAssessmentToFirestore(file);
+    //await saveAssessmentToFirestore(file);
   }
 
   // save assement to firetore
@@ -221,9 +266,17 @@ class AssessmentProvider extends ChangeNotifier {
     if (_ppeModelList.contains(ppeItem)) {
       // remove ppeItem
       _ppeModelList.remove(ppeItem);
+
+      // remove ppe from assessmentModel
+      _assessmentModel!.ppe.remove(ppeItem.label);
     } else {
       _ppeModelList.add(ppeItem);
+
+      //  add ppe to assessmentModel
+      _assessmentModel!.ppe.add(ppeItem.label);
     }
+
+    log('PPELIST: ${_assessmentModel.ppe}');
     notifyListeners();
   }
 
@@ -346,6 +399,7 @@ class AssessmentProvider extends ChangeNotifier {
   Future<void> submitPrompt({
     required String creatorID,
     required String description,
+    required String docTitle,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -353,7 +407,11 @@ class AssessmentProvider extends ChangeNotifier {
     var model = await GeminiService.getModel(images: _maxImages);
 
     // set description to use in prompt
-    await setDescription(description, creatorID);
+    await setDescription(
+      description,
+      creatorID,
+      docTitle,
+    );
 
     // get promptDara
     final prompt = getPromptData();
@@ -375,7 +433,9 @@ class AssessmentProvider extends ChangeNotifier {
         _assessmentModel = AssessmentModel.fromGeneratedContent(
           content,
           creatorID,
+          organisationID,
           _weather.name,
+          _assessmentModel.ppe,
           images,
           DateTime.now(),
         );
@@ -441,7 +501,9 @@ equipments, hazards and risks should be of type List<String> with a max length o
     required String creatorID,
   }) async {
     _isLoading = true;
+    _uid = creatorID;
     final List<String> images = [];
+    notifyListeners();
     if (_imagesFileList != null) {
       for (var image in _imagesFileList!) {
         images.add(image.path);
@@ -450,7 +512,9 @@ equipments, hazards and risks should be of type List<String> with a max length o
     _assessmentModel = AssessmentModel.fromTestString(
       testAssessment,
       creatorID,
+      organisationID,
       _weather.name,
+      _assessmentModel.ppe,
       images,
       DateTime.now(),
     );

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
@@ -124,6 +126,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     final authProvider = context.read<AuthProvider>();
                     final creatorID = authProvider.userModel!.uid;
 
+                    log('creatorID: $creatorID');
+
                     // show my alert dialog for loading
                     showMyAnimatedDialog(
                       context: context,
@@ -134,42 +138,12 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           width: 40,
                           child: CircularProgressIndicator()),
                     );
-                    // await assessmentProvider
-                    //     .submitTestAssessment(creatorID: creatorID)
-                    //     .then((_) async {
-                    //   // pop the the dialog
-                    //   Navigator.pop(context);
-                    //   if (!context.mounted) return;
-                    //   if (assessmentProvider.assessmentModel != null) {
-                    //     // display the risk assessment details screen
-                    //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                    //       opaque: false,
-                    //       pageBuilder: (BuildContext context, animation,
-                    //               secondaryAnimation) =>
-                    //           RiskAssessmentDetailsScreen(
-                    //         assessmentModel:
-                    //             assessmentProvider.assessmentModel!,
-                    //         animation: animation,
-                    //       ),
-                    //     );
-                    //     bool shouldSave =
-                    //         await Navigator.of(context).push(pageRouteBuilder);
-                    //     if (shouldSave) {
-                    //       // TODO save the risk assessment to database
-                    //     }
-                    //   }
-                    // });
-
                     await assessmentProvider
-                        .submitPrompt(
-                      creatorID: creatorID,
-                      description: _descriptionController.text,
-                    )
+                        .submitTestAssessment(creatorID: creatorID)
                         .then((_) async {
                       // pop the the dialog
                       Navigator.pop(context);
                       if (!context.mounted) return;
-                      // display the results
                       if (assessmentProvider.assessmentModel != null) {
                         // display the risk assessment details screen
                         PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
@@ -187,6 +161,34 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                         }
                       }
                     });
+
+                    // await assessmentProvider
+                    //     .submitPrompt(
+                    //   creatorID: creatorID,
+                    //   description: _descriptionController.text,
+                    // )
+                    //     .then((_) async {
+                    //   // pop the the dialog
+                    //   Navigator.pop(context);
+                    //   if (!context.mounted) return;
+                    //   // display the results
+                    //   if (assessmentProvider.assessmentModel != null) {
+                    //     // display the risk assessment details screen
+                    //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                    //       opaque: false,
+                    //       pageBuilder: (BuildContext context, animation,
+                    //               secondaryAnimation) =>
+                    //           AssessmentDetailsScreen(
+                    //         animation: animation,
+                    //       ),
+                    //     );
+                    //     bool shouldSave =
+                    //         await Navigator.of(context).push(pageRouteBuilder);
+                    //     if (shouldSave) {
+                    //       // TODO save the risk assessment to database
+                    //     }
+                    //   }
+                    // });
                   },
                 ),
               ),

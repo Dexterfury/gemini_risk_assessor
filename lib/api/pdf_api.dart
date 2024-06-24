@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
@@ -11,6 +12,7 @@ class PdfApi {
   static Future<File> generatePdf({
     required AssessmentModel assessmentModel,
     required Uint8List signatureImage,
+    required String heading,
   }) async {
     final document = PdfDocument();
 
@@ -18,13 +20,19 @@ class PdfApi {
     final page = document.pages.add();
 
     // Load the logo from assets
-    final PdfBitmap logo = await loadLogo(AssetsManager.userIcon);
+    final PdfBitmap logo = await loadLogo(AssetsManager.appLogo);
+
+    // load a list of ppe from assets - depending on the list of ppe from the model
+    final List<PdfBitmap> ppeImages =
+        await loadPPELogoList(assessmentModel.ppe);
 
     // draw table
     drawGrid(
+      heading,
       assessmentModel,
       page,
       logo,
+      ppeImages,
     );
 
     // add a signature image to the page
@@ -78,14 +86,16 @@ Date: $dateTime''';
   }
 
   static Future<void> drawGrid(
+    String heading,
     AssessmentModel assessmentModel,
     PdfPage page,
     PdfBitmap logo,
+    List<PdfBitmap> ppeImages,
   ) async {
     // Draw the header
     drawHeader(
       page,
-      "Risk Assessment",
+      heading,
       assessmentModel.id,
       logo,
     );
@@ -103,6 +113,8 @@ Date: $dateTime''';
     final grid4 = PdfGrid();
     // Fifth grid with one colum
     final grid5 = PdfGrid();
+    // Grid for PPE images
+    final ppeGrid = PdfGrid();
 
     // Add a column to grid1
     grid1.columns.add(count: 1);
@@ -112,19 +124,23 @@ Date: $dateTime''';
     grid3.columns.add(count: 1);
     // Add three columns to grid4
     grid4.columns.add(count: 3);
-    // Add a column to grid1
+    // Add a column to grid5
     grid5.columns.add(count: 1);
+    // Add one column to ppeGrid
+    ppeGrid.columns.add(count: 1);
 
     // Make this a header and put the title of the assessment here
     final headerRow1 = grid1.headers.add(1)[0];
     // Make one header row for grid2 with "Task:" and "Date and Time:"
     final headerRow2 = grid2.headers.add(1)[0];
-    // make a heard for grid3 for "Equipment and tools"
+    // make a header for grid3 for "Equipment and tools"
     final headerRow3 = grid3.headers.add(1)[0];
     // make a header for grid4 for "Hazards", "Risk", and "Control"
     final headerRow4 = grid4.headers.add(1)[0];
     // Make this a header and put the summary
     final headerRow5 = grid5.headers.add(1)[0];
+    // Make this a header for PPE Images
+    final headerRowPPE = ppeGrid.headers.add(1)[0];
 
     // create a list of header rows
     final headerRowList = [
@@ -133,6 +149,7 @@ Date: $dateTime''';
       headerRow3,
       headerRow4,
       headerRow5,
+      headerRowPPE,
     ];
 
     // Get the header style for the grid
@@ -206,6 +223,24 @@ Date: $dateTime''';
     }
     grids.add(grid4);
 
+    // Add PPE images to ppeGrid
+    headerRowPPE.cells[0].value = "PERSONAL PROTECTIVE EQUIPMENT (PPE)";
+    headerRowPPE.cells[0].style.stringFormat = await centerHeaderTitle();
+
+    for (final ppeImage in ppeImages) {
+      final dataRow = ppeGrid.rows.add();
+      dataRow.height =
+          50; // Set a fixed height for the row to accommodate images
+      dataRow.cells[0].value = '';
+      dataRow.cells[0].style.backgroundImage = ppeImage;
+      dataRow.cells[0].style.stringFormat = PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      );
+      applyCellPaddingToRow(dataRow, false);
+    }
+    grids.add(ppeGrid);
+
     headerRow5.cells[0].value = "SUMMARY";
     // Create a new row for the task and date/time data
     final dataRow5 = grid5.rows.add();
@@ -238,7 +273,6 @@ Date: $dateTime''';
   static void drawHeader(
       PdfPage page, String title, String documentId, PdfImage logo) {
     final trimmedDocId = documentId.substring(0, 13);
-    log('ID: $documentId');
     final graphics = page.graphics;
 
     // Define the bounds for the header elements
@@ -274,6 +308,50 @@ Date: $dateTime''';
     final ByteData data = await rootBundle.load(assetPath);
     final Uint8List bytes = data.buffer.asUint8List();
     return PdfBitmap(bytes);
+  }
+
+  static Future<List<PdfBitmap>> loadPPELogoList(List<String> ppe) async {
+    log('ppe1: $ppe');
+    final logoList = <PdfBitmap>[];
+    final assetPaths = await getAssetsPath(ppe);
+
+    log('assetPaths: $assetPaths');
+    for (final assetPath in assetPaths) {
+      final logo = await loadLogo(assetPath);
+      logoList.add(logo); // Error occurs here
+    }
+    return logoList;
+  }
+
+  static Future getAssetsPath(List<String> ppe) async {
+    for (var item in ppe) {
+      switch (item) {
+        case 'Dust Mask':
+          return AssetsManager.dustMask;
+        case 'Ear Protection':
+          return AssetsManager.earProtection;
+        case 'Face Shield':
+          return AssetsManager.faceShield;
+        case 'Foot Protection':
+          return AssetsManager.footProtection;
+        case 'Hand Protection':
+          return AssetsManager.handProtection;
+        case 'Head Protection':
+          return AssetsManager.headProtection;
+        case 'High Vis Clothing':
+          return AssetsManager.highVisClothing;
+        case 'Life Jacke':
+          return AssetsManager.lifeJacket;
+        case 'Protective Clothing':
+          return AssetsManager.protectiveClothing;
+        case 'Safety Glasses':
+          return AssetsManager.safetyGlasses;
+        case 'Other':
+          return AssetsManager.appLogo;
+        default:
+          return AssetsManager.appLogo;
+      }
+    }
   }
 
 // Save the file to the device

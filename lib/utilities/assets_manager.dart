@@ -5,6 +5,9 @@ class AssetsManager {
 
   static const String _lottiePath = 'assets/lottie/';
 
+  // app logo
+  static String appLogo = '${_imagesPath}app_logo.png';
+
   // google logo
   static String googleLogo = '${_imagesPath}google.jpg';
 
