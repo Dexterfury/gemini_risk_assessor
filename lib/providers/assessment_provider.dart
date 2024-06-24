@@ -105,7 +105,6 @@ class AssessmentProvider extends ChangeNotifier {
     _description = desc;
     _uid = creatorID;
     _pdfHeading = getDoctTitle(docTitle);
-    log('id: $_uid');
     notifyListeners();
   }
 
@@ -275,8 +274,6 @@ class AssessmentProvider extends ChangeNotifier {
       //  add ppe to assessmentModel
       _assessmentModel!.ppe.add(ppeItem.label);
     }
-
-    log('PPELIST: ${_assessmentModel.ppe}');
     notifyListeners();
   }
 
@@ -499,9 +496,14 @@ equipments, hazards and risks should be of type List<String> with a max length o
 
   Future<void> submitTestAssessment({
     required String creatorID,
+    required String docTitle,
   }) async {
     _isLoading = true;
-    _uid = creatorID;
+    await setDescription(
+      description,
+      creatorID,
+      docTitle,
+    );
     final List<String> images = [];
     notifyListeners();
     if (_imagesFileList != null) {

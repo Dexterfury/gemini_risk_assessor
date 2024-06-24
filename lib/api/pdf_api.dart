@@ -26,6 +26,8 @@ class PdfApi {
     final List<PdfBitmap> ppeImages =
         await loadPPELogoList(assessmentModel.ppe);
 
+    log('heading: $heading');
+
     // draw table
     drawGrid(
       heading,
@@ -111,9 +113,9 @@ Date: $dateTime''';
     final grid3 = PdfGrid();
     // Fourth grid with three columns
     final grid4 = PdfGrid();
-    // Fifth grid with one colum
+    // Fifth grid with one column
     final grid5 = PdfGrid();
-    // Grid for PPE images
+    // Grid for PPE images with dynamic columns
     final ppeGrid = PdfGrid();
 
     // Add a column to grid1
@@ -126,23 +128,23 @@ Date: $dateTime''';
     grid4.columns.add(count: 3);
     // Add a column to grid5
     grid5.columns.add(count: 1);
-    // Add one column to ppeGrid
-    ppeGrid.columns.add(count: 1);
+    // Add dynamic columns to ppeGrid based on number of images
+    ppeGrid.columns.add(count: ppeImages.length);
 
     // Make this a header and put the title of the assessment here
     final headerRow1 = grid1.headers.add(1)[0];
     // Make one header row for grid2 with "Task:" and "Date and Time:"
     final headerRow2 = grid2.headers.add(1)[0];
-    // make a header for grid3 for "Equipment and tools"
+    // Make a header for grid3 for "Equipment and tools"
     final headerRow3 = grid3.headers.add(1)[0];
-    // make a header for grid4 for "Hazards", "Risk", and "Control"
+    // Make a header for grid4 for "Hazards", "Risk", and "Control"
     final headerRow4 = grid4.headers.add(1)[0];
     // Make this a header and put the summary
     final headerRow5 = grid5.headers.add(1)[0];
     // Make this a header for PPE Images
     final headerRowPPE = ppeGrid.headers.add(1)[0];
 
-    // create a list of header rows
+    // Create a list of header rows
     final headerRowList = [
       headerRow1,
       headerRow2,
@@ -167,7 +169,7 @@ Date: $dateTime''';
     // Add the data in the second grid (grid2)
     headerRow2.cells[0].value = 'TASK:';
     headerRow2.cells[1].value = 'DATE & TIME:';
-    // cell padding Date and Time
+    // Cell padding Date and Time
     cellPadding(headerRow2, 1, true);
 
     // Create a new row for the task and date/time data
@@ -182,7 +184,7 @@ Date: $dateTime''';
     headerRow3.cells[0].value = "EQUIPMENT AND TOOLS TO BE USED";
     headerRow3.cells[0].style.stringFormat = await centerHeaderTitle();
 
-    // add the equipments list from the assessment model to grid3
+    // Add the equipments list from the assessment model to grid3
     int index = 1;
     for (final equipment in assessmentModel.equipments) {
       final dataRow = grid3.rows.add();
@@ -191,10 +193,11 @@ Date: $dateTime''';
     }
     grids.add(grid3);
 
+    // Add the data in the fourth grid (grid4)
     headerRow4.cells[0].value = "HAZARDS";
     headerRow4.cells[1].value = "RISKS";
     headerRow4.cells[2].value = "CONTROL MEASURES";
-    // center the text in the header
+    // Center the text in the header
     for (int i = 0; i < headerRow4.cells.count; i++) {
       headerRow4.cells[i].style.stringFormat = await centerHeaderTitle();
       cellPadding(headerRow4, i, true);
@@ -227,22 +230,24 @@ Date: $dateTime''';
     headerRowPPE.cells[0].value = "PERSONAL PROTECTIVE EQUIPMENT (PPE)";
     headerRowPPE.cells[0].style.stringFormat = await centerHeaderTitle();
 
-    for (final ppeImage in ppeImages) {
-      final dataRow = ppeGrid.rows.add();
-      dataRow.height =
-          50; // Set a fixed height for the row to accommodate images
-      dataRow.cells[0].value = '';
-      dataRow.cells[0].style.backgroundImage = ppeImage;
-      dataRow.cells[0].style.stringFormat = PdfStringFormat(
+    // Add images to the ppeGrid
+    final ppeRow = ppeGrid.rows.add();
+    ppeRow.height = 50; // Set a fixed height for the row to accommodate images
+
+    for (int i = 0; i < ppeImages.length; i++) {
+      ppeRow.cells[i].value = '';
+      ppeRow.cells[i].style.backgroundImage = ppeImages[i];
+      ppeRow.cells[i].style.stringFormat = PdfStringFormat(
         alignment: PdfTextAlignment.center,
         lineAlignment: PdfVerticalAlignment.middle,
       );
-      applyCellPaddingToRow(dataRow, false);
+      applyCellPaddingToRow(ppeRow, false);
     }
     grids.add(ppeGrid);
 
+    // Add the summary to grid5
     headerRow5.cells[0].value = "SUMMARY";
-    // Create a new row for the task and date/time data
+    // Create a new row for the summary data
     final dataRow5 = grid5.rows.add();
     dataRow5.cells[0].value = assessmentModel.summary;
     applyCellPaddingToRow(dataRow5, false);
@@ -265,7 +270,7 @@ Date: $dateTime''';
 
       // Update the current vertical offset for the next grid
       if (result != null) {
-        currentOffsetY += result.bounds.height + 10; // space between grids
+        currentOffsetY += result.bounds.height + 10; // Space between grids
       }
     }
   }
@@ -323,35 +328,47 @@ Date: $dateTime''';
     return logoList;
   }
 
-  static Future getAssetsPath(List<String> ppe) async {
+  static Future<List<String>> getAssetsPath(List<String> ppe) async {
+    List<String> assetPaths = [];
     for (var item in ppe) {
       switch (item) {
         case 'Dust Mask':
-          return AssetsManager.dustMask;
+          assetPaths.add(AssetsManager.dustMask);
+          break;
         case 'Ear Protection':
-          return AssetsManager.earProtection;
+          assetPaths.add(AssetsManager.earProtection);
+          break;
         case 'Face Shield':
-          return AssetsManager.faceShield;
+          assetPaths.add(AssetsManager.faceShield);
+          break;
         case 'Foot Protection':
-          return AssetsManager.footProtection;
+          assetPaths.add(AssetsManager.footProtection);
+          break;
         case 'Hand Protection':
-          return AssetsManager.handProtection;
+          assetPaths.add(AssetsManager.handProtection);
+          break;
         case 'Head Protection':
-          return AssetsManager.headProtection;
+          assetPaths.add(AssetsManager.headProtection);
+          break;
         case 'High Vis Clothing':
-          return AssetsManager.highVisClothing;
-        case 'Life Jacke':
-          return AssetsManager.lifeJacket;
+          assetPaths.add(AssetsManager.highVisClothing);
+          break;
+        case 'Life Jacket':
+          assetPaths.add(AssetsManager.lifeJacket);
+          break;
         case 'Protective Clothing':
-          return AssetsManager.protectiveClothing;
+          assetPaths.add(AssetsManager.protectiveClothing);
+          break;
         case 'Safety Glasses':
-          return AssetsManager.safetyGlasses;
+          assetPaths.add(AssetsManager.safetyGlasses);
+          break;
         case 'Other':
-          return AssetsManager.appLogo;
         default:
-          return AssetsManager.appLogo;
+          assetPaths.add(AssetsManager.appLogo);
+          break;
       }
     }
+    return assetPaths;
   }
 
 // Save the file to the device

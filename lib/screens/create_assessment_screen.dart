@@ -139,7 +139,10 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           child: CircularProgressIndicator()),
                     );
                     await assessmentProvider
-                        .submitTestAssessment(creatorID: creatorID)
+                        .submitTestAssessment(
+                      creatorID: creatorID,
+                      docTitle: title,
+                    )
                         .then((_) async {
                       // pop the the dialog
                       Navigator.pop(context);
