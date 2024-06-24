@@ -30,9 +30,9 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     return Scaffold(
-      appBar: MyAppBar(
+      appBar: const MyAppBar(
         title: 'User Information',
-        leading: backIcon(context),
+        leading: BackButton(),
       ),
       body: Center(
           child: Padding(

@@ -54,7 +54,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
         child: Scaffold(
           appBar: MyAppBar(
             title: title,
-            leading: backIcon(context),
+            leading: const BackButton(),
             actions: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(

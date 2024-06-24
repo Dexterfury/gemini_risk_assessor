@@ -393,15 +393,15 @@ void imagePickerAnimatedDialog({
   );
 }
 
-// general bacl icon
-Widget backIcon(BuildContext context) {
-  return IconButton(
-    onPressed: () => Navigator.pop(context),
-    icon: Icon(
-      Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
-    ),
-  );
-}
+// // general bacl icon
+// Widget backIcon(BuildContext context) {
+//   return IconButton(
+//     onPressed: () => Navigator.pop(context),
+//     icon: Icon(
+//       Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
+//     ),
+//   );
+// }
 
 // store file to storage and return file url
 Future<String> storeFileToStorage({

@@ -9,9 +9,6 @@ import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/page_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import '../providers/auth_provider.dart';
 
 class CreateExplainerScreen extends StatefulWidget {
   const CreateExplainerScreen({super.key, this.tool});
@@ -49,8 +46,8 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     final bool isViewOnly = widget.tool != null;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: MyAppBar(
-        leading: backIcon(context),
+      appBar: const MyAppBar(
+        leading: BackButton(),
         title: 'Tool Explainer',
       ),
       body: SingleChildScrollView(
