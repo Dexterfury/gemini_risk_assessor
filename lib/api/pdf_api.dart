@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:http/http.dart' as http;
 
 class PdfApi {
   static Future<File> generatePdf({
@@ -16,35 +17,130 @@ class PdfApi {
   }) async {
     final document = PdfDocument();
 
-    // add a page to the document
-    final page = document.pages.add();
-
     // Load the logo from assets
-    final PdfBitmap logo = await loadLogo(AssetsManager.appLogo);
+    final PdfBitmap logo = await loadImage(AssetsManager.appLogo);
 
-    // load a list of ppe from assets - depending on the list of ppe from the model
+    // Load a list of ppe from assets - depending on the list of ppe from the model
     final List<PdfBitmap> ppeImages =
         await loadPPELogoList(assessmentModel.ppe);
 
-    log('heading: $heading');
+    // Get images from assets or firestore
+    final List<PdfBitmap> images = await loadImagesList(assessmentModel.images);
 
-    // draw table
+    // Function to add header and signature to a page
+    void addHeaderAndSignature(PdfPage page) {
+      drawHeader(
+        page,
+        heading,
+        assessmentModel.id,
+        logo,
+      );
+      addSignatureImage(
+        assessmentModel,
+        page,
+        signatureImage,
+      );
+    }
+
+    // Add first page
+    final firstPage = document.pages.add();
+    addHeaderAndSignature(firstPage);
+
+    // Draw table on the first page
     drawGrid(
       heading,
       assessmentModel,
-      page,
+      firstPage,
       logo,
       ppeImages,
     );
 
-    // add a signature image to the page
-    addSignatureImage(
-      assessmentModel,
-      page,
-      signatureImage,
-    );
+    // Add a new page for images
+    final imagePage = document.pages.add();
+    addHeaderAndSignature(imagePage);
+    await addImagesOnNewPage(images, imagePage);
+
+    // Add a new page for names
+    final namesPage = document.pages.add();
+    addHeaderAndSignature(namesPage);
+    addNamesPage(namesPage);
 
     return saveFile(document);
+  }
+
+  static void addNamesPage(PdfPage page) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 4);
+
+    final headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = 'NAME';
+    headerRow.cells[1].value = 'SURNAME';
+    headerRow.cells[2].value = 'ORGANISATION';
+    headerRow.cells[3].value = 'SIGNATURE';
+
+    // Apply styling to header row
+    for (int i = 0; i < headerRow.cells.count; i++) {
+      var cell = headerRow.cells[i];
+      cell.style.backgroundBrush = PdfSolidBrush(PdfColor(100, 100, 100));
+      cell.style.textBrush = PdfBrushes.white;
+      cell.style.font = PdfStandardFont(PdfFontFamily.helvetica, 12,
+          style: PdfFontStyle.bold);
+    }
+
+    // Add empty rows for data entry
+    for (int i = 0; i < 30; i++) {
+      final row = grid.rows.add();
+      for (int j = 0; j < row.cells.count; j++) {
+        row.cells[j].style.borders.all = PdfPen(PdfColor(0, 0, 0), width: 0.5);
+      }
+      // apply padding to row
+      row.height = 20;
+    }
+
+    // Add a row for TIME at the bottom
+    final timeRow = grid.rows.add();
+    timeRow.cells[0].value = 'TIME:';
+    timeRow.cells[0].columnSpan = 4;
+    timeRow.height = 30;
+
+    grid.style.cellPadding = PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
+
+    // Define header and footer space
+    double headerHeight = 50.0;
+    double footerHeight = 50.0;
+
+    grid.draw(
+      page: page,
+      bounds: Rect.fromLTWH(0, headerHeight, page.getClientSize().width,
+          page.getClientSize().height - headerHeight - footerHeight),
+    );
+  }
+
+  static Future<void> addImagesOnNewPage(
+      List<PdfBitmap> images, PdfPage page) async {
+    const double padding = 20.0;
+    double headerHeight = 50.0;
+    double footerHeight = 50.0;
+    double imageWidth = (page.getClientSize().width - 3 * padding) / 2;
+    double currentX = padding;
+    double currentY = padding + headerHeight;
+
+    for (int i = 0; i < images.length; i++) {
+      if (i > 0 && i % 2 == 0) {
+        // Move to the next row
+        currentX = padding;
+        currentY +=
+            images[i - 1].height * imageWidth / images[i - 1].width + padding;
+      }
+
+      page.graphics.drawImage(
+        images[i],
+        Rect.fromLTWH(currentX, currentY, imageWidth,
+            images[i].height * imageWidth / images[i].width),
+      );
+
+      currentX += imageWidth + padding;
+    }
   }
 
   static void addSignatureImage(
@@ -94,14 +190,6 @@ Date: $dateTime''';
     PdfBitmap logo,
     List<PdfBitmap> ppeImages,
   ) async {
-    // Draw the header
-    drawHeader(
-      page,
-      heading,
-      assessmentModel.id,
-      logo,
-    );
-
     // Create a list of grids to add together for a custom grid
     final List<PdfGrid> grids = [];
 
@@ -312,21 +400,40 @@ Date: $dateTime''';
             headerHeight));
   }
 
-  static Future<PdfBitmap> loadLogo(String assetPath) async {
-    final ByteData data = await rootBundle.load(assetPath);
-    final Uint8List bytes = data.buffer.asUint8List();
-    return PdfBitmap(bytes);
+  static Future<PdfBitmap> loadImage(String path) async {
+    if (path.startsWith('http')) {
+      // Load image from a remote URL
+      final response = await http.get(Uri.parse(path));
+      if (response.statusCode == 200) {
+        final Uint8List bytes = response.bodyBytes;
+        return PdfBitmap(bytes);
+      } else {
+        throw Exception('Failed to load image from URL');
+      }
+    } else {
+      // Load image from local assets
+      final ByteData data = await rootBundle.load(path);
+      final Uint8List bytes = data.buffer.asUint8List();
+      return PdfBitmap(bytes);
+    }
   }
 
   static Future<List<PdfBitmap>> loadPPELogoList(List<String> ppe) async {
-    log('ppe1: $ppe');
     final logoList = <PdfBitmap>[];
     final assetPaths = await getAssetsPath(ppe);
 
-    log('assetPaths: $assetPaths');
     for (final assetPath in assetPaths) {
-      final logo = await loadLogo(assetPath);
+      final logo = await loadImage(assetPath);
       logoList.add(logo); // Error occurs here
+    }
+    return logoList;
+  }
+
+  static Future<List<PdfBitmap>> loadImagesList(List<String> images) async {
+    final logoList = <PdfBitmap>[];
+    for (final image in images) {
+      final logo = await loadImage(image);
+      logoList.add(logo);
     }
     return logoList;
   }

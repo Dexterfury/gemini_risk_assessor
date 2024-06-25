@@ -239,19 +239,19 @@ class AssessmentProvider extends ChangeNotifier {
   }) async {
     switch (label) {
       case ListHeader.equipments:
-        _assessmentModel!.equipments.remove(data);
+        _assessmentModel.equipments.remove(data);
         notifyListeners();
         break;
       case ListHeader.hazards:
-        _assessmentModel!.hazards.remove(data);
+        _assessmentModel.hazards.remove(data);
         notifyListeners();
         break;
       case ListHeader.risks:
-        _assessmentModel!.risks.remove(data);
+        _assessmentModel.risks.remove(data);
         notifyListeners();
         break;
       case ListHeader.control:
-        _assessmentModel!.control.remove(data);
+        _assessmentModel.control.remove(data);
         notifyListeners();
         break;
       default:
@@ -267,12 +267,12 @@ class AssessmentProvider extends ChangeNotifier {
       _ppeModelList.remove(ppeItem);
 
       // remove ppe from assessmentModel
-      _assessmentModel!.ppe.remove(ppeItem.label);
+      _assessmentModel.ppe.remove(ppeItem.label);
     } else {
       _ppeModelList.add(ppeItem);
 
       //  add ppe to assessmentModel
-      _assessmentModel!.ppe.add(ppeItem.label);
+      _assessmentModel.ppe.add(ppeItem.label);
     }
     notifyListeners();
   }
@@ -313,7 +313,6 @@ class AssessmentProvider extends ChangeNotifier {
         }
         // update maximum number of images
         _maxImages = _maxImages - returnedFiles.length;
-        log("images: ${_imagesFileList.toString()}");
         notifyListeners();
       }
     }

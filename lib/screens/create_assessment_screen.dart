@@ -123,6 +123,14 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       return;
                     }
 
+                    // check if atleast 3 ppe is selected
+                    if (assessmentProvider.ppeModelList.length < 3) {
+                      showSnackBar(
+                          context: context,
+                          message: 'Please select atleast 3 PPE');
+                      return;
+                    }
+
                     final authProvider = context.read<AuthProvider>();
                     final creatorID = authProvider.userModel!.uid;
 
