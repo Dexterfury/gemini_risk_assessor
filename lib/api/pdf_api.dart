@@ -88,7 +88,7 @@ class PdfApi {
     }
 
     // Add empty rows for data entry
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 20; i++) {
       final row = grid.rows.add();
       for (int j = 0; j < row.cells.count; j++) {
         row.cells[j].style.borders.all = PdfPen(PdfColor(0, 0, 0), width: 0.5);
@@ -106,8 +106,8 @@ class PdfApi {
     grid.style.cellPadding = PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
 
     // Define header and footer space
-    double headerHeight = 50.0;
-    double footerHeight = 50.0;
+    double headerHeight = 80.0;
+    double footerHeight = 80.0;
 
     grid.draw(
       page: page,
@@ -119,8 +119,8 @@ class PdfApi {
   static Future<void> addImagesOnNewPage(
       List<PdfBitmap> images, PdfPage page) async {
     const double padding = 20.0;
-    double headerHeight = 50.0;
-    double footerHeight = 50.0;
+    double headerHeight = 80.0;
+    double footerHeight = 80.0;
     double imageWidth = (page.getClientSize().width - 3 * padding) / 2;
     double currentX = padding;
     double currentY = padding + headerHeight;
