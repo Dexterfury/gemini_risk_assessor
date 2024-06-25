@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
@@ -43,7 +44,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
     // summary
     final summary = assessmentProvider.assessmentModel!.summary;
     // createdBy
-    final createdBy = assessmentProvider.assessmentModel!.createdBy;
+    final createdBy = context.read<AuthProvider>().userModel!.name;
 
     // Format the datetime using Intl package
     String formattedTime = DateFormat.yMMMEd().format(time);
@@ -157,7 +158,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 Text(summary),
                 const SizedBox(height: 10),
                 Text(
-                  'Created by: $createdBy',
+                  createdBy,
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 16),
                 ),

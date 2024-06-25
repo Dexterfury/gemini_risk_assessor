@@ -110,9 +110,9 @@ class AssessmentProvider extends ChangeNotifier {
 
   String getDoctTitle(String docTitle) {
     if (docTitle == Constants.createAssessment) {
-      return 'Risk Assessment';
+      return Constants.riskAssessment;
     } else {
-      return 'Daily Safety Task Instruction';
+      return Constants.dailySafetyTaskInstructions;
     }
   }
 
@@ -124,19 +124,28 @@ class AssessmentProvider extends ChangeNotifier {
 
   // create pdf assessment file
   Future<void> createPdfAssessmentFile() async {
-    log('PPE HERE: ${_assessmentModel.ppe}');
     // set loading
     _isLoading = true;
     notifyListeners();
+    final creatorName = await getCreatorName(_assessmentModel.createdBy);
     final file = await PdfApi.generatePdf(
-      assessmentModel: _assessmentModel!,
+      assessmentModel: _assessmentModel,
       signatureImage: _signatureImage!,
       heading: _pdfHeading,
+      creatorName: creatorName,
     );
 
     _pdfAssessmentFile = file;
     notifyListeners();
     //await saveAssessmentToFirestore(file);
+  }
+
+  Future<String> getCreatorName(String creatorId) async {
+    final userDoc = await _firestore
+        .collection(Constants.usersCollection)
+        .doc(creatorId)
+        .get();
+    return userDoc[Constants.name];
   }
 
   // save assement to firetore

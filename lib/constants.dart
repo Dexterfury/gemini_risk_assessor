@@ -5,6 +5,13 @@ class Constants {
   // risk assessment
   static const String riskAssessments = 'Risk Assessments';
 
+  // risk assessment
+  static const String riskAssessment = 'Risk Assessment';
+
+  // daily safety task instructions
+  static const String dailySafetyTaskInstructions =
+      'Daily Safety Task Instructions';
+
   // tools
   static const String tools = 'Tools';
 

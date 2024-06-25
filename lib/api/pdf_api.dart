@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ class PdfApi {
     required AssessmentModel assessmentModel,
     required Uint8List signatureImage,
     required String heading,
+    required String creatorName,
   }) async {
     final document = PdfDocument();
 
@@ -24,8 +26,12 @@ class PdfApi {
     final List<PdfBitmap> ppeImages =
         await loadPPELogoList(assessmentModel.ppe);
 
-    // Get images from assets or firestore
-    final List<PdfBitmap> images = await loadImagesList(assessmentModel.images);
+    List<PdfBitmap> images = [];
+
+    if (assessmentModel.images.isNotEmpty) {
+      // Get images from assets or firestore
+      images = await loadImagesList(assessmentModel.images);
+    }
 
     // Function to add header and signature to a page
     void addHeaderAndSignature(PdfPage page) {
@@ -39,6 +45,7 @@ class PdfApi {
         assessmentModel,
         page,
         signatureImage,
+        creatorName,
       );
     }
 
@@ -55,17 +62,22 @@ class PdfApi {
       ppeImages,
     );
 
-    // Add a new page for images
-    final imagePage = document.pages.add();
-    addHeaderAndSignature(imagePage);
-    await addImagesOnNewPage(images, imagePage);
+    if (images.isNotEmpty) {
+      // Add a new page for images
+      final imagePage = document.pages.add();
+      addHeaderAndSignature(imagePage);
+      await addImagesOnNewPage(images, imagePage);
+    }
 
     // Add a new page for names
     final namesPage = document.pages.add();
     addHeaderAndSignature(namesPage);
     addNamesPage(namesPage);
 
-    return saveFile(document);
+    return saveFile(
+      document,
+      heading,
+    );
   }
 
   static void addNamesPage(PdfPage page) {
@@ -88,7 +100,7 @@ class PdfApi {
     }
 
     // Add empty rows for data entry
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 28; i++) {
       final row = grid.rows.add();
       for (int j = 0; j < row.cells.count; j++) {
         row.cells[j].style.borders.all = PdfPen(PdfColor(0, 0, 0), width: 0.5);
@@ -97,17 +109,17 @@ class PdfApi {
       row.height = 20;
     }
 
-    // Add a row for TIME at the bottom
-    final timeRow = grid.rows.add();
-    timeRow.cells[0].value = 'TIME:';
-    timeRow.cells[0].columnSpan = 4;
-    timeRow.height = 30;
+    // // Add a row for TIME at the bottom
+    // final timeRow = grid.rows.add();
+    // timeRow.cells[0].value = 'TIME:';
+    // timeRow.cells[0].columnSpan = 4;
+    // timeRow.height = 30;
 
     grid.style.cellPadding = PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
 
     // Define header and footer space
     double headerHeight = 80.0;
-    double footerHeight = 80.0;
+    double footerHeight = 40.0;
 
     grid.draw(
       page: page,
@@ -147,6 +159,7 @@ class PdfApi {
     AssessmentModel assessmentModel,
     PdfPage page,
     Uint8List signatureImage,
+    String creatorName,
   ) {
     // get page size
     final pageSize = page.getClientSize();
@@ -154,7 +167,7 @@ class PdfApi {
     final image = PdfBitmap(signatureImage);
     // draw the image on the page and locate it at the bottom right corner
 
-    final creatorName = assessmentModel.createdBy;
+    //final creatorName = assessmentModel.createdBy;
     String dateTime = DateFormat.yMMMEd().format(assessmentModel.createdAt);
 
     final signatureText = '''Creator: $creatorName
@@ -352,9 +365,9 @@ Date: $dateTime''';
       final result = grid.draw(
         page: page,
         bounds: Rect.fromLTWH(
-          20,
+          0,
           currentOffsetY,
-          page.getClientSize().width - 40,
+          0,
           0, // Height set to 0 for auto-height adjustment
         ),
       );
@@ -374,7 +387,7 @@ Date: $dateTime''';
     // Define the bounds for the header elements
     const double margin = 20;
     const double headerHeight = 50;
-    // get page size
+    // Get page size
     final pageSize = page.getClientSize();
 
     // Set the font and brush for the title
@@ -384,20 +397,43 @@ Date: $dateTime''';
     final brush = PdfSolidBrush(PdfColor(0, 0, 0));
 
     // Draw the title on the top left
-    graphics.drawString(title, titleFont,
-        brush: brush,
-        bounds: const Rect.fromLTWH(margin, margin, 200, headerHeight));
+    graphics.drawString(
+      title,
+      titleFont,
+      brush: brush,
+      bounds: const Rect.fromLTWH(
+        0,
+        margin,
+        0,
+        headerHeight,
+      ),
+    );
 
     // Draw the document ID below the title
-    graphics.drawString('ID: $trimmedDocId', documentIdFont,
-        brush: brush,
-        bounds: const Rect.fromLTWH(margin, margin + 20, 200, headerHeight));
+    graphics.drawString(
+      'ID: $trimmedDocId',
+      documentIdFont,
+      brush: brush,
+      bounds: const Rect.fromLTWH(
+        0,
+        margin + 20,
+        0,
+        headerHeight,
+      ),
+    );
 
     // Draw the image/logo on the top right
+    const logoWidth = headerHeight;
+    final logoXPosition = pageSize.width - margin - logoWidth;
     graphics.drawImage(
-        logo,
-        Rect.fromLTWH(pageSize.width - (margin * 5), margin - 10, headerHeight,
-            headerHeight));
+      logo,
+      Rect.fromLTWH(
+        logoXPosition,
+        margin,
+        logoWidth,
+        headerHeight,
+      ),
+    );
   }
 
   static Future<PdfBitmap> loadImage(String path) async {
@@ -482,12 +518,19 @@ Date: $dateTime''';
   }
 
 // Save the file to the device
-  static Future<File> saveFile(PdfDocument document) async {
+  static Future<File> saveFile(
+    PdfDocument document,
+    String heading,
+  ) async {
+    // get folder directory
+    final folderName =
+        heading == Constants.riskAssessment ? 'RiskAssessments' : 'Dstis';
+
     // Get the path to the document directory
     final path = await getApplicationDocumentsDirectory();
     // Get the file name
     final fileName =
-        '${path.path}/RiskAssessment${DateTime.now().toIso8601String()}.pdf';
+        '${path.path}/$folderName${DateTime.now().toIso8601String()}.pdf';
     // Save the document to the device
     final file = File(fileName);
     // Write the document to the file
