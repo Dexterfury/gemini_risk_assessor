@@ -50,7 +50,7 @@ class AssessmentProvider extends ChangeNotifier {
   int get numberOfPeople => _numberOfPeople;
   String get pdfHeading => _pdfHeading;
   String get description => _description;
-  AssessmentModel? get assessmentModel => _assessmentModel;
+  AssessmentModel get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
   File? get pdfAssessmentFile => _pdfAssessmentFile;
   bool get hasSigned => _hasSigned;
@@ -148,10 +148,7 @@ class AssessmentProvider extends ChangeNotifier {
 
     _pdfAssessmentFile = file;
     notifyListeners();
-    await saveFileToFirestore(
-      file,
-      _pdfHeading,
-    );
+    // savePdf to firestore here
   }
 
   Future<String> getCreatorName(String creatorId) async {
@@ -164,46 +161,64 @@ class AssessmentProvider extends ChangeNotifier {
 
   // save assement to firetore
   Future<void> saveFileToFirestore(
-    File file,
-    String pdfHeading,
-  ) async {
+      //File file,
+      //String pdfHeading,
+      ) async {
     final id = _isPersonal ? _uid : _organisationID;
     // get folder directory
     final folderName = Constants.getFolderName(pdfHeading);
-    // upload pdf to storage
-    String fileUrl = await storeFileToStorage(
-        file: file,
-        reference:
-            '${Constants.pdfFiles}/$folderName/$id/${assessmentModel!.id}.pdf');
+    // // upload pdf to storage
+    // String fileUrl = await storeFileToStorage(
+    //     file: file,
+    //     reference:
+    //         '${Constants.pdfFiles}/$folderName/$id/${assessmentModel!.id}.pdf');
 
     List<String> imagesUrls = [];
     for (var image in _assessmentModel.images) {
       final imageUrl = await storeFileToStorage(
           file: File(image),
           reference:
-              '${Constants.images}/$folderName/$folderName${DateTime.now().toIso8601String()}.jpg');
+              '${Constants.images}/$folderName/$id${DateTime.now().toIso8601String()}.jpg');
       imagesUrls.add(imageUrl);
     }
 
     // set pdf and images
-    _assessmentModel.pdfUrl = fileUrl;
+    //_assessmentModel.pdfUrl = fileUrl;
     _assessmentModel.images = imagesUrls;
 
     if (_isPersonal) {
-      // save to user's database
-      await assessmentCollection
-          .doc(assessmentModel!.id)
-          .set(assessmentModel!.toJson());
-      // save to user's database end.
+      if (_pdfHeading == Constants.riskAssessment) {
+        // save to user's database
+        await assessmentCollection
+            .doc(assessmentModel.id)
+            .set(assessmentModel.toJson());
+        // save to user's database end.
+      } else {
+        // save to user's database
+        await dstiCollection
+            .doc(assessmentModel.id)
+            .set(assessmentModel.toJson());
+        // save to user's database end.
+      }
     } else {
       // add organisationID
-      assessmentModel!.organisationID = _organisationID;
+      assessmentModel.organisationID = _organisationID;
 
-      // save to organisation's database
-      await organisationCollection
-          .doc(assessmentModel!.id)
-          .set(assessmentModel!.toJson());
-      // save to organisation's database end.
+      if (_pdfHeading == Constants.riskAssessment) {
+        // save to organisation's database
+        await organisationCollection
+            .doc(_organisationID)
+            .collection(Constants.assessmentCollection)
+            .doc(assessmentModel.id)
+            .set(assessmentModel.toJson());
+      } else {
+        // save to organisation's database
+        await organisationCollection
+            .doc(_organisationID)
+            .collection(Constants.dstiCollections)
+            .doc(assessmentModel.id)
+            .set(assessmentModel.toJson());
+      }
     }
 
     notifyListeners();

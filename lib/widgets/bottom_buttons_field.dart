@@ -114,7 +114,7 @@ class BottonButtonsField extends StatelessWidget {
                   );
                   // create the pdf file and save to local storage
                   assessmentProvider
-                      .createPdfAssessmentFile()
+                      .saveFileToFirestore()
                       .whenComplete(() async {
                     // close the loading dialog
                     Navigator.pop(context);
