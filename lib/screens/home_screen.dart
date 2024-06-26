@@ -3,6 +3,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
@@ -22,14 +23,19 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               // TODO remove this later
               //context.read<ToolProvider>().setMacTestToolsList();
-              context.read<ToolsProvider>().setWindowsTestToolsList();
+              //context.read<ToolsProvider>().setWindowsTestToolsList();
             },
             icon: const Icon(Icons.search),
           ),
           actions: DisplayUserImage(
             radius: 20,
             isViewOnly: true,
-            onPressed: () {},
+            onPressed: () {
+              navigationController(
+                context: context,
+                route: Constants.profileRoute,
+              );
+            },
           ),
           bottom: const TabBar(
             tabs: [

@@ -91,6 +91,9 @@ class Constants {
   static const String signInToAutoFillName = 'Sign In to auto fill name';
   static const String enterDescription = 'Enter Description';
 
+  static const String changeName = 'Change Name';
+  static const String changeDescription = 'Change Description';
+
   // firestore collections
   static const String usersCollection = 'users';
   static const String promptCollection = 'prompts';

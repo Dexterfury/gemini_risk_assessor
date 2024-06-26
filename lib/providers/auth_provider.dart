@@ -31,6 +31,8 @@ class AuthProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
+  final CollectionReference _organisationsCollection =
+      FirebaseFirestore.instance.collection(Constants.organisationCollection);
 
   // getters
   bool get isSignedIn => _isSignedIn;
@@ -458,6 +460,16 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       showSnackBar(context: context, message: e.toString());
     });
+  }
+
+  // get user stream
+  Stream<DocumentSnapshot> userStream({required String userID}) {
+    return _usersCollection.doc(userID).snapshots();
+  }
+
+  // get organisations stream
+  Stream<DocumentSnapshot> organisationStream({required String orgID}) {
+    return _organisationsCollection.doc(orgID).snapshots();
   }
 
   // sign out
