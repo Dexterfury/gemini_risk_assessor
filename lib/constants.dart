@@ -25,6 +25,10 @@ class Constants {
   static const String createAssessment = 'New Assessment';
   static const String createDsti = 'New DSTI';
 
+  // image cache manager keys
+  static const String userImageKey = 'userImageKey';
+  static const String generatedImagesKey = 'generatedImagesKey';
+
   // navigation routes
   static const String homeRoute = '/home';
   static const String createAssessmentRoute = '/createAssessment';

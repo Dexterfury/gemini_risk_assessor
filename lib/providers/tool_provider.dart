@@ -113,9 +113,14 @@ class ToolsProvider extends ChangeNotifier {
   }
 
   // stream my tools from firestore
-  Stream<QuerySnapshot> streamMyTools() {
+  Stream<QuerySnapshot> toolsStream({
+    required String userId,
+  }) {
     return toolsCollection
-        .where(Constants.createdBy, isEqualTo: _uid)
+        .where(
+          Constants.createdBy,
+          isEqualTo: userId,
+        )
         .snapshots();
   }
 

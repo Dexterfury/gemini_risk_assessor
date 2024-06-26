@@ -34,7 +34,12 @@ class ExplainerDetailsScreen extends StatelessWidget {
         child: Scaffold(
           appBar: MyAppBar(
             title: title,
-            leading: const BackButton(),
+            leading: BackButton(
+              onPressed: () {
+                // pop the screen with save as true
+                Navigator.of(context).pop(false);
+              },
+            ),
           ),
           body: SingleChildScrollView(
             controller: _scrollController,

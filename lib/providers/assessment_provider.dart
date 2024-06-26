@@ -176,9 +176,26 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // stream dsti's from firestore
-  Stream<QuerySnapshot> dstiStream() {
+  Stream<QuerySnapshot> dstiStream({
+    required String userId,
+  }) {
     return dstiCollection
-        .where(Constants.createdBy, isEqualTo: _uid)
+        .where(
+          Constants.createdBy,
+          isEqualTo: userId,
+        )
+        .snapshots();
+  }
+
+  // stream risk assessments from firestore
+  Stream<QuerySnapshot> ristAssessmentsStream({
+    required String userId,
+  }) {
+    return assessmentCollection
+        .where(
+          Constants.createdBy,
+          isEqualTo: userId,
+        )
         .snapshots();
   }
 

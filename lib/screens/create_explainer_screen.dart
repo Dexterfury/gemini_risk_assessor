@@ -113,7 +113,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                   return;
                 }
 
-                await toolProvider.windowstestPrompt();
+                await toolProvider.macTestPrompt();
                 if (!context.mounted) return;
                 // display the results
                 if (toolProvider.toolModel != null) {
