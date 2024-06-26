@@ -41,7 +41,7 @@ class InfoDetailsCard extends StatelessWidget {
       if (isOrganisation) {
         // check if user is admin
         if (isAdmin!) {
-          return InkWell(
+          return GestureDetector(
             onTap: () {
               showMyEditAnimatedDialog(
                 context: context,
@@ -89,7 +89,7 @@ class InfoDetailsCard extends StatelessWidget {
           return const SizedBox();
         }
 
-        return InkWell(
+        return GestureDetector(
           onTap: () {
             showMyEditAnimatedDialog(
               context: context,

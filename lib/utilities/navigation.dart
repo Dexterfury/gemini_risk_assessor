@@ -27,6 +27,13 @@ navigationController({
         (route) => false,
       );
       break;
+    case Constants.profileRoute:
+      Navigator.pushNamed(
+        context,
+        route,
+        arguments: argument,
+      );
+      break;
     default:
       Navigator.pushNamed(
         context,

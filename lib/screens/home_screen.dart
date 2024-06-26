@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
@@ -27,15 +28,19 @@ class HomeScreen extends StatelessWidget {
             },
             icon: const Icon(Icons.search),
           ),
-          actions: DisplayUserImage(
-            radius: 20,
-            isViewOnly: true,
-            onPressed: () {
+          actions: GestureDetector(
+            onTap: () {
               navigationController(
                 context: context,
                 route: Constants.profileRoute,
+                argument: context.read<AuthProvider>().userModel!.uid,
               );
             },
+            child: DisplayUserImage(
+              radius: 20,
+              isViewOnly: true,
+              onPressed: () {},
+            ),
           ),
           bottom: const TabBar(
             tabs: [
