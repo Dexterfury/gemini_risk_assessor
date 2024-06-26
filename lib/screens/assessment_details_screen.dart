@@ -55,7 +55,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
         child: Scaffold(
           appBar: MyAppBar(
             title: title,
-            leading: const BackButton(),
+            leading: BackButton(
+              onPressed: () {
+                // pop the screen with save as false
+                Navigator.of(context).pop(false);
+              },
+            ),
             actions: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(

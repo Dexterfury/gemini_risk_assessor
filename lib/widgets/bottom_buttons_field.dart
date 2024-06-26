@@ -119,14 +119,17 @@ class BottonButtonsField extends StatelessWidget {
                     // close the loading dialog
                     Navigator.pop(context);
 
-                    // navigate to home screen
-                    navigationController(
-                      context: context,
-                      route: Constants.screensControllerRoute,
-                    );
+                    // pop the current screen with save as true
+                    Navigator.of(context).pop(true);
 
-                    await OpenFile.open(
-                        (assessmentProvider.pdfAssessmentFile!.path));
+                    // // navigate to home screen
+                    // navigationController(
+                    //   context: context,
+                    //   route: Constants.screensControllerRoute,
+                    // );
+
+                    // await OpenFile.open(
+                    //     (assessmentProvider.pdfAssessmentFile!.path));
                   });
                 }),
           ],

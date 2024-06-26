@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
@@ -15,7 +16,11 @@ import 'package:gemini_risk_assessor/service/gemini.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
@@ -87,13 +92,19 @@ class AssessmentProvider extends ChangeNotifier {
   //   notifyListeners();
   // }
 
+  // set isPersonal
+  void setIsPersonal({
+    required bool isPersonal,
+  }) {
+    _isPersonal = isPersonal;
+    notifyListeners();
+  }
+
   // set organisationID
   void setOrganisationID({
     required String companyID,
-    required bool isPersonal,
   }) async {
     _organisationID = companyID;
-    _isPersonal = isPersonal;
     notifyListeners();
   }
 
@@ -137,7 +148,10 @@ class AssessmentProvider extends ChangeNotifier {
 
     _pdfAssessmentFile = file;
     notifyListeners();
-    //await saveAssessmentToFirestore(file);
+    await saveFileToFirestore(
+      file,
+      _pdfHeading,
+    );
   }
 
   Future<String> getCreatorName(String creatorId) async {
@@ -149,31 +163,107 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // save assement to firetore
-  Future<void> saveAssessmentToFirestore(File file) async {
+  Future<void> saveFileToFirestore(
+    File file,
+    String pdfHeading,
+  ) async {
     final id = _isPersonal ? _uid : _organisationID;
-    // upload image to storage
+    // get folder directory
+    final folderName = Constants.getFolderName(pdfHeading);
+    // upload pdf to storage
     String fileUrl = await storeFileToStorage(
         file: file,
-        reference: '${Constants.pdfFiles}/$id/${assessmentModel!.id}');
+        reference:
+            '${Constants.pdfFiles}/$folderName/$id/${assessmentModel!.id}.pdf');
 
-    assessmentModel!.pdfUrl = fileUrl;
-    notifyListeners();
+    List<String> imagesUrls = [];
+    for (var image in _assessmentModel.images) {
+      final imageUrl = await storeFileToStorage(
+          file: File(image),
+          reference:
+              '${Constants.images}/$folderName/$folderName${DateTime.now().toIso8601String()}.jpg');
+      imagesUrls.add(imageUrl);
+    }
+
+    // set pdf and images
+    _assessmentModel.pdfUrl = fileUrl;
+    _assessmentModel.images = imagesUrls;
 
     if (_isPersonal) {
       // save to user's database
-      await assessmentCollection.doc(_uid).set(assessmentModel!.toJson());
+      await assessmentCollection
+          .doc(assessmentModel!.id)
+          .set(assessmentModel!.toJson());
       // save to user's database end.
     } else {
       // add organisationID
       assessmentModel!.organisationID = _organisationID;
-      notifyListeners();
+
       // save to organisation's database
       await organisationCollection
-          .doc(_organisationID)
+          .doc(assessmentModel!.id)
           .set(assessmentModel!.toJson());
       // save to organisation's database end.
     }
+
+    notifyListeners();
   }
+
+  // download pdf assessment file
+  Future<File?> downloadFile(String url, String filename) async {
+    try {
+      final ref = FirebaseStorage.instance.refFromURL(url);
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final String filePath = path.join(appDocDir.path, filename);
+
+      final File file = File(filePath);
+
+      if (await file.exists()) {
+        return file;
+      } else {
+        await ref.writeToFile(file);
+        return file;
+      }
+    } catch (e) {
+      print("Error downloading file: $e");
+      return null;
+    }
+  }
+
+  // open pdf assessment file
+  Future<void> openPdf(String url, String filename) async {
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String filePath = path.join(appDocDir.path, filename);
+    final File file = File(filePath);
+
+    if (await file.exists()) {
+      await OpenFile.open(filePath);
+    } else {
+      final downloadedFile = await downloadFile(url, filename);
+      if (downloadedFile != null) {
+        await OpenFile.open(downloadedFile.path);
+      }
+    }
+  }
+
+  // Future<String> downloadFile(String url, String fileName) async {
+  //   try {
+  //     // Get the temporary directory of the device
+  //     final directory = await getTemporaryDirectory();
+  //     final filePath = '${directory.path}/$fileName.pdf';
+
+  //     // Download the file
+  //     final response = await http.get(Uri.parse(url));
+  //     final file = File(filePath);
+  //     await file.writeAsBytes(response.bodyBytes);
+
+  //     // Open the file
+  //     return filePath;
+  //   } catch (e) {
+  //     print('Error downloading or opening file: $e');
+  //     return 'file not found';
+  //   }
+  // }
 
   // stream dsti's from firestore
   Stream<QuerySnapshot> dstiStream({

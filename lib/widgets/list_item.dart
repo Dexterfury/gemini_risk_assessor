@@ -2,7 +2,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:provider/provider.dart';
 
 class ListItem extends StatelessWidget {
   const ListItem({
@@ -17,6 +21,8 @@ class ListItem extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: SizedBox(
+        height: 60,
+        width: 80,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: CachedNetworkImage(
@@ -42,7 +48,12 @@ class ListItem extends StatelessWidget {
       trailing: Icon(
         Platform.isIOS ? Icons.arrow_forward_ios : Icons.arrow_forward,
       ),
+      onTap: () async {
+        // here I want to download and open the file if its not already saved to local
+        // if its already saved to local then open it
+        final assessmentProvider = context.read<AssessmentProvider>();
+        await assessmentProvider.openPdf(data.pdfUrl, '${data.id}.pdf');
+      },
     );
-    ;
   }
 }

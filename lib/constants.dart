@@ -25,6 +25,10 @@ class Constants {
   static const String createAssessment = 'New Assessment';
   static const String createDsti = 'New DSTI';
 
+  static getFolderName(String heading) {
+    return heading == Constants.riskAssessment ? 'RiskAssessments' : 'Dstis';
+  }
+
   // image cache manager keys
   static const String userImageKey = 'userImageKey';
   static const String generatedImagesKey = 'generatedImagesKey';

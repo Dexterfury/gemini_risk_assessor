@@ -523,8 +523,7 @@ Date: $dateTime''';
     String heading,
   ) async {
     // get folder directory
-    final folderName =
-        heading == Constants.riskAssessment ? 'RiskAssessments' : 'Dstis';
+    final folderName = Constants.getFolderName(heading);
 
     // Get the path to the document directory
     final path = await getApplicationDocumentsDirectory();

@@ -36,7 +36,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
             title: title,
             leading: BackButton(
               onPressed: () {
-                // pop the screen with save as true
+                // pop the screen with save as false
                 Navigator.of(context).pop(false);
               },
             ),

@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
+import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
 
 class DisplayUserImage extends StatelessWidget {
@@ -25,9 +27,9 @@ class DisplayUserImage extends StatelessWidget {
         Padding(
           padding: EdgeInsets.all(avatarPadding),
           child: CircleAvatar(
-            radius: radius,
-            backgroundImage: getImageToShow(authProvider),
-          ),
+              key: UniqueKey(),
+              radius: radius,
+              backgroundImage: getImageToShow(authProvider)),
         ),
         isViewOnly
             ? const SizedBox()
@@ -57,7 +59,12 @@ class DisplayUserImage extends StatelessWidget {
           as ImageProvider<Object>;
     } else if (authProvider.userModel != null &&
         authProvider.userModel!.imageUrl.isNotEmpty) {
-      return NetworkImage(authProvider.userModel!.imageUrl);
+      return CachedNetworkImageProvider(
+        authProvider.userModel!.imageUrl,
+        cacheManager: MyImageCacheManager.profileCacheManager,
+      );
+
+      //NetworkImage(authProvider.userModel!.imageUrl);
     } else {
       return AssetImage(AssetsManager.userIcon);
     }

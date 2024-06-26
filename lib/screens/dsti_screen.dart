@@ -41,8 +41,10 @@ class DSTIScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              final dsti = AssessmentModel.fromJson(
-                  snapshot.data!.docs[index] as Map<String, dynamic>);
+              final doc = snapshot.data!.docs[index];
+              final data = doc.data()
+                  as Map<String, dynamic>; // Use .data() to get the map
+              final dsti = AssessmentModel.fromJson(data);
               return ListItem(
                 data: dsti,
               );

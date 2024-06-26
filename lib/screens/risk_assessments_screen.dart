@@ -36,20 +36,25 @@ class RistAssessmentsScreen extends StatelessWidget {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('No Daily Safety Tast Intructions found',
+                child: Text('No Risk Assessments found',
                     textAlign: TextAlign.center, style: textStyle18w500),
               ),
             );
           }
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              final assessment = AssessmentModel.fromJson(
-                  snapshot.data!.docs[index] as Map<String, dynamic>);
-              return ListItem(
-                data: assessment,
-              );
-            },
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                final doc = snapshot.data!.docs[index];
+                final data = doc.data()
+                    as Map<String, dynamic>; // Use .data() to get the map
+                final assessment = AssessmentModel.fromJson(data);
+                return ListItem(
+                  data: assessment,
+                );
+              },
+            ),
           );
         },
       ),

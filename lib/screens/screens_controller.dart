@@ -83,6 +83,10 @@ class _ScreensControllerState extends State<ScreensController>
           setState(() {
             _selectedIndex = value;
           });
+          // set isPersonal
+          context
+              .read<AssessmentProvider>()
+              .setIsPersonal(isPersonal: value == 0);
         },
       ),
 
