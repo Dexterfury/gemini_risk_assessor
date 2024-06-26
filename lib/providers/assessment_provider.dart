@@ -134,7 +134,7 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // create pdf assessment file
-  Future<void> createPdfAssessmentFile() async {
+  Future<void> createPdfAndSave() async {
     // set loading
     _isLoading = true;
     notifyListeners();
@@ -149,6 +149,10 @@ class AssessmentProvider extends ChangeNotifier {
     _pdfAssessmentFile = file;
     notifyListeners();
     // savePdf to firestore here
+    saveFileToFirestore(
+      file,
+      _pdfHeading,
+    );
   }
 
   Future<String> getCreatorName(String creatorId) async {
@@ -161,17 +165,17 @@ class AssessmentProvider extends ChangeNotifier {
 
   // save assement to firetore
   Future<void> saveFileToFirestore(
-      //File file,
-      //String pdfHeading,
-      ) async {
+    File file,
+    String pdfHeading,
+  ) async {
     final id = _isPersonal ? _uid : _organisationID;
     // get folder directory
     final folderName = Constants.getFolderName(pdfHeading);
-    // // upload pdf to storage
-    // String fileUrl = await storeFileToStorage(
-    //     file: file,
-    //     reference:
-    //         '${Constants.pdfFiles}/$folderName/$id/${assessmentModel!.id}.pdf');
+    // upload pdf to storage
+    String fileUrl = await storeFileToStorage(
+        file: file,
+        reference:
+            '${Constants.pdfFiles}/$folderName/$id/${assessmentModel.id}.pdf');
 
     List<String> imagesUrls = [];
     for (var image in _assessmentModel.images) {
@@ -183,7 +187,7 @@ class AssessmentProvider extends ChangeNotifier {
     }
 
     // set pdf and images
-    //_assessmentModel.pdfUrl = fileUrl;
+    _assessmentModel.pdfUrl = fileUrl;
     _assessmentModel.images = imagesUrls;
 
     if (_isPersonal) {
@@ -254,7 +258,11 @@ class AssessmentProvider extends ChangeNotifier {
     if (await file.exists()) {
       await OpenFile.open(filePath);
     } else {
+      _isLoading = true;
+      notifyListeners();
       final downloadedFile = await downloadFile(url, filename);
+      _isLoading = false;
+      notifyListeners();
       if (downloadedFile != null) {
         await OpenFile.open(downloadedFile.path);
       }

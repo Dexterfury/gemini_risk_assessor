@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 class PdfApi {
   static Future<File> generatePdf({
@@ -77,6 +78,7 @@ class PdfApi {
     return saveFile(
       document,
       heading,
+      assessmentModel.id,
     );
   }
 
@@ -521,17 +523,14 @@ Date: $dateTime''';
   static Future<File> saveFile(
     PdfDocument document,
     String heading,
+    String fileName,
   ) async {
-    // get folder directory
-    final folderName = Constants.getFolderName(heading);
-
     // Get the path to the document directory
-    final path = await getApplicationDocumentsDirectory();
-    // Get the file name
-    final fileName =
-        '${path.path}/$folderName${DateTime.now().toIso8601String()}.pdf';
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String filePath = path.join(appDocDir.path, fileName);
+
     // Save the document to the device
-    final file = File(fileName);
+    final File file = File(filePath);
     // Write the document to the file
     file.writeAsBytes(await document.save());
     // Dispose the document

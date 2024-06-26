@@ -113,9 +113,7 @@ class BottonButtonsField extends StatelessWidget {
                         child: CircularProgressIndicator()),
                   );
                   // create the pdf file and save to local storage
-                  assessmentProvider
-                      .saveFileToFirestore()
-                      .whenComplete(() async {
+                  assessmentProvider.createPdfAndSave().whenComplete(() async {
                     // close the loading dialog
                     Navigator.pop(context);
 
