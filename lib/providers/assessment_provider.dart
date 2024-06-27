@@ -7,20 +7,20 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
+import 'package:gemini_risk_assessor/api/pdf_handler.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini.dart';
+import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 
 class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
@@ -147,9 +147,8 @@ class AssessmentProvider extends ChangeNotifier {
     );
 
     _pdfAssessmentFile = file;
-    notifyListeners();
     // savePdf to firestore here
-    saveFileToFirestore(
+    await saveFileToFirestore(
       file,
       _pdfHeading,
     );
@@ -171,24 +170,32 @@ class AssessmentProvider extends ChangeNotifier {
     final id = _isPersonal ? _uid : _organisationID;
     // get folder directory
     final folderName = Constants.getFolderName(pdfHeading);
+
     // upload pdf to storage
-    String fileUrl = await storeFileToStorage(
+    String fileUrl = await FileUploadHandler.uploadFileAndGetUrl(
         file: file,
         reference:
             '${Constants.pdfFiles}/$folderName/$id/${assessmentModel.id}.pdf');
 
-    List<String> imagesUrls = [];
-    for (var image in _assessmentModel.images) {
-      final imageUrl = await storeFileToStorage(
-          file: File(image),
-          reference:
-              '${Constants.images}/$folderName/$id${DateTime.now().toIso8601String()}.jpg');
-      imagesUrls.add(imageUrl);
+    log('file 2: $file');
+
+    if (_assessmentModel.images.isNotEmpty) {
+      List<String> imagesUrls = [];
+      for (var image in _assessmentModel.images) {
+        final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
+            file: File(image),
+            reference:
+                '${Constants.images}/$folderName/$id${DateTime.now().toIso8601String()}.jpg');
+        imagesUrls.add(imageUrl);
+      }
+
+      _assessmentModel.images = imagesUrls;
     }
+
+    log('file 3: $file');
 
     // set pdf and images
     _assessmentModel.pdfUrl = fileUrl;
-    _assessmentModel.images = imagesUrls;
 
     if (_isPersonal) {
       if (_pdfHeading == Constants.riskAssessment) {
@@ -228,65 +235,31 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // download pdf assessment file
-  Future<File?> downloadFile(String url, String filename) async {
-    try {
-      final ref = FirebaseStorage.instance.refFromURL(url);
-      final Directory appDocDir = await getApplicationDocumentsDirectory();
-      final String filePath = path.join(appDocDir.path, filename);
-
-      final File file = File(filePath);
-
-      if (await file.exists()) {
-        return file;
-      } else {
-        await ref.writeToFile(file);
-        return file;
-      }
-    } catch (e) {
-      print("Error downloading file: $e");
-      return null;
-    }
-  }
-
   // open pdf assessment file
   Future<void> openPdf(String url, String filename) async {
-    final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final String filePath = path.join(appDocDir.path, filename);
-    final File file = File(filePath);
+    _isLoading = true;
+    notifyListeners();
 
-    if (await file.exists()) {
-      await OpenFile.open(filePath);
-    } else {
-      _isLoading = true;
-      notifyListeners();
-      final downloadedFile = await downloadFile(url, filename);
+    try {
+      await PDFHandler.openPDF(url, filename);
+    } catch (e) {
+      print("Error opening PDF: $e");
+      // Handle error (e.g., show an error message to the user)
+    } finally {
       _isLoading = false;
       notifyListeners();
-      if (downloadedFile != null) {
-        await OpenFile.open(downloadedFile.path);
-      }
     }
   }
 
-  // Future<String> downloadFile(String url, String fileName) async {
-  //   try {
-  //     // Get the temporary directory of the device
-  //     final directory = await getTemporaryDirectory();
-  //     final filePath = '${directory.path}/$fileName.pdf';
+  // delete pdf from local storage
+  Future<void> deletePdf(String filename) async {
+    await PDFHandler.deleteFile(filename);
+  }
 
-  //     // Download the file
-  //     final response = await http.get(Uri.parse(url));
-  //     final file = File(filePath);
-  //     await file.writeAsBytes(response.bodyBytes);
-
-  //     // Open the file
-  //     return filePath;
-  //   } catch (e) {
-  //     print('Error downloading or opening file: $e');
-  //     return 'file not found';
-  //   }
-  // }
+  // Method to check if a PDF is downloaded
+  Future<bool> isPdfDownloaded(String filename) async {
+    return await PDFHandler.getDownloadStatus(filename);
+  }
 
   // stream dsti's from firestore
   Stream<QuerySnapshot> dstiStream({
@@ -565,8 +538,10 @@ class AssessmentProvider extends ChangeNotifier {
             images.add(image.path);
           }
         }
+        final assessmentId = const Uuid().v4();
         _assessmentModel = AssessmentModel.fromGeneratedContent(
           content,
+          assessmentId,
           creatorID,
           organisationID,
           _weather.name,
@@ -618,7 +593,6 @@ ${_description.isNotEmpty ? _description : ''}
   final String format = '''
 Return the assessment as valid JSON using the following structure:
 {
-  "id": \$uniqueId,
   "title": \$assessmentTitle,
   "taskToAchieve": \$taskToAchieve,
   "equipments": \$equipments,
@@ -628,7 +602,6 @@ Return the assessment as valid JSON using the following structure:
   "summary": \$summary,
 }
   
-uniqueId should be unique and of type String.
 equipments, hazards and risks should be of type List<String> with a max length of 10 or less.
 ''';
 

@@ -66,7 +66,10 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             authProvider.isLoading
                 ? const CircularProgressIndicator()
                 : MainAppButton(
-                    widget: const Icon(Icons.login),
+                    widget: const Icon(
+                      Icons.login,
+                      color: Colors.white,
+                    ),
                     label: 'Continue',
                     onTap: () {
                       if (_nameController.text.isEmpty ||

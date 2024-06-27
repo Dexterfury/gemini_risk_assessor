@@ -44,6 +44,7 @@ class Constants {
   static const String screensControllerRoute = '/screensController';
   static const String optRoute = '/opt';
   static const String createToolRoute = '/createTool';
+  static const String createOrganisationRoute = '/createOrganisation';
 
   static const String verificationId = 'verificationId';
   static const String phoneNumber = 'phoneNumber';
@@ -88,8 +89,9 @@ class Constants {
   static const String pdfUrl = 'pdfUrl';
 
   static const String enterYourName = 'Enter your name';
+  static const String organisationName = 'Organisation name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
-  static const String enterDescription = 'Enter Description';
+  static const String enterDescription = 'Enter description';
 
   static const String changeName = 'Change Name';
   static const String changeDescription = 'Change Description';

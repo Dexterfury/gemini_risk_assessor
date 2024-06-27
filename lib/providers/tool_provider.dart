@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/prompt_data_model.dart';
 import '../service/gemini.dart';
@@ -314,15 +315,15 @@ class ToolsProvider extends ChangeNotifier {
             images.add(image.path);
           }
         }
+
+        final toolId = const Uuid().v4();
         _toolModel = ToolModel.fromGeneratedContent(
           content,
+          toolId,
           creatorID,
           images,
           DateTime.now(),
         );
-        log('imageURL: $images');
-        log('tool : $_toolModel');
-        log('RESPONSE : ${content.text}');
         _isLoading = false;
         notifyListeners();
       }
@@ -359,13 +360,11 @@ ${_description.isNotEmpty ? _description : ''}
   final String format = '''
 Return the response as valid JSON using the following structure:
 {
-  "id": \$uniqueId,
   "name": \$name,
   "description": \$description,
   "summary": \$summary,
 }
   
-uniqueId should be unique and of type String.
 name, description and summary should be of type String.
 ''';
 }

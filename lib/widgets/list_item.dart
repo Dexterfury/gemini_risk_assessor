@@ -45,14 +45,24 @@ class ListItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: Icon(
-        Platform.isIOS ? Icons.arrow_forward_ios : Icons.arrow_forward,
-      ),
+      // trailing: Icon(
+      //   Platform.isIOS ? Icons.arrow_forward_ios : Icons.arrow_forward,
+      // ),
       onTap: () async {
         // here I want to download and open the file if its not already saved to local
         // if its already saved to local then open it
         final assessmentProvider = context.read<AssessmentProvider>();
-        await assessmentProvider.openPdf(data.pdfUrl, '${data.id}.pdf');
+        if (!assessmentProvider.isLoading) {
+          final isDownloaded =
+              await assessmentProvider.isPdfDownloaded('${data.id}.pdf');
+          if (!isDownloaded) {
+            // Show a message that the file needs to be downloaded
+            showSnackBar(
+                context: context, message: 'Downloading PDF. Please wait...');
+          }
+          await assessmentProvider.openPdf(data.pdfUrl, '${data.id}.pdf');
+        }
+        //await assessmentProvider.deletePdf('${data.id}.pdf');
       },
     );
   }

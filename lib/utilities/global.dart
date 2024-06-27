@@ -472,18 +472,6 @@ Widget backIcon(BuildContext context) {
   );
 }
 
-// store file to storage and return file url
-Future<String> storeFileToStorage({
-  required File file,
-  required String reference,
-}) async {
-  UploadTask uploadTask =
-      FirebaseStorage.instance.ref().child(reference).putFile(file);
-  TaskSnapshot taskSnapshot = await uploadTask;
-  String fileUrl = await taskSnapshot.ref.getDownloadURL();
-  return fileUrl;
-}
-
 Widget previewImages({
   required BuildContext context,
   required List<dynamic> images,

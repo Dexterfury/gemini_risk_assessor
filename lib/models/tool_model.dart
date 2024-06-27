@@ -26,11 +26,12 @@ class ToolModel {
   });
 
   factory ToolModel.fromGeneratedContent(
-      GenerateContentResponse content,
-      String creatorID,
-      List<String> images,
-      DateTime createdAt,
-      ) {
+    GenerateContentResponse content,
+    String toolId,
+    String creatorID,
+    List<String> images,
+    DateTime createdAt,
+  ) {
     assert(content.text != null);
 
     final validJson = cleanJson(content.text!);
@@ -38,7 +39,7 @@ class ToolModel {
 
     if (json is Map<String, dynamic>) {
       return ToolModel(
-        id: json[Constants.id] ?? '',
+        id: toolId,
         name: json[Constants.name] ?? '',
         description: json[Constants.description] ?? '',
         summary: json[Constants.summary] ?? '',

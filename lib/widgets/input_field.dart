@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
@@ -9,17 +10,20 @@ class InputField extends StatelessWidget {
     required this.hintText,
     required this.controller,
     this.authProvider,
+    this.organisationProvider,
   });
 
   final String labelText;
   final String hintText;
   final TextEditingController controller;
   final AuthProvider? authProvider;
+  final OrganisationProvider? organisationProvider;
 
   @override
   Widget build(BuildContext context) {
     // check if its name imput
-    final isNameInput = labelText == Constants.enterYourName;
+    final isNameInput = labelText == Constants.enterYourName ||
+        labelText == Constants.organisationName;
     return TextField(
       controller: controller,
       textCapitalization: TextCapitalization.sentences,
@@ -42,14 +46,13 @@ class InputField extends StatelessWidget {
 
   // get enabled state - enable or disable input field
   getEnabled() {
-    if (authProvider != null) {
-      if (authProvider!.isLoading) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return true;
+    if (authProvider != null && authProvider!.isLoading) {
+      return false;
     }
+
+    if (organisationProvider != null && organisationProvider!.isLoading) {
+      return false;
+    }
+    return true;
   }
 }

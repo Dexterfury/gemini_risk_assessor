@@ -13,6 +13,8 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utilities/file_upload_handler.dart';
+
 class AuthProvider extends ChangeNotifier {
   bool _isSignedIn = false;
   UserModel? _userModel;
@@ -191,7 +193,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       if (_finalFileImage != null) {
         // upload image to storage
-        String imageUrl = await storeFileToStorage(
+        String imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
             file: _finalFileImage!,
             reference: '${Constants.userImages}/${userModel.uid}.jpg');
 

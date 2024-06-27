@@ -1,10 +1,9 @@
-import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/fab_buttons/organisation_fab_button.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
-import 'package:gemini_risk_assessor/utilities/navigation.dart';
+import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
 import 'package:provider/provider.dart';
 
 class ScreensController extends StatefulWidget {
@@ -92,65 +91,10 @@ class _ScreensControllerState extends State<ScreensController>
 
       // float action button to add new risk assessment
       floatingActionButton: _selectedIndex == 1
-          ? null
-          : FloatingActionBubble(
-              items: [
-                Bubble(
-                  title: "Tools Explainer",
-                  iconColor: Colors.white,
-                  bubbleColor: Theme.of(context).colorScheme.primary,
-                  icon: Icons.handyman,
-                  titleStyle:
-                      const TextStyle(fontSize: 16, color: Colors.white),
-                  onPress: () {
-                    _animationController.reverse();
-                    navigationController(
-                      context: context,
-                      route: Constants.createToolRoute,
-                    );
-                  },
-                ),
-                Bubble(
-                  title: "Risk Assessment",
-                  iconColor: Colors.white,
-                  bubbleColor: Theme.of(context).colorScheme.primary,
-                  icon: Icons.assignment_late_outlined,
-                  titleStyle:
-                      const TextStyle(fontSize: 16, color: Colors.white),
-                  onPress: () {
-                    _animationController.reverse();
-                    navigationController(
-                      context: context,
-                      route: Constants.createAssessmentRoute,
-                      argument: Constants.createAssessment,
-                    );
-                  },
-                ),
-                Bubble(
-                  title: "Daily Safety Tasks Instructions",
-                  iconColor: Colors.white,
-                  bubbleColor: Theme.of(context).colorScheme.primary,
-                  icon: Icons.assignment_add,
-                  titleStyle:
-                      const TextStyle(fontSize: 16, color: Colors.white),
-                  onPress: () {
-                    _animationController.reverse();
-                    //context.read<AssessmentProvider>().emptyAssessmentModel();
-                    navigationController(
-                      context: context,
-                      route: Constants.createAssessmentRoute,
-                      argument: Constants.createDsti,
-                    );
-                  },
-                ),
-              ],
+          ? const OrganisationFabButton()
+          : MyFabButton(
+              animationController: _animationController,
               animation: _animation,
-              onPress: () => _animationController.isCompleted
-                  ? _animationController.reverse()
-                  : _animationController.forward(),
-              iconColor: Colors.white,
-              animatedIconData: AnimatedIcons.menu_close, // Animated icon
-              backGroundColor: Theme.of(context).colorScheme.primary,
             ),
     );
   }

@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
 
 class PdfApi {
   static Future<File> generatePdf({
@@ -121,7 +120,7 @@ class PdfApi {
 
     // Define header and footer space
     double headerHeight = 80.0;
-    double footerHeight = 40.0;
+    double footerHeight = 20.0;
 
     grid.draw(
       page: page,
@@ -134,7 +133,7 @@ class PdfApi {
       List<PdfBitmap> images, PdfPage page) async {
     const double padding = 20.0;
     double headerHeight = 80.0;
-    double footerHeight = 80.0;
+    double footerHeight = 20.0;
     double imageWidth = (page.getClientSize().width - 3 * padding) / 2;
     double currentX = padding;
     double currentY = padding + headerHeight;
@@ -182,7 +181,7 @@ Date: $dateTime''';
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(
         pageSize.width - 250,
-        pageSize.height - 50,
+        pageSize.height - 20,
         0,
         0,
       ),
@@ -191,7 +190,7 @@ Date: $dateTime''';
       image,
       Rect.fromLTWH(
         pageSize.width - 100,
-        pageSize.height - 60,
+        pageSize.height - 30,
         100,
         40,
       ),
@@ -523,18 +522,26 @@ Date: $dateTime''';
   static Future<File> saveFile(
     PdfDocument document,
     String heading,
-    String fileName,
+    String pdfName,
   ) async {
+    final folderName = Constants.getFolderName(heading);
     // Get the path to the document directory
-    final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final String filePath = path.join(appDocDir.path, fileName);
+    final path = await getApplicationDocumentsDirectory();
+    final dirPath = '${path.path}/$folderName';
+    final fileName = '$dirPath/$pdfName.pdf';
+
+    // Create the directory if it doesn't exist
+    await Directory(dirPath).create(recursive: true);
 
     // Save the document to the device
-    final File file = File(filePath);
+    final file = File(fileName);
+
     // Write the document to the file
-    file.writeAsBytes(await document.save());
+    await file.writeAsBytes(await document.save());
+
     // Dispose the document
     document.dispose();
+
     // Return the file
     return file;
   }

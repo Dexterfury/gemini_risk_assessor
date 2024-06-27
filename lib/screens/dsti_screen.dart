@@ -38,17 +38,20 @@ class DSTIScreen extends StatelessWidget {
               ),
             );
           }
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final data = doc.data()
-                  as Map<String, dynamic>; // Use .data() to get the map
-              final dsti = AssessmentModel.fromJson(data);
-              return ListItem(
-                data: dsti,
-              );
-            },
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                final doc = snapshot.data!.docs[index];
+                final data = doc.data()
+                    as Map<String, dynamic>; // Use .data() to get the map
+                final dsti = AssessmentModel.fromJson(data);
+                return ListItem(
+                  data: dsti,
+                );
+              },
+            ),
           );
         },
       ),
