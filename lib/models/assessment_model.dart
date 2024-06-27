@@ -44,6 +44,7 @@ class AssessmentModel {
 
   factory AssessmentModel.fromTestString(
     String testString,
+    String assessmentId,
     String creatorID,
     String organisationID,
     String weather,
@@ -56,7 +57,7 @@ class AssessmentModel {
 
     if (json is Map<String, dynamic>) {
       return AssessmentModel(
-        id: json[Constants.id] ?? '',
+        id: assessmentId,
         title: json[Constants.title] ?? '',
         taskToAchieve: json[Constants.taskToAchieve] ?? '',
         images: testImages,

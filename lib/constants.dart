@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/models/ppe_model.dart';
+import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
+
 class Constants {
   // app name
   static const String appName = 'Gemini Risk Assessor';
@@ -103,23 +107,196 @@ class Constants {
   static const String organisationCollection = 'organisations';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
-  // dummy list of risk assessments
-  static const List<Map<String, dynamic>> riskAssessmentsList = [
-    {
-      'title': 'Risk Assessment 1',
-      'description': 'This is the first risk assessment',
-    },
-    {
-      'title': 'Risk Assessment 2',
-      'description': 'This is the second risk assessment'
-    },
-    {
-      'title': 'Risk Assessment 3',
-      'description': 'This is the third risk assessment',
-    },
-    {
-      'title': 'Risk Assessment 4',
-      'description': 'This is the fourth risk assessment',
+
+  // // list of ppe icons
+  // static List<PpeModel> ppeIcons({
+  //   double radius = 20,
+  // }) {
+  //   return [
+  //     PpeModel(
+  //       id: 1,
+  //       label: 'Dust Mask',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.dustMask,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 2,
+  //       label: 'Ear Protection',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.earProtection,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 3,
+  //       label: 'Face Shield',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.faceShield,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 4,
+  //       label: 'Foot Protection',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.footProtection,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 5,
+  //       label: 'Hand Protection',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.handProtection,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 6,
+  //       label: 'Head Protection',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.headProtection,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 7,
+  //       label: 'High Vis Clothing',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.highVisClothing,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 8,
+  //       label: 'Life Jacket',
+  //       icon: CircleAvatar(
+  //         radius: 20,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.lifeJacket,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 9,
+  //       label: 'Protective Clothing',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.protectiveClothing,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 10,
+  //       label: 'Safety Glasses',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.safetyGlasses,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 11,
+  //       label: 'Safety Harness',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.safetyHarness,
+  //         ),
+  //       ),
+  //     ),
+  //     PpeModel(
+  //       id: 12,
+  //       label: 'Other',
+  //       icon: CircleAvatar(
+  //         radius: radius,
+  //         backgroundColor: Colors.blue,
+  //         backgroundImage: AssetImage(
+  //           AssetsManager.other,
+  //         ),
+  //       ),
+  //     ),
+  //   ];
+  // }
+
+  // list of ppe icons
+  static List<PpeModel> getPPEIcons({
+    double radius = 20.0,
+  }) {
+    List<PpeModel> icons = [];
+    for (int i = 0; i < ppeAssetsList.length; i++) {
+      icons.add(
+        PpeModel(
+          id: 1 + i,
+          label: ppeLabels[i],
+          icon: CircleAvatar(
+            radius: radius,
+            backgroundColor: Colors.blue,
+            backgroundImage: AssetImage(ppeAssetsList[i]),
+          ),
+        ),
+      );
     }
+    return icons;
+  }
+
+  // list of ppe labels
+  static List<String> ppeAssetsList = [
+    AssetsManager.dustMask,
+    AssetsManager.earProtection,
+    AssetsManager.faceShield,
+    AssetsManager.footProtection,
+    AssetsManager.handProtection,
+    AssetsManager.headProtection,
+    AssetsManager.highVisClothing,
+    AssetsManager.lifeJacket,
+    AssetsManager.protectiveClothing,
+    AssetsManager.safetyGlasses,
+    AssetsManager.safetyHarness,
+    AssetsManager.other,
+  ];
+  // list of ppe labels
+  static List<String> ppeLabels = [
+    'Dust Mask',
+    'Ear Protection',
+    'Face Shield',
+    'Foot Protection',
+    'Hand Protection',
+    'Head Protection',
+    'High Vis Clothing',
+    'Life Jacket',
+    'Protective Clothing',
+    'Safety Glasses',
+    'Safety Harness',
+    'Other',
   ];
 }

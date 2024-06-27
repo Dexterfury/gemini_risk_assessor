@@ -29,4 +29,6 @@ class AssetsManager {
   static String protectiveClothing = '${_iconsPath}protective_clothing.jpg';
   static String safetyGlasses = '${_iconsPath}safety_glasses.jpg';
   static String safetyHarness = '${_iconsPath}safety_harness.jpg';
+  static String other = '${_iconsPath}other.png';
+  static String checkMark = '${_iconsPath}check_mark.png';
 }

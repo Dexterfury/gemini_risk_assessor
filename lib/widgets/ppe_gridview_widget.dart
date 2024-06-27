@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_item.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +26,9 @@ class PpeGridViewWidget extends StatelessWidget {
             crossAxisCount: 3,
             childAspectRatio: 1.5,
           ),
-          itemCount: ppeIcons().length,
+          itemCount: Constants.getPPEIcons().length,
           itemBuilder: (context, index) {
-            // get the first word of the game time
-            final ppeItem = ppeIcons()[index];
+            final ppeItem = Constants.getPPEIcons()[index];
 
             return Consumer<AssessmentProvider>(
               builder: (context, assessmentProvider, child) {

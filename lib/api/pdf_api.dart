@@ -22,9 +22,12 @@ class PdfApi {
     // Load the logo from assets
     final PdfBitmap logo = await loadImage(AssetsManager.appLogo);
 
-    // Load a list of ppe from assets - depending on the list of ppe from the model
-    final List<PdfBitmap> ppeImages =
-        await loadPPELogoList(assessmentModel.ppe);
+    // Load all ppe from assets
+    final List<PdfBitmap> ppeImages = await loadPPELogoList();
+
+    // load all selected ppe from assets
+    final List<PdfBitmap> selectedPPEImages =
+        await loadSelectedPPELogoList(assessmentModel.ppe);
 
     List<PdfBitmap> images = [];
 
@@ -101,7 +104,7 @@ class PdfApi {
     }
 
     // Add empty rows for data entry
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 25; i++) {
       final row = grid.rows.add();
       for (int j = 0; j < row.cells.count; j++) {
         row.cells[j].style.borders.all = PdfPen(PdfColor(0, 0, 0), width: 0.5);
@@ -120,7 +123,7 @@ class PdfApi {
 
     // Define header and footer space
     double headerHeight = 80.0;
-    double footerHeight = 20.0;
+    double footerHeight = 40.0;
 
     grid.draw(
       page: page,
@@ -181,7 +184,7 @@ Date: $dateTime''';
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(
         pageSize.width - 250,
-        pageSize.height - 20,
+        pageSize.height - 40,
         0,
         0,
       ),
@@ -190,7 +193,7 @@ Date: $dateTime''';
       image,
       Rect.fromLTWH(
         pageSize.width - 100,
-        pageSize.height - 30,
+        pageSize.height - 50,
         100,
         40,
       ),
@@ -455,9 +458,10 @@ Date: $dateTime''';
     }
   }
 
-  static Future<List<PdfBitmap>> loadPPELogoList(List<String> ppe) async {
+  static Future<List<PdfBitmap>> loadSelectedPPELogoList(
+      List<String> ppe) async {
     final logoList = <PdfBitmap>[];
-    final assetPaths = await getAssetsPath(ppe);
+    final assetPaths = await getSelectedAssets(ppe);
 
     for (final assetPath in assetPaths) {
       final logo = await loadImage(assetPath);
@@ -475,7 +479,26 @@ Date: $dateTime''';
     return logoList;
   }
 
-  static Future<List<String>> getAssetsPath(List<String> ppe) async {
+  static Future<List<PdfBitmap>> loadPPELogoList() async {
+    final logoList = <PdfBitmap>[];
+    final assetPaths = await getAssetsPath();
+
+    for (final assetPath in assetPaths) {
+      final logo = await loadImage(assetPath);
+      logoList.add(logo); // Error occurs here
+    }
+    return logoList;
+  }
+
+  static Future<List<String>> getAssetsPath() async {
+    List<String> assetPaths = [];
+    for (var item in Constants.ppeAssetsList) {
+      assetPaths.add(item);
+    }
+    return assetPaths;
+  }
+
+  static Future<List<String>> getSelectedAssets(List<String> ppe) async {
     List<String> assetPaths = [];
     for (var item in ppe) {
       switch (item) {

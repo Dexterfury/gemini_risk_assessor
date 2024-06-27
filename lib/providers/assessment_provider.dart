@@ -147,11 +147,12 @@ class AssessmentProvider extends ChangeNotifier {
     );
 
     _pdfAssessmentFile = file;
+    await OpenFile.open((file.path));
     // savePdf to firestore here
-    await saveFileToFirestore(
-      file,
-      _pdfHeading,
-    );
+    // await saveFileToFirestore(
+    //   file,
+    //   _pdfHeading,
+    // );
   }
 
   Future<String> getCreatorName(String creatorId) async {
@@ -177,8 +178,6 @@ class AssessmentProvider extends ChangeNotifier {
         reference:
             '${Constants.pdfFiles}/$folderName/$id/${assessmentModel.id}.pdf');
 
-    log('file 2: $file');
-
     if (_assessmentModel.images.isNotEmpty) {
       List<String> imagesUrls = [];
       for (var image in _assessmentModel.images) {
@@ -191,8 +190,6 @@ class AssessmentProvider extends ChangeNotifier {
 
       _assessmentModel.images = imagesUrls;
     }
-
-    log('file 3: $file');
 
     // set pdf and images
     _assessmentModel.pdfUrl = fileUrl;
@@ -622,8 +619,10 @@ equipments, hazards and risks should be of type List<String> with a max length o
         images.add(image.path);
       }
     }
+    final assessmentId = const Uuid().v4();
     _assessmentModel = AssessmentModel.fromTestString(
       testAssessment,
+      assessmentId,
       creatorID,
       organisationID,
       _weather.name,

@@ -146,44 +146,15 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           width: 40,
                           child: CircularProgressIndicator()),
                     );
-                    // await assessmentProvider
-                    //     .submitTestAssessment(
-                    //   creatorID: creatorID,
-                    //   docTitle: title,
-                    // )
-                    //     .then((_) async {
-                    //   // pop the the dialog
-                    //   Navigator.pop(context);
-                    //   if (!context.mounted) return;
-                    //   if (assessmentProvider.assessmentModel != null) {
-                    //     // display the risk assessment details screen
-                    //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                    //       opaque: false,
-                    //       pageBuilder: (BuildContext context, animation,
-                    //               secondaryAnimation) =>
-                    //           AssessmentDetailsScreen(
-                    //         animation: animation,
-                    //       ),
-                    //     );
-                    //     bool shouldSave =
-                    //         await Navigator.of(context).push(pageRouteBuilder);
-                    //     if (shouldSave) {
-                    //       // TODO save the risk assessment to database
-                    //     }
-                    //   }
-                    // });
-
                     await assessmentProvider
-                        .submitPrompt(
+                        .submitTestAssessment(
                       creatorID: creatorID,
-                      description: _descriptionController.text,
                       docTitle: title,
                     )
                         .then((_) async {
                       // pop the the dialog
                       Navigator.pop(context);
                       if (!context.mounted) return;
-                      // display the results
                       if (assessmentProvider.assessmentModel != null) {
                         // display the risk assessment details screen
                         PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
@@ -197,22 +168,51 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                         bool shouldSave =
                             await Navigator.of(context).push(pageRouteBuilder);
                         if (shouldSave) {
-                          // reset the data
-                          assessmentProvider.resetPromptData();
-
-                          setState(() {
-                            _descriptionController.clear();
-                          });
-                          Future.delayed(const Duration(milliseconds: 200))
-                              .whenComplete(() {
-                            Navigator.pop(context);
-                            showSnackBar(
-                                context: context,
-                                message: 'Tool successfully saved');
-                          });
+                          // TODO save the risk assessment to database
                         }
                       }
                     });
+
+                    // await assessmentProvider
+                    //     .submitPrompt(
+                    //   creatorID: creatorID,
+                    //   description: _descriptionController.text,
+                    //   docTitle: title,
+                    // )
+                    //     .then((_) async {
+                    //   // pop the the dialog
+                    //   Navigator.pop(context);
+                    //   if (!context.mounted) return;
+                    //   // display the results
+                    //   if (assessmentProvider.assessmentModel != null) {
+                    //     // display the risk assessment details screen
+                    //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                    //       opaque: false,
+                    //       pageBuilder: (BuildContext context, animation,
+                    //               secondaryAnimation) =>
+                    //           AssessmentDetailsScreen(
+                    //         animation: animation,
+                    //       ),
+                    //     );
+                    //     bool shouldSave =
+                    //         await Navigator.of(context).push(pageRouteBuilder);
+                    //     if (shouldSave) {
+                    //       // reset the data
+                    //       assessmentProvider.resetPromptData();
+
+                    //       setState(() {
+                    //         _descriptionController.clear();
+                    //       });
+                    //       Future.delayed(const Duration(milliseconds: 200))
+                    //           .whenComplete(() {
+                    //         Navigator.pop(context);
+                    //         showSnackBar(
+                    //             context: context,
+                    //             message: 'Tool successfully saved');
+                    //       });
+                    //     }
+                    //   }
+                    // });
                   },
                 ),
               ),
