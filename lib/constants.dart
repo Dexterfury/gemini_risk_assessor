@@ -92,6 +92,16 @@ class Constants {
   static const String organisationID = 'organisationID';
   static const String pdfUrl = 'pdfUrl';
 
+  // organisation model constants
+  static const String creatorUID = 'creatorUID';
+  static const String aboutOrganisation = 'aboutOrganisation';
+  static const String address = 'address';
+  static const String emailAddress = 'emailAddress';
+  static const String websiteURL = 'websiteURL';
+  static const String awaitingApprovalUIDs = 'awaitingApprovalUIDs';
+  static const String membersUIDs = 'membersUIDs';
+  static const String adminsUIDs = 'adminsUIDs';
+
   static const String enterYourName = 'Enter your name';
   static const String organisationName = 'Organisation name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
@@ -107,146 +117,6 @@ class Constants {
   static const String organisationCollection = 'organisations';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
-
-  // // list of ppe icons
-  // static List<PpeModel> ppeIcons({
-  //   double radius = 20,
-  // }) {
-  //   return [
-  //     PpeModel(
-  //       id: 1,
-  //       label: 'Dust Mask',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.dustMask,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 2,
-  //       label: 'Ear Protection',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.earProtection,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 3,
-  //       label: 'Face Shield',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.faceShield,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 4,
-  //       label: 'Foot Protection',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.footProtection,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 5,
-  //       label: 'Hand Protection',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.handProtection,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 6,
-  //       label: 'Head Protection',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.headProtection,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 7,
-  //       label: 'High Vis Clothing',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.highVisClothing,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 8,
-  //       label: 'Life Jacket',
-  //       icon: CircleAvatar(
-  //         radius: 20,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.lifeJacket,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 9,
-  //       label: 'Protective Clothing',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.protectiveClothing,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 10,
-  //       label: 'Safety Glasses',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.safetyGlasses,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 11,
-  //       label: 'Safety Harness',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.safetyHarness,
-  //         ),
-  //       ),
-  //     ),
-  //     PpeModel(
-  //       id: 12,
-  //       label: 'Other',
-  //       icon: CircleAvatar(
-  //         radius: radius,
-  //         backgroundColor: Colors.blue,
-  //         backgroundImage: AssetImage(
-  //           AssetsManager.other,
-  //         ),
-  //       ),
-  //     ),
-  //   ];
-  // }
 
   // list of ppe icons
   static List<PpeModel> getPPEIcons({

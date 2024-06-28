@@ -45,6 +45,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             DisplayUserImage(
               radius: 50,
               isViewOnly: false,
+              authProvider: authProvider,
               onPressed: () {
                 authProvider.showImagePickerDialog(
                   context: context,

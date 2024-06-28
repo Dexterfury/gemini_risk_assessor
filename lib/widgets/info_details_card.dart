@@ -20,7 +20,7 @@ class InfoDetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // get current user
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.watch<AuthProvider>();
     final uid = authProvider.userModel!.uid;
     final phoneNumber = authProvider.userModel!.phone;
     // get profile image
@@ -135,6 +135,7 @@ class InfoDetailsCard extends StatelessWidget {
                 DisplayUserImage(
                   radius: 50,
                   isViewOnly: false,
+                  authProvider: authProvider,
                   onPressed: () {
                     authProvider.showImagePickerDialog(
                       context: context,

@@ -27,7 +27,6 @@ class AuthProvider extends ChangeNotifier {
   int _secondsRemaining = 60;
 
   File? _finalFileImage;
-  String _userImage = '';
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -47,8 +46,6 @@ class AuthProvider extends ChangeNotifier {
   Timer? get timer => _timer;
   int get secondsRemaining => _secondsRemaining;
   File? get finalFileImage => _finalFileImage;
-  String get userImage => _userImage;
-
   // setters
 
   // set loading
