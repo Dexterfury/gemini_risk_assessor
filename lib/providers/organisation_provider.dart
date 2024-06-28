@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -9,12 +10,17 @@ import 'package:image_cropper/image_cropper.dart';
 class OrganisationProvider extends ChangeNotifier {
   bool _isLoading = false;
   File? _finalFileImage;
+  String _searchQuery = '';
   OrganisationModel? _organisationModel;
 
   // getters
   bool get isLoading => _isLoading;
   File? get finalFileImage => _finalFileImage;
+  String get searchQuery => _searchQuery;
   OrganisationModel? get organisationModel => _organisationModel;
+
+  final CollectionReference _usersCollection =
+      FirebaseFirestore.instance.collection(Constants.usersCollection);
 
   // setters
   void setfinalFileImage(File? file) {
@@ -26,6 +32,11 @@ class OrganisationProvider extends ChangeNotifier {
   void setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
+  }
+
+  // get all users stream
+  Stream<QuerySnapshot> allUsersStream() {
+    return _usersCollection.snapshots();
   }
 
   void showImagePickerDialog({

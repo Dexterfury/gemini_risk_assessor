@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
@@ -26,14 +28,6 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
     _descriptionController.dispose();
     super.dispose();
   }
-
-  // void showBottomSheet() {
-  //   showModalBottomSheet(
-  //       context: context,
-  //       builder: (context) {
-  //         return const OrganisationBottomSheet();
-  //       });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +76,11 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                           }
 
                           // show botton sheet
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return const PeopleBottomSheet();
+                              });
                         },
                       ),
                     ],
@@ -158,5 +157,54 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
       ),
     );
     ;
+  }
+}
+
+class PeopleBottomSheet extends StatelessWidget {
+  const PeopleBottomSheet({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoSearchTextField(
+                    onChanged: (value) {
+                      // search for users
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                MainAppButton(
+                  widget: const Icon(
+                    Icons.done,
+                    color: Colors.white,
+                  ),
+                  label: 'Done',
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Expanded(
+            child: Center(
+              child: Text(
+                'Search and add members',
+                style: textStyle18w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
