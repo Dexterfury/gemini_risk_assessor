@@ -23,10 +23,10 @@ class PdfApi {
     final PdfBitmap logo = await loadImage(AssetsManager.appLogo);
 
     // Load all ppe from assets
-    final List<PdfBitmap> ppeImages = await loadPPELogoList();
+    final List<(PdfBitmap, String)> ppeImages = await loadPPELogoList();
 
     // load all selected ppe from assets
-    final List<PdfBitmap> selectedPPEImages =
+    final List<(PdfBitmap, String)> selectedPPEImages =
         await loadSelectedPPELogoList(assessmentModel.ppe);
 
     List<PdfBitmap> images = [];
@@ -63,6 +63,7 @@ class PdfApi {
       firstPage,
       logo,
       ppeImages,
+      selectedPPEImages,
     );
 
     if (images.isNotEmpty) {
@@ -205,7 +206,8 @@ Date: $dateTime''';
     AssessmentModel assessmentModel,
     PdfPage page,
     PdfBitmap logo,
-    List<PdfBitmap> ppeImages,
+    List<(PdfBitmap, String)> ppeImages,
+    List<(PdfBitmap, String)> selectedPPEImages,
   ) async {
     // Create a list of grids to add together for a custom grid
     final List<PdfGrid> grids = [];
@@ -340,8 +342,9 @@ Date: $dateTime''';
     ppeRow.height = 50; // Set a fixed height for the row to accommodate images
 
     for (int i = 0; i < ppeImages.length; i++) {
+      final (image, identifier) = ppeImages[i];
       ppeRow.cells[i].value = '';
-      ppeRow.cells[i].style.backgroundImage = ppeImages[i];
+      ppeRow.cells[i].style.backgroundImage = image;
       ppeRow.cells[i].style.stringFormat = PdfStringFormat(
         alignment: PdfTextAlignment.center,
         lineAlignment: PdfVerticalAlignment.middle,
@@ -349,6 +352,14 @@ Date: $dateTime''';
       // Add padding to the cells
       ppeRow.cells[i].style.cellPadding =
           PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
+
+      // Check if this PPE image is selected
+      if (selectedPPEImages.any((selected) => selected.$2 == identifier)) {
+        // Set a background color for selected PPE images
+        ppeRow.cells[i].style.backgroundBrush =
+            PdfSolidBrush(PdfColor(255, 255, 0)); // Yellow background
+      }
+
       applyCellPaddingToRow(ppeRow, false);
     }
     grids.add(ppeGrid);
@@ -458,17 +469,17 @@ Date: $dateTime''';
     }
   }
 
-  static Future<List<PdfBitmap>> loadSelectedPPELogoList(
-      List<String> ppe) async {
-    final logoList = <PdfBitmap>[];
-    final assetPaths = await getSelectedAssets(ppe);
+  // static Future<List<PdfBitmap>> loadSelectedPPELogoList(
+  //     List<String> ppe) async {
+  //   final logoList = <PdfBitmap>[];
+  //   final assetPaths = await getSelectedAssets(ppe);
 
-    for (final assetPath in assetPaths) {
-      final logo = await loadImage(assetPath);
-      logoList.add(logo); // Error occurs here
-    }
-    return logoList;
-  }
+  //   for (final assetPath in assetPaths) {
+  //     final logo = await loadImage(assetPath);
+  //     logoList.add(logo); // Error occurs here
+  //   }
+  //   return logoList;
+  // }
 
   static Future<List<PdfBitmap>> loadImagesList(List<String> images) async {
     final logoList = <PdfBitmap>[];
@@ -479,13 +490,34 @@ Date: $dateTime''';
     return logoList;
   }
 
-  static Future<List<PdfBitmap>> loadPPELogoList() async {
-    final logoList = <PdfBitmap>[];
-    final assetPaths = await getAssetsPath();
+  // static Future<List<PdfBitmap>> loadPPELogoList() async {
+  //   final logoList = <PdfBitmap>[];
+  //   final assetPaths = await getAssetsPath();
 
+  //   for (final assetPath in assetPaths) {
+  //     final logo = await loadImage(assetPath);
+  //     logoList.add(logo); // Error occurs here
+  //   }
+  //   return logoList;
+  // }
+
+  static Future<List<(PdfBitmap, String)>> loadSelectedPPELogoList(
+      List<String> ppe) async {
+    final logoList = <(PdfBitmap, String)>[];
+    final assetPaths = await getSelectedAssets(ppe);
     for (final assetPath in assetPaths) {
       final logo = await loadImage(assetPath);
-      logoList.add(logo); // Error occurs here
+      logoList.add((logo, assetPath));
+    }
+    return logoList;
+  }
+
+  static Future<List<(PdfBitmap, String)>> loadPPELogoList() async {
+    final logoList = <(PdfBitmap, String)>[];
+    final assetPaths = await getAssetsPath();
+    for (final assetPath in assetPaths) {
+      final logo = await loadImage(assetPath);
+      logoList.add((logo, assetPath));
     }
     return logoList;
   }
