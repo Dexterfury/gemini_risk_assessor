@@ -60,6 +60,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                       DisplayUserImage(
                         radius: 50,
                         isViewOnly: false,
+                        organisationProvider: organisationProvider,
                         onPressed: () {
                           // authProvider.showImagePickerDialog(
                           //   context: context,

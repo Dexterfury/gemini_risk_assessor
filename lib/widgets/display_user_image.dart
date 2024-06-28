@@ -86,20 +86,18 @@ class DisplayUserImage extends StatelessWidget {
         return AssetImage(AssetsManager.userIcon);
       }
     } else {
-      // for organisation provider
-
-      //   if (provider.finalFileImage != null) {
-      //   return FileImage(File(provider.finalFileImage!.path))
-      //       as ImageProvider<Object>;
-      // } else if (provider.userModel != null &&
-      //     provider.userModel!.imageUrl.isNotEmpty) {
-      //   return CachedNetworkImageProvider(
-      //     provider.userModel!.imageUrl,
-      //     cacheManager: MyImageCacheManager.profileCacheManager,
-      //   );
-      // } else {
-      //   return AssetImage(AssetsManager.userIcon);
-      // }
+      if (provider.finalFileImage != null) {
+        return FileImage(File(provider.finalFileImage!.path))
+            as ImageProvider<Object>;
+      } else if (provider.organisationModel != null &&
+          provider.organisationModel!.imageUrl.isNotEmpty) {
+        return CachedNetworkImageProvider(
+          provider.organisationModel!.imageUrl,
+          cacheManager: MyImageCacheManager.profileCacheManager,
+        );
+      } else {
+        return AssetImage(AssetsManager.userIcon);
+      }
     }
   }
 }

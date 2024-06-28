@@ -23,6 +23,7 @@ class OrganisationsScreen extends StatelessWidget {
         actions: DisplayUserImage(
           radius: 20,
           isViewOnly: true,
+          authProvider: context.watch<AuthProvider>(),
           onPressed: () {},
         ),
       ),
