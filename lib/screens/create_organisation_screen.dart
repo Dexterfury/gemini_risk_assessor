@@ -195,6 +195,7 @@ class PeopleBottomSheet extends StatelessWidget {
                   child: CupertinoSearchTextField(
                     onChanged: (value) {
                       // search for users
+                      orgProvider.setSearchQuery(value);
                     },
                   ),
                 ),

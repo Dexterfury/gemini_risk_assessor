@@ -45,4 +45,16 @@ class UserModel {
       Constants.createdAt: createdAt,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is UserModel && other.uid == uid;
+  }
+
+  @override
+  int get hashCode {
+    return uid.hashCode;
+  }
 }

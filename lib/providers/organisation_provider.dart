@@ -5,8 +5,6 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:uuid/uuid.dart';
 
 class OrganisationProvider extends ChangeNotifier {
@@ -42,6 +40,11 @@ class OrganisationProvider extends ChangeNotifier {
 
   final CollectionReference _organisationCollection =
       FirebaseFirestore.instance.collection(Constants.organisationCollection);
+
+  void setSearchQuery(String value) {
+    _searchQuery = value;
+    notifyListeners();
+  }
 
   // set loading
   void setLoading(bool loading) {
