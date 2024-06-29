@@ -62,7 +62,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                       ),
                       MainAppButton(
                         icon: Icons.person_add,
-                        label: 'Add People',
+                        label: 'People',
                         onTap: () {
                           if (organisationProvider.isLoading) {
                             return;

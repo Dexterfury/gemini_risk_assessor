@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
+import 'package:gemini_risk_assessor/widgets/add_image.dart';
 
 class DisplayOrgImage extends StatelessWidget {
   const DisplayOrgImage({
@@ -50,9 +51,8 @@ class DisplayOrgImage extends StatelessWidget {
         cacheManager: MyImageCacheManager.itemsCacheManager,
       );
     } else {
-      return Image.asset(
-        AssetsManager.userIcon,
-        fit: BoxFit.cover,
+      return AddImage(
+        onTap: onPressed,
       );
     }
   }
