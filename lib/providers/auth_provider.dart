@@ -26,8 +26,6 @@ class AuthProvider extends ChangeNotifier {
   Timer? _timer;
   int _secondsRemaining = 60;
 
-  File? _finalFileImage;
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _usersCollection =
@@ -45,7 +43,6 @@ class AuthProvider extends ChangeNotifier {
   String? get phoneNumber => _phoneNumber;
   Timer? get timer => _timer;
   int get secondsRemaining => _secondsRemaining;
-  File? get finalFileImage => _finalFileImage;
   // setters
 
   // set loading
@@ -58,73 +55,6 @@ class AuthProvider extends ChangeNotifier {
   void setIsSignedIn(bool value) {
     _isSignedIn = value;
     notifyListeners();
-  }
-
-  void setfinalFileImage(File? file) {
-    _finalFileImage = file;
-    notifyListeners();
-  }
-
-  void showImagePickerDialog({
-    required BuildContext context,
-  }) {
-    imagePickerAnimatedDialog(
-      context: context,
-      title: 'Select Photo',
-      content: 'Choose an Option',
-      onPressed: (value) {
-        if (value) {
-          selectImage(
-            fromCamera: value,
-            onError: (String error) {
-              showSnackBar(context: context, message: error);
-            },
-          );
-        } else {
-          selectImage(
-            fromCamera: value,
-            onError: (String error) {
-              showSnackBar(context: context, message: error);
-            },
-          );
-        }
-      },
-    );
-  }
-
-  void selectImage({
-    required bool fromCamera,
-    required Function(String) onError,
-  }) async {
-    _finalFileImage = await pickUserImage(
-      fromCamera: fromCamera,
-      onFail: (String message) => onError(message),
-    );
-
-    if (_finalFileImage == null) {
-      return;
-    }
-
-    // crop image
-    await cropImage(
-      filePath: finalFileImage!.path,
-    );
-  }
-
-  Future<void> cropImage({
-    required String filePath,
-  }) async {
-    setfinalFileImage(File(filePath));
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: filePath,
-      maxHeight: 800,
-      maxWidth: 800,
-      compressQuality: 90,
-    );
-
-    if (croppedFile != null) {
-      setfinalFileImage(File(croppedFile.path));
-    }
   }
 
   // check authentication state
@@ -181,6 +111,7 @@ class AuthProvider extends ChangeNotifier {
   // save user data to firestore
   void saveUserDataToFireStore({
     required UserModel userModel,
+    required File? fileImage,
     required Function onSuccess,
     required Function onFail,
   }) async {
@@ -188,10 +119,10 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      if (_finalFileImage != null) {
+      if (fileImage != null) {
         // upload image to storage
         String imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
-            file: _finalFileImage!,
+            file: fileImage,
             reference: '${Constants.userImages}/${userModel.uid}.jpg');
 
         userModel.imageUrl = imageUrl;
@@ -271,7 +202,6 @@ class AuthProvider extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "operation-not-allowed":
-          print("Anonymous auth hasn't been enabled for this project.");
           _isLoading = false;
           notifyListeners();
           onFail(e.code);
@@ -280,7 +210,6 @@ class AuthProvider extends ChangeNotifier {
           _isLoading = false;
           notifyListeners();
           onFail(e.code);
-          print("Unknown error.");
       }
     } finally {
       _isSuccessful = true;

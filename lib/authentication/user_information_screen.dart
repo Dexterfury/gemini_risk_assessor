@@ -1,8 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
@@ -19,6 +23,8 @@ class UserInformationScreen extends StatefulWidget {
 
 class _UserInformationScreenState extends State<UserInformationScreen> {
   final TextEditingController _nameController = TextEditingController();
+
+  File? _finalFileImage;
 
   @override
   void dispose() {
@@ -45,11 +51,16 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             DisplayUserImage(
               radius: 50,
               isViewOnly: false,
-              authProvider: authProvider,
-              onPressed: () {
-                authProvider.showImagePickerDialog(
+              fileImage: _finalFileImage,
+              onPressed: () async {
+                final file = await ImagePickerHandler.showImagePickerDialog(
                   context: context,
                 );
+                if (file != null) {
+                  setState(() {
+                    _finalFileImage = file;
+                  });
+                }
               },
             ),
             const SizedBox(height: 30),
@@ -103,6 +114,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
     authProvider.saveUserDataToFireStore(
       userModel: userModel,
+      fileImage: _finalFileImage,
       onSuccess: () async {
         // save user data to shared preferences
         await authProvider.saveUserDataToSharedPreferences().whenComplete(() {

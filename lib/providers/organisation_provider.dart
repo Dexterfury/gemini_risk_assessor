@@ -11,7 +11,6 @@ import 'package:uuid/uuid.dart';
 
 class OrganisationProvider extends ChangeNotifier {
   bool _isLoading = false;
-  File? _finalFileImage;
   String _searchQuery = '';
   List<UserModel> _orgMembersList = [];
   List<UserModel> _orgAdminsList = [];
@@ -33,7 +32,6 @@ class OrganisationProvider extends ChangeNotifier {
 
   // getters
   bool get isLoading => _isLoading;
-  File? get finalFileImage => _finalFileImage;
   String get searchQuery => _searchQuery;
   List<UserModel> get orgMembersList => _orgMembersList;
   List<UserModel> get orgAdminsList => _orgAdminsList;
@@ -44,12 +42,6 @@ class OrganisationProvider extends ChangeNotifier {
 
   final CollectionReference _organisationCollection =
       FirebaseFirestore.instance.collection(Constants.organisationCollection);
-
-  // setters
-  void setfinalFileImage(File? file) {
-    _finalFileImage = file;
-    notifyListeners();
-  }
 
   // set loading
   void setLoading(bool loading) {
@@ -94,68 +86,6 @@ class OrganisationProvider extends ChangeNotifier {
     _tempRemovedAdminsList = [];
 
     notifyListeners();
-  }
-
-  void showImagePickerDialog({
-    required BuildContext context,
-  }) {
-    imagePickerAnimatedDialog(
-      context: context,
-      title: 'Select Photo',
-      content: 'Choose an Option',
-      onPressed: (value) {
-        if (value) {
-          selectImage(
-            fromCamera: value,
-            onError: (String error) {
-              showSnackBar(context: context, message: error);
-            },
-          );
-        } else {
-          selectImage(
-            fromCamera: value,
-            onError: (String error) {
-              showSnackBar(context: context, message: error);
-            },
-          );
-        }
-      },
-    );
-  }
-
-  void selectImage({
-    required bool fromCamera,
-    required Function(String) onError,
-  }) async {
-    _finalFileImage = await pickUserImage(
-      fromCamera: fromCamera,
-      onFail: (String message) => onError(message),
-    );
-
-    if (_finalFileImage == null) {
-      return;
-    }
-
-    // crop image
-    await cropImage(
-      filePath: finalFileImage!.path,
-    );
-  }
-
-  Future<void> cropImage({
-    required String filePath,
-  }) async {
-    setfinalFileImage(File(filePath));
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: filePath,
-      maxHeight: 800,
-      maxWidth: 800,
-      compressQuality: 90,
-    );
-
-    if (croppedFile != null) {
-      setfinalFileImage(File(croppedFile.path));
-    }
   }
 
   // check if there was a change in group members - if there was a member added or removed
@@ -282,6 +212,7 @@ class OrganisationProvider extends ChangeNotifier {
   Future<void> createOrganisation({
     required String name,
     required String description,
+    required File? fileImage,
     required OrganisationModel newOrganisationModel,
     required Function() onSuccess,
     required Function(String) onError,
@@ -292,10 +223,10 @@ class OrganisationProvider extends ChangeNotifier {
       newOrganisationModel.organisationID = organisationID;
 
       // check if we have the organisation image
-      if (finalFileImage != null) {
+      if (fileImage != null) {
         // upload the image to firestore
         String imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
-          file: finalFileImage!,
+          file: fileImage,
           reference: '${Constants.organisationImage}/$organisationID.jpg',
         );
         newOrganisationModel.imageUrl = imageUrl;

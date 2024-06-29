@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
@@ -16,6 +15,7 @@ import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';
@@ -66,31 +66,6 @@ class AssessmentProvider extends ChangeNotifier {
       FirebaseFirestore.instance.collection(Constants.organisationCollection);
   final CollectionReference dstiCollection =
       FirebaseFirestore.instance.collection(Constants.dstiCollections);
-
-  // create an empty AssessmentModel
-  // AssessmentModel _assessmentModel = AssessmentModel(
-  //   id: '',
-  //   companyId: '',
-  //   ppeList: [],
-  //   imagesFileList: [],
-  //   maxImages: 0,
-  //   numberOfPeople: 0,
-  //   pdfHeading: '',
-  //   description: '',
-  //   weather: Weather.unknown,
-  //   signatureImage: null,
-  //   pdfAssessmentFile: null,
-  //   hasSigned: false,
-  //   uid: '',
-  //   assessmentModel: null,
-  //   signatureGlobalKey: GlobalKey<SfSignaturePadState>(),
-  // );
-
-  // void emptyAssessmentModel() {
-  //   final map = <String, dynamic>{};
-  //   _assessmentModel = AssessmentModel.fromJson(map);
-  //   notifyListeners();
-  // }
 
   // set isPersonal
   void setIsPersonal({
@@ -450,30 +425,19 @@ class AssessmentProvider extends ChangeNotifier {
   void showImagePickerDialog({
     required BuildContext context,
   }) {
-    imagePickerAnimatedDialog(
+    ImagePickerHandler.imagePickerAnimatedDialog(
       context: context,
       title: 'Select Photo',
       content: 'Choose an Option',
       onPressed: (value) {
-        if (value) {
-          selectImages(
-            fromCamera: value,
-            onError: (String error) {
-              if (context.mounted) {
-                showSnackBar(context: context, message: error);
-              }
-            },
-          );
-        } else {
-          selectImages(
-            fromCamera: value,
-            onError: (String error) {
-              if (context.mounted) {
-                showSnackBar(context: context, message: error);
-              }
-            },
-          );
-        }
+        selectImages(
+          fromCamera: value,
+          onError: (String error) {
+            if (context.mounted) {
+              showSnackBar(context: context, message: error);
+            }
+          },
+        );
       },
     );
   }

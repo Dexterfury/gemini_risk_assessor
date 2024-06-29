@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -201,30 +202,19 @@ class ToolsProvider extends ChangeNotifier {
   void showImagePickerDialog({
     required BuildContext context,
   }) {
-    imagePickerAnimatedDialog(
+    ImagePickerHandler.imagePickerAnimatedDialog(
       context: context,
       title: 'Select Photo',
       content: 'Choose an Option',
       onPressed: (value) {
-        if (value) {
-          selectImages(
-            fromCamera: value,
-            onError: (String error) {
-              if (context.mounted) {
-                showSnackBar(context: context, message: error);
-              }
-            },
-          );
-        } else {
-          selectImages(
-            fromCamera: value,
-            onError: (String error) {
-              if (context.mounted) {
-                showSnackBar(context: context, message: error);
-              }
-            },
-          );
-        }
+        selectImages(
+          fromCamera: value,
+          onError: (String error) {
+            if (context.mounted) {
+              showSnackBar(context: context, message: error);
+            }
+          },
+        );
       },
     );
   }

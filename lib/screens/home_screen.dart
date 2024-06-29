@@ -39,7 +39,7 @@ class HomeScreen extends StatelessWidget {
             child: DisplayUserImage(
               radius: 20,
               isViewOnly: true,
-              authProvider: context.watch<AuthProvider>(),
+              imageUrl: context.watch<AuthProvider>().userModel?.imageUrl ?? '',
               onPressed: () {},
             ),
           ),

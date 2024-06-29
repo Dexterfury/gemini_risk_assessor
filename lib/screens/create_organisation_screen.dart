@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/streams/search_stream.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
-import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
@@ -22,6 +26,8 @@ class CreateOrganisationScreen extends StatefulWidget {
 class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+
+  File? _finalFileImage;
 
   @override
   void dispose() {
@@ -46,44 +52,55 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      DisplayOrgImage(
-                        isViewOnly: true,
-                        organisationProvider: organisationProvider,
-                        onPressed: () {},
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      MainAppButton(
-                        icon: Icons.person_add,
-                        label: 'People',
-                        onTap: () {
-                          if (organisationProvider.isLoading) {
-                            return;
-                          }
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DisplayOrgImage(
+                      isViewOnly: true,
+                      fileImage: _finalFileImage,
+                      onPressed: () async {
+                        final file =
+                            await ImagePickerHandler.showImagePickerDialog(
+                          context: context,
+                        );
+                        if (file != null) {
+                          setState(() {
+                            _finalFileImage = file;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    MainAppButton(
+                      icon: Icons.person_add,
+                      label: 'People',
+                      onTap: () {
+                        if (organisationProvider.isLoading) {
+                          return;
+                        }
 
-                          // show botton sheet
-                          // show bottom sheet
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) {
-                              return const FractionallySizedBox(
-                                heightFactor: 0.9,
-                                child: PeopleBottomSheet(),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                        // show botton sheet
+                        // show bottom sheet
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) {
+                            return FractionallySizedBox(
+                              heightFactor: 0.9,
+                              child: PeopleBottomSheet(
+                                orgProvider: organisationProvider,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 30),
@@ -156,10 +173,16 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
 }
 
 class PeopleBottomSheet extends StatelessWidget {
-  const PeopleBottomSheet({super.key});
+  const PeopleBottomSheet({
+    super.key,
+    required this.orgProvider,
+  });
+
+  final OrganisationProvider orgProvider;
 
   @override
   Widget build(BuildContext context) {
+    final uid = context.read<AuthProvider>().userModel!.uid;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -186,13 +209,15 @@ class PeopleBottomSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Expanded(
-            child: Center(
-              child: Text(
-                'Search and add members',
-                style: textStyle18w500,
-              ),
-            ),
+          Expanded(
+            child: orgProvider.searchQuery.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Search and add members',
+                      style: textStyle18w500,
+                    ),
+                  )
+                : SearchStream(uid: uid),
           ),
         ],
       ),

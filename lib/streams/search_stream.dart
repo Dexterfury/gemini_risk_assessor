@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -9,11 +8,11 @@ class SearchStream extends StatelessWidget {
   const SearchStream({
     super.key,
     required this.uid,
-    this.groupId = '',
+    this.organisationID = '',
   });
 
   final String uid;
-  final String groupId;
+  final String organisationID;
 
   @override
   Widget build(BuildContext context) {

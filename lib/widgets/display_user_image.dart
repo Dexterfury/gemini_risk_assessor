@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
@@ -10,13 +9,15 @@ class DisplayUserImage extends StatelessWidget {
     super.key,
     required this.radius,
     required this.isViewOnly,
-    required this.authProvider,
+    this.fileImage,
+    this.imageUrl = '',
     required this.onPressed,
     this.avatarPadding = 8.0,
   });
   final double radius;
   final bool isViewOnly;
-  final AuthProvider authProvider;
+  final File? fileImage;
+  final String imageUrl;
   final VoidCallback onPressed;
   final double avatarPadding;
 
@@ -29,7 +30,7 @@ class DisplayUserImage extends StatelessWidget {
           child: CircleAvatar(
             key: UniqueKey(),
             radius: radius,
-            backgroundImage: showUserImage(authProvider),
+            backgroundImage: showUserImage(fileImage),
           ),
         ),
         isViewOnly
@@ -54,14 +55,12 @@ class DisplayUserImage extends StatelessWidget {
     );
   }
 
-  showUserImage(provider) {
-    if (provider.finalFileImage != null) {
-      return FileImage(File(provider.finalFileImage!.path))
-          as ImageProvider<Object>;
-    } else if (provider.userModel != null &&
-        provider.userModel!.imageUrl.isNotEmpty) {
+  showUserImage(File? fileImage) {
+    if (fileImage != null) {
+      return FileImage(File(fileImage.path)) as ImageProvider<Object>;
+    } else if (imageUrl.isNotEmpty) {
       return CachedNetworkImageProvider(
-        provider.userModel!.imageUrl,
+        imageUrl,
         cacheManager: MyImageCacheManager.profileCacheManager,
       );
     } else {

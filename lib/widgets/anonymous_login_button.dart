@@ -69,6 +69,7 @@ class AnonymousLoginButton extends StatelessWidget {
                         createdAt: '',
                       );
                       authProvider.saveUserDataToFireStore(
+                        fileImage: null,
                         userModel: userModel,
                         onSuccess: () async {
                           // save user data to shared preferences
