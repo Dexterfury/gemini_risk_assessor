@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
@@ -55,10 +56,16 @@ class SearchStream extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final userData = UserModel.fromJson(
                       results.elementAt(index).data() as Map<String, dynamic>);
-                  return UserWidget(
-                    userData: userData,
-                    showCheckMark: true,
-                  );
+                  // dont add yourself to the list of users you are searching for.
+                  if (userData.uid == uid) {
+                    return Container();
+                  } else {
+                    return UserWidget(
+                      userData: userData,
+                      showCheckMark: true,
+                      viewType: UserViewType.creator,
+                    );
+                  }
                 },
               );
             }

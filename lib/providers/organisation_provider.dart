@@ -12,15 +12,20 @@ class OrganisationProvider extends ChangeNotifier {
   String _searchQuery = '';
   List<UserModel> _orgMembersList = [];
   List<UserModel> _orgAdminsList = [];
+  List<UserModel> _awaitApprovalMembersList = [];
 
   List<UserModel> _tempOrgMembersList = [];
   List<UserModel> _tempOrgAdminsList = [];
+  List<UserModel> _tempWaitingApprovalMembersList = [];
 
   List<String> _tempOrgMemberUIDs = [];
   List<String> _tempOrgAdminUIDs = [];
 
   List<UserModel> _tempRemovedAdminsList = [];
   List<UserModel> _tempRemovedMembersList = [];
+
+  List<UserModel> _tempRemovedWaitingApprovalMembersList = [];
+  List<String> _tempRemovedWaitingApprovalMemberUIDs = [];
 
   List<String> _tempRemovedMemberUIDs = [];
   List<String> _tempRemovedAdminsUIDs = [];
@@ -33,6 +38,7 @@ class OrganisationProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   List<UserModel> get orgMembersList => _orgMembersList;
   List<UserModel> get orgAdminsList => _orgAdminsList;
+  List<UserModel> get awaitApprovalMembersList => _awaitApprovalMembersList;
   OrganisationModel get organisationModel => _organisationModel;
 
   final CollectionReference _usersCollection =
@@ -87,6 +93,7 @@ class OrganisationProvider extends ChangeNotifier {
     _tempRemovedAdminsUIDs = [];
     _tempRemovedMembersList = [];
     _tempRemovedAdminsList = [];
+    _tempWaitingApprovalMembersList = [];
 
     notifyListeners();
   }
@@ -96,6 +103,15 @@ class OrganisationProvider extends ChangeNotifier {
     _isSaved = true;
     notifyListeners();
     await updateOrganisationDataInFireStore();
+  }
+
+  // add a organisation member
+  void addToWaitingApproval({required UserModel groupMember}) {
+    _awaitApprovalMembersList.add(groupMember);
+    _organisationModel.awaitingApprovalUIDs.add(groupMember.uid);
+    // add data to temp lists
+    _tempWaitingApprovalMembersList.add(groupMember);
+    notifyListeners();
   }
 
   // add a organisation member
@@ -116,6 +132,25 @@ class OrganisationProvider extends ChangeNotifier {
     _tempOrgAdminsList.add(groupAdmin);
     _tempOrgAdminUIDs.add(groupAdmin.uid);
     notifyListeners();
+  }
+
+  Future<void> removeWaitingApproval({required UserModel orgMember}) async {
+    _awaitApprovalMembersList.remove(orgMember);
+    // also remove this member from organisation model
+    _organisationModel.awaitingApprovalUIDs.remove(orgMember.uid);
+
+    // remove from temp lists
+    _tempWaitingApprovalMembersList.remove(orgMember);
+
+    // add  this member to the list of removed members
+    _tempRemovedWaitingApprovalMembersList.add(orgMember);
+    _tempRemovedWaitingApprovalMemberUIDs.add(orgMember.uid);
+
+    notifyListeners();
+
+    // return if groupID is empty - meaning we are creating a new group
+    if (_organisationModel.organisationID.isEmpty) return;
+    updateOrganisationDataInFireStore();
   }
 
   // remove member from group

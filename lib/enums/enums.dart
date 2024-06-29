@@ -32,3 +32,10 @@ enum GenerationType {
   dsti,
   riskAssessment,
 }
+
+// user Type enum
+enum UserViewType {
+  admin,
+  user,
+  creator,
+}

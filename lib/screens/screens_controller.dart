@@ -33,26 +33,6 @@ class _ScreensControllerState extends State<ScreensController>
     super.initState();
   }
 
-  // void _navigateToCreateAssessment(BuildContext context) {
-  //   OpenContainer(
-  //     closedShape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.all(Radius.circular(56.0)),
-  //     ),
-  //     transitionType: ContainerTransitionType.fade,
-  //     transitionDuration: const Duration(milliseconds: 500),
-  //     closedColor: Theme.of(context).colorScheme.primary,
-  //     closedBuilder: (context, openContainer) {
-  //       return FloatingActionButton(
-  //         onPressed: openContainer,
-  //         child: const Icon(Icons.add),
-  //       );
-  //     },
-  //     openBuilder: (context, _) {
-  //       return const CreateAssessmentScreen();
-  //     },
-  //   );
-  // }
-
   @override
   void dispose() {
     _animationController.dispose();

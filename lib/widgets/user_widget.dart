@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
@@ -11,26 +12,17 @@ class UserWidget extends StatelessWidget {
     required this.userData,
     this.isAdminView = false,
     required this.showCheckMark,
+    required this.viewType,
   });
 
   final UserModel userData;
   final bool isAdminView;
   final bool showCheckMark;
+  final UserViewType viewType;
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     final name = uid == userData.uid ? 'You' : userData.name;
-    getValue() {
-      return isAdminView
-          ? context
-              .watch<OrganisationProvider>()
-              .orgAdminsList
-              .contains(userData)
-          : context
-              .watch<OrganisationProvider>()
-              .orgMembersList
-              .contains(userData);
-    }
 
     return ListTile(
       minLeadingWidth: 0.0,
@@ -50,33 +42,62 @@ class UserWidget extends StatelessWidget {
       ),
       trailing: showCheckMark
           ? Checkbox(
-              value: getValue(),
+              value: getValue(
+                context,
+                viewType,
+              ),
               onChanged: (value) {
                 // check the check box
-                if (isAdminView) {
-                  if (value == true) {
-                    context
-                        .read<OrganisationProvider>()
-                        .addMemberToAdmins(groupAdmin: userData);
-                  } else {
-                    context
-                        .read<OrganisationProvider>()
-                        .removeOrgAdmin(orgAdmin: userData);
-                  }
+                if (value == true) {
+                  context
+                      .read<OrganisationProvider>()
+                      .addToWaitingApproval(groupMember: userData);
                 } else {
-                  if (value == true) {
-                    context
-                        .read<OrganisationProvider>()
-                        .addMemberToOrganisation(groupMember: userData);
-                  } else {
-                    context.read<OrganisationProvider>().removeOrgMember(
-                          orgMember: userData,
-                        );
-                  }
+                  context
+                      .read<OrganisationProvider>()
+                      .removeWaitingApproval(orgMember: userData);
                 }
+                // if (isAdminView) {
+                //   if (value == true) {
+                //     context
+                //         .read<OrganisationProvider>()
+                //         .addMemberToAdmins(groupAdmin: userData);
+                //   } else {
+                //     context
+                //         .read<OrganisationProvider>()
+                //         .removeOrgAdmin(orgAdmin: userData);
+                //   }
+                // } else {
+                //   if (value == true) {
+                //     context
+                //         .read<OrganisationProvider>()
+                //         .addMemberToOrganisation(groupMember: userData);
+                //   } else {
+                //     context.read<OrganisationProvider>().removeOrgMember(
+                //           orgMember: userData,
+                //         );
+                //   }
+                // }
               },
             )
           : null,
     );
+  }
+
+  getValue(
+    BuildContext context,
+    UserViewType viewType,
+  ) {
+    final orgProvider = context.read<OrganisationProvider>();
+    switch (viewType) {
+      case UserViewType.admin:
+        return orgProvider.orgAdminsList.contains(userData);
+      case UserViewType.creator:
+        return orgProvider.awaitApprovalMembersList.contains(
+          userData,
+        );
+      default:
+        return orgProvider.orgMembersList.contains(userData);
+    }
   }
 }
