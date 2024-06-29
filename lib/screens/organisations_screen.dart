@@ -41,10 +41,7 @@ class OrganisationsScreen extends StatelessWidget {
                       height: 20,
                     ),
                     MainAppButton(
-                      widget: const Icon(
-                        Icons.login,
-                        color: Colors.white,
-                      ),
+                      icon: Icons.login,
                       label: 'Sign In',
                       onTap: () {
                         // navigate to sign in screen and remove all routes

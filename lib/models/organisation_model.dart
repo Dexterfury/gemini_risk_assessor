@@ -4,7 +4,7 @@ class OrganisationModel {
   String creatorUID;
   String organisationID;
   String organisationName;
-  String imageUrl;
+  String? imageUrl;
   String aboutOrganisation;
   String address;
   String phoneNumber;
@@ -15,23 +15,27 @@ class OrganisationModel {
   List<String> adminsUIDs;
   DateTime createdAt;
 
-  // constructor
+  // Constructor with default values
   OrganisationModel({
-    required this.creatorUID,
-    required this.organisationID,
-    required this.organisationName,
-    required this.imageUrl,
-    required this.aboutOrganisation,
-    required this.address,
-    required this.phoneNumber,
-    required this.emailAddress,
-    required this.websiteURL,
-    required this.awaitingApprovalUIDs,
-    required this.membersUIDs,
-    required this.adminsUIDs,
-    required this.createdAt,
-  });
-  // factory constructor
+    this.creatorUID = '',
+    this.organisationID = '',
+    this.organisationName = '',
+    this.imageUrl,
+    this.aboutOrganisation = '',
+    this.address = '',
+    this.phoneNumber = '',
+    this.emailAddress = '',
+    this.websiteURL = '',
+    List<String>? awaitingApprovalUIDs,
+    List<String>? membersUIDs,
+    List<String>? adminsUIDs,
+    DateTime? createdAt,
+  })  : awaitingApprovalUIDs = awaitingApprovalUIDs ?? [],
+        membersUIDs = membersUIDs ?? [],
+        adminsUIDs = adminsUIDs ?? [],
+        createdAt = createdAt ?? DateTime.now();
+
+  // Factory constructor
   factory OrganisationModel.fromJson(Map<String, dynamic> json) {
     return OrganisationModel(
       creatorUID: json[Constants.creatorUID] ?? '',
@@ -47,12 +51,13 @@ class OrganisationModel {
           List<String>.from(json[Constants.awaitingApprovalUIDs] ?? []),
       membersUIDs: List<String>.from(json[Constants.membersUIDs] ?? []),
       adminsUIDs: List<String>.from(json[Constants.adminsUIDs] ?? []),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(
-          json[Constants.createdAt] ?? DateTime.now().millisecondsSinceEpoch),
+      createdAt: json[Constants.createdAt] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt])
+          : null,
     );
   }
 
-  //  to json method
+  // To JSON method
   Map<String, dynamic> toJson() {
     return {
       Constants.creatorUID: creatorUID,
@@ -69,5 +74,10 @@ class OrganisationModel {
       Constants.adminsUIDs: adminsUIDs,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
+  }
+
+  // empty organization
+  factory OrganisationModel.empty() {
+    return OrganisationModel();
   }
 }

@@ -101,10 +101,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: MainAppButton(
-              widget: const Icon(
-                Icons.create,
-                color: Colors.white,
-              ),
+              icon: Icons.create,
               label: 'Generate Explainer',
               onTap: () async {
                 //check if images are added

@@ -4,6 +4,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
@@ -51,24 +52,16 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      DisplayUserImage(
-                        radius: 50,
-                        isViewOnly: false,
+                      DisplayOrgImage(
+                        isViewOnly: true,
                         organisationProvider: organisationProvider,
-                        onPressed: () {
-                          // authProvider.showImagePickerDialog(
-                          //   context: context,
-                          // );
-                        },
+                        onPressed: () {},
                       ),
                       const SizedBox(
                         width: 10,
                       ),
                       MainAppButton(
-                        widget: const Icon(
-                          Icons.person_add,
-                          color: Colors.white,
-                        ),
+                        icon: Icons.person_add,
                         label: 'Add People',
                         onTap: () {
                           if (organisationProvider.isLoading) {
@@ -76,11 +69,17 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                           }
 
                           // show botton sheet
+                          // show bottom sheet
                           showModalBottomSheet(
-                              context: context,
-                              builder: (context) {
-                                return const PeopleBottomSheet();
-                              });
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) {
+                              return const FractionallySizedBox(
+                                heightFactor: 0.9,
+                                child: PeopleBottomSheet(),
+                              );
+                            },
+                          );
                         },
                       ),
                     ],
@@ -109,10 +108,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
               const SizedBox(height: 40),
 
               MainAppButton(
-                widget: const Icon(
-                  Icons.save,
-                  color: Colors.white,
-                ),
+                icon: Icons.save,
                 label: 'Save and Continue',
                 onTap: () {
                   if (organisationProvider.isLoading) {
@@ -156,7 +152,6 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
         ),
       ),
     );
-    ;
   }
 }
 
@@ -184,10 +179,6 @@ class PeopleBottomSheet extends StatelessWidget {
                   width: 10,
                 ),
                 MainAppButton(
-                  widget: const Icon(
-                    Icons.done,
-                    color: Colors.white,
-                  ),
                   label: 'Done',
                   onTap: () {},
                 ),

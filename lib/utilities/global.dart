@@ -407,10 +407,7 @@ Widget previewImages({
           left: 20,
           bottom: 20,
           child: MainAppButton(
-            widget: const Icon(
-              Icons.camera_alt_rounded,
-              color: Colors.white,
-            ),
+            icon: Icons.camera_alt_rounded,
             label: '+',
             onTap: () {
               toolsProvider.showImagePickerDialog(

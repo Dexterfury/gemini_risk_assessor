@@ -20,10 +20,7 @@ class AnonymousLoginButton extends StatelessWidget {
     return authProvider.isLoading
         ? const SizedBox()
         : MainAppButton(
-            widget: const Icon(
-              Icons.person,
-              color: Colors.white,
-            ),
+            icon: Icons.person,
             label: 'Continue as Guest',
             onTap: () async {
               if (!authProvider.isLoading) {

@@ -118,6 +118,8 @@ class Constants {
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
 
+  static const String organisationImage = 'organisationImage';
+
   // list of ppe icons
   static List<PpeModel> getPPEIcons({
     double radius = 20.0,

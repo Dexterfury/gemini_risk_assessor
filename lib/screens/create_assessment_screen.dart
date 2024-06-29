@@ -108,10 +108,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: MainAppButton(
-                  widget: const Icon(
-                    Icons.create,
-                    color: Colors.white,
-                  ),
+                  icon: Icons.create,
                   label: 'Generate Assessment',
                   onTap: () async {
                     // check if description field is not empty and description length is more 10 characters or more

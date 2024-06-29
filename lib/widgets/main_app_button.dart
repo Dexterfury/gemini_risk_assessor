@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class MainAppButton extends StatelessWidget {
   const MainAppButton({
     super.key,
-    required this.widget,
+    this.icon,
     required this.label,
     this.color = Colors.white,
     required this.onTap,
   });
 
-  final Widget widget;
+  final IconData? icon;
   final String label;
   final Color color;
   final Function() onTap;
@@ -19,7 +19,7 @@ class MainAppButton extends StatelessWidget {
     return GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(15),
@@ -28,16 +28,31 @@ class MainAppButton extends StatelessWidget {
               color: Colors.grey,
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              widget,
-              const SizedBox(
-                width: 10,
-              ),
-              Text(label, style: TextStyle(color: color,),),
-            ],
-          ),
+          child: icon != null
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      icon,
+                      color: color,
+                    ),
+                    const SizedBox(
+                      width: 8.0,
+                    ),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: color,
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                  ),
+                ),
         ));
   }
 }

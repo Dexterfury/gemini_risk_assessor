@@ -67,10 +67,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: MainAppButton(
-                    widget: const Icon(
-                      Icons.save,
-                      color: Colors.white,
-                    ),
+                    icon: Icons.save,
                     label: "Save",
                     onTap: () async {
                       // show my alert dialog for loading
