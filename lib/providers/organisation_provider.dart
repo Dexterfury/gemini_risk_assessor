@@ -12,7 +12,7 @@ class OrganisationProvider extends ChangeNotifier {
   String _searchQuery = '';
   List<UserModel> _orgMembersList = [];
   List<UserModel> _orgAdminsList = [];
-  List<UserModel> _awaitApprovalMembersList = [];
+  List<UserModel> _awaitApprovalList = [];
 
   List<UserModel> _tempOrgMembersList = [];
   List<UserModel> _tempOrgAdminsList = [];
@@ -38,7 +38,7 @@ class OrganisationProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   List<UserModel> get orgMembersList => _orgMembersList;
   List<UserModel> get orgAdminsList => _orgAdminsList;
-  List<UserModel> get awaitApprovalMembersList => _awaitApprovalMembersList;
+  List<UserModel> get awaitApprovalsList => _awaitApprovalList;
   OrganisationModel get organisationModel => _organisationModel;
 
   final CollectionReference _usersCollection =
@@ -61,6 +61,11 @@ class OrganisationProvider extends ChangeNotifier {
   // get all users stream
   Stream<QuerySnapshot> allUsersStream() {
     return _usersCollection.snapshots();
+  }
+
+  // get a list UIDs from group members list
+  List<String> getAwaitingApprovalUIDs() {
+    return _awaitApprovalList.map((e) => e.uid).toList();
   }
 
   // get a list UIDs from group members list
@@ -107,7 +112,7 @@ class OrganisationProvider extends ChangeNotifier {
 
   // add a organisation member
   void addToWaitingApproval({required UserModel groupMember}) {
-    _awaitApprovalMembersList.add(groupMember);
+    _awaitApprovalList.add(groupMember);
     _organisationModel.awaitingApprovalUIDs.add(groupMember.uid);
     // add data to temp lists
     _tempWaitingApprovalMembersList.add(groupMember);
@@ -135,7 +140,7 @@ class OrganisationProvider extends ChangeNotifier {
   }
 
   Future<void> removeWaitingApproval({required UserModel orgMember}) async {
-    _awaitApprovalMembersList.remove(orgMember);
+    _awaitApprovalList.remove(orgMember);
     // also remove this member from organisation model
     _organisationModel.awaitingApprovalUIDs.remove(orgMember.uid);
 
@@ -248,8 +253,6 @@ class OrganisationProvider extends ChangeNotifier {
 
   // create organisation
   Future<void> createOrganisation({
-    required String name,
-    required String description,
     required File? fileImage,
     required OrganisationModel newOrganisationModel,
     required Function() onSuccess,
@@ -270,16 +273,22 @@ class OrganisationProvider extends ChangeNotifier {
         newOrganisationModel.imageUrl = imageUrl;
       }
 
+      _organisationModel.createdAt = DateTime.now();
+
+      newOrganisationModel.awaitingApprovalUIDs = [
+        ...getAwaitingApprovalUIDs()
+      ];
+
       // add the group admins
       newOrganisationModel.adminsUIDs = [
         newOrganisationModel.creatorUID,
-        ...getOrgAdminsUIDs()
+        //...getOrgAdminsUIDs()
       ];
 
       // add the group members
       newOrganisationModel.membersUIDs = [
         newOrganisationModel.creatorUID,
-        ...getOrgMembersUIDs()
+        //...getOrgMembersUIDs()
       ];
 
       // update the global groupModel

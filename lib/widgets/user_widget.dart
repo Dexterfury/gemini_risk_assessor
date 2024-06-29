@@ -93,7 +93,7 @@ class UserWidget extends StatelessWidget {
       case UserViewType.admin:
         return orgProvider.orgAdminsList.contains(userData);
       case UserViewType.creator:
-        return orgProvider.awaitApprovalMembersList.contains(
+        return orgProvider.awaitApprovalsList.contains(
           userData,
         );
       default:

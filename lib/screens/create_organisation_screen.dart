@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/streams/search_stream.dart';
@@ -161,7 +162,19 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                     return;
                   }
 
+                  final orgModel = OrganisationModel(
+                    creatorUID: context.read<AuthProvider>().userModel!.uid,
+                    organisationName: _nameController.text,
+                    imageUrl: '',
+                  );
+
                   // save organisation data to firestore
+                  organisationProvider.createOrganisation(
+                    fileImage: _finalFileImage,
+                    newOrganisationModel: orgModel,
+                    onSuccess: () {},
+                    onError: (error) {},
+                  );
                 },
               ),
             ],
