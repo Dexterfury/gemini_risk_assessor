@@ -15,6 +15,7 @@ import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:gemini_risk_assessor/widgets/people.dart';
 import 'package:provider/provider.dart';
 
 class CreateOrganisationScreen extends StatefulWidget {
@@ -101,9 +102,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                         builder: (context) => Dialog(
                           child: SizedBox(
                             height: MediaQuery.of(context).size.height * 0.6,
-                            child: PeopleBottomSheet(
-                              orgProvider: organisationProvider,
-                            ),
+                            child: const People(),
                           ),
                         ),
                       );
@@ -217,68 +216,6 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class PeopleBottomSheet extends StatelessWidget {
-  const PeopleBottomSheet({
-    super.key,
-    required this.orgProvider,
-  });
-
-  final OrganisationProvider orgProvider;
-
-  @override
-  Widget build(BuildContext context) {
-    final uid = context.read<AuthProvider>().userModel!.uid;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CupertinoSearchTextField(
-                    onChanged: (value) {
-                      // search for users
-                      orgProvider.setSearchQuery(value);
-                    },
-                    onSuffixTap: () {
-                      // clear search query
-                      orgProvider.setSearchQuery('');
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10),
-                MainAppButton(
-                  label: 'Done',
-                  onTap: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: Consumer<OrganisationProvider>(
-              builder: (context, orgProvider, _) {
-                if (orgProvider.searchQuery.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'Search and add members',
-                      style: textStyle18w500,
-                    ),
-                  );
-                } else {
-                  return SearchStream(uid: uid);
-                }
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

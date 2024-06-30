@@ -12,6 +12,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:gemini_risk_assessor/widgets/people.dart';
 import 'package:provider/provider.dart';
 
 class OrganisationDetails extends StatefulWidget {
@@ -131,7 +132,17 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
         CircleAvatar(
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const People(),
+                  ),
+                ),
+              );
+            },
             icon: const Icon(
               Icons.person_add,
               color: Colors.white,
