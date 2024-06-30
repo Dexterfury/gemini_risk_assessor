@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 
 class FileUploadHandler {
   // compress, upload and return file url
@@ -44,5 +47,31 @@ class FileUploadHandler {
     );
 
     return File(result!.path);
+  }
+
+  // update image in firestore
+  static Future<String> updateImage({
+    required File file,
+    required bool isUser,
+    required String id,
+    required String reference,
+  }) async {
+    final imageURL = await uploadFileAndGetUrl(
+      file: file,
+      reference: reference,
+    );
+    if (isUser) {
+      await FirebaseFirestore.instance
+          .collection(Constants.usersCollection)
+          .doc(id)
+          .update({Constants.imageUrl: imageURL});
+    } else {
+      await FirebaseFirestore.instance
+          .collection(Constants.organisationCollection)
+          .doc(id)
+          .update({Constants.imageUrl: imageURL});
+    }
+
+    return imageURL;
   }
 }

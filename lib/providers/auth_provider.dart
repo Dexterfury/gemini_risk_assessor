@@ -425,4 +425,89 @@ class AuthProvider extends ChangeNotifier {
       }
     }
   }
+
+  final CollectionReference _organisationCollection =
+      FirebaseFirestore.instance.collection(Constants.organisationCollection);
+
+  // update name
+  Future<String> updateName({
+    required bool isUser,
+    required String id,
+    required String newName,
+    required String oldName,
+  }) async {
+    if (newName.isEmpty || newName.length < 3 || newName == oldName) {
+      return 'Invalid name.';
+    }
+
+    if (!isUser) {
+      await _updateOrgName(id, newName);
+      final nameToReturn = newName;
+      newName = '';
+      return nameToReturn;
+    } else {
+      await _updateUserName(id, newName);
+
+      _userModel!.name = newName;
+      // save user data to share preferences
+      await saveUserDataToSharedPreferences();
+      newName = '';
+      notifyListeners();
+      return _userModel!.name;
+    }
+  }
+
+  // update description
+  Future<String> updateDescription({
+    required bool isUser,
+    required String id,
+    required String newDesc,
+    required String oldDesc,
+  }) async {
+    if (newDesc.isEmpty || newDesc.length < 3 || newDesc == oldDesc) {
+      return 'Invalid description.';
+    }
+
+    if (!isUser) {
+      await _updateOrgDesc(id, newDesc);
+      final descToReturn = newDesc;
+      newDesc = '';
+      return descToReturn;
+    } else {
+      await _updateAboutMe(id, newDesc);
+
+      _userModel!.aboutMe = newDesc;
+      // save user data to share preferences
+      await saveUserDataToSharedPreferences();
+      newDesc = '';
+      notifyListeners();
+      return _userModel!.aboutMe;
+    }
+  }
+
+  // update groupName
+  Future<void> _updateOrgName(String id, String newName) async {
+    await _organisationCollection.doc(id).update({
+      Constants.organisationName: newName,
+    });
+  }
+
+  // update userName
+  Future<void> _updateUserName(String id, String newName) async {
+    await _usersCollection.doc(id).update({
+      Constants.name: newName,
+    });
+  }
+
+  // update aboutMe
+  Future<void> _updateAboutMe(String id, String newDesc) async {
+    await _usersCollection.doc(id).update({Constants.aboutMe: newDesc});
+  }
+
+  // update group desc
+  Future<void> _updateOrgDesc(String id, String newDesc) async {
+    await _organisationsCollection
+        .doc(id)
+        .update({Constants.aboutOrganisation: newDesc});
+  }
 }

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
-import 'package:gemini_risk_assessor/widgets/add_image.dart';
 
 class DisplayOrgImage extends StatelessWidget {
   const DisplayOrgImage({
@@ -15,7 +14,7 @@ class DisplayOrgImage extends StatelessWidget {
   final bool isViewOnly;
   final File? fileImage;
   final String imageUrl;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   @override
   Widget build(BuildContext context) {
     return SizedBox(

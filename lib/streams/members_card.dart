@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
 
-class MembersCard extends StatefulWidget {
+class MembersCard extends StatelessWidget {
   const MembersCard({
     super.key,
-    required this.orgID,
+    required this.orgModel,
     required this.isAdmin,
   });
 
-  final String orgID;
+  final OrganisationModel orgModel;
   final bool isAdmin;
 
-  @override
-  State<MembersCard> createState() => _MembersCardState();
-}
-
-class _MembersCardState extends State<MembersCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -29,7 +25,9 @@ class _MembersCardState extends State<MembersCard> {
           FutureBuilder<List<UserModel>>(
             future: context
                 .read<OrganisationProvider>()
-                .getMembersDataFromFirestore(orgID: widget.orgID),
+                .getMembersDataFromFirestore(
+                  orgID: orgModel.organisationID,
+                ),
             // builder: (context, snapshot)
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -53,49 +51,13 @@ class _MembersCardState extends State<MembersCard> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final member = snapshot.data![index];
+                    final isAdmin = orgModel.adminsUIDs.contains(member.uid);
                     return UserWidget(
                       userData: member,
+                      isAdminView: isAdmin,
                       showCheckMark: false,
                       viewType: UserViewType.user,
                     );
-
-                    // ListTile(
-                    //   contentPadding: EdgeInsets.zero,
-                    //   leading: userImageWidget(
-                    //       imageUrl: member.image, radius: 40, onTap: () {}),
-                    //   title: Text(member.name),
-                    //   subtitle: Text(member.aboutMe),
-                    //   trailing: widget.groupProvider.groupModel.adminsUIDs
-                    //           .contains(member.uid)
-                    //       ? const Icon(
-                    //           Icons.admin_panel_settings,
-                    //           color: Colors.orangeAccent,
-                    //         )
-                    //       : const SizedBox(),
-                    //   onTap: !widget.isAdmin
-                    //       ? null
-                    //       : () {
-                    //           // show dialog to remove member
-                    //           showMyAnimatedDialog(
-                    //             context: context,
-                    //             title: 'Remove Member',
-                    //             content:
-                    //                 'Are you sure you want to remove ${member.name} from the group?',
-                    //             textAction: 'Remove',
-                    //             onActionTap: (value, updatedText) async {
-                    //               if (value) {
-                    //                 //remove member from group
-                    //                 await widget.groupProvider
-                    //                     .removeGroupMember(
-                    //                   groupMember: member,
-                    //                 );
-
-                    //                 setState(() {});
-                    //               }
-                    //             },
-                    //           );
-                    //        },
-                    // );
                   });
             },
           ),

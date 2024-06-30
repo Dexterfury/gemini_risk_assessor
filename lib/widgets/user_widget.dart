@@ -59,30 +59,11 @@ class UserWidget extends StatelessWidget {
                       .read<OrganisationProvider>()
                       .removeWaitingApproval(orgMember: userData);
                 }
-                // if (isAdminView) {
-                //   if (value == true) {
-                //     context
-                //         .read<OrganisationProvider>()
-                //         .addMemberToAdmins(groupAdmin: userData);
-                //   } else {
-                //     context
-                //         .read<OrganisationProvider>()
-                //         .removeOrgAdmin(orgAdmin: userData);
-                //   }
-                // } else {
-                //   if (value == true) {
-                //     context
-                //         .read<OrganisationProvider>()
-                //         .addMemberToOrganisation(groupMember: userData);
-                //   } else {
-                //     context.read<OrganisationProvider>().removeOrgMember(
-                //           orgMember: userData,
-                //         );
-                //   }
-                // }
               },
             )
-          : null,
+          : isAdminView
+              ? const Icon(Icons.admin_panel_settings_rounded)
+              : null,
       onTap: onTap,
     );
   }

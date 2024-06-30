@@ -59,6 +59,11 @@ const textStyle18w500 = TextStyle(
   fontWeight: FontWeight.w500,
 );
 
+const textStyle18Bold = TextStyle(
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+);
+
 const textStyle16w600 = TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w500,
