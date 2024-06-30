@@ -1,10 +1,8 @@
 import 'package:animations/animations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
-import 'package:gemini_risk_assessor/screens/create_organisation_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisation_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';

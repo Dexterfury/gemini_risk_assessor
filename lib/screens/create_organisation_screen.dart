@@ -54,65 +54,62 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DisplayOrgImage(
-                      fileImage: _finalFileImage,
-                      onPressed: () async {
-                        final file =
-                            await ImagePickerHandler.showImagePickerDialog(
-                          context: context,
-                        );
-                        if (file != null) {
-                          setState(() {
-                            _finalFileImage = file;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    MainAppButton(
-                      icon: Icons.person_add,
-                      label: 'People',
-                      onTap: () {
-                        if (organisationProvider.isLoading) {
-                          return;
-                        }
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DisplayOrgImage(
+                    fileImage: _finalFileImage,
+                    onPressed: () async {
+                      final file =
+                          await ImagePickerHandler.showImagePickerDialog(
+                        context: context,
+                      );
+                      if (file != null) {
+                        setState(() {
+                          _finalFileImage = file;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  MainAppButton(
+                    icon: Icons.person_add,
+                    label: 'People',
+                    onTap: () {
+                      if (organisationProvider.isLoading) {
+                        return;
+                      }
 
-                        // show bottom sheet
-                        // showModalBottomSheet(
-                        //   context: context,
-                        //   isScrollControlled: true,
-                        //   builder: (context) {
-                        //     return FractionallySizedBox(
-                        //       heightFactor: 0.9,
-                        //       child: PeopleBottomSheet(
-                        //         orgProvider: organisationProvider,
-                        //       ),
-                        //     );
-                        //   },
-                        // );
-                        showDialog(
-                          context: context,
-                          builder: (context) => Dialog(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.6,
-                              child: PeopleBottomSheet(
-                                orgProvider: organisationProvider,
-                              ),
+                      // show bottom sheet
+                      // showModalBottomSheet(
+                      //   context: context,
+                      //   isScrollControlled: true,
+                      //   builder: (context) {
+                      //     return FractionallySizedBox(
+                      //       heightFactor: 0.9,
+                      //       child: PeopleBottomSheet(
+                      //         orgProvider: organisationProvider,
+                      //       ),
+                      //     );
+                      //   },
+                      // );
+                      showDialog(
+                        context: context,
+                        builder: (context) => Dialog(
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: PeopleBottomSheet(
+                              orgProvider: organisationProvider,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 30),
 
