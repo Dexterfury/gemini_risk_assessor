@@ -85,6 +85,18 @@ class OrganisationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // stream organisations from firestore
+  Stream<QuerySnapshot> organisationsStream({
+    required String userId,
+  }) {
+    return _organisationCollection
+        .where(
+          Constants.membersUIDs,
+          arrayContains: userId,
+        )
+        .snapshots();
+  }
+
   // set the temp lists to empty
   Future<void> setEmptyTemps() async {
     _isSaved = false;
@@ -100,6 +112,14 @@ class OrganisationProvider extends ChangeNotifier {
     _tempRemovedAdminsList = [];
     _tempWaitingApprovalMembersList = [];
 
+    notifyListeners();
+  }
+
+  // set empty lists
+  Future<void> setEmptyLists() async {
+    _orgMembersList = [];
+    _orgAdminsList = [];
+    _awaitApprovalList = [];
     notifyListeners();
   }
 
@@ -299,10 +319,11 @@ class OrganisationProvider extends ChangeNotifier {
           .doc(organisationID)
           .set(organisationModel.toJson());
 
-      // set loading
-      setLoading(true);
+      // reset the lists
+      await setEmptyLists();
+      await setEmptyTemps();
       // set onSuccess
-      onSuccess;
+      onSuccess();
       setLoading(false);
     } catch (e) {
       setLoading(false);

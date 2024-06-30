@@ -26,9 +26,9 @@ class UserWidget extends StatelessWidget {
 
     return ListTile(
       minLeadingWidth: 0.0,
-      contentPadding: const EdgeInsets.only(left: -10),
+      contentPadding: EdgeInsets.zero,
       leading: DisplayUserImage(
-        radius: 40,
+        radius: 30,
         imageUrl: userData.imageUrl,
         isViewOnly: true,
         onPressed: () {},

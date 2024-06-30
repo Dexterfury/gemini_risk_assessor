@@ -19,23 +19,19 @@ class SearchStream extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<OrganisationProvider>(builder: ((
-      context,
-      organisationProvider,
-      child,
-    ) {
-      return StreamBuilder<QuerySnapshot>(
+    return Consumer<OrganisationProvider>(
+      builder: (context, organisationProvider, _) {
+        return StreamBuilder<QuerySnapshot>(
           stream: organisationProvider.allUsersStream(),
-          builder: (builderContext, snapshot) {
+          builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return const Center(
-                child: Text('Something went wrong'),
-              );
+              return const Center(child: Text('Something went wrong'));
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text('No data found'));
             }
 
             final results = snapshot.data!.docs.where((element) =>
@@ -45,34 +41,28 @@ class SearchStream extends StatelessWidget {
                     .contains(organisationProvider.searchQuery.toLowerCase()));
 
             if (results.isEmpty) {
-              return const Center(
-                child: Text('No data found'),
-              );
+              return const Center(child: Text('No matching results'));
             }
 
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: results.length,
-                itemBuilder: (context, index) {
-                  final userData = UserModel.fromJson(
-                      results.elementAt(index).data() as Map<String, dynamic>);
-                  // dont add yourself to the list of users you are searching for.
-                  if (userData.uid == uid) {
-                    return Container();
-                  } else {
-                    return UserWidget(
-                      userData: userData,
-                      showCheckMark: true,
-                      viewType: UserViewType.creator,
-                    );
-                  }
-                },
-              );
-            }
-            return const Center(
-              child: Text('No data found'),
+            return ListView.builder(
+              itemCount: results.length,
+              itemBuilder: (context, index) {
+                final userData = UserModel.fromJson(
+                    results.elementAt(index).data() as Map<String, dynamic>);
+                if (userData.uid == uid) {
+                  return Container();
+                } else {
+                  return UserWidget(
+                    userData: userData,
+                    showCheckMark: true,
+                    viewType: UserViewType.creator,
+                  );
+                }
+              },
             );
-          });
-    }));
+          },
+        );
+      },
+    );
   }
 }

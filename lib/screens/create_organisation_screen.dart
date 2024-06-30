@@ -85,19 +85,29 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                           return;
                         }
 
-                        // show botton sheet
                         // show bottom sheet
-                        showModalBottomSheet(
+                        // showModalBottomSheet(
+                        //   context: context,
+                        //   isScrollControlled: true,
+                        //   builder: (context) {
+                        //     return FractionallySizedBox(
+                        //       heightFactor: 0.9,
+                        //       child: PeopleBottomSheet(
+                        //         orgProvider: organisationProvider,
+                        //       ),
+                        //     );
+                        //   },
+                        // );
+                        showDialog(
                           context: context,
-                          isScrollControlled: true,
-                          builder: (context) {
-                            return FractionallySizedBox(
-                              heightFactor: 0.9,
+                          builder: (context) => Dialog(
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
                               child: PeopleBottomSheet(
                                 orgProvider: organisationProvider,
                               ),
-                            );
-                          },
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -165,15 +175,45 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                   final orgModel = OrganisationModel(
                     creatorUID: context.read<AuthProvider>().userModel!.uid,
                     organisationName: _nameController.text,
+                    aboutOrganisation: _descriptionController.text,
                     imageUrl: '',
+                  );
+
+                  // show loading dialog
+                  // show my alert dialog for loading
+                  showMyAnimatedDialog(
+                    context: context,
+                    title: 'Creating organisation',
+                    content: 'Please wait...',
+                    loadingIndicator: const SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: CircularProgressIndicator()),
                   );
 
                   // save organisation data to firestore
                   organisationProvider.createOrganisation(
                     fileImage: _finalFileImage,
                     newOrganisationModel: orgModel,
-                    onSuccess: () {},
-                    onError: (error) {},
+                    onSuccess: () {
+                      // pop the loading dialog
+                      Navigator.pop(context);
+                      // clear data
+                      setState(() {
+                        _nameController.text = '';
+                        _descriptionController.text = '';
+                        _finalFileImage = null;
+                      });
+                      showSnackBar(
+                          context: context, message: 'Organisation created');
+                      // pop to previous screen
+                      Navigator.pop(context);
+                    },
+                    onError: (error) {
+                      // pop the loading dialog
+                      Navigator.pop(context);
+                      showSnackBar(context: context, message: error.toString());
+                    },
                   );
                 },
               ),
@@ -210,28 +250,36 @@ class PeopleBottomSheet extends StatelessWidget {
                       // search for users
                       orgProvider.setSearchQuery(value);
                     },
+                    onSuffixTap: () {
+                      // clear search query
+                      orgProvider.setSearchQuery('');
+                    },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 MainAppButton(
                   label: 'Done',
-                  onTap: () {},
+                  onTap: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: orgProvider.searchQuery.isEmpty
-                ? const Center(
+            child: Consumer<OrganisationProvider>(
+              builder: (context, orgProvider, _) {
+                if (orgProvider.searchQuery.isEmpty) {
+                  return const Center(
                     child: Text(
                       'Search and add members',
                       style: textStyle18w500,
                     ),
-                  )
-                : SearchStream(uid: uid),
+                  );
+                } else {
+                  return SearchStream(uid: uid);
+                }
+              },
+            ),
           ),
         ],
       ),
