@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -71,7 +72,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                     label: "Save",
                     onTap: () async {
                       // show my alert dialog for loading
-                      showMyAnimatedDialog(
+                      MyDialogs.showMyAnimatedDialog(
                         context: context,
                         title: 'Saving',
                         content: 'Please wait...',

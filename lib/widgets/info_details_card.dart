@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -43,7 +44,7 @@ class InfoDetailsCard extends StatelessWidget {
         if (isAdmin!) {
           return GestureDetector(
             onTap: () {
-              showMyEditAnimatedDialog(
+              MyDialogs.showMyEditAnimatedDialog(
                 context: context,
                 title: title,
                 content: content,
@@ -91,7 +92,7 @@ class InfoDetailsCard extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            showMyEditAnimatedDialog(
+            MyDialogs.showMyEditAnimatedDialog(
               context: context,
               title: title,
               content: content,

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/display_signature.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
-import 'package:open_file_plus/open_file_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
@@ -28,7 +26,7 @@ class BottonButtonsField extends StatelessWidget {
                     label: "Add Signature",
                     onTap: () {
                       // show signature dialog
-                      showMyAnimatedDialog(
+                      MyDialogs.showMyAnimatedDialog(
                           context: context,
                           title: 'Signature',
                           content: '',
@@ -97,7 +95,7 @@ class BottonButtonsField extends StatelessWidget {
                   }
 
                   // show my alert dialog for loading
-                  showMyAnimatedDialog(
+                  MyDialogs.showMyAnimatedDialog(
                     context: context,
                     title: 'Generating PDF file',
                     content: 'Please wait...',

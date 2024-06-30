@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
@@ -134,7 +135,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     log('creatorID: $creatorID');
 
                     // show my alert dialog for loading
-                    showMyAnimatedDialog(
+                    MyDialogs.showMyAnimatedDialog(
                       context: context,
                       title: 'Generating',
                       content: 'Please wait while we generate your assessment',

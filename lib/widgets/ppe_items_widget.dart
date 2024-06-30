@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
@@ -51,7 +52,7 @@ class PpeItemsWidget extends StatelessWidget {
                           onTap: () {
                             if (isAdded) {
                               // show my animated dialog to aske if user is sure to remove this ppe item
-                              showMyAnimatedDialog(
+                              MyDialogs.showMyAnimatedDialog(
                                   context: context,
                                   title: 'Remove PPE',
                                   content:

@@ -1,20 +1,40 @@
 import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
-import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
+import 'package:gemini_risk_assessor/screens/create_organisation_screen.dart';
+import 'package:gemini_risk_assessor/screens/organisation_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
-import 'package:provider/provider.dart';
 
 class GridItem extends StatelessWidget {
-  const GridItem({super.key, required this.tool});
+  const GridItem({
+    super.key,
+    this.toolModel,
+    this.orgModel,
+  });
 
-  final ToolModel tool;
+  final ToolModel? toolModel;
+  final OrganisationModel? orgModel;
 
   @override
   Widget build(BuildContext context) {
+    // get title and subtitle based on model type
+    bool isTool = toolModel != null;
+    String title = getTitle(
+      toolModel,
+      orgModel,
+    );
+    String subtitle = getSubTitle(
+      toolModel,
+      orgModel,
+    );
+    String imageUrl = getImageUrl(
+      toolModel,
+      orgModel,
+    );
     return Card(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -34,23 +54,10 @@ class GridItem extends StatelessWidget {
                         topLeft: Radius.circular(10.0),
                         topRight: Radius.circular(10.0),
                       ),
-                      child: CachedNetworkImage(
-                        imageUrl: tool.images.first,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) => const Center(
-                            child: Icon(
-                          Icons.error,
-                          color: Colors.red,
-                        )),
-                        cacheManager: MyImageCacheManager.itemsCacheManager,
+                      child: MyImageCacheManager.showImage(
+                        imageUrl: imageUrl,
+                        isTool: isTool,
                       ),
-
-                      // Image.file(
-                      //   File(tool.images.first),
-                      //   fit: BoxFit.cover,
-                      // ),
                     ),
                   ),
                   SizedBox(
@@ -61,7 +68,7 @@ class GridItem extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        tool.name,
+                        title,
                         style: textStyle16w600,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -70,9 +77,17 @@ class GridItem extends StatelessWidget {
                 ],
               ),
             ),
-            openBuilder: (context, action) => CreateExplainerScreen(
-              tool: tool,
-            ),
+            openBuilder: (context, action) {
+              if (isTool) {
+                return CreateExplainerScreen(
+                  tool: toolModel,
+                );
+              } else {
+                return OrganisationDetails(
+                  orgModel: orgModel!,
+                );
+              }
+            },
             transitionType: ContainerTransitionType.fadeThrough,
             transitionDuration: const Duration(milliseconds: 500),
             closedElevation: 0,
@@ -85,5 +100,44 @@ class GridItem extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String getTitle(
+    ToolModel? toolModel,
+    OrganisationModel? orgModel,
+  ) {
+    if (toolModel != null) {
+      return toolModel.name;
+    } else if (orgModel != null) {
+      return orgModel.organisationName;
+    } else {
+      return "No title";
+    }
+  }
+
+  String getSubTitle(
+    ToolModel? toolModel,
+    OrganisationModel? orgModel,
+  ) {
+    if (toolModel != null) {
+      return toolModel.summary;
+    } else if (orgModel != null) {
+      return orgModel.aboutOrganisation;
+    } else {
+      return "No subtitle";
+    }
+  }
+
+  String getImageUrl(
+    ToolModel? toolModel,
+    OrganisationModel? orgModel,
+  ) {
+    if (toolModel != null) {
+      return toolModel.images[0];
+    } else if (orgModel != null) {
+      return orgModel.imageUrl!;
+    } else {
+      return "No image";
+    }
   }
 }

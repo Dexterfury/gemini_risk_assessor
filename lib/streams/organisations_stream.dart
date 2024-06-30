@@ -1,12 +1,10 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/org_grid_item.dart';
+import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:provider/provider.dart';
 
 class OrganisationsStream extends StatelessWidget {
@@ -54,7 +52,7 @@ class OrganisationsStream extends StatelessWidget {
               final doc = snapshot.data!.docs[index];
               final orgData = doc.data() as Map<String, dynamic>;
               final org = OrganisationModel.fromJson(orgData);
-              return OrgGridItem(orgModel: org);
+              return GridItem(orgModel: org);
             });
       },
     );

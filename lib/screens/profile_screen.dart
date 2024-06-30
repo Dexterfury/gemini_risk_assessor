@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/info_details_card.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
@@ -154,7 +154,7 @@ class ProfileScreen extends StatelessWidget {
                               icon: Icons.logout_outlined,
                               iconContainerColor: Colors.red,
                               onTap: () {
-                                showMyAnimatedDialog(
+                                MyDialogs.showMyAnimatedDialog(
                                     context: context,
                                     title: 'Logout',
                                     content: 'Are you sure you want to logout?',

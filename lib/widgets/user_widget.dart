@@ -13,12 +13,14 @@ class UserWidget extends StatelessWidget {
     this.isAdminView = false,
     required this.showCheckMark,
     required this.viewType,
+    this.onTap,
   });
 
   final UserModel userData;
   final bool isAdminView;
   final bool showCheckMark;
   final UserViewType viewType;
+  final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
@@ -81,6 +83,7 @@ class UserWidget extends StatelessWidget {
               },
             )
           : null,
+      onTap: onTap,
     );
   }
 

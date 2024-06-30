@@ -51,7 +51,7 @@ class ToolsStream extends StatelessWidget {
             itemBuilder: (context, index) {
               final tool = ToolModel.fromJson(
                   snapshot.data!.docs[index] as Map<String, dynamic>);
-              return GridItem(tool: tool);
+              return GridItem(toolModel: tool);
             });
       },
     );

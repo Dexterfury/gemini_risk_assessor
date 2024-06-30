@@ -17,6 +17,12 @@ class AssetsManager {
   // clipbaord animation
   static String clipboardAnimation = '${_lottiePath}clipboard_animation.json';
 
+  // group icon
+  static String groupIcon = '${_imagesPath}group_icon.png';
+
+  // tools icon
+  static String toolsIcon = '${_imagesPath}tools_icon.jpg';
+
   // ppe icons
   static String dustMask = '${_iconsPath}dust_mask.jpg';
   static String earProtection = '${_iconsPath}ear_protection.jpg';

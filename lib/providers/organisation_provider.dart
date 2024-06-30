@@ -271,6 +271,33 @@ class OrganisationProvider extends ChangeNotifier {
     }
   }
 
+  // get a list of goup members data from firestore
+  Future<List<UserModel>> getMembersDataFromFirestore({
+    required String orgID,
+  }) async {
+    try {
+      List<UserModel> membersData = [];
+
+      // get the list of membersUIDs
+      List<String> membersUIDs = [];
+      await _organisationCollection.doc(orgID).get().then((value) {
+        if (value.exists) {
+          membersUIDs = List<String>.from(value[Constants.membersUIDs]);
+        }
+      });
+
+      for (var uid in membersUIDs) {
+        var user = await _usersCollection.doc(uid).get();
+        membersData
+            .add(UserModel.fromJson(user.data()! as Map<String, dynamic>));
+      }
+
+      return membersData;
+    } catch (e) {
+      return [];
+    }
+  }
+
   // create organisation
   Future<void> createOrganisation({
     required File? fileImage,

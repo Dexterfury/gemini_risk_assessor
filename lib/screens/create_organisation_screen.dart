@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
@@ -60,7 +61,6 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DisplayOrgImage(
-                      isViewOnly: true,
                       fileImage: _finalFileImage,
                       onPressed: () async {
                         final file =
@@ -181,7 +181,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
 
                   // show loading dialog
                   // show my alert dialog for loading
-                  showMyAnimatedDialog(
+                  MyDialogs.showMyAnimatedDialog(
                     context: context,
                     title: 'Creating organisation',
                     content: 'Please wait...',
