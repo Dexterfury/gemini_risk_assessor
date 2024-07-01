@@ -118,6 +118,7 @@ class OrganisationProvider extends ChangeNotifier {
 
   // set empty lists
   Future<void> setEmptyLists() async {
+    _isSaved = false;
     _orgMembersList = [];
     _orgAdminsList = [];
     _awaitApprovalList = [];
@@ -125,11 +126,33 @@ class OrganisationProvider extends ChangeNotifier {
   }
 
   // check if there was a change in group members - if there was a member added or removed
-  Future<void> updateGroupDataInFireStoreIfNeeded() async {
+  Future<void> updateOrgMembersInFirestore({required OrganisationModel orgModel,}) async {
     _isSaved = true;
     notifyListeners();
     await updateOrganisationDataInFireStore();
   }
+     
+  // update the organisation image
+   Future<void> setImageUrl(String imageUrl) async {
+    _organisationModel.imageUrl = imageUrl;
+    notifyListeners();
+   }
+
+   // up date the organisation name
+    Future<void> setName(String name) async {
+    _organisationModel.organisationName = name;
+    notifyListeners();
+    }
+
+    // up date the organisation description
+    Future<void> setDescription(String description) async {
+    _organisationModel.aboutOrganisation = description;
+    notifyListeners();
+    }
+
+
+
+  
 
   // add a organisation member
   void addToWaitingApproval({required UserModel groupMember}) {
@@ -174,9 +197,6 @@ class OrganisationProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    // return if groupID is empty - meaning we are creating a new group
-    if (_organisationModel.organisationID.isEmpty) return;
-    updateOrganisationDataInFireStore();
   }
 
   // remove member from group
@@ -363,22 +383,22 @@ class OrganisationProvider extends ChangeNotifier {
   Future<String> exitOrganisation({
     required bool isAdmin,
     required String uid,
-    required String orgId,
+    required String orgID,
   }) async {
     try {
       if (isAdmin) {
         // get organisation data from firestore
-        DocumentSnapshot doc = await _organisationCollection.doc(orgId).get();
+        DocumentSnapshot doc = await _organisationCollection.doc(orgID).get();
         OrganisationModel organisationModel =
             OrganisationModel.fromJson(doc.data() as Map<String, dynamic>);
         // check if there are other admins left
         if (organisationModel.adminsUIDs.length > 1) {
           // remove the admin from admins list
-          await _organisationCollection.doc(orgId).update({
+          await _organisationCollection.doc(orgID).update({
             Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
           });
           // remove the admin from group members list
-          await _organisationCollection.doc(orgId).update({
+          await _organisationCollection.doc(orgID).update({
             Constants.membersUIDs: FieldValue.arrayRemove([uid]),
           });
 
@@ -386,29 +406,29 @@ class OrganisationProvider extends ChangeNotifier {
         } else {
           // if there are no other admins check if there are other members left
           if (organisationModel.membersUIDs.length > 1) {
-            await _organisationCollection.doc(orgId).update({
+            await _organisationCollection.doc(orgID).update({
               Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
             });
 
             // remove the admin from group members list
-            await _organisationCollection.doc(orgId).update({
+            await _organisationCollection.doc(orgID).update({
               Constants.membersUIDs: FieldValue.arrayRemove([uid]),
             });
             // pick up a new admin, get one member and make him admin
             String newAdminUID = organisationModel.membersUIDs[0];
-            await _organisationCollection.doc(orgId).update({
+            await _organisationCollection.doc(orgID).update({
               Constants.adminsUIDs: FieldValue.arrayUnion([newAdminUID]),
             });
             return Constants.exitSuccessful;
           } else {
             // If there are no other admins and members left, delete the group from firestore
-            await _organisationCollection.doc(orgId).delete();
+            await _organisationCollection.doc(orgID).delete();
 
             return Constants.deletedSuccessfully;
           }
         }
       } else {
-        await _organisationCollection.doc(orgId).update({
+        await _organisationCollection.doc(orgID).update({
           Constants.membersUIDs: FieldValue.arrayRemove([uid]),
         });
 
@@ -416,7 +436,7 @@ class OrganisationProvider extends ChangeNotifier {
       }
     } catch (e) {
       return Constants.exitFailed;
-      log(e.toString());
-    }
   }
+
+ 
 }

@@ -15,53 +15,68 @@ class People extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     final orgProvider = context.read<OrganisationProvider>();
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CupertinoSearchTextField(
-                    onChanged: (value) {
-                      // search for users
-                      orgProvider.setSearchQuery(value);
-                    },
-                    onSuffixTap: () {
-                      // clear search query
-                      orgProvider.setSearchQuery('');
-                    },
+    final searchController = TextEditingController();
+    return Column(
+      children: [
+        CupertinoSearchTextField(
+          controller: searchController,
+          onChanged: (value) {
+            // search for users
+            orgProvider.setSearchQuery(value);
+          },
+          onSuffixTap: () {
+            // clear search query
+            orgProvider.setSearchQuery('');
+            // close keyboard
+            FocusScope.of(context).unfocus();
+            // remove text from search field
+            searchController.clear();
+          },
+        ),
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: CupertinoSearchTextField(
+        //         controller: searchController,
+        //         onChanged: (value) {
+        //           // search for users
+        //           orgProvider.setSearchQuery(value);
+        //         },
+        //         onSuffixTap: () {
+        //           // clear search query
+        //           orgProvider.setSearchQuery('');
+        //           // close keyboard
+        //           FocusScope.of(context).unfocus();
+        //           // remove text from search field
+        //           searchController.clear();
+        //         },
+        //       ),
+        //     ),
+        //     const SizedBox(width: 10),
+        //     MainAppButton(
+        //       label: 'Cancel',
+        //       onTap: () => Navigator.pop(context),
+        //     ),
+        //   ],
+        // ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: Consumer<OrganisationProvider>(
+            builder: (context, orgProvider, _) {
+              if (orgProvider.searchQuery.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'Search and add members',
+                    style: textStyle18w500,
                   ),
-                ),
-                const SizedBox(width: 10),
-                MainAppButton(
-                  label: 'Done',
-                  onTap: () => Navigator.pop(context),
-                ),
-              ],
-            ),
+                );
+              } else {
+                return SearchStream(uid: uid);
+              }
+            },
           ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: Consumer<OrganisationProvider>(
-              builder: (context, orgProvider, _) {
-                if (orgProvider.searchQuery.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'Search and add members',
-                      style: textStyle18w500,
-                    ),
-                  );
-                } else {
-                  return SearchStream(uid: uid);
-                }
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

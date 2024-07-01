@@ -4,6 +4,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/streams/members_card.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
@@ -31,12 +32,15 @@ class OrganisationDetails extends StatefulWidget {
 class _OrganisationDetailsState extends State<OrganisationDetails> {
   File? _finalFileImage;
 
-  void showLoadingDialog() {
+  void showLoadingDialog({
+    required String title,
+    required String message,
+  }) {
     if (mounted) {
       MyDialogs.showMyAnimatedDialog(
         context: context,
-        title: 'Saving',
-        content: 'Please wait...',
+        title: title,
+        content: message,
         loadingIndicator: const SizedBox(
             height: 40, width: 40, child: CircularProgressIndicator()),
       );
@@ -52,9 +56,43 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
   }
 
   @override
+  void initState() {
+    setOrgModel();
+    super.initState();
+  }
+
+  void setOrgModel() async {
+    // wait for widget  to be built before setting state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context
+          .read<OrganisationProvider>()
+          .setOrganisationModel(orgModel: widget.orgModel);
+    });
+  }
+
+  // set new image from file and update provider
+  Future<void> setNewImageInProvider(String imageUrl) async {
+    // set newimage in provider
+    await context.read<OrganisationProvider>().setImageUrl(imageUrl);
+  }
+
+  // set new name  in provider
+  Future<void> setNewNameInProvider(String newName) async {
+    // set new name in provider
+    await context.read<OrganisationProvider>().setName(newName);
+  }
+
+  // set new description in provider
+  Future<void> setNewDescriptionInProvider(String newDescription) async {
+    // set new description in provider
+    await context.read<OrganisationProvider>().setDescription(newDescription);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     bool isAdmin = widget.orgModel.adminsUIDs.contains(uid);
+    String orgID = widget.orgModel.organisationID;
     String membersCount = getMembersCount(widget.orgModel);
     return Scaffold(
       appBar: const MyAppBar(
@@ -97,7 +135,11 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
               const SizedBox(height: 10),
 
               //   members list if the user is an admin
-              buildMembersList(isAdmin, uid)
+              buildMembersList(
+                isAdmin,
+                uid,
+                orgID,
+              )
             ],
           ),
         ),
@@ -105,7 +147,11 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
     );
   }
 
-  Column buildMembersList(bool isAdmin, String uid) {
+  Column buildMembersList(
+    bool isAdmin,
+    String uid,
+    String orgID,
+  ) {
     return Column(
       children: [
         MembersCard(
@@ -113,8 +159,72 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
           isAdmin: isAdmin,
         ),
         const SizedBox(height: 10),
-        ExitGroupCard(
-          uid: uid,
+        ExitCard(
+          onTap: () {
+            // exit group
+            MyDialogs.showMyAnimatedDialog(
+              context: context,
+              title: 'Exit Group',
+              content: 'Are you sure you want to exit the group?',
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    // pop the dialog
+                    Navigator.pop(context);
+
+                    // show loading dialog
+                    showLoadingDialog(
+                      title: 'Exiting',
+                      message: 'Please wait...',
+                    );
+                    final orgProvider = context.read<OrganisationProvider>();
+
+                    String result = await orgProvider.exitOrganisation(
+                      isAdmin: isAdmin,
+                      uid: uid,
+                      orgID: orgID,
+                    );
+
+                    if (result == Constants.exitSuccessful ||
+                        result == Constants.deletedSuccessfully) {
+                      Future.delayed(const Duration(milliseconds: 200))
+                          .whenComplete(() {
+                        if (context.mounted) {
+                          // pop loading dialog
+                          Navigator.pop(context);
+                          // show snackbar
+                          showSnackBar(
+                            context: context,
+                            message: result,
+                          );
+                          // pop the Organization details Screen
+                          Navigator.pop(context);
+                        }
+                      });
+                    } else {
+                      Future.delayed(const Duration(milliseconds: 200))
+                          .whenComplete(() {
+                        if (context.mounted) {
+                          // pop loading dialog
+                          Navigator.pop(context);
+                          // show snackbar
+                          showSnackBar(
+                            context: context,
+                            message: result,
+                          );
+                        }
+                      });
+                    }
+                  },
+                  child: const Text('Yes'),
+                ),
+              ],
+            );
+          },
         )
       ],
     );
@@ -161,15 +271,22 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
   }
 
   void _showPeopleDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: const People(),
+    MyDialogs.showAnimatedPeopleDialog(context: context, actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(
+          'Cancel',
+          style: textStyle18Bold,
         ),
       ),
-    );
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(
+          'Save',
+          style: textStyle18Bold,
+        ),
+      ),
+    ]);
   }
 
   Column buildDescription(bool isAdmin) {
@@ -254,15 +371,21 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
                       _finalFileImage = file;
 
                       // show loading dialog
-                      showLoadingDialog();
+                      showLoadingDialog(
+                        title: 'Saving,',
+                        message: 'Please wait...',
+                      );
 
-                      await FileUploadHandler.updateImage(
+                      final imageUrl = await FileUploadHandler.updateImage(
                         file: file,
                         isUser: false,
                         id: widget.orgModel.organisationID,
                         reference:
                             '${Constants.organisationImage}/${widget.orgModel.organisationID}.jpg',
                       );
+
+                      // set newimage in provider
+                      await setNewImageInProvider(imageUrl);
 
                       // pop loading dialog
                       popDialog();

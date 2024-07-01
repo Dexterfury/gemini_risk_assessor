@@ -17,7 +17,7 @@ class SettingsListTile extends StatelessWidget {
   final String? subtitle;
   final IconData icon;
   final Color iconContainerColor;
-  final Function() onTap;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {

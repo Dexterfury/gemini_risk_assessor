@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 
-class ExitGroupCard extends StatelessWidget {
-  const ExitGroupCard({
+class ExitCard extends StatelessWidget {
+  const ExitCard({
     super.key,
-    required this.uid,
+    this.onTap,
   });
 
-  final String uid;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -16,30 +17,10 @@ class ExitGroupCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: SettingsListTile(
-          title: 'Exit Organization',
-          icon: Icons.exit_to_app,
-          iconContainerColor: Colors.red,
-          onTap: () {
-            // exit group
-            // showMyAnimatedDialog(
-            //   context: context,
-            //   title: 'Exit Group',
-            //   content: 'Are you sure you want to exit the group?',
-            //   textAction: 'Exit',
-            //   onActionTap: (value, updatedText) async {
-            //     if (value) {
-            //       // exit group
-            //       final groupProvider = context.read<GroupProvider>();
-            //       await groupProvider.exitGroup(uid: uid).whenComplete(() {
-            //         showSnackBar(context, 'You have exited the group');
-            //         // navigate to first screen
-            //         Navigator.popUntil(context, (route) => route.isFirst);
-            //       });
-            //     }
-            //   },
-            // );
-          },
-        ),
+            title: 'Exit Organization',
+            icon: Icons.exit_to_app,
+            iconContainerColor: Colors.red,
+            onTap: onTap),
       ),
     );
   }

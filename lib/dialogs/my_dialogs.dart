@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
+import 'package:gemini_risk_assessor/widgets/people.dart';
 
 class MyDialogs {
   // general dialog
@@ -113,6 +115,36 @@ class MyDialogs {
                     child: Text(textAction),
                   ),
                 ],
+              ),
+            ));
+      },
+    );
+  }
+
+  // people dialog
+  static void showAnimatedPeopleDialog({
+    required BuildContext context,
+    List<Widget>? actions,
+  }) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, animation1, animation2, child) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: FadeTransition(
+              opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+              child: AlertDialog(
+                content: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    width: MediaQuery.of(context).size.width,
+                    child: const People()),
+                actions: actions ?? [],
               ),
             ));
       },

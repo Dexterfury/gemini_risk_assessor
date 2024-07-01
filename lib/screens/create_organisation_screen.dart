@@ -84,28 +84,16 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                         return;
                       }
 
-                      // show bottom sheet
-                      // showModalBottomSheet(
-                      //   context: context,
-                      //   isScrollControlled: true,
-                      //   builder: (context) {
-                      //     return FractionallySizedBox(
-                      //       heightFactor: 0.9,
-                      //       child: PeopleBottomSheet(
-                      //         orgProvider: organisationProvider,
-                      //       ),
-                      //     );
-                      //   },
-                      // );
-                      showDialog(
-                        context: context,
-                        builder: (context) => Dialog(
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.6,
-                            child: const People(),
-                          ),
-                        ),
-                      );
+                      MyDialogs.showAnimatedPeopleDialog(
+                          context: context,
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text(
+                                  'Close',
+                                  style: textStyle18Bold,
+                                ))
+                          ]);
                     },
                   ),
                 ],
