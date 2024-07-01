@@ -120,6 +120,10 @@ class Constants {
 
   static const String organisationImage = 'organisationImage';
 
+  static const String exitSuccessful = 'Exit Successful';
+  static const String exitFailed = 'Exit Failed';
+  static const String deletedSuccessfully = 'Deleted successfully';
+
   // list of ppe icons
   static List<PpeModel> getPPEIcons({
     double radius = 20.0,

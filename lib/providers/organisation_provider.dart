@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -355,6 +356,67 @@ class OrganisationProvider extends ChangeNotifier {
     } catch (e) {
       setLoading(false);
       onError(e.toString());
+    }
+  }
+
+  // exit organisation
+  Future<String> exitOrganisation({
+    required bool isAdmin,
+    required String uid,
+    required String orgId,
+  }) async {
+    try {
+      if (isAdmin) {
+        // get organisation data from firestore
+        DocumentSnapshot doc = await _organisationCollection.doc(orgId).get();
+        OrganisationModel organisationModel =
+            OrganisationModel.fromJson(doc.data() as Map<String, dynamic>);
+        // check if there are other admins left
+        if (organisationModel.adminsUIDs.length > 1) {
+          // remove the admin from admins list
+          await _organisationCollection.doc(orgId).update({
+            Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
+          });
+          // remove the admin from group members list
+          await _organisationCollection.doc(orgId).update({
+            Constants.membersUIDs: FieldValue.arrayRemove([uid]),
+          });
+
+          return Constants.exitSuccessful;
+        } else {
+          // if there are no other admins check if there are other members left
+          if (organisationModel.membersUIDs.length > 1) {
+            await _organisationCollection.doc(orgId).update({
+              Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
+            });
+
+            // remove the admin from group members list
+            await _organisationCollection.doc(orgId).update({
+              Constants.membersUIDs: FieldValue.arrayRemove([uid]),
+            });
+            // pick up a new admin, get one member and make him admin
+            String newAdminUID = organisationModel.membersUIDs[0];
+            await _organisationCollection.doc(orgId).update({
+              Constants.adminsUIDs: FieldValue.arrayUnion([newAdminUID]),
+            });
+            return Constants.exitSuccessful;
+          } else {
+            // If there are no other admins and members left, delete the group from firestore
+            await _organisationCollection.doc(orgId).delete();
+
+            return Constants.deletedSuccessfully;
+          }
+        }
+      } else {
+        await _organisationCollection.doc(orgId).update({
+          Constants.membersUIDs: FieldValue.arrayRemove([uid]),
+        });
+
+        return Constants.exitSuccessful;
+      }
+    } catch (e) {
+      return Constants.exitFailed;
+      log(e.toString());
     }
   }
 }

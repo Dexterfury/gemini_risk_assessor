@@ -16,7 +16,7 @@ class ExitGroupCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: SettingsListTile(
-          title: 'Exit Orga nization',
+          title: 'Exit Organization',
           icon: Icons.exit_to_app,
           iconContainerColor: Colors.red,
           onTap: () {

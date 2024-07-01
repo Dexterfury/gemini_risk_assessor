@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 
 class SettingsListTile extends StatelessWidget {
   const SettingsListTile({
@@ -26,18 +27,9 @@ class SettingsListTile extends StatelessWidget {
         left: 8.0,
         right: 8.0,
       ),
-      leading: Container(
-        decoration: BoxDecoration(
-          color: iconContainerColor,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Icon(
-            icon,
-            color: Colors.white,
-          ),
-        ),
+      leading: IconContainer(
+        icon: icon,
+        containerColor: iconContainerColor,
       ),
       title: Text(title),
       subtitle: subtitle != null

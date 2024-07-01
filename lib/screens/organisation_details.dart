@@ -11,6 +11,7 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
+import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/people.dart';
 import 'package:provider/provider.dart';
@@ -87,6 +88,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 10),
 
               //  add members button if the user is an admin
@@ -122,34 +124,51 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          membersCount,
-          style: const TextStyle(
-            fontSize: 18,
-          ),
+        _buildIconButton(Icons.assignment_add),
+        _buildIconButton(Icons.assignment_late_outlined),
+        _buildIconButton(Icons.handyman),
+        _buildMembersSection(membersCount, context),
+      ],
+    );
+  }
+
+  Widget _buildIconButton(IconData icon) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: () {},
+          icon: Icon(icon),
         ),
         const SizedBox(width: 10),
-        CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: IconButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: const People(),
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.person_add,
-              color: Colors.white,
-            ),
-          ),
-        )
       ],
+    );
+  }
+
+  Widget _buildMembersSection(String membersCount, BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          membersCount,
+          style: const TextStyle(fontSize: 18),
+        ),
+        const SizedBox(width: 5),
+        GestureDetector(
+          onTap: () => _showPeopleDialog(context),
+          child: const IconContainer(icon: Icons.person_add),
+        ),
+      ],
+    );
+  }
+
+  void _showPeopleDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: const People(),
+        ),
+      ),
     );
   }
 
@@ -303,15 +322,22 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
     );
   }
 
-  String getMembersCount(
-    OrganisationModel orgModel,
-  ) {
-    if (orgModel.membersUIDs.isEmpty) {
-      return 'No members';
-    } else if (orgModel.membersUIDs.length == 1) {
-      return '1 member';
+  //  get member count function
+  String getMembersCount(OrganisationModel orgModel) {
+    int count = orgModel.membersUIDs.length;
+
+    if (count == 0) {
+      return '';
+    } else if (count == 1) {
+      return '1';
+    } else if (count < 100) {
+      return count.toString();
+    } else if (count < 1000) {
+      return '$count+';
+    } else if (count < 1000000) {
+      return '${(count / 1000).floor()}k+';
     } else {
-      return '${orgModel.membersUIDs.length} members';
+      return '${(count / 1000000).floor()}M+';
     }
   }
 }
