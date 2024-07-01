@@ -60,11 +60,11 @@ class AssessmentProvider extends ChangeNotifier {
   GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final CollectionReference assessmentCollection =
+  final CollectionReference _assessmentCollection =
       FirebaseFirestore.instance.collection(Constants.assessmentCollection);
-  final CollectionReference organisationCollection =
+  final CollectionReference _organisationCollection =
       FirebaseFirestore.instance.collection(Constants.organisationCollection);
-  final CollectionReference dstiCollection =
+  final CollectionReference _dstiCollection =
       FirebaseFirestore.instance.collection(Constants.dstiCollections);
 
   // set isPersonal
@@ -172,13 +172,17 @@ class AssessmentProvider extends ChangeNotifier {
     if (_isPersonal) {
       if (_pdfHeading == Constants.riskAssessment) {
         // save to user's database
-        await assessmentCollection
+        await _assessmentCollection
+            .doc(id)
+            .collection(Constants.assessmentCollection)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
         // save to user's database end.
       } else {
         // save to user's database
-        await dstiCollection
+        await _dstiCollection
+            .doc(id)
+            .collection(Constants.dstiCollections)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
         // save to user's database end.
@@ -189,14 +193,14 @@ class AssessmentProvider extends ChangeNotifier {
 
       if (_pdfHeading == Constants.riskAssessment) {
         // save to organisation's database
-        await organisationCollection
+        await _organisationCollection
             .doc(_organisationID)
             .collection(Constants.assessmentCollection)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
       } else {
         // save to organisation's database
-        await organisationCollection
+        await _organisationCollection
             .doc(_organisationID)
             .collection(Constants.dstiCollections)
             .doc(assessmentModel.id)
@@ -236,25 +240,37 @@ class AssessmentProvider extends ChangeNotifier {
   // stream dsti's from firestore
   Stream<QuerySnapshot> dstiStream({
     required String userId,
+    required String orgID,
   }) {
-    return dstiCollection
-        .where(
-          Constants.createdBy,
-          isEqualTo: userId,
-        )
-        .snapshots();
+    if (orgID.isNotEmpty) {
+      return _organisationCollection
+          .doc(orgID)
+          .collection(Constants.dstiCollections)
+          .snapshots();
+    } else {
+      return _dstiCollection
+          .doc(userId)
+          .collection(Constants.dstiCollections)
+          .snapshots();
+    }
   }
 
   // stream risk assessments from firestore
   Stream<QuerySnapshot> ristAssessmentsStream({
     required String userId,
+    required String orgID,
   }) {
-    return assessmentCollection
-        .where(
-          Constants.createdBy,
-          isEqualTo: userId,
-        )
-        .snapshots();
+    if (orgID.isNotEmpty) {
+      return _assessmentCollection
+          .doc(orgID)
+          .collection(Constants.assessmentCollection)
+          .snapshots();
+    } else {
+      return _assessmentCollection
+          .doc(userId)
+          .collection(Constants.assessmentCollection)
+          .snapshots();
+    }
   }
 
   // set has signed

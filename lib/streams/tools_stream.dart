@@ -10,16 +10,19 @@ class ToolsStream extends StatelessWidget {
     super.key,
     required this.toolProvider,
     required this.uid,
+    required this.orgID,
   });
 
   final ToolsProvider toolProvider;
   final String uid;
+  final String orgID;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: toolProvider.toolsStream(
         userId: uid,
+        orgID: orgID,
       ),
       builder: (
         BuildContext context,

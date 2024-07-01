@@ -27,6 +27,10 @@ class UserWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     final name = uid == userData.uid ? 'You' : userData.name;
+    bool value = getValue(
+      context,
+      viewType,
+    );
 
     return ListTile(
       minLeadingWidth: 0.0,
@@ -46,21 +50,14 @@ class UserWidget extends StatelessWidget {
       ),
       trailing: showCheckMark
           ? Checkbox(
-              value: getValue(
-                context,
-                viewType,
-              ),
+              value: value,
               onChanged: (value) {
-                // check the check box
-                if (value == true) {
-                  context
-                      .read<OrganisationProvider>()
-                      .addToWaitingApproval(groupMember: userData);
-                } else {
-                  context
-                      .read<OrganisationProvider>()
-                      .removeWaitingApproval(orgMember: userData);
-                }
+                _handleCheckBox(
+                  context,
+                  userData,
+                  value,
+                  viewType,
+                );
               },
             )
           : isAdminView
@@ -77,24 +74,50 @@ class UserWidget extends StatelessWidget {
     final orgProvider = context.watch<OrganisationProvider>();
     switch (viewType) {
       case UserViewType.admin:
-        log('HERE 1');
         return orgProvider.orgAdminsList.contains(userData);
       case UserViewType.creator:
-        log('HERE 2');
         return orgProvider.awaitApprovalsList.contains(
           userData,
         );
       case UserViewType.tempPlus:
-        log('HERE 3');
         return orgProvider.awaitApprovalsList.contains(
               userData,
             ) ||
-            orgProvider.orgMembersList.contains(
-              userData,
+            orgProvider.tempOrgMemberUIDs.contains(
+              userData.uid,
             );
       default:
-        log('HERE 4');
         return orgProvider.orgMembersList.contains(userData);
     }
+  }
+}
+
+void _handleCheckBox(
+  BuildContext context,
+  UserModel userData,
+  bool? value,
+  UserViewType viewType,
+) {
+  final orgProvider = context.read<OrganisationProvider>();
+  switch (viewType) {
+    case UserViewType.admin:
+      break;
+    case UserViewType.creator:
+      // check the check box
+      if (value == true) {
+        orgProvider.addToWaitingApproval(groupMember: userData);
+      } else {
+        orgProvider.removeWaitingApproval(orgMember: userData);
+      }
+      break;
+    case UserViewType.tempPlus:
+      if (value == true) {
+        orgProvider.addMemberToTempOrg(memberUID: userData.uid);
+      } else {
+        orgProvider.removeMemberFromTempOrg(memberUID: userData.uid);
+      }
+      break;
+    default:
+      log('HERE 4');
   }
 }

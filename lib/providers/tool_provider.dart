@@ -38,9 +38,27 @@ class ToolsProvider extends ChangeNotifier {
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
 
   // save tool to firestore
-  Future<void> saveToolToFirestore() async {
+  Future<void> saveToolToFirestore({
+    required String orgID,
+  }) async {
     if (_toolModel != null) {
-      await toolsCollection.add(_toolModel!.toJson());
+      if (orgID.isNotEmpty) {
+        await toolsCollection
+            .doc(orgID)
+            .collection(Constants.toolsCollection)
+            .doc(_toolModel!.id)
+            .set(
+              _toolModel!.toJson(),
+            );
+      } else {
+        await toolsCollection
+            .doc(_uid)
+            .collection(Constants.toolsCollection)
+            .doc(toolModel!.id)
+            .set(
+              _toolModel!.toJson(),
+            );
+      }
     }
   }
 
@@ -117,13 +135,19 @@ class ToolsProvider extends ChangeNotifier {
   // stream my tools from firestore
   Stream<QuerySnapshot> toolsStream({
     required String userId,
+    required String orgID,
   }) {
-    return toolsCollection
-        .where(
-          Constants.createdBy,
-          isEqualTo: userId,
-        )
-        .snapshots();
+    if (orgID.isNotEmpty) {
+      return toolsCollection
+          .doc(orgID)
+          .collection(Constants.toolsCollection)
+          .snapshots();
+    } else {
+      return toolsCollection
+          .doc(userId)
+          .collection(Constants.toolsCollection)
+          .snapshots();
+    }
   }
 
   // set max images
@@ -278,6 +302,7 @@ class ToolsProvider extends ChangeNotifier {
 
   Future<void> submitPrompt({
     required String creatorID,
+    required String organisationID,
     required String description,
   }) async {
     _isLoading = true;
@@ -311,6 +336,7 @@ class ToolsProvider extends ChangeNotifier {
           content,
           toolId,
           creatorID,
+          organisationID,
           images,
           DateTime.now(),
         );

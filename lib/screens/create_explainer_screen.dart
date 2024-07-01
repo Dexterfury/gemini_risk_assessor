@@ -11,9 +11,14 @@ import 'package:gemini_risk_assessor/widgets/page_indicator.dart';
 import 'package:provider/provider.dart';
 
 class CreateExplainerScreen extends StatefulWidget {
-  const CreateExplainerScreen({super.key, this.tool});
+  const CreateExplainerScreen({
+    super.key,
+    this.tool,
+    this.orgID = '',
+  });
 
   final ToolModel? tool;
+  final String orgID;
 
   @override
   State<CreateExplainerScreen> createState() => _CreateExplainerScreenState();
@@ -121,6 +126,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                         (BuildContext context, animation, secondaryAnimation) =>
                             ExplainerDetailsScreen(
                       animation: animation,
+                      orgID: widget.orgID,
                     ),
                   );
                   bool saved =

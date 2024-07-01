@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +40,7 @@ class OrganisationProvider extends ChangeNotifier {
   List<UserModel> get orgAdminsList => _orgAdminsList;
   List<UserModel> get awaitApprovalsList => _awaitApprovalList;
   OrganisationModel get organisationModel => _organisationModel;
+  List<String> get tempOrgMemberUIDs => _tempOrgMemberUIDs;
 
   final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
@@ -83,6 +83,8 @@ class OrganisationProvider extends ChangeNotifier {
     required OrganisationModel orgModel,
   }) async {
     _organisationModel = orgModel;
+    // set temp members
+    _tempOrgMemberUIDs = orgModel.membersUIDs;
     notifyListeners();
   }
 
@@ -126,13 +128,13 @@ class OrganisationProvider extends ChangeNotifier {
   }
 
   // check if there was a change in group members - if there was a member added or removed
-  Future<void> updateOrgMembersInFirestore({
-    required OrganisationModel orgModel,
-  }) async {
-    _isSaved = true;
-    notifyListeners();
-    await updateOrganisationDataInFireStore();
-  }
+  // Future<void> updateOrgMembersInFirestore({
+  //   required OrganisationModel orgModel,
+  // }) async {
+  //   _isSaved = true;
+  //   notifyListeners();
+  //   await updateOrganisationDataInFireStore();
+  // }
 
   // update the organisation image
   Future<void> setImageUrl(String imageUrl) async {
@@ -161,13 +163,19 @@ class OrganisationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // add a organisation member
-  void addMemberToOrganisation({required UserModel groupMember}) {
-    _orgMembersList.add(groupMember);
-    _organisationModel.membersUIDs.add(groupMember.uid);
-    // add data to temp lists
-    _tempOrgMembersList.add(groupMember);
-    _tempOrgMemberUIDs.add(groupMember.uid);
+  // add member to temp list for saving changes later
+  void addMemberToTempOrg({
+    required String memberUID,
+  }) {
+    _tempOrgMemberUIDs.add(memberUID);
+    notifyListeners();
+  }
+
+  // remove member from temp list for saving changes later
+  void removeMemberFromTempOrg({
+    required String memberUID,
+  }) {
+    _tempOrgMemberUIDs.removeWhere((element) => element == memberUID);
     notifyListeners();
   }
 
@@ -196,54 +204,62 @@ class OrganisationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // remove member from group
-  Future<void> removeOrgMember({required UserModel orgMember}) async {
-    _orgMembersList.remove(orgMember);
-    // also remove this member from admins list if he is an admin
-    _orgAdminsList.remove(orgMember);
-    _organisationModel.membersUIDs.remove(orgMember.uid);
+  // // remove member from group
+  // Future<void> removeOrgMember({required UserModel orgMember}) async {
+  //   _orgMembersList.remove(orgMember);
+  //   // also remove this member from admins list if he is an admin
+  //   _orgAdminsList.remove(orgMember);
+  //   _organisationModel.membersUIDs.remove(orgMember.uid);
 
-    // remove from temp lists
-    _tempOrgMembersList.remove(orgMember);
-    _tempOrgAdminUIDs.remove(orgMember.uid);
+  //   // remove from temp lists
+  //   _tempOrgMembersList.remove(orgMember);
+  //   _tempOrgAdminUIDs.remove(orgMember.uid);
 
-    // add  this member to the list of removed members
-    _tempRemovedMembersList.add(orgMember);
-    _tempRemovedMemberUIDs.add(orgMember.uid);
+  //   // add  this member to the list of removed members
+  //   _tempRemovedMembersList.add(orgMember);
+  //   _tempRemovedMemberUIDs.add(orgMember.uid);
 
-    notifyListeners();
+  //   notifyListeners();
 
-    // return if groupID is empty - meaning we are creating a new group
-    if (_organisationModel.organisationID.isEmpty) return;
-    updateOrganisationDataInFireStore();
-  }
+  //   // return if groupID is empty - meaning we are creating a new group
+  //   if (_organisationModel.organisationID.isEmpty) return;
+  //   updateOrganisationDataInFireStore();
+  // }
 
-  // remove admin from group
-  void removeOrgAdmin({required UserModel orgAdmin}) {
-    _orgAdminsList.remove(orgAdmin);
-    _organisationModel.adminsUIDs.remove(orgAdmin.uid);
-    // remo from temp lists
-    _tempOrgAdminUIDs.remove(orgAdmin.uid);
-    _organisationModel.adminsUIDs.remove(orgAdmin.uid);
+  // // remove admin from group
+  // void removeOrgAdmin({required UserModel orgAdmin}) {
+  //   _orgAdminsList.remove(orgAdmin);
+  //   _organisationModel.adminsUIDs.remove(orgAdmin.uid);
+  //   // remo from temp lists
+  //   _tempOrgAdminUIDs.remove(orgAdmin.uid);
+  //   _organisationModel.adminsUIDs.remove(orgAdmin.uid);
 
-    // add the removed admins to temp removed lists
-    _tempRemovedAdminsList.add(orgAdmin);
-    _tempRemovedAdminsUIDs.add(orgAdmin.uid);
-    notifyListeners();
+  //   // add the removed admins to temp removed lists
+  //   _tempRemovedAdminsList.add(orgAdmin);
+  //   _tempRemovedAdminsUIDs.add(orgAdmin.uid);
+  //   notifyListeners();
 
-    // return if groupID is empty - meaning we are creating a new group
-    if (_organisationModel.organisationID.isEmpty) return;
-    updateOrganisationDataInFireStore();
-  }
+  //   // return if groupID is empty - meaning we are creating a new group
+  //   if (_organisationModel.organisationID.isEmpty) return;
+  //   updateOrganisationDataInFireStore();
+  // }
 
   // update group settings in firestore
-  Future<void> updateOrganisationDataInFireStore() async {
+  Future<bool> updateOrganisationDataInFireStore() async {
+    if (_tempOrgMembersList.isEmpty) {
+      return false;
+    }
+    // add temp members to awaiting approval list
+    _organisationModel.awaitingApprovalUIDs
+        .addAll(_tempOrgMembersList.map((e) => e.uid));
     try {
       await _organisationCollection
           .doc(_organisationModel.organisationID)
           .update(organisationModel.toJson());
+      return true;
     } catch (e) {
       print(e.toString());
+      return false;
     }
   }
 

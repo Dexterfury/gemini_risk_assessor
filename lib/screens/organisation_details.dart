@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -6,6 +8,9 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
+import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
+import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/streams/members_card.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
@@ -16,6 +21,7 @@ import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
 import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/people.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:provider/provider.dart';
 
 class OrganisationDetails extends StatefulWidget {
@@ -131,7 +137,11 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
               const SizedBox(height: 10),
 
               //  add members button if the user is an admin
-              buildAddMembers(membersCount, context),
+              buildAddMembers(
+                membersCount,
+                context,
+                orgID,
+              ),
 
               const SizedBox(height: 10),
 
@@ -231,27 +241,53 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
     );
   }
 
-  Row buildAddMembers(String membersCount, BuildContext context) {
+  Row buildAddMembers(
+    String membersCount,
+    BuildContext context,
+    String orgID,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildIconButton(Icons.assignment_add),
-        _buildIconButton(Icons.assignment_late_outlined),
-        _buildIconButton(Icons.handyman),
+        _buildIconButton(Icons.assignment_add, orgID),
+        _buildIconButton(Icons.assignment_late_outlined, orgID),
+        _buildIconButton(Icons.handyman, orgID),
         _buildMembersSection(membersCount, context),
       ],
     );
   }
 
-  Widget _buildIconButton(IconData icon) {
-    return Row(
-      children: [
-        IconButton(
-          onPressed: () {},
+  Widget _buildIconButton(
+    IconData icon,
+    String orgID,
+  ) {
+    return OpenContainer(
+      closedBuilder: (context, action) {
+        return IconButton(
+          onPressed: action,
           icon: Icon(icon),
-        ),
-        const SizedBox(width: 10),
-      ],
+        );
+      },
+      openBuilder: (context, action) {
+        switch (icon) {
+          case Icons.assignment_add:
+            return DSTIScreen(
+              orgID: orgID,
+            );
+          case Icons.assignment_late_outlined:
+            return RistAssessmentsScreen(orgID: orgID);
+          case Icons.handyman:
+            return ToolsScreen(
+              orgID: orgID,
+            );
+          default:
+            return const SizedBox();
+        }
+      },
+      transitionType: ContainerTransitionType.fadeThrough,
+      transitionDuration: const Duration(milliseconds: 500),
+      closedElevation: 0,
+      openElevation: 4,
     );
   }
 
@@ -264,27 +300,57 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
         ),
         const SizedBox(width: 5),
         GestureDetector(
-          onTap: () => _showPeopleDialog(context),
+          onTap: () {
+            // show people dialog
+            _showPeopleDialog(
+                context: context,
+                onActionTap: (value) async {
+                  if (value) {
+                    bool isSaved = await context
+                        .read<OrganisationProvider>()
+                        .updateOrganisationDataInFireStore();
+
+                    if (isSaved) {
+                      Future.delayed(const Duration(milliseconds: 200))
+                          .whenComplete(() {
+                        showSnackBar(
+                          context: context,
+                          message: 'Requests sent to added members',
+                        );
+                      });
+                    }
+                  }
+                });
+          },
           child: const IconContainer(icon: Icons.person_add),
         ),
       ],
     );
   }
 
-  void _showPeopleDialog(BuildContext context) {
+  void _showPeopleDialog({
+    required BuildContext context,
+    required Function(bool) onActionTap,
+  }) {
     MyDialogs.showAnimatedPeopleDialog(
         context: context,
         userViewType: UserViewType.tempPlus,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+              onActionTap(false);
+            },
             child: const Text(
               'Cancel',
               style: textStyle18Bold,
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+              onActionTap(true);
+            },
             child: const Text(
               'Save',
               style: textStyle18Bold,

@@ -51,20 +51,16 @@ class SearchStream extends StatelessWidget {
               itemBuilder: (context, index) {
                 final userData = UserModel.fromJson(
                     results.elementAt(index).data() as Map<String, dynamic>);
-                return UserWidget(
-                  userData: userData,
-                  showCheckMark: true,
-                  viewType: userViewType,
-                );
-                // if (userData.uid == uid) {
-                //   return Container();
-                // } else {
-                //   return UserWidget(
-                //     userData: userData,
-                //     showCheckMark: true,
-                //     viewType: UserViewType.creator,
-                //   );
-                // }
+
+                if (userData.uid == uid) {
+                  return Container();
+                } else {
+                  return UserWidget(
+                    userData: userData,
+                    showCheckMark: true,
+                    viewType: UserViewType.creator,
+                  );
+                }
               },
             );
           },
