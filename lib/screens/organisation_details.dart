@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
@@ -36,8 +37,18 @@ class OrganisationDetails extends StatefulWidget {
   State<OrganisationDetails> createState() => _OrganisationDetailsState();
 }
 
-class _OrganisationDetailsState extends State<OrganisationDetails> {
+class _OrganisationDetailsState extends State<OrganisationDetails>
+    with SingleTickerProviderStateMixin {
   File? _finalFileImage;
+
+  late Animation<double> _animation;
+  late AnimationController _animationController;
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void showLoadingDialog({
     required String title,
@@ -64,7 +75,12 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
 
   @override
   void initState() {
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
+    _animation =
+        CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
     setOrgModel();
+
     super.initState();
   }
 
@@ -154,6 +170,10 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: MyFabButton(
+        animationController: _animationController,
+        animation: _animation,
       ),
     );
   }
