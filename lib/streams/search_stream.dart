@@ -12,10 +12,12 @@ class SearchStream extends StatelessWidget {
     super.key,
     required this.uid,
     this.organisationID = '',
+    required this.userViewType,
   });
 
   final String uid;
   final String organisationID;
+  final UserViewType userViewType;
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +51,20 @@ class SearchStream extends StatelessWidget {
               itemBuilder: (context, index) {
                 final userData = UserModel.fromJson(
                     results.elementAt(index).data() as Map<String, dynamic>);
-                if (userData.uid == uid) {
-                  return Container();
-                } else {
-                  return UserWidget(
-                    userData: userData,
-                    showCheckMark: true,
-                    viewType: UserViewType.creator,
-                  );
-                }
+                return UserWidget(
+                  userData: userData,
+                  showCheckMark: true,
+                  viewType: userViewType,
+                );
+                // if (userData.uid == uid) {
+                //   return Container();
+                // } else {
+                //   return UserWidget(
+                //     userData: userData,
+                //     showCheckMark: true,
+                //     viewType: UserViewType.creator,
+                //   );
+                // }
               },
             );
           },

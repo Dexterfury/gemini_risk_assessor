@@ -34,8 +34,4 @@ enum GenerationType {
 }
 
 // user Type enum
-enum UserViewType {
-  admin,
-  user,
-  creator,
-}
+enum UserViewType { admin, user, creator, tempPlus }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
@@ -271,22 +272,25 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
   }
 
   void _showPeopleDialog(BuildContext context) {
-    MyDialogs.showAnimatedPeopleDialog(context: context, actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text(
-          'Cancel',
-          style: textStyle18Bold,
-        ),
-      ),
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text(
-          'Save',
-          style: textStyle18Bold,
-        ),
-      ),
-    ]);
+    MyDialogs.showAnimatedPeopleDialog(
+        context: context,
+        userViewType: UserViewType.tempPlus,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancel',
+              style: textStyle18Bold,
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Save',
+              style: textStyle18Bold,
+            ),
+          ),
+        ]);
   }
 
   Column buildDescription(bool isAdmin) {
@@ -322,6 +326,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
                                 oldDesc: widget.orgModel.aboutOrganisation,
                               );
                               if (desc == 'Invalid description.') return;
+                              await setNewDescriptionInProvider(desc);
                               Future.delayed(const Duration(milliseconds: 200))
                                   .whenComplete(() {
                                 showSnackBar(
@@ -419,6 +424,8 @@ class _OrganisationDetailsState extends State<OrganisationDetails> {
                               oldName: widget.orgModel.organisationName,
                             );
                             if (name == 'Invalid name.') return;
+                            // set new name
+                            await setNewNameInProvider(name);
                             Future.delayed(const Duration(milliseconds: 200))
                                 .whenComplete(() {
                               showSnackBar(

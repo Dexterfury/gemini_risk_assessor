@@ -126,33 +126,31 @@ class OrganisationProvider extends ChangeNotifier {
   }
 
   // check if there was a change in group members - if there was a member added or removed
-  Future<void> updateOrgMembersInFirestore({required OrganisationModel orgModel,}) async {
+  Future<void> updateOrgMembersInFirestore({
+    required OrganisationModel orgModel,
+  }) async {
     _isSaved = true;
     notifyListeners();
     await updateOrganisationDataInFireStore();
   }
-     
+
   // update the organisation image
-   Future<void> setImageUrl(String imageUrl) async {
+  Future<void> setImageUrl(String imageUrl) async {
     _organisationModel.imageUrl = imageUrl;
     notifyListeners();
-   }
+  }
 
-   // up date the organisation name
-    Future<void> setName(String name) async {
+  // up date the organisation name
+  Future<void> setName(String name) async {
     _organisationModel.organisationName = name;
     notifyListeners();
-    }
+  }
 
-    // up date the organisation description
-    Future<void> setDescription(String description) async {
+  // up date the organisation description
+  Future<void> setDescription(String description) async {
     _organisationModel.aboutOrganisation = description;
     notifyListeners();
-    }
-
-
-
-  
+  }
 
   // add a organisation member
   void addToWaitingApproval({required UserModel groupMember}) {
@@ -196,7 +194,6 @@ class OrganisationProvider extends ChangeNotifier {
     _tempRemovedWaitingApprovalMemberUIDs.add(orgMember.uid);
 
     notifyListeners();
-
   }
 
   // remove member from group
@@ -436,7 +433,6 @@ class OrganisationProvider extends ChangeNotifier {
       }
     } catch (e) {
       return Constants.exitFailed;
+    }
   }
-
- 
 }

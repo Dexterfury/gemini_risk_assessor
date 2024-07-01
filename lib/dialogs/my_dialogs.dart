@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/widgets/people.dart';
 
@@ -124,6 +125,7 @@ class MyDialogs {
   // people dialog
   static void showAnimatedPeopleDialog({
     required BuildContext context,
+    required UserViewType userViewType,
     List<Widget>? actions,
   }) {
     showGeneralDialog(
@@ -141,9 +143,12 @@ class MyDialogs {
               opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
               child: AlertDialog(
                 content: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    width: MediaQuery.of(context).size.width,
-                    child: const People()),
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  width: MediaQuery.of(context).size.width,
+                  child: People(
+                    userViewType: userViewType,
+                  ),
+                ),
                 actions: actions ?? [],
               ),
             ));

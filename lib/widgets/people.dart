@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/streams/search_stream.dart';
@@ -9,7 +10,10 @@ import 'package:provider/provider.dart';
 class People extends StatelessWidget {
   const People({
     super.key,
+    required this.userViewType,
   });
+
+  final UserViewType userViewType;
 
   @override
   Widget build(BuildContext context) {
@@ -33,32 +37,6 @@ class People extends StatelessWidget {
             searchController.clear();
           },
         ),
-        // Row(
-        //   children: [
-        //     Expanded(
-        //       child: CupertinoSearchTextField(
-        //         controller: searchController,
-        //         onChanged: (value) {
-        //           // search for users
-        //           orgProvider.setSearchQuery(value);
-        //         },
-        //         onSuffixTap: () {
-        //           // clear search query
-        //           orgProvider.setSearchQuery('');
-        //           // close keyboard
-        //           FocusScope.of(context).unfocus();
-        //           // remove text from search field
-        //           searchController.clear();
-        //         },
-        //       ),
-        //     ),
-        //     const SizedBox(width: 10),
-        //     MainAppButton(
-        //       label: 'Cancel',
-        //       onTap: () => Navigator.pop(context),
-        //     ),
-        //   ],
-        // ),
         const SizedBox(height: 10),
         Expanded(
           child: Consumer<OrganisationProvider>(
@@ -71,7 +49,10 @@ class People extends StatelessWidget {
                   ),
                 );
               } else {
-                return SearchStream(uid: uid);
+                return SearchStream(
+                  uid: uid,
+                  userViewType: userViewType,
+                );
               }
             },
           ),

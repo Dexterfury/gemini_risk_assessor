@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
@@ -72,15 +74,26 @@ class UserWidget extends StatelessWidget {
     BuildContext context,
     UserViewType viewType,
   ) {
-    final orgProvider = context.read<OrganisationProvider>();
+    final orgProvider = context.watch<OrganisationProvider>();
     switch (viewType) {
       case UserViewType.admin:
+        log('HERE 1');
         return orgProvider.orgAdminsList.contains(userData);
       case UserViewType.creator:
+        log('HERE 2');
         return orgProvider.awaitApprovalsList.contains(
           userData,
         );
+      case UserViewType.tempPlus:
+        log('HERE 3');
+        return orgProvider.awaitApprovalsList.contains(
+              userData,
+            ) ||
+            orgProvider.orgMembersList.contains(
+              userData,
+            );
       default:
+        log('HERE 4');
         return orgProvider.orgMembersList.contains(userData);
     }
   }

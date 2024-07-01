@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
@@ -85,15 +86,17 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                       }
 
                       MyDialogs.showAnimatedPeopleDialog(
-                          context: context,
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text(
-                                  'Close',
-                                  style: textStyle18Bold,
-                                ))
-                          ]);
+                        context: context,
+                        userViewType: UserViewType.creator,
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text(
+                                'Close',
+                                style: textStyle18Bold,
+                              ))
+                        ],
+                      );
                     },
                   ),
                 ],
