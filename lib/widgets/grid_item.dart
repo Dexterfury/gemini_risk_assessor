@@ -66,7 +66,7 @@ class GridItem extends StatelessWidget {
                   SizedBox(
                     height: textHeight * 0.9,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(4.0),
                       child: Text(
                         title,
                         style: textStyle16w600,
