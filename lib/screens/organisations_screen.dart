@@ -14,11 +14,8 @@ class OrganisationsScreen extends StatelessWidget {
     bool isAnonymous = context.watch<AuthProvider>().isUserAnonymous();
     return Scaffold(
         appBar: MyAppBar(
-          title: 'Organisations',
-          leading: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
+          title: '',
+          onSearch: _handleSearch, // Pass the search function
           actions: DisplayUserImage(
             radius: 20,
             isViewOnly: true,
@@ -28,5 +25,10 @@ class OrganisationsScreen extends StatelessWidget {
         ),
         body:
             isAnonymous ? const AnonymouseView() : const OrganisationsStream());
+  }
+
+  void _handleSearch(String query) {
+    print('Searching for "$query" in tab: ');
+    // Implement your search logic here
   }
 }

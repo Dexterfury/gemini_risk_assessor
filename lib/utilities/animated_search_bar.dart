@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/providers/tab_provider.dart';
+import 'package:provider/provider.dart';
 
 class AnimatedSearchBar extends StatefulWidget {
   const AnimatedSearchBar({
@@ -78,19 +80,28 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.search),
+                icon: Icon(!_isExpanded ? Icons.search : Icons.clear_outlined),
                 onPressed: _toggleSearch,
               ),
               Expanded(
                 child: _isExpanded
-                    ? TextField(
-                        controller: _textController,
-                        focusNode: _focusNode,
-                        decoration: const InputDecoration(
-                          hintText: 'Search...',
-                          border: InputBorder.none,
-                        ),
-                        onSubmitted: widget.onSearch,
+                    ? Consumer<TabProvider>(
+                        builder: (context, tabProvider, child) {
+                          final hintText =
+                              _hintText(tabProvider.currentTabIndex);
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: TextField(
+                              controller: _textController,
+                              focusNode: _focusNode,
+                              decoration: InputDecoration(
+                                hintText: hintText,
+                                border: InputBorder.none,
+                              ),
+                              onSubmitted: widget.onSearch,
+                            ),
+                          );
+                        },
                       )
                     : const SizedBox(),
               ),
@@ -99,5 +110,18 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
         );
       },
     );
+  }
+}
+
+_hintText(int currentTabIndex) {
+  switch (currentTabIndex) {
+    case 0:
+      return 'Daily Safety Task Instructions...';
+    case 1:
+      return 'Risk Assessments...';
+    case 2:
+      return 'Tools...';
+    default:
+      return ''; // Default hint text if no match is found
   }
 }
