@@ -9,6 +9,7 @@ import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
@@ -33,6 +34,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
       ChangeNotifierProvider(create: (context) => ToolsProvider()),
       ChangeNotifierProvider(create: (context) => OrganisationProvider()),
+      ChangeNotifierProvider(create: (context) => TabProvider()),
     ], child: const MyApp()),
   );
 }
