@@ -174,6 +174,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
       floatingActionButton: MyFabButton(
         animationController: _animationController,
         animation: _animation,
+        organisationID: widget.orgModel.organisationID,
       ),
     );
   }

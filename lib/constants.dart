@@ -28,6 +28,7 @@ class Constants {
   // create assessment
   static const String createAssessment = 'New Assessment';
   static const String createDsti = 'New DSTI';
+  static const String toolExplainer = 'Tool Explainer';
 
   static getFolderName(String heading) {
     return heading == Constants.riskAssessment ? 'RiskAssessments' : 'Dstis';
@@ -91,6 +92,8 @@ class Constants {
   static const String createdBy = 'createdBy';
   static const String organisationID = 'organisationID';
   static const String pdfUrl = 'pdfUrl';
+
+  static const String orgArg = 'orgArg';
 
   // organisation model constants
   static const String creatorUID = 'creatorUID';

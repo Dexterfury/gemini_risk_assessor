@@ -26,7 +26,6 @@ class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
   bool _isLoading = false;
-  bool _isPersonal = true;
   int _maxImages = 10;
   int _numberOfPeople = 1;
   String _description = '';
@@ -45,7 +44,6 @@ class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> get ppeModelList => _ppeModelList;
   List<XFile>? get imagesFileList => _imagesFileList;
   bool get isLoading => _isLoading;
-  bool get isPersonal => _isPersonal;
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
   String get pdfHeading => _pdfHeading;
@@ -67,29 +65,15 @@ class AssessmentProvider extends ChangeNotifier {
   final CollectionReference _dstiCollection =
       FirebaseFirestore.instance.collection(Constants.dstiCollections);
 
-  // set isPersonal
-  void setIsPersonal({
-    required bool isPersonal,
-  }) {
-    _isPersonal = isPersonal;
-    notifyListeners();
-  }
-
-  // set organisationID
-  void setOrganisationID({
-    required String companyID,
-  }) async {
-    _organisationID = companyID;
-    notifyListeners();
-  }
-
-  Future<void> setDescription(
+  Future<void> setDocData(
     String desc,
     String creatorID,
+    String orgID,
     String docTitle,
   ) async {
     _description = desc;
     _uid = creatorID;
+    _organisationID = orgID;
     _pdfHeading = getDoctTitle(docTitle);
     notifyListeners();
   }
@@ -143,7 +127,7 @@ class AssessmentProvider extends ChangeNotifier {
     File file,
     String pdfHeading,
   ) async {
-    final id = _isPersonal ? _uid : _organisationID;
+    final id = _organisationID.isNotEmpty ? _organisationID : _uid;
     // get folder directory
     final folderName = Constants.getFolderName(pdfHeading);
 
@@ -169,7 +153,7 @@ class AssessmentProvider extends ChangeNotifier {
     // set pdf and images
     _assessmentModel.pdfUrl = fileUrl;
 
-    if (_isPersonal) {
+    if (_organisationID.isEmpty) {
       if (_pdfHeading == Constants.riskAssessment) {
         // save to user's database
         await _assessmentCollection
@@ -483,6 +467,7 @@ class AssessmentProvider extends ChangeNotifier {
 
   Future<void> submitPrompt({
     required String creatorID,
+    required String orgID,
     required String description,
     required String docTitle,
   }) async {
@@ -492,9 +477,10 @@ class AssessmentProvider extends ChangeNotifier {
     var model = await GeminiService.getModel(images: _maxImages);
 
     // set description to use in prompt
-    await setDescription(
+    await setDocData(
       description,
       creatorID,
+      orgID,
       docTitle,
     );
 
@@ -520,7 +506,7 @@ class AssessmentProvider extends ChangeNotifier {
           content,
           assessmentId,
           creatorID,
-          organisationID,
+          _organisationID,
           _weather.name,
           _assessmentModel.ppe,
           images,
@@ -584,12 +570,14 @@ equipments, hazards and risks should be of type List<String> with a max length o
 
   Future<void> submitTestAssessment({
     required String creatorID,
+    required String orgID,
     required String docTitle,
   }) async {
     _isLoading = true;
-    await setDescription(
+    await setDocData(
       description,
       creatorID,
+      orgID,
       docTitle,
     );
     final List<String> images = [];

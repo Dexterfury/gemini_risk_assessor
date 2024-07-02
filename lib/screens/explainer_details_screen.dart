@@ -13,11 +13,9 @@ class ExplainerDetailsScreen extends StatelessWidget {
   ExplainerDetailsScreen({
     super.key,
     required this.animation,
-    required this.orgID,
   }) : _scrollController = ScrollController();
 
   final Animation<double> animation;
-  final String orgID;
   final ScrollController _scrollController;
 
   @override
@@ -84,11 +82,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                             child: CircularProgressIndicator()),
                       );
                       // save tool to firestore
-                      await toolProvider
-                          .saveToolToFirestore(
-                        orgID: orgID,
-                      )
-                          .whenComplete(() {
+                      await toolProvider.saveToolToFirestore().whenComplete(() {
                         // pop the loading dialog
                         Navigator.pop(context);
 

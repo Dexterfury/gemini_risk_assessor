@@ -26,23 +26,23 @@ class AssessmentDetailsScreen extends StatelessWidget {
     // assessment provider
     final assessmentProvider = context.watch<AssessmentProvider>();
     // get time
-    final time = assessmentProvider.assessmentModel!.createdAt;
+    final time = assessmentProvider.assessmentModel.createdAt;
     // get title
-    final title = assessmentProvider.assessmentModel!.title;
+    final title = assessmentProvider.assessmentModel.title;
     // weather
-    final weather = assessmentProvider.assessmentModel!.weather;
+    final weather = assessmentProvider.assessmentModel.weather;
     // task to archieve
-    final task = assessmentProvider.assessmentModel!.taskToAchieve;
+    final task = assessmentProvider.assessmentModel.taskToAchieve;
     // equipments
-    final equipments = assessmentProvider.assessmentModel!.equipments;
+    final equipments = assessmentProvider.assessmentModel.equipments;
     // hazards
-    final hazards = assessmentProvider.assessmentModel!.hazards;
+    final hazards = assessmentProvider.assessmentModel.hazards;
     // risks
-    final risks = assessmentProvider.assessmentModel!.risks;
+    final risks = assessmentProvider.assessmentModel.risks;
     // control
-    final control = assessmentProvider.assessmentModel!.control;
+    final control = assessmentProvider.assessmentModel.control;
     // summary
-    final summary = assessmentProvider.assessmentModel!.summary;
+    final summary = assessmentProvider.assessmentModel.summary;
     // createdBy
     final createdBy = context.read<AuthProvider>().userModel!.name;
 

@@ -20,6 +20,7 @@ class ToolsProvider extends ChangeNotifier {
   String _description = '';
   File? _pdfToolFile;
   String _uid = '';
+  String _organisationID = '';
   List<XFile>? _imagesFileList = [];
   ToolModel? _toolModel;
   List<ToolModel> _toolsList = [];
@@ -30,6 +31,7 @@ class ToolsProvider extends ChangeNotifier {
   String get description => _description;
   File? get pdfToolFile => _pdfToolFile;
   String get uid => _uid;
+  String get organisationID => _organisationID;
   List<XFile>? get imagesFileList => _imagesFileList;
   ToolModel? get toolModel => _toolModel;
   List<ToolModel> get toolsList => _toolsList;
@@ -38,13 +40,11 @@ class ToolsProvider extends ChangeNotifier {
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
 
   // save tool to firestore
-  Future<void> saveToolToFirestore({
-    required String orgID,
-  }) async {
+  Future<void> saveToolToFirestore() async {
     if (_toolModel != null) {
-      if (orgID.isNotEmpty) {
+      if (_organisationID.isNotEmpty) {
         await toolsCollection
-            .doc(orgID)
+            .doc(_organisationID)
             .collection(Constants.toolsCollection)
             .doc(_toolModel!.id)
             .set(
@@ -164,9 +164,14 @@ class ToolsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setDescription(String desc, String creatorID) async {
+  Future<void> setToolData(
+    String desc,
+    String creatorID,
+    String orgID,
+  ) async {
     _description = desc;
     _uid = creatorID;
+    _organisationID = orgID;
     notifyListeners();
   }
 
@@ -311,7 +316,11 @@ class ToolsProvider extends ChangeNotifier {
     var model = await GeminiService.getModel(images: _maxImages);
 
     // set description to use in prompt
-    await setDescription(description, creatorID);
+    await setToolData(
+      description,
+      creatorID,
+      organisationID,
+    );
 
     // get promptDara
     final prompt = getPromptData();

@@ -4,7 +4,8 @@ import 'package:gemini_risk_assessor/constants.dart';
 navigationController({
   required BuildContext context,
   required String route,
-  String argument = '',
+  String titleArg = '',
+  String orgArg = '',
 }) {
   switch (route) {
     case Constants.screensControllerRoute:
@@ -31,7 +32,7 @@ navigationController({
       Navigator.pushNamed(
         context,
         route,
-        arguments: argument,
+        arguments: titleArg,
       );
       break;
     default:
@@ -39,7 +40,8 @@ navigationController({
         context,
         route,
         arguments: {
-          Constants.title: argument,
+          Constants.title: titleArg,
+          Constants.orgArg: orgArg,
         },
       );
       break;

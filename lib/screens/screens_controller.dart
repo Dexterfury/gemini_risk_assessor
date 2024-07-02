@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/fab_buttons/organisation_fab_button.dart';
-import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
 import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
-import 'package:provider/provider.dart';
 
 class ScreensController extends StatefulWidget {
   const ScreensController({super.key});
@@ -62,10 +60,6 @@ class _ScreensControllerState extends State<ScreensController>
           setState(() {
             _selectedIndex = value;
           });
-          // set isPersonal
-          context
-              .read<AssessmentProvider>()
-              .setIsPersonal(isPersonal: value == 0);
         },
       ),
 

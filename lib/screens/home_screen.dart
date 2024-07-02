@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
               navigationController(
                 context: context,
                 route: Constants.profileRoute,
-                argument: context.read<AuthProvider>().userModel!.uid,
+                titleArg: context.read<AuthProvider>().userModel!.uid,
               );
             },
             child: DisplayUserImage(
