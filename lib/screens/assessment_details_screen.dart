@@ -61,28 +61,44 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 Navigator.of(context).pop(false);
               },
             ),
-            actions: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
+            actions: [
+              IconButton(
+                onPressed: () {
                   _scrollController.animateTo(
                     _scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 500),
+                    duration: const Duration(
+                      milliseconds: 500,
+                    ),
                     curve: Curves.easeInOut,
                   );
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 0.5),
-                    borderRadius: BorderRadius.circular(30),
-                    color: Colors.blue[100],
-                  ),
-                  child: const Icon(
-                    Icons.arrow_downward_rounded,
-                  ),
+                icon: const Icon(
+                  Icons.keyboard_double_arrow_down,
                 ),
               ),
-            ),
+              //   Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: GestureDetector(
+              //     onTap: () {
+              //       _scrollController.animateTo(
+              //         _scrollController.position.maxScrollExtent,
+              //         duration: const Duration(milliseconds: 500),
+              //         curve: Curves.easeInOut,
+              //       );
+              //     },
+              //     child: Container(
+              //       decoration: BoxDecoration(
+              //         border: Border.all(width: 0.5),
+              //         borderRadius: BorderRadius.circular(30),
+              //         color: Colors.blue[100],
+              //       ),
+              //       child: const Icon(
+              //         Icons.arrow_downward_rounded,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ],
           ),
           body: SingleChildScrollView(
             controller: _scrollController,

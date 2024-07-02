@@ -16,12 +16,14 @@ class OrganisationsScreen extends StatelessWidget {
         appBar: MyAppBar(
           title: '',
           onSearch: _handleSearch, // Pass the search function
-          actions: DisplayUserImage(
-            radius: 20,
-            isViewOnly: true,
-            imageUrl: context.watch<AuthProvider>().userModel?.imageUrl ?? '',
-            onPressed: () {},
-          ),
+          actions: [
+            DisplayUserImage(
+              radius: 20,
+              isViewOnly: true,
+              imageUrl: context.watch<AuthProvider>().userModel?.imageUrl ?? '',
+              onPressed: () {},
+            ),
+          ],
         ),
         body:
             isAnonymous ? const AnonymouseView() : const OrganisationsStream());

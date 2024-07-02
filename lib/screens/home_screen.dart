@@ -51,6 +51,26 @@ class _HomeScreenState extends State<HomeScreen>
     // Implement your search logic here
   }
 
+  GestureDetector _buildUserImage(
+    BuildContext context,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        navigationController(
+          context: context,
+          route: Constants.profileRoute,
+          titleArg: context.read<AuthProvider>().userModel!.uid,
+        );
+      },
+      child: DisplayUserImage(
+        radius: 20,
+        isViewOnly: true,
+        imageUrl: context.watch<AuthProvider>().userModel?.imageUrl ?? '',
+        onPressed: () {},
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TabProvider>(
@@ -59,22 +79,9 @@ class _HomeScreenState extends State<HomeScreen>
           appBar: MyAppBar(
             title: '',
             onSearch: _handleSearch, // Pass the search function
-            actions: GestureDetector(
-              onTap: () {
-                navigationController(
-                  context: context,
-                  route: Constants.profileRoute,
-                  titleArg: context.read<AuthProvider>().userModel!.uid,
-                );
-              },
-              child: DisplayUserImage(
-                radius: 20,
-                isViewOnly: true,
-                imageUrl:
-                    context.watch<AuthProvider>().userModel?.imageUrl ?? '',
-                onPressed: () {},
-              ),
-            ),
+            actions: [
+              _buildUserImage(context),
+            ],
             bottom: TabBar(
               controller: _tabController,
               tabs: const [

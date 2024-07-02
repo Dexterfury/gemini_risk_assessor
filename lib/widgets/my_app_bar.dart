@@ -44,14 +44,14 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.leading,
-    this.actions = const SizedBox(),
+    this.actions = const [],
     this.bottom,
     this.onSearch,
   });
 
   final String title;
   final Widget? leading;
-  final Widget actions;
+  final List<Widget> actions;
   final PreferredSizeWidget? bottom;
   final Function(String)? onSearch;
 
@@ -65,7 +65,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: onSearch != null ? false : true,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,
-      actions: [actions],
+      actions: actions,
       bottom: bottom,
     );
   }
