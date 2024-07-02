@@ -96,7 +96,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
                                 hintText: tabProvider.hintText,
                                 border: InputBorder.none,
                               ),
-                              onSubmitted: widget.onSearch,
+                              onChanged: (value) => widget.onSearch(value),
                             ),
                           );
                         },

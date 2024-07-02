@@ -46,9 +46,11 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _handleSearch(String query) {
-    int currentTab = context.read<TabProvider>().currentTabIndex;
-    print('Searching for "$query" in tab: $currentTab');
+    final tabProvider = context.read<TabProvider>();
+    print('Searching for "$query" in tab: ${tabProvider.currentTabIndex}');
     // Implement your search logic here
+    // Implement your search logic here
+    tabProvider.setSearchQuery(query);
   }
 
   GestureDetector _buildUserImage(

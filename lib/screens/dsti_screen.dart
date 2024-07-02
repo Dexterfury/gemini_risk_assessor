@@ -1,9 +1,11 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
@@ -21,12 +23,18 @@ class DSTIScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     final assessmentProvider = context.read<AssessmentProvider>();
+
+    handleSearch(String query) {
+      // Implement your search logic here
+      context.read<TabProvider>().setSearchQuery(query);
+    }
+
     return Scaffold(
       appBar: orgID.isNotEmpty
           ? MyAppBar(
               leading: const BackButton(),
               title: '',
-              onSearch: _handleSearch,
+              onSearch: handleSearch,
             )
           : null,
       body: SafeArea(
@@ -74,10 +82,5 @@ class DSTIScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _handleSearch(String query) {
-    print('Searching for "$query" in tab: ');
-    // Implement your search logic here
   }
 }

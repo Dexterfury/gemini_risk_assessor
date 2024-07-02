@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class TabProvider extends ChangeNotifier {
   int _currentTabIndex = 0;
   String _hintText = 'Search';
+  String _searchQuery = '';
 
   int get currentTabIndex => _currentTabIndex;
   String get hintText => _hintText;
+  String get searchQuery => _searchQuery;
 
   Future<void> setCurrentTabIndex(int index) async {
     _currentTabIndex = index;
@@ -15,6 +19,12 @@ class TabProvider extends ChangeNotifier {
 
   Future<void> setSearchHintText(String text) async {
     _hintText = text;
+    notifyListeners();
+  }
+
+  Future<void> setSearchQuery(String query) async {
+    log('query: $query');
+    _searchQuery = query;
     notifyListeners();
   }
 
