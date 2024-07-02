@@ -23,8 +23,11 @@ class RistAssessmentsScreen extends StatelessWidget {
     final assessmentProvider = context.read<AssessmentProvider>();
     return Scaffold(
       appBar: orgID.isNotEmpty
-          ? const MyAppBar(
-              leading: BackButton(), title: Constants.riskAssessments)
+          ? MyAppBar(
+              leading: const BackButton(),
+              title: '',
+              onSearch: _handleSearch,
+            )
           : null,
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
@@ -71,5 +74,10 @@ class RistAssessmentsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleSearch(String query) {
+    print('Searching for "$query" in tab: ');
+    // Implement your search logic here
   }
 }

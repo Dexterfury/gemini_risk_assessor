@@ -87,15 +87,13 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
                 child: _isExpanded
                     ? Consumer<TabProvider>(
                         builder: (context, tabProvider, child) {
-                          final hintText =
-                              _hintText(tabProvider.currentTabIndex);
                           return Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: TextField(
                               controller: _textController,
                               focusNode: _focusNode,
                               decoration: InputDecoration(
-                                hintText: hintText,
+                                hintText: tabProvider.hintText,
                                 border: InputBorder.none,
                               ),
                               onSubmitted: widget.onSearch,
@@ -110,18 +108,5 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
         );
       },
     );
-  }
-}
-
-_hintText(int currentTabIndex) {
-  switch (currentTabIndex) {
-    case 0:
-      return 'Daily Safety Task Instructions...';
-    case 1:
-      return 'Risk Assessments...';
-    case 2:
-      return 'Tools...';
-    default:
-      return ''; // Default hint text if no match is found
   }
 }

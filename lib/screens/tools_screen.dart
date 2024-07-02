@@ -20,9 +20,10 @@ class ToolsScreen extends StatelessWidget {
     final toolProvider = context.read<ToolsProvider>();
     return Scaffold(
       appBar: orgID.isNotEmpty
-          ? const MyAppBar(
-              leading: BackButton(),
-              title: Constants.tools,
+          ? MyAppBar(
+              leading: const BackButton(),
+              title: '',
+              onSearch: _handleSearch,
             )
           : null,
       body: SafeArea(
@@ -33,5 +34,10 @@ class ToolsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleSearch(String query) {
+    print('Searching for "$query" in tab: ');
+    // Implement your search logic here
   }
 }

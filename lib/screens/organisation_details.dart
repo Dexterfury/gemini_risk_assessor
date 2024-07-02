@@ -9,6 +9,7 @@ import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
@@ -285,25 +286,17 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
     return OpenContainer(
       closedBuilder: (context, action) {
         return IconButton(
-          onPressed: action,
+          onPressed: () async {
+            // set search data depending on the clicked icon
+            await _setSearchData(context, icon);
+            action();
+          },
           icon: Icon(icon),
         );
       },
       openBuilder: (context, action) {
-        switch (icon) {
-          case Icons.assignment_add:
-            return DSTIScreen(
-              orgID: orgID,
-            );
-          case Icons.assignment_late_outlined:
-            return RistAssessmentsScreen(orgID: orgID);
-          case Icons.handyman:
-            return ToolsScreen(
-              orgID: orgID,
-            );
-          default:
-            return const SizedBox();
-        }
+        // navigate to screen depending on the clicked icon
+        return _navigateToCreen(icon, orgID);
       },
       transitionType: ContainerTransitionType.fadeThrough,
       transitionDuration: const Duration(milliseconds: 500),
@@ -556,5 +549,35 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
     } else {
       return '${(count / 1000000).floor()}M+';
     }
+  }
+}
+
+Widget _navigateToCreen(IconData icon, String orgID) {
+  switch (icon) {
+    case Icons.assignment_add:
+      return DSTIScreen(
+        orgID: orgID,
+      );
+    case Icons.assignment_late_outlined:
+      return RistAssessmentsScreen(orgID: orgID);
+    case Icons.handyman:
+      return ToolsScreen(
+        orgID: orgID,
+      );
+    default:
+      return const SizedBox();
+  }
+}
+
+_setSearchData(
+  BuildContext context,
+  IconData icon,
+) async {
+  if (icon == Icons.assignment_add) {
+    await context.read<TabProvider>().dataSearch(0);
+  } else if (icon == Icons.assignment_late_outlined) {
+    await context.read<TabProvider>().dataSearch(1);
+  } else {
+    await context.read<TabProvider>().dataSearch(2);
   }
 }
