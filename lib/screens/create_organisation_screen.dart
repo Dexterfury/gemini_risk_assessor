@@ -15,7 +15,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
-import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/people.dart';
 import 'package:provider/provider.dart';
 

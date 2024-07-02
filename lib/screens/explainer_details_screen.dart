@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../widgets/images_display.dart';
-import '../widgets/my_app_bar.dart';
+import '../appBars/my_app_bar.dart';
 
 class ExplainerDetailsScreen extends StatelessWidget {
   ExplainerDetailsScreen({

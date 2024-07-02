@@ -21,7 +21,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
 import 'package:gemini_risk_assessor/widgets/icon_container.dart';
-import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/people.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:provider/provider.dart';

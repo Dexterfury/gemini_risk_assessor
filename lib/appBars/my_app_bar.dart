@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/utilities/animated_search_bar.dart';
+import 'package:gemini_risk_assessor/search/animated_search_bar.dart';
 
 // class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 //   const MyAppBar({

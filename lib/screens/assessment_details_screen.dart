@@ -6,7 +6,7 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/widgets/data_items_widget.dart';
-import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_items_widget.dart';
 import 'package:gemini_risk_assessor/widgets/weather_button.dart';
 import 'package:intl/intl.dart';

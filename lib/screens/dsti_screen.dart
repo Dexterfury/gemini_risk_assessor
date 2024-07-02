@@ -1,14 +1,14 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/appBars/my_sliver_app_bar.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
-import 'package:gemini_risk_assessor/widgets/my_app_bar.dart';
+import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class DSTIScreen extends StatelessWidget {
@@ -26,17 +26,10 @@ class DSTIScreen extends StatelessWidget {
 
     handleSearch(String query) {
       // Implement your search logic here
-      context.read<TabProvider>().setSearchQuery(query);
+      //context.read<TabProvider>().setSearchQuery(query);
     }
 
     return Scaffold(
-      appBar: orgID.isNotEmpty
-          ? MyAppBar(
-              leading: const BackButton(),
-              title: '',
-              onSearch: handleSearch,
-            )
-          : null,
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
           stream: assessmentProvider.dstiStream(
@@ -56,28 +49,42 @@ class DSTIScreen extends StatelessWidget {
             }
 
             if (snapshot.data!.docs.isEmpty) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('No Daily Safety Tast Intructions found',
-                      textAlign: TextAlign.center, style: textStyle18w500),
+              return Scaffold(
+                appBar: orgID.isNotEmpty
+                    ? const MyAppBar(
+                        leading: BackButton(),
+                        title: Constants.dailySafetyTaskInstructions,
+                      )
+                    : null,
+                body: const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('No Daily Safety Tast Intructions found',
+                        textAlign: TextAlign.center, style: textStyle18w500),
+                  ),
                 ),
               );
             }
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  final doc = snapshot.data!.docs[index];
-                  final data = doc.data() as Map<String, dynamic>;
-                  final dsti = AssessmentModel.fromJson(data);
-                  return ListItem(
-                    data: dsti,
+            return orgID.isNotEmpty
+                ? MySliverAppBar(
+                    snapshot: snapshot,
+                    title: Constants.dailySafetyTaskInstructions,
+                    onSearch: handleSearch,
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        final doc = snapshot.data!.docs[index];
+                        final data = doc.data() as Map<String, dynamic>;
+                        final dsti = AssessmentModel.fromJson(data);
+                        return ListItem(
+                          data: dsti,
+                        );
+                      },
+                    ),
                   );
-                },
-              ),
-            );
           },
         ),
       ),
