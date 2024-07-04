@@ -95,28 +95,6 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   Icons.keyboard_double_arrow_down,
                 ),
               ),
-              //   Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: GestureDetector(
-              //     onTap: () {
-              //       _scrollController.animateTo(
-              //         _scrollController.position.maxScrollExtent,
-              //         duration: const Duration(milliseconds: 500),
-              //         curve: Curves.easeInOut,
-              //       );
-              //     },
-              //     child: Container(
-              //       decoration: BoxDecoration(
-              //         border: Border.all(width: 0.5),
-              //         borderRadius: BorderRadius.circular(30),
-              //         color: Colors.blue[100],
-              //       ),
-              //       child: const Icon(
-              //         Icons.arrow_downward_rounded,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           body: SingleChildScrollView(
@@ -161,33 +139,6 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // PUT THE GRID HERE
-
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     DataItemsWidget(
-                //       label: ListHeader.equipments,
-                //       dataList: equipments,
-                //     ),
-                //     DataItemsWidget(
-                //       label: ListHeader.hazards,
-                //       dataList: hazards,
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 10),
-                // DataItemsWidget(
-                //   label: ListHeader.risks,
-                //   dataList: risks,
-                //   width: 100,
-                // ),
-                // const SizedBox(height: 10),
-                // DataItemsWidget(
-                //   label: ListHeader.control,
-                //   dataList: control,
-                //   width: 100,
-                // ),
                 AssessmentGridItems(
                   equipments: equipments,
                   hazards: hazards,
@@ -233,14 +184,14 @@ class AssessmentDetailsScreen extends StatelessWidget {
     );
   }
 
-  getModel(
+  AssessmentModel getModel(
     BuildContext context,
     AssessmentModel? currentModel,
   ) {
     if (currentModel != null) {
       return currentModel;
     } else {
-      final assessmentProvider = context.watch()<AssessmentProvider>();
+      final assessmentProvider = context.watch<AssessmentProvider>();
       return assessmentProvider.assessmentModel;
     }
   }

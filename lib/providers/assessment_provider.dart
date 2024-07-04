@@ -343,6 +343,33 @@ class AssessmentProvider extends ChangeNotifier {
     }
   }
 
+  // remove item from list
+  Future<void> removeDataItem({
+    required String label,
+    required String data,
+  }) async {
+    switch (label) {
+      case 'Equipments':
+        _assessmentModel.equipments.remove(data);
+        notifyListeners();
+        break;
+      case 'Hazards':
+        _assessmentModel.hazards.remove(data);
+        notifyListeners();
+        break;
+      case 'Risks':
+        _assessmentModel.risks.remove(data);
+        notifyListeners();
+        break;
+      case 'Control Measures':
+        _assessmentModel.control.remove(data);
+        notifyListeners();
+        break;
+      default:
+        break;
+    }
+  }
+
   // add ppe model item
   void addOrRemovePpeModelItem({required PpeModel ppeItem}) {
     // check ppeModelList contains ppeItem

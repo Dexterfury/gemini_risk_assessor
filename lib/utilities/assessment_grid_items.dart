@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/widgets/action_button.dart';
+import 'package:provider/provider.dart';
 
 class AssessmentGridItems extends StatefulWidget {
   final List<String> equipments;
@@ -110,10 +114,55 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                           ),
                     ),
                     const SizedBox(height: 8),
-                    ..._getSelectedList().map((item) => Padding(
+                    ..._getSelectedList().map((item) {
+                      // capitalize the first letter of each word
+                      String capitalizedItem = item
+                          .split(' ')
+                          .map((word) =>
+                              word[0].toUpperCase() + word.substring(1))
+                          .join(' ');
+                      return InkWell(
+                        onTap: () {
+                          // show animated dialog and to remove item
+                          MyDialogs.showMyAnimatedDialog(
+                              context: context,
+                              title: 'Remove item',
+                              content:
+                                  'Are you sure to remove\n $capitalizedItem',
+                              actions: [
+                                ActionButton(
+                                  label: const Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                ActionButton(
+                                  label: const Text(
+                                    'Yes',
+                                  ),
+                                  onPressed: () {
+                                    context
+                                        .read<AssessmentProvider>()
+                                        .removeDataItem(
+                                            label:
+                                                _selectedCategory!, // get selected index
+                                            data: item)
+                                        .whenComplete(
+                                          () => Navigator.of(context).pop(),
+                                        );
+                                  },
+                                ),
+                              ]);
+                        },
+                        child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Text(
-                            '• $item',
+                            '• $capitalizedItem',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -123,7 +172,9 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                                       .onSurfaceVariant,
                                 ),
                           ),
-                        )),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
