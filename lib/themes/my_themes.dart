@@ -17,6 +17,7 @@ ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
   ),
   useMaterial3: true,
+  cardColor: Colors.grey[800],
 ).copyWith(
   pageTransitionsTheme: const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -40,6 +41,7 @@ ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
   ),
   useMaterial3: true,
+  cardColor: Colors.grey[200],
 ).copyWith(
   pageTransitionsTheme: const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{

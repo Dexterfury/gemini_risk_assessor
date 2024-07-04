@@ -20,7 +20,7 @@ class ImagesDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = getProvider(assessmentProvider, toolProvider);
     return isViewOnly && provider.imagesFileList!.isEmpty
-        ? const Text('No Assessment images added')
+        ? const Text('No images added')
         : Container(
             height: 120,
             decoration: BoxDecoration(

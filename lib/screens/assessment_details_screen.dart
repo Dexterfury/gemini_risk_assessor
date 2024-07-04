@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
@@ -45,6 +46,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
     final summary = assessmentProvider.assessmentModel.summary;
     // createdBy
     final createdBy = context.read<AuthProvider>().userModel!.name;
+    // ppe list
+    final ppeList = context.watch<AssessmentProvider>().ppeModelList;
 
     // Format the datetime using Intl package
     String formattedTime = DateFormat.yMMMEd().format(time);
@@ -140,37 +143,53 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   assessmentProvider: assessmentProvider,
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    DataItemsWidget(
-                      label: ListHeader.equipments,
-                      dataList: equipments,
-                    ),
-                    DataItemsWidget(
-                      label: ListHeader.hazards,
-                      dataList: hazards,
-                    ),
-                  ],
+
+                // PUT THE GRID HERE
+
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     DataItemsWidget(
+                //       label: ListHeader.equipments,
+                //       dataList: equipments,
+                //     ),
+                //     DataItemsWidget(
+                //       label: ListHeader.hazards,
+                //       dataList: hazards,
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(height: 10),
+                // DataItemsWidget(
+                //   label: ListHeader.risks,
+                //   dataList: risks,
+                //   width: 100,
+                // ),
+                // const SizedBox(height: 10),
+                // DataItemsWidget(
+                //   label: ListHeader.control,
+                //   dataList: control,
+                //   width: 100,
+                // ),
+                AssessmentGridItems(
+                  equipments: equipments,
+                  hazards: hazards,
+                  risks: risks,
+                  controlMeasures: control,
                 ),
+
                 const SizedBox(height: 10),
-                DataItemsWidget(
-                  label: ListHeader.risks,
-                  dataList: risks,
-                  width: 100,
-                ),
-                const SizedBox(height: 10),
-                DataItemsWidget(
-                  label: ListHeader.control,
-                  dataList: control,
-                  width: 100,
-                ),
-                const SizedBox(height: 10),
-                PpeItemsWidget(
-                  label: ListHeader.ppe,
-                  ppeModelList:
-                      context.watch<AssessmentProvider>().ppeModelList,
-                ),
+
+                // GRID ABOVE HERE
+
+                // ANIMATED CARD OF LIST HERE BELOW THE GRID
+
+                ppeList.isNotEmpty
+                    ? PpeItemsWidget(
+                        label: ListHeader.ppe,
+                        ppeModelList: ppeList,
+                      )
+                    : const SizedBox.shrink(),
                 const SizedBox(height: 10),
                 const Text(
                   'Summary:',

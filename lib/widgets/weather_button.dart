@@ -21,7 +21,11 @@ class WeatherButton extends StatelessWidget {
       onTap: onChanged,
       child: Container(
         decoration: BoxDecoration(
-          color: value ? Colors.blue[100] : Colors.grey[300],
+          color: value
+              ?
+              // Colors.blue[100]
+              Theme.of(context).colorScheme.primaryContainer
+              : Colors.grey[300],
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
