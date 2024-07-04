@@ -162,12 +162,6 @@ class Constants {
     AssetsManager.safetyGlasses,
     AssetsManager.safetyHarness,
     AssetsManager.other,
-    AssetsManager.highVisClothing,
-    AssetsManager.lifeJacket,
-    AssetsManager.protectiveClothing,
-    AssetsManager.safetyGlasses,
-    AssetsManager.safetyHarness,
-    AssetsManager.other,
   ];
   // list of ppe labels
   static List<String> ppeLabels = [
@@ -177,12 +171,6 @@ class Constants {
     'Foot Protection',
     'Hand Protection',
     'Head Protection',
-    'High Vis Clothing',
-    'Life Jacket',
-    'Protective Clothing',
-    'Safety Glasses',
-    'Safety Harness',
-    'Other',
     'High Vis Clothing',
     'Life Jacket',
     'Protective Clothing',

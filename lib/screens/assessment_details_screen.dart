@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
@@ -16,37 +19,51 @@ class AssessmentDetailsScreen extends StatelessWidget {
   AssessmentDetailsScreen({
     super.key,
     required this.animation,
+    this.currentModel,
   }) : _scrollController = ScrollController();
 
   final Animation<double> animation;
   final ScrollController _scrollController;
+  final AssessmentModel? currentModel;
 
   @override
   Widget build(BuildContext context) {
-    // assessment provider
-    final assessmentProvider = context.watch<AssessmentProvider>();
+    // assessment provider de pendency injection
+    final assessmentProvider = getProvider(
+      context,
+      currentModel,
+    );
+
+    // get assessment model depending on current model or from provider
+    final assessmentModel = getModel(
+      context,
+      currentModel,
+    );
     // get time
-    final time = assessmentProvider.assessmentModel.createdAt;
+    final time = assessmentModel.createdAt;
     // get title
-    final title = assessmentProvider.assessmentModel.title;
+    final title = assessmentModel.title;
     // weather
-    final weather = assessmentProvider.assessmentModel.weather;
+    final weather = assessmentModel.weather;
     // task to archieve
-    final task = assessmentProvider.assessmentModel.taskToAchieve;
+    final task = assessmentModel.taskToAchieve;
     // equipments
-    final equipments = assessmentProvider.assessmentModel.equipments;
+    final equipments = assessmentModel.equipments;
     // hazards
-    final hazards = assessmentProvider.assessmentModel.hazards;
+    final hazards = assessmentModel.hazards;
     // risks
-    final risks = assessmentProvider.assessmentModel.risks;
+    final risks = assessmentModel.risks;
     // control
-    final control = assessmentProvider.assessmentModel.control;
+    final control = assessmentModel.control;
     // summary
-    final summary = assessmentProvider.assessmentModel.summary;
+    final summary = assessmentModel.summary;
     // createdBy
-    final createdBy = context.read<AuthProvider>().userModel!.name;
+    final createdBy = getCreatedBy(context, currentModel);
     // ppe list
-    final ppeList = context.watch<AssessmentProvider>().ppeModelList;
+    final ppeList = getPPEList(
+      context,
+      currentModel,
+    );
 
     // Format the datetime using Intl package
     String formattedTime = DateFormat.yMMMEd().format(time);
@@ -140,6 +157,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 ImagesDisplay(
                   isViewOnly: true,
                   assessmentProvider: assessmentProvider,
+                  assessmentModel: currentModel,
                 ),
                 const SizedBox(height: 10),
 
@@ -213,5 +231,72 @@ class AssessmentDetailsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  getModel(
+    BuildContext context,
+    AssessmentModel? currentModel,
+  ) {
+    if (currentModel != null) {
+      return currentModel;
+    } else {
+      final assessmentProvider = context.watch()<AssessmentProvider>();
+      return assessmentProvider.assessmentModel;
+    }
+  }
+
+  getCreatedBy(
+    BuildContext context,
+    AssessmentModel? currentModel,
+  ) {
+    if (currentModel != null) {
+      return currentModel.createdBy;
+    } else {
+      return context.read<AuthProvider>().userModel!.name;
+    }
+  }
+
+  getProvider(
+    BuildContext context,
+    AssessmentModel? currentModel,
+  ) {
+    if (currentModel != null) {
+      return null;
+    } else {
+      return context.watch<AssessmentProvider>();
+    }
+  }
+
+  List<PpeModel> getPPEList(
+      BuildContext context, AssessmentModel? currentModel) {
+    // Check if we have a current assessment model
+    if (currentModel != null) {
+      // Get the full list of PPE icons
+      List<PpeModel> allPpeIcons = Constants.getPPEIcons();
+      // Initialize an empty list to store selected PPE items
+      List<PpeModel> selectedPpeList = [];
+
+      // Iterate through each selected PPE label in the current model
+      for (var selectedLabel in currentModel.ppe) {
+        // Find the matching PpeModel in the full list of PPE icons
+        var matchingPpe = allPpeIcons.firstWhere(
+          (ppe) => ppe.label == selectedLabel,
+          // If no match is found, return a default PpeModel
+          orElse: () =>
+              PpeModel(id: 0, label: 'Not Found', icon: const CircleAvatar()),
+        );
+
+        // If a matching PPE item was found (id != 0), add it to the selected list
+        if (matchingPpe.id != 0) {
+          selectedPpeList.add(matchingPpe);
+        }
+      }
+
+      // Return the list of selected PPE items
+      return selectedPpeList;
+    } else {
+      // If no current model is available, return the default PPE list from the provider
+      return context.watch<AssessmentProvider>().ppeModelList;
+    }
   }
 }

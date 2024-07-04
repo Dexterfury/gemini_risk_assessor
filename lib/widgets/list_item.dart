@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:open_file_plus/open_file_plus.dart';
@@ -49,20 +50,35 @@ class ListItem extends StatelessWidget {
       //   Platform.isIOS ? Icons.arrow_forward_ios : Icons.arrow_forward,
       // ),
       onTap: () async {
-        // here I want to download and open the file if its not already saved to local
-        // if its already saved to local then open it
-        final assessmentProvider = context.read<AssessmentProvider>();
-        if (!assessmentProvider.isLoading) {
-          final isDownloaded =
-              await assessmentProvider.isPdfDownloaded('${data.id}.pdf');
-          if (!isDownloaded) {
-            // Show a message that the file needs to be downloaded
-            showSnackBar(
-                context: context, message: 'Downloading PDF. Please wait...');
-          }
-          await assessmentProvider.openPdf(data.pdfUrl, '${data.id}.pdf');
+        // navigate to detail page
+        // display the risk assessment details screen
+        PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+          opaque: false,
+          pageBuilder: (BuildContext context, animation, secondaryAnimation) =>
+              AssessmentDetailsScreen(
+            animation: animation,
+            currentModel: data,
+          ),
+        );
+        bool shouldSave = await Navigator.of(context).push(pageRouteBuilder);
+        if (shouldSave) {
+          // TODO save the risk assessment to database
         }
-        //await assessmentProvider.deletePdf('${data.id}.pdf');
+
+        // // here I want to download and open the file if its not already saved to local
+        // // if its already saved to local then open it
+        // final assessmentProvider = context.read<AssessmentProvider>();
+        // if (!assessmentProvider.isLoading) {
+        //   final isDownloaded =
+        //       await assessmentProvider.isPdfDownloaded('${data.id}.pdf');
+        //   if (!isDownloaded) {
+        //     // Show a message that the file needs to be downloaded
+        //     showSnackBar(
+        //         context: context, message: 'Downloading PDF. Please wait...');
+        //   }
+        //   await assessmentProvider.openPdf(data.pdfUrl, '${data.id}.pdf');
+        // }
+        // //await assessmentProvider.deletePdf('${data.id}.pdf');
       },
     );
   }
