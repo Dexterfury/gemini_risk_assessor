@@ -56,7 +56,6 @@ class GeminiService {
     ]);
   }
 
-
   // function to set the model based on if images are present
   static Future<GenerativeModel> getModel({required int images}) async {
     if (images < 10) {
