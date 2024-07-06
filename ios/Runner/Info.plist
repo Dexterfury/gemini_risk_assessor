@@ -43,6 +43,8 @@
 	<string>This permission is to access your mic for voice inputs</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This permission is to access your photo library</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This permission is required to recognize speech in voice chats and discussions</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

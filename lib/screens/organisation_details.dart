@@ -296,7 +296,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
       },
       openBuilder: (context, action) {
         // navigate to screen depending on the clicked icon
-        return _navigateToCreen(icon, orgID);
+        return _navigateToScreen(icon, orgID);
       },
       transitionType: ContainerTransitionType.fadeThrough,
       transitionDuration: const Duration(milliseconds: 500),
@@ -552,7 +552,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
   }
 }
 
-Widget _navigateToCreen(IconData icon, String orgID) {
+Widget _navigateToScreen(IconData icon, String orgID) {
   switch (icon) {
     case Icons.assignment_add:
       return DSTIScreen(

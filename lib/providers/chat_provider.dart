@@ -282,8 +282,9 @@ class ChatProvider extends ChangeNotifier {
     required String chatID,
     required bool isTool,
   }) async {
-    // empty all current history messages
+    // empty all messages
     _historyMessages = [];
+    _messages = [];
     _isLoading = true;
     notifyListeners();
 
@@ -301,6 +302,10 @@ class ChatProvider extends ChangeNotifier {
           .then((value) {
         for (var doc in value.docs) {
           final message = Message.fromJson(doc.data());
+
+          // populate the messages from firebase and store them in a list
+          _messages.add(message);
+
           // add user message to history
           _historyMessages.add(
             Content.text(message.question),
@@ -326,7 +331,6 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  // send message
   Future<void> sendMessage({
     required String uid,
     required String chatID,
@@ -334,33 +338,34 @@ class ChatProvider extends ChangeNotifier {
     required bool isTool,
     required Function onSuccess,
     required Function(String) onError,
-    required Function allAudioFilesPlayed,
     AudioPlayer? audioPlayer,
   }) async {
     try {
-      // set the model
-      await setModel();
+      String messageID = const Uuid().v4();
 
-      _isLoading = true;
+      final newMessage = Message(
+        senderID: uid,
+        messageID: messageID,
+        chatID: chatID,
+        question: message,
+        answer: StringBuffer(),
+        imagesUrls: [],
+        sentencesUrls: [],
+        finalWords: true,
+        timeSent: DateTime.now(),
+      );
+
+      _messages.add(newMessage);
       notifyListeners();
-      // collection reference
-      final collection = isTool
-          ? Constants.toolsChatsCollection
-          : Constants.assessmentsChatsCollection;
 
-      // send message to chatGPT and get answer then send to firestore
       await sendMessageToGeminiAndGetStreamedAnswer(
         uid: uid,
         chatID: chatID,
+        messageID: messageID,
         message: message,
-        collectionRef: collection,
+        isTool: isTool,
         audioPlayer: audioPlayer,
-        onError: (value) {
-          onError(value);
-        },
-        allAudioFilesPlayed: () {
-          allAudioFilesPlayed();
-        },
+        onError: onError,
       );
 
       onSuccess();
@@ -368,42 +373,30 @@ class ChatProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       log(error.toString());
+      onError(error.toString());
     }
   }
 
   Future<void> sendMessageToGeminiAndGetStreamedAnswer({
     required String uid,
     required String chatID,
+    required String messageID,
     required String message,
-    required String collectionRef,
+    required bool isTool,
     AudioPlayer? audioPlayer,
     required Function(String) onError,
-    required Function() allAudioFilesPlayed,
   }) async {
-    // stop any audio which is playing if any
+    await setModel();
+
+    _isLoading = true;
+    notifyListeners();
+
+    final collection = isTool
+        ? Constants.toolsChatsCollection
+        : Constants.assessmentsChatsCollection;
+
     audioPlayer?.stop();
-    String messageID = const Uuid().v4();
 
-    // Replace the last empty message with the new message
-    if (_messages.isNotEmpty) {
-      _messages.removeWhere(
-          (qa) => qa.question.isEmpty || qa.answer.toString().isEmpty);
-    }
-
-    // message json
-    final messageJson = Message(
-      senderID: uid,
-      messageID: messageID,
-      chatID: chatID,
-      question: message,
-      answer: StringBuffer(),
-      imagesUrls: [],
-      sentencesUrls: [],
-      finalWords: true,
-      timeSent: DateTime.now(),
-    );
-
-    _messages.add(messageJson);
     _isStreaming = true;
     _sentencesAudioFileList = [];
     notifyListeners();
@@ -413,9 +406,8 @@ class ChatProvider extends ChangeNotifier {
       messageID,
       chatID,
       message,
-      collectionRef,
+      collection,
       audioPlayer,
-      allAudioFilesPlayed,
     );
   }
 
@@ -426,30 +418,23 @@ class ChatProvider extends ChangeNotifier {
     String message,
     String collectionRef,
     AudioPlayer? audioPlayer,
-    Function() allAudioFilesPlayed,
   ) async {
     String fullSentence = '';
-    String fullStreameAnswer = '';
+    String fullStreamedAnswer = '';
 
     int counter = 0;
     _fileToPlay = 0;
     _allSentencesCount = 0;
     _allSentencesAudioFilesPlayed = false;
-    //final appCheckToken = await FirebaseAppCheck.instance.getToken();
 
-    // start the chat session - only send history if its text-only, dont send history if its images message
     final chatSession = _model!.startChat(
       history: _historyMessages.isEmpty || _imagesFileList!.isNotEmpty
           ? null
           : _historyMessages,
     );
 
-    // get content
-    final content = await getContent(
-      message: message,
-    );
+    final content = await getContent(message: message);
 
-    // add message to messages list
     final chatMessage = Message(
       senderID: uid,
       messageID: messageID,
@@ -464,107 +449,48 @@ class ChatProvider extends ChangeNotifier {
 
     _messages.add(chatMessage);
 
-    chatSession.sendMessageStream(content).asyncMap((eventData) {
-      return eventData;
-    }).listen((event) {
-      final streamedAnswer = event.text;
+    await for (final eventData in chatSession.sendMessageStream(content)) {
+      final streamedAnswer = eventData.text;
       fullSentence += streamedAnswer!;
-      fullStreameAnswer += streamedAnswer;
+      fullStreamedAnswer += streamedAnswer;
 
       _messages
           .firstWhere((element) => element.messageID == messageID)
           .answer
-          .write(event.text);
-      log('event: ${event.text}');
+          .write(streamedAnswer);
+      log('event: $streamedAnswer');
       notifyListeners();
 
-      // // Check if a full sentence is available
       if (streamedAnswer.endsWith('.') ||
           streamedAnswer.endsWith('!') ||
           streamedAnswer.endsWith('?')) {
-        // play and transcribe each sentence as we receive it
-        // transcribeAndPlaySentenceAsWeReceive(
-        //   counter++,
-        //   fullSentence,
-        //   audioPlayer!,
-        // );
         log('counter ${counter++}');
         log('full sentence $fullSentence');
-
-        // Clear the accumulated streamed answer
         fullSentence = '';
       }
-    }, onDone: () async {
-      log('stream is done');
-      // add messages to history - user message and assistant message
-      _historyMessages.add(Content.text(message));
-      // add assistant message to history
-      _historyMessages.add(Content.model([
-        TextPart(
-          fullStreameAnswer,
-        )
-      ]));
-      // we initialize an empty the list of sentences file url - String
-      List<String> sentencesUrls = [];
+    }
 
-      // get the last message from messages
-      final lastMessage =
-          Message.fromJson(_messages.last as Map<String, dynamic>);
+    _historyMessages.add(Content.text(message));
+    _historyMessages.add(Content.model([TextPart(fullStreamedAnswer)]));
 
-      log('lastMessage: $lastMessage');
+    List<String> sentencesUrls = [];
 
-      // Save the message to Firestore
-      // await _chatsCollection
-      //     .doc(uid)
-      //     .collection(collectionRef)
-      //     .doc(chatID)
-      //     .collection(Constants.chatDataCollection)
-      //     .doc(messageID)
-      //     .set(lastMessage.toJson());
-      _isLoading = false;
-      notifyListeners();
+    final lastMessage =
+        Message.fromJson(_messages.last as Map<String, dynamic>);
+    log('lastMessage: $lastMessage');
 
-      // // update sentencesUrls
-      // await updateSentencesUrlsToFirestore(
-      //   counter: counter,
-      //   uid: uid,
-      //   messageId: messageId,
-      // );
-      // console("done with talking");
-      // console(shouldSpeak);
+    // TODO: Save the message to Firestore
+    // Save the message to Firestore
+    // await _chatsCollection
+    //     .doc(uid)
+    //     .collection(collectionRef)
+    //     .doc(chatID)
+    //     .collection(Constants.chatDataCollection)
+    //     .doc(messageID)
+    //     .set(lastMessage.toJson());
 
-      // if (!shouldSpeak) {
-      //   _isTyping = false;
-      //   notifyListeners();
-      //   return;
-      // }
-
-      // // while allSentencesCount is not equal to fileToPlay we wait for 1 second
-      // // then we check again
-      // while (allSentencesCount != fileToPlay) {
-      //   await Future.delayed(Duration(seconds: 1));
-      // }
-      // // wait for the last file to finish playing
-      // await audioPlayer!.playerStateStream.firstWhere(
-      //     (state) => state.processingState == ProcessingState.completed);
-
-      // // stop the audio player
-      // await audioPlayer.stop();
-
-      // // set all sentences played to true
-      // _allSentencesAudioFilesPlayed = true;
-
-      // await Future.delayed(Duration(seconds: 1));
-
-      // _isChatGPTTalking = false;
-      // allAudioFilesPlayed();
-      // _isTyping = false;
-      // notifyListeners();
-    }).onError((error, stackTrace) {
-      log('error: $error');
-      _isLoading = false;
-      notifyListeners();
-    });
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<Content> getContent({
@@ -613,5 +539,71 @@ class ChatProvider extends ChangeNotifier {
       }
     }
     return imagesUrls;
+  }
+
+  Future<void> addAndDisplayMessage({
+    required String uid,
+    required String chatID,
+    required bool isTool,
+    required bool finalWords,
+    AudioPlayer? audioPlayer,
+    String? spokenWords,
+    required Function onSuccess,
+    required Function(String) onError,
+  }) async {
+    if (spokenWords != null) {
+      String messageID;
+      if (finalWords) {
+        messageID = const Uuid().v4();
+        final message = Message(
+          senderID: uid,
+          messageID: messageID,
+          chatID: chatID,
+          question: spokenWords,
+          answer: StringBuffer(),
+          imagesUrls: [],
+          sentencesUrls: [],
+          finalWords: finalWords,
+          timeSent: DateTime.now(),
+        );
+
+        _messages.add(message);
+
+        // Send the message to Gemini and get streamed answer
+        await sendMessageToGeminiAndGetStreamedAnswer(
+          uid: uid,
+          chatID: chatID,
+          messageID: messageID,
+          message: spokenWords,
+          isTool: isTool,
+          audioPlayer: audioPlayer,
+          onError: onError,
+        );
+      } else {
+        if (_messages.isNotEmpty && _messages.last.answer.isEmpty) {
+          // Update the last message's question field
+          _messages.last = _messages.last.copyWith(
+            question: '${_messages.last.question} $spokenWords',
+          );
+        } else {
+          // Create a new message if there's no existing message or if the last message has an answer
+          messageID = const Uuid().v4();
+          _messages.add(Message(
+            senderID: uid,
+            messageID: messageID,
+            chatID: chatID,
+            question: spokenWords,
+            answer: StringBuffer(),
+            imagesUrls: [],
+            sentencesUrls: [],
+            finalWords: false,
+            timeSent: DateTime.now(),
+          ));
+        }
+      }
+      notifyListeners();
+    }
+
+    onSuccess();
   }
 }
