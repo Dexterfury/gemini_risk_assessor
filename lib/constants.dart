@@ -120,12 +120,33 @@ class Constants {
   static const String organisationCollection = 'organisations';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
+  static const String chatsCollection = 'chats';
+  static const String toolsChatsCollection = 'toolsChats';
+  static const String assessmentsChatsCollection = 'assessmentsChats';
+  static const String chatDataCollection = 'chatData';
 
   static const String organisationImage = 'organisationImage';
 
   static const String exitSuccessful = 'Exit Successful';
   static const String exitFailed = 'Exit Failed';
   static const String deletedSuccessfully = 'Deleted successfully';
+
+  // message constants
+  static const String messageID = 'messageID';
+  static const String chatID = 'chatID';
+  static const String senderID = 'senderID';
+  static const String question = 'question';
+  static const String answer = 'answer';
+  static const String imagesUrls = 'imagesUrls';
+  static const String sentencesUrls = 'sentencesUrls';
+  static const String finalWords = 'finalWords';
+  static const String timeSent = 'timeSent';
+
+  // shared preferences keys
+  static const String voiceIndex = 'voiceIndex';
+  static const String volume = 'volume';
+  static const String audioSpeed = 'audioSpeed';
+  static const String shouldSpeak = 'ShouldSpeak';
 
   // list of ppe icons
   static List<PpeModel> getPPEIcons({
