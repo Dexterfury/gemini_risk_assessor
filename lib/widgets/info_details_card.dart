@@ -133,16 +133,13 @@ class InfoDetailsCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // DisplayUserImage(
-                //   radius: 50,
-                //   isViewOnly: false,
-                //   authProvider: authProvider,
-                //   onPressed: () {
-                //     authProvider.showImagePickerDialog(
-                //       context: context,
-                //     );
-                //   },
-                // ),
+                DisplayUserImage(
+                  radius: 50,
+                  isViewOnly: false,
+                  imageUrl:
+                      context.watch<AuthProvider>().userModel?.imageUrl ?? '',
+                  onPressed: () {},
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
