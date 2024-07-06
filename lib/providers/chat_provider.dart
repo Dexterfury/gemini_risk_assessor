@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatProvider extends ChangeNotifier {
   // list of messages
@@ -13,6 +15,8 @@ class ChatProvider extends ChangeNotifier {
 
   // history of messages
   List<Message> _historyMessages = [];
+
+  List<dynamic> _sentencesAudioFileList = [];
 
   int _selectedVoiceIndex = 0;
   double _audioSpeed = 1.0;
@@ -43,6 +47,7 @@ class ChatProvider extends ChangeNotifier {
   bool get isStreaming => _isStreaming;
   String get googleVoiceName => _googleVoiceName;
   String get googelVoiceLanguageCode => _googelVoiceLanguageCode;
+  List<dynamic> get sentencesAudioFileList => _sentencesAudioFileList;
 
   final CollectionReference _chatsCollection =
       FirebaseFirestore.instance.collection(Constants.chatsCollection);
@@ -188,7 +193,7 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> getChatHistoryFromFirebase({
     required String uid,
-    required String chatId,
+    required String chatID,
     required bool isTool,
   }) async {
     // empty all current history messages
@@ -204,7 +209,7 @@ class ChatProvider extends ChangeNotifier {
       await _chatsCollection
           .doc(uid)
           .collection(collection)
-          .doc(chatId)
+          .doc(chatID)
           .collection(Constants.chatDataCollection)
           .get()
           .then((value) {
@@ -228,6 +233,7 @@ class ChatProvider extends ChangeNotifier {
   // send message
   Future<void> sendMessage({
     required String uid,
+    required String chatID,
     required String message,
     required Function onSuccess,
     required Function(String) onError,
@@ -235,14 +241,14 @@ class ChatProvider extends ChangeNotifier {
     AudioPlayer? audioPlayer,
   }) async {
     try {
-      _isTyping = true;
+      //_isTyping = true;
       notifyListeners();
 
       // send message to chatGPT and get answer then send to firestore
-      await sendMessageToChatGPTAndGetStreamedAnswer(
+      await sendMessageToGeminiAndGetStreamedAnswer(
         uid: uid,
+        chatID: chatID,
         message: message,
-        isText: isText,
         audioPlayer: audioPlayer,
         onError: (value) {
           onError(value);
@@ -254,10 +260,65 @@ class ChatProvider extends ChangeNotifier {
 
       onSuccess();
     } catch (error) {
-      _isTyping = false;
+      //_isTyping = false;
       notifyListeners();
-      console(error);
+      log(error.toString());
     }
+  }
+
+  Future<void> sendMessageToGeminiAndGetStreamedAnswer({
+    required String uid,
+    required String chatID,
+    required String message,
+    AudioPlayer? audioPlayer,
+    required Function(String) onError,
+    required Function() allAudioFilesPlayed,
+  }) async {
+    // stop any audio which is playing if any
+    audioPlayer?.stop();
+    String messageID = const Uuid().v4();
+
+    // Replace the last empty message with the new message
+    if (_messages.isNotEmpty) {
+      _messages.removeWhere(
+          (qa) => qa.question.isEmpty || qa.answer.toString().isEmpty);
+    }
+
+    // message json
+    final messageJson = Message(
+      senderID: uid,
+      messageID: messageID,
+      chatID: chatID,
+      question: message,
+      answer: StringBuffer(),
+      imagesUrls: [],
+      sentencesUrls: [],
+      finalWords: true,
+      timeSent: DateTime.now(),
+    );
+
+    _messages.add(messageJson);
+    _isStreaming = true;
+    _sentencesAudioFileList = [];
+    notifyListeners();
+
+    await generateMessagesToSend(message: message);
+
+    // final request = CompletionRequest(
+    //   model: getCurrentModel,
+    //   stream: true,
+    //   messages: _historyMessages,
+    //   maxTokens: maxTokens,
+    // );
+
+    await streamResponse(
+      //request,
+      audioPlayer,
+      messageId,
+      allAudioFilesPlayed,
+      uid,
+      message,
+    );
   }
 
   // page controller
