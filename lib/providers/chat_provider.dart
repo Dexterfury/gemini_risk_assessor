@@ -1,10 +1,14 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -13,8 +17,11 @@ class ChatProvider extends ChangeNotifier {
   // list of messages
   List<Message> _messages = [];
 
+  // images file list
+  List<XFile>? _imagesFileList = [];
+
   // history of messages
-  List<Message> _historyMessages = [];
+  List<Content> _historyMessages = [];
 
   List<dynamic> _sentencesAudioFileList = [];
 
@@ -34,6 +41,21 @@ class ChatProvider extends ChangeNotifier {
   bool _geminiTalking = false;
   bool _isAudioSending = false;
   bool _isStreaming = false;
+
+  // initialize generative model
+  GenerativeModel? _model;
+
+  // itialize text model
+  GenerativeModel? _textModel;
+
+  // initialize vision model
+  GenerativeModel? _visionModel;
+
+  // current mode
+  String _modelType = 'gemini-1.0-pro';
+
+  // loading bool
+  bool _isLoading = false;
 
   String _googleVoiceName = 'en-US-Neural2-G';
   String _googelVoiceLanguageCode = 'en-US';
@@ -55,12 +77,24 @@ class ChatProvider extends ChangeNotifier {
   List<dynamic> get sentencesAudioFileList => _sentencesAudioFileList;
   bool get allSentencesAudioFilesPlayed => _allSentencesAudioFilesPlayed;
   int get fileToPlay => _fileToPlay;
+  bool get isLoading => _isLoading;
+  List<XFile>? get imagesFileList => _imagesFileList;
+  GenerativeModel? get model => _model;
+  GenerativeModel? get textModel => _textModel;
+  GenerativeModel? get visionModel => _visionModel;
+  String get modelType => _modelType;
 
   final CollectionReference _chatsCollection =
       FirebaseFirestore.instance.collection(Constants.chatsCollection);
 
   set fileToPlay(int value) {
     _fileToPlay = value;
+    notifyListeners();
+  }
+
+  // set loading
+  void setLoading({required bool value}) {
+    _isLoading = value;
     notifyListeners();
   }
 
@@ -119,6 +153,46 @@ class ChatProvider extends ChangeNotifier {
     await saveVolumeToSharedPreferences(value: 1.0);
 
     notifyListeners();
+  }
+
+  // function to set the model based on bool - isTextOnly
+  Future<void> setModel() async {
+    if (_imagesFileList!.isEmpty) {
+      _model = _textModel ??
+          GenerativeModel(
+              model: setCurrentModel(newModel: 'gemini-1.0-pro'),
+              apiKey: getApiKey(),
+              generationConfig: GenerationConfig(
+                temperature: 0.4,
+                topK: 32,
+                topP: 1,
+                maxOutputTokens: 4096,
+              ),
+              safetySettings: [
+                SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+                SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+              ]);
+    } else {
+      _model = _visionModel ??
+          GenerativeModel(
+              model: setCurrentModel(newModel: 'gemini-1.5-flash'),
+              apiKey: getApiKey(),
+              generationConfig: GenerationConfig(
+                temperature: 0.4,
+                topK: 32,
+                topP: 1,
+                maxOutputTokens: 4096,
+              ),
+              safetySettings: [
+                SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+                SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+              ]);
+    }
+    notifyListeners();
+  }
+
+  String getApiKey() {
+    return dotenv.env['GEMINI_API_KEY'].toString();
   }
 
   // save volume to shared preferences
@@ -227,10 +301,20 @@ class ChatProvider extends ChangeNotifier {
           .then((value) {
         for (var doc in value.docs) {
           final message = Message.fromJson(doc.data());
-
-          // populate the listView with the history messages
-          _messages.add(message);
-          _historyMessages.add(message);
+          // add user message to history
+          _historyMessages.add(
+            Content.text(message.question),
+          );
+          // add assistant message to history
+          _historyMessages.add(
+            Content.model(
+              [
+                TextPart(
+                  message.answer.toString(),
+                ),
+              ],
+            ),
+          );
         }
         _isLoading = false;
         notifyListeners();
@@ -247,20 +331,29 @@ class ChatProvider extends ChangeNotifier {
     required String uid,
     required String chatID,
     required String message,
+    required bool isTool,
     required Function onSuccess,
     required Function(String) onError,
     required Function allAudioFilesPlayed,
     AudioPlayer? audioPlayer,
   }) async {
     try {
-      //_isTyping = true;
+      // set the model
+      await setModel();
+
+      _isLoading = true;
       notifyListeners();
+      // collection reference
+      final collection = isTool
+          ? Constants.toolsChatsCollection
+          : Constants.assessmentsChatsCollection;
 
       // send message to chatGPT and get answer then send to firestore
       await sendMessageToGeminiAndGetStreamedAnswer(
         uid: uid,
         chatID: chatID,
         message: message,
+        collectionRef: collection,
         audioPlayer: audioPlayer,
         onError: (value) {
           onError(value);
@@ -272,7 +365,7 @@ class ChatProvider extends ChangeNotifier {
 
       onSuccess();
     } catch (error) {
-      //_isTyping = false;
+      _isLoading = false;
       notifyListeners();
       log(error.toString());
     }
@@ -282,6 +375,7 @@ class ChatProvider extends ChangeNotifier {
     required String uid,
     required String chatID,
     required String message,
+    required String collectionRef,
     AudioPlayer? audioPlayer,
     required Function(String) onError,
     required Function() allAudioFilesPlayed,
@@ -319,16 +413,18 @@ class ChatProvider extends ChangeNotifier {
       messageID,
       chatID,
       message,
+      collectionRef,
       audioPlayer,
       allAudioFilesPlayed,
     );
   }
 
-  streamResponse(
+  Future<void> streamResponse(
     String uid,
     String messageID,
     String chatID,
     String message,
+    String collectionRef,
     AudioPlayer? audioPlayer,
     Function() allAudioFilesPlayed,
   ) async {
@@ -341,26 +437,45 @@ class ChatProvider extends ChangeNotifier {
     _allSentencesAudioFilesPlayed = false;
     //final appCheckToken = await FirebaseAppCheck.instance.getToken();
 
-    Stream<OpenAIStreamChatCompletionModel> chatStream =
-        OpenAI.instance.chat.createStream(
-      appCheckToken: appCheckToken,
-      model: getCurrentModel,
-      messages: _openAIChatCompletionChoiceMessageHistory,
+    // start the chat session - only send history if its text-only, dont send history if its images message
+    final chatSession = _model!.startChat(
+      history: _historyMessages.isEmpty || _imagesFileList!.isNotEmpty
+          ? null
+          : _historyMessages,
     );
 
-    chatStream.listen((chatStreamEvent) {
-      console(chatStreamEvent); // ...
+    // get content
+    final content = await getContent(
+      message: message,
+    );
 
-      final content = chatStreamEvent.choices.first.delta.content;
-      console(content);
+    // add message to messages list
+    final chatMessage = Message(
+      senderID: uid,
+      messageID: messageID,
+      chatID: chatID,
+      question: message,
+      answer: StringBuffer(),
+      imagesUrls: [],
+      sentencesUrls: [],
+      finalWords: false,
+      timeSent: DateTime.now(),
+    );
 
-      var streamedAnswer = content;
+    _messages.add(chatMessage);
+
+    chatSession.sendMessageStream(content).asyncMap((eventData) {
+      return eventData;
+    }).listen((event) {
+      final streamedAnswer = event.text;
       fullSentence += streamedAnswer!;
       fullStreameAnswer += streamedAnswer;
 
-      questionAnswers.last.answer.write(streamedAnswer);
-
-      _completeStreamAnswerString += streamedAnswer;
+      _messages
+          .firstWhere((element) => element.messageID == messageID)
+          .answer
+          .write(event.text);
+      log('event: ${event.text}');
       notifyListeners();
 
       // // Check if a full sentence is available
@@ -368,645 +483,94 @@ class ChatProvider extends ChangeNotifier {
           streamedAnswer.endsWith('!') ||
           streamedAnswer.endsWith('?')) {
         // play and transcribe each sentence as we receive it
-        transcribeAndPlaySentenceAsWeReceive(
-          counter++,
-          fullSentence,
-          audioPlayer!,
-        );
+        // transcribeAndPlaySentenceAsWeReceive(
+        //   counter++,
+        //   fullSentence,
+        //   audioPlayer!,
+        // );
+        log('counter ${counter++}');
+        log('full sentence $fullSentence');
 
         // Clear the accumulated streamed answer
         fullSentence = '';
       }
     }, onDone: () async {
-      console("Done");
-      //   if (event.streamMessageEnd) {
-      _isStreaming = false;
-      subscription?.cancel();
-      setAllSentencesCount = counter;
-
-      // add a assistance answer to history messages
-      // _historyMessages.add(MessageModel(
-      //   role: Role.assistant.name,
-      //   content: fullStreameAnswer,
-      // ));
-
-      _openAIChatCompletionChoiceMessageHistory.add(
-        OpenAIChatCompletionChoiceMessageModel(
-          content: fullStreameAnswer,
-          role: OpenAIChatMessageRole.assistant,
-        ),
-      );
-      notifyListeners();
-
+      log('stream is done');
+      // add messages to history - user message and assistant message
+      _historyMessages.add(Content.text(message));
+      // add assistant message to history
+      _historyMessages.add(Content.model([
+        TextPart(
+          fullStreameAnswer,
+        )
+      ]));
       // we initialize an empty the list of sentences file url - String
       List<String> sentencesUrls = [];
 
+      // get the last message from messages
+      final lastMessage =
+          Message.fromJson(_messages.last as Map<String, dynamic>);
+
+      log('lastMessage: $lastMessage');
+
       // Save the message to Firestore
-      await firebaseFirestore
-          .collection(Constants.chats)
-          .doc(uid)
-          .collection(Constants.lemurChatsLocation)
-          .doc(getChatId)
-          .collection(Constants.myChats)
-          .doc(messageId)
-          .set({
-        Constants.senderId: uid,
-        Constants.messageId: messageId,
-        Constants.chatId: getChatId,
-        Constants.message: message,
-        Constants.answer: fullStreameAnswer,
-        Constants.messageTime: DateTime.now(),
-        Constants.isText: isText,
-        Constants.sentencesUrls: sentencesUrls,
-      });
+      // await _chatsCollection
+      //     .doc(uid)
+      //     .collection(collectionRef)
+      //     .doc(chatID)
+      //     .collection(Constants.chatDataCollection)
+      //     .doc(messageID)
+      //     .set(lastMessage.toJson());
+      _isLoading = false;
+      notifyListeners();
 
-      // we update our recent chats directory with required data
-      var recentChatSnapShot = await firebaseFirestore
-          .collection(Constants.chats)
-          .doc(uid)
-          .collection(Constants.lemurChatsLocation)
-          .doc(getChatId)
-          .get();
+      // // update sentencesUrls
+      // await updateSentencesUrlsToFirestore(
+      //   counter: counter,
+      //   uid: uid,
+      //   messageId: messageId,
+      // );
+      // console("done with talking");
+      // console(shouldSpeak);
 
-      if (!recentChatSnapShot.exists) {
-        await firebaseFirestore
-            .collection(Constants.chats)
-            .doc(uid)
-            .collection(Constants.lemurChatsLocation)
-            .doc(getChatId)
-            .set({
-          Constants.senderId: uid,
-          Constants.chatId: getChatId,
-          Constants.lastUserMessage: message,
-          Constants.messageId: messageId,
-          Constants.lastLemurChatMessage: fullStreameAnswer,
-          Constants.messageTime: FieldValue.serverTimestamp(),
-          Constants.fromLemurTeam: false,
-        });
-      } else {
-        await firebaseFirestore
-            .collection(Constants.chats)
-            .doc(uid)
-            .collection(Constants.lemurChatsLocation)
-            .doc(getChatId)
-            .update({
-          Constants.lastUserMessage: message,
-          Constants.lastLemurChatMessage: fullStreameAnswer,
-          Constants.messageTime: FieldValue.serverTimestamp(),
-        });
-      }
+      // if (!shouldSpeak) {
+      //   _isTyping = false;
+      //   notifyListeners();
+      //   return;
+      // }
 
-      // update sentencesUrls
-      await updateSentencesUrlsToFirestore(
-        counter: counter,
-        uid: uid,
-        messageId: messageId,
-      );
-      console("done with talking");
-      console(shouldSpeak);
+      // // while allSentencesCount is not equal to fileToPlay we wait for 1 second
+      // // then we check again
+      // while (allSentencesCount != fileToPlay) {
+      //   await Future.delayed(Duration(seconds: 1));
+      // }
+      // // wait for the last file to finish playing
+      // await audioPlayer!.playerStateStream.firstWhere(
+      //     (state) => state.processingState == ProcessingState.completed);
 
-      if (!shouldSpeak) {
-        _isTyping = false;
-        notifyListeners();
-        return;
-      }
+      // // stop the audio player
+      // await audioPlayer.stop();
 
-      // while allSentencesCount is not equal to fileToPlay we wait for 1 second
-      // then we check again
-      while (allSentencesCount != fileToPlay) {
-        await Future.delayed(Duration(seconds: 1));
-      }
-      // wait for the last file to finish playing
-      await audioPlayer!.playerStateStream.firstWhere(
-          (state) => state.processingState == ProcessingState.completed);
+      // // set all sentences played to true
+      // _allSentencesAudioFilesPlayed = true;
 
-      // stop the audio player
-      await audioPlayer.stop();
+      // await Future.delayed(Duration(seconds: 1));
 
-      // set all sentences played to true
-      _allSentencesAudioFilesPlayed = true;
-
-      await Future.delayed(Duration(seconds: 1));
-
-      _isChatGPTTalking = false;
-      allAudioFilesPlayed();
-      _isTyping = false;
+      // _isChatGPTTalking = false;
+      // allAudioFilesPlayed();
+      // _isTyping = false;
+      // notifyListeners();
+    }).onError((error, stackTrace) {
+      log('error: $error');
+      _isLoading = false;
       notifyListeners();
     });
-
-    /* try {
-      final stream = await chatGPT.createChatCompletionStream(request);
-      subscription = stream!.listen((event) async {
-        if (event.streamMessageEnd) {
-          _isStreaming = false;
-          subscription?.cancel();
-          setAllSentencesCount = counter;
-
-          // add a assistance answer to history messages
-          _historyMessages.add(MessageModel(
-            role: Role.assistant.name,
-            content: fullStreameAnswer,
-          ));
-          notifyListeners();
-
-          // we initialize an empty the list of sentences file url - String
-          List<String> sentencesUrls = [];
-
-          // Save the message to Firestore
-          await firebaseFirestore
-              .collection(Constants.chats)
-              .doc(uid)
-              .collection(Constants.lemurChatsLocation)
-              .doc(getChatId)
-              .collection(Constants.myChats)
-              .doc(messageId)
-              .set({
-            Constants.senderId: uid,
-            Constants.messageId: messageId,
-            Constants.chatId: getChatId,
-            Constants.message: message,
-            Constants.answer: fullStreameAnswer,
-            Constants.messageTime: DateTime.now(),
-            Constants.isText: isText,
-            Constants.sentencesUrls: sentencesUrls,
-          });
-
-          // we update our recent chats directory with required data
-          var recentChatSnapShot = await firebaseFirestore
-              .collection(Constants.chats)
-              .doc(uid)
-              .collection(Constants.lemurChatsLocation)
-              .doc(getChatId)
-              .get();
-
-          if (!recentChatSnapShot.exists) {
-            await firebaseFirestore
-                .collection(Constants.chats)
-                .doc(uid)
-                .collection(Constants.lemurChatsLocation)
-                .doc(getChatId)
-                .set({
-              Constants.senderId: uid,
-              Constants.chatId: getChatId,
-              Constants.lastUserMessage: message,
-              Constants.messageId: messageId,
-              Constants.lastLemurChatMessage: fullStreameAnswer,
-              Constants.messageTime: FieldValue.serverTimestamp(),
-              Constants.fromLemurTeam: false,
-            });
-          } else {
-            await firebaseFirestore
-                .collection(Constants.chats)
-                .doc(uid)
-                .collection(Constants.lemurChatsLocation)
-                .doc(getChatId)
-                .update({
-              Constants.lastUserMessage: message,
-              Constants.lastLemurChatMessage: fullStreameAnswer,
-              Constants.messageTime: FieldValue.serverTimestamp(),
-            });
-          }
-
-          //update sentencesUrls
-          await updateSentencesUrlsToFirestore(
-            counter: counter,
-            uid: uid,
-            messageId: messageId,
-          );
-
-          if (!shouldSpeak) {
-            _isTyping = false;
-            notifyListeners();
-            return;
-          }
-
-          // while allSentencesCount is not equal to fileToPlay we wait for 1 second
-          // then we check again
-          while (allSentencesCount != fileToPlay) {
-            await Future.delayed(Duration(seconds: 1));
-          }
-          // wait for the last file to finish playing
-          await audioPlayer!.playerStateStream.firstWhere(
-                  (state) => state.processingState == ProcessingState.completed);
-
-          // stop the audio player
-          await audioPlayer.stop();
-
-          // set all sentences played to true
-          _allSentencesAudioFilesPlayed = true;
-
-          await Future.delayed(Duration(seconds: 1));
-
-          _isChatGPTTalking = false;
-          allAudioFilesPlayed();
-          _isTyping = false;
-          notifyListeners();
-        } else {
-          var streamedAnswer = event.choices?.first.delta?.content;
-          fullSentence += streamedAnswer!;
-          fullStreameAnswer += streamedAnswer;
-
-          questionAnswers.last.answer.write(streamedAnswer);
-
-          completeStreamAnswerString += streamedAnswer;
-          notifyListeners();
-
-          // // Check if a full sentence is available
-          if (streamedAnswer.endsWith('.') ||
-              streamedAnswer.endsWith('!') ||
-              streamedAnswer.endsWith('?')) {
-            // play and transcribe each sentence as we receive it
-            transcribeAndPlaySentenceAsWeReceive2(
-              counter++,
-              fullSentence,
-              audioPlayer!,
-            );
-
-            // Clear the accumulated streamed answer
-            fullSentence = '';
-          }
-        }
-      });
-    } catch (e) {
-      console('error : ${e.toString()}');
-    }*/
-  }
-
-  // page controller
-  final PageController _pageController = PageController();
-
-  // images file list
-  List<XFile>? _imagesFileList = [];
-
-  // index of the current screen
-  int _currentIndex = 0;
-
-  // cuttent chatId
-  String _currentChatId = '';
-
-  // initialize generative model
-  GenerativeModel? _model;
-
-  // itialize text model
-  GenerativeModel? _textModel;
-
-  // initialize vision model
-  GenerativeModel? _visionModel;
-
-  // current mode
-  String _modelType = 'gemini-pro';
-
-  // loading bool
-  bool _isLoading = false;
-
-  // getters
-  List<Message> get inChatMessages => _inChatMessages;
-
-  PageController get pageController => _pageController;
-
-  List<XFile>? get imagesFileList => _imagesFileList;
-
-  int get currentIndex => _currentIndex;
-
-  String get currentChatId => _currentChatId;
-
-  GenerativeModel? get model => _model;
-
-  GenerativeModel? get textModel => _textModel;
-
-  GenerativeModel? get visionModel => _visionModel;
-
-  String get modelType => _modelType;
-
-  bool get isLoading => _isLoading;
-
-  // setters
-
-  // set inChatMessages
-  Future<void> setInChatMessages({required String chatId}) async {
-    // get messages from hive database
-    final messagesFromDB = await loadMessagesFromDB(chatId: chatId);
-
-    for (var message in messagesFromDB) {
-      if (_inChatMessages.contains(message)) {
-        log('message already exists');
-        continue;
-      }
-
-      _inChatMessages.add(message);
-    }
-    notifyListeners();
-  }
-
-  // load the messages from db
-  Future<List<Message>> loadMessagesFromDB({required String chatId}) async {
-    // open the box of this chatID
-    await Hive.openBox('${Constants.chatMessagesBox}$chatId');
-
-    final messageBox = Hive.box('${Constants.chatMessagesBox}$chatId');
-
-    final newData = messageBox.keys.map((e) {
-      final message = messageBox.get(e);
-      final messageData = Message.fromMap(Map<String, dynamic>.from(message));
-
-      return messageData;
-    }).toList();
-    notifyListeners();
-    return newData;
-  }
-
-  // set file list
-  void setImagesFileList({required List<XFile> listValue}) {
-    _imagesFileList = listValue;
-    notifyListeners();
-  }
-
-  // set the current model
-  String setCurrentModel({required String newModel}) {
-    _modelType = newModel;
-    notifyListeners();
-    return newModel;
-  }
-
-  // function to set the model based on bool - isTextOnly
-  Future<void> setModel({required bool isTextOnly}) async {
-    if (isTextOnly) {
-      _model = _textModel ??
-          GenerativeModel(
-              model: setCurrentModel(newModel: 'gemini-1.0-pro'),
-              apiKey: getApiKey(),
-              generationConfig: GenerationConfig(
-                temperature: 0.4,
-                topK: 32,
-                topP: 1,
-                maxOutputTokens: 4096,
-              ),
-              safetySettings: [
-                SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-                SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-              ]);
-    } else {
-      _model = _visionModel ??
-          GenerativeModel(
-              model: setCurrentModel(newModel: 'gemini-1.5-flash'),
-              apiKey: getApiKey(),
-              generationConfig: GenerationConfig(
-                temperature: 0.4,
-                topK: 32,
-                topP: 1,
-                maxOutputTokens: 4096,
-              ),
-              safetySettings: [
-                SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-                SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-              ]);
-    }
-    notifyListeners();
-  }
-
-  String getApiKey() {
-    return dotenv.env['GEMINI_API_KEY'].toString();
-  }
-
-  // set current page index
-  void setCurrentIndex({required int newIndex}) {
-    _currentIndex = newIndex;
-    notifyListeners();
-  }
-
-  // set current chat id
-  void setCurrentChatId({required String newChatId}) {
-    _currentChatId = newChatId;
-    notifyListeners();
-  }
-
-  // set loading
-  void setLoading({required bool value}) {
-    _isLoading = value;
-    notifyListeners();
-  }
-
-  // delete caht
-  Future<void> deletChatMessages({required String chatId}) async {
-    // 1. check if the box is open
-    if (!Hive.isBoxOpen('${Constants.chatMessagesBox}$chatId')) {
-      // open the box
-      await Hive.openBox('${Constants.chatMessagesBox}$chatId');
-
-      // delete all messages in the box
-      await Hive.box('${Constants.chatMessagesBox}$chatId').clear();
-
-      // close the box
-      await Hive.box('${Constants.chatMessagesBox}$chatId').close();
-    } else {
-      // delete all messages in the box
-      await Hive.box('${Constants.chatMessagesBox}$chatId').clear();
-
-      // close the box
-      await Hive.box('${Constants.chatMessagesBox}$chatId').close();
-    }
-
-    // get the current chatId, its its not empty
-    // we check if its the same as the chatId
-    // if its the same we set it to empty
-    if (currentChatId.isNotEmpty) {
-      if (currentChatId == chatId) {
-        setCurrentChatId(newChatId: '');
-        _inChatMessages.clear();
-        notifyListeners();
-      }
-    }
-  }
-
-  // prepare chat room
-  Future<void> prepareChatRoom({
-    required bool isNewChat,
-    required String chatID,
-  }) async {
-    if (!isNewChat) {
-      // 1.  load the chat messages from the db
-      final chatHistory = await loadMessagesFromDB(chatId: chatID);
-
-      // 2. clear the inChatMessages
-      _inChatMessages.clear();
-
-      for (var message in chatHistory) {
-        _inChatMessages.add(message);
-      }
-
-      // 3. set the current chat id
-      setCurrentChatId(newChatId: chatID);
-    } else {
-      // 1. clear the inChatMessages
-      _inChatMessages.clear();
-
-      // 2. set the current chat id
-      setCurrentChatId(newChatId: chatID);
-    }
-  }
-
-  // send message to gemini and get the streamed reposnse
-  Future<void> sentMessage({
-    required String message,
-    required bool isTextOnly,
-  }) async {
-    // set the model
-    await setModel(isTextOnly: isTextOnly);
-
-    // set loading
-    setLoading(value: true);
-
-    // get the chatId
-    String chatId = getChatId();
-
-    // list of history messahes
-    List<Content> history = [];
-
-    // get the chat history
-    history = await getHistory(chatId: chatId);
-
-    // get the imagesUrls
-    List<String> imagesUrls = getImagesUrls(isTextOnly: isTextOnly);
-
-    // open the messages box
-    final messagesBox =
-        await Hive.openBox('${Constants.chatMessagesBox}$chatId');
-
-    // get the last user message id
-    final userMessageId = messagesBox.keys.length;
-
-    // assistant messageId
-    final assistantMessageId = messagesBox.keys.length + 1;
-
-    // user message
-    final userMessage = Message(
-      messageId: userMessageId.toString(),
-      chatId: chatId,
-      role: Role.user,
-      message: StringBuffer(message),
-      imagesUrls: imagesUrls,
-      timeSent: DateTime.now(),
-    );
-
-    // add this message to the list on inChatMessages
-    _inChatMessages.add(userMessage);
-    notifyListeners();
-
-    if (currentChatId.isEmpty) {
-      setCurrentChatId(newChatId: chatId);
-    }
-
-    // send the message to the model and wait for the response
-    await sendMessageAndWaitForResponse(
-      message: message,
-      chatId: chatId,
-      isTextOnly: isTextOnly,
-      history: history,
-      userMessage: userMessage,
-      modelMessageId: assistantMessageId.toString(),
-      messagesBox: messagesBox,
-    );
-  }
-
-  // send message to the model and wait for the response
-  Future<void> sendMessageAndWaitForResponse({
-    required String message,
-    required String chatId,
-    required bool isTextOnly,
-    required List<Content> history,
-    required Message userMessage,
-    required String modelMessageId,
-    required Box messagesBox,
-  }) async {
-    // start the chat session - only send history is its text-only
-    final chatSession = _model!.startChat(
-      history: history.isEmpty || !isTextOnly ? null : history,
-    );
-
-    // get content
-    final content = await getContent(
-      message: message,
-      isTextOnly: isTextOnly,
-    );
-
-    // assistant message
-    final assistantMessage = userMessage.copyWith(
-      messageId: modelMessageId,
-      role: Role.assistant,
-      message: StringBuffer(),
-      timeSent: DateTime.now(),
-    );
-
-    // add this message to the list on inChatMessages
-    _inChatMessages.add(assistantMessage);
-    notifyListeners();
-
-    // wait for stream response
-    chatSession.sendMessageStream(content).asyncMap((event) {
-      return event;
-    }).listen((event) {
-      _inChatMessages
-          .firstWhere((element) =>
-              element.messageId == assistantMessage.messageId &&
-              element.role.name == Role.assistant.name)
-          .message
-          .write(event.text);
-      log('event: ${event.text}');
-      notifyListeners();
-    }, onDone: () async {
-      log('stream done');
-      // save message to hive db
-      await saveMessagesToDB(
-        chatID: chatId,
-        userMessage: userMessage,
-        assistantMessage: assistantMessage,
-        messagesBox: messagesBox,
-      );
-      // set loading to false
-      setLoading(value: false);
-    }).onError((erro, stackTrace) {
-      log('error: $erro');
-      // set loading
-      setLoading(value: false);
-    });
-  }
-
-  // save messages to hive db
-  Future<void> saveMessagesToDB({
-    required String chatID,
-    required Message userMessage,
-    required Message assistantMessage,
-    required Box messagesBox,
-  }) async {
-    // save the user messages
-    await messagesBox.add(userMessage.toMap());
-
-    // save the assistant messages
-    await messagesBox.add(assistantMessage.toMap());
-
-    // save chat history with thae same chatId
-    // if its already there update it
-    // if not create a new one
-    final chatHistoryBox = Boxes.getChatHistory();
-
-    final chatHistory = ChatHistory(
-      chatId: chatID,
-      prompt: userMessage.message.toString(),
-      response: assistantMessage.message.toString(),
-      imagesUrls: userMessage.imagesUrls,
-      timestamp: DateTime.now(),
-    );
-    await chatHistoryBox.put(chatID, chatHistory);
-
-    // close the box
-    await messagesBox.close();
   }
 
   Future<Content> getContent({
     required String message,
-    required bool isTextOnly,
   }) async {
-    if (isTextOnly) {
+    if (_imagesFileList!.isEmpty) {
       // generate text from text-only input
       return Content.text(message);
     } else {
@@ -1025,6 +589,19 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
+  // set file list
+  void setImagesFileList({required List<XFile> listValue}) {
+    _imagesFileList = listValue;
+    notifyListeners();
+  }
+
+  // set the current model
+  String setCurrentModel({required String newModel}) {
+    _modelType = newModel;
+    notifyListeners();
+    return newModel;
+  }
+
   // get y=the imagesUrls
   List<String> getImagesUrls({
     required bool isTextOnly,
@@ -1036,53 +613,5 @@ class ChatProvider extends ChangeNotifier {
       }
     }
     return imagesUrls;
-  }
-
-  Future<List<Content>> getHistory({required String chatId}) async {
-    List<Content> history = [];
-    if (currentChatId.isNotEmpty) {
-      await setInChatMessages(chatId: chatId);
-
-      for (var message in inChatMessages) {
-        if (message.role == Role.user) {
-          history.add(Content.text(message.message.toString()));
-        } else {
-          history.add(Content.model([TextPart(message.message.toString())]));
-        }
-      }
-    }
-
-    return history;
-  }
-
-  String getChatId() {
-    if (currentChatId.isEmpty) {
-      return const Uuid().v4();
-    } else {
-      return currentChatId;
-    }
-  }
-
-  // init Hive box
-  static initHive() async {
-    final dir = await path.getApplicationDocumentsDirectory();
-    Hive.init(dir.path);
-    await Hive.initFlutter(Constants.geminiDB);
-
-    // register adapters
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(ChatHistoryAdapter());
-
-      // open the chat history box
-      await Hive.openBox<ChatHistory>(Constants.chatHistoryBox);
-    }
-    if (!Hive.isAdapterRegistered(1)) {
-      Hive.registerAdapter(UserModelAdapter());
-      await Hive.openBox<UserModel>(Constants.userBox);
-    }
-    if (!Hive.isAdapterRegistered(2)) {
-      Hive.registerAdapter(SettingsAdapter());
-      await Hive.openBox<Settings>(Constants.settingsBox);
-    }
   }
 }
