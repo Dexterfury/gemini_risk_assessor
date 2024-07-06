@@ -18,9 +18,14 @@ class ChatProvider extends ChangeNotifier {
 
   List<dynamic> _sentencesAudioFileList = [];
 
+  bool _allSentencesAudioFilesPlayed = false;
+
   int _selectedVoiceIndex = 0;
   double _audioSpeed = 1.0;
   double _audioVolume = 0.5;
+
+  int _fileToPlay = 0;
+  int _allSentencesCount = 0;
 
   bool _isListening = false;
   bool _isPlaySample = false;
@@ -48,9 +53,16 @@ class ChatProvider extends ChangeNotifier {
   String get googleVoiceName => _googleVoiceName;
   String get googelVoiceLanguageCode => _googelVoiceLanguageCode;
   List<dynamic> get sentencesAudioFileList => _sentencesAudioFileList;
+  bool get allSentencesAudioFilesPlayed => _allSentencesAudioFilesPlayed;
+  int get fileToPlay => _fileToPlay;
 
   final CollectionReference _chatsCollection =
       FirebaseFirestore.instance.collection(Constants.chatsCollection);
+
+  set fileToPlay(int value) {
+    _fileToPlay = value;
+    notifyListeners();
+  }
 
   //set volume
   Future<void> setVoiceId({
@@ -302,23 +314,322 @@ class ChatProvider extends ChangeNotifier {
     _sentencesAudioFileList = [];
     notifyListeners();
 
-    await generateMessagesToSend(message: message);
-
-    // final request = CompletionRequest(
-    //   model: getCurrentModel,
-    //   stream: true,
-    //   messages: _historyMessages,
-    //   maxTokens: maxTokens,
-    // );
-
     await streamResponse(
-      //request,
-      audioPlayer,
-      messageId,
-      allAudioFilesPlayed,
       uid,
+      messageID,
+      chatID,
       message,
+      audioPlayer,
+      allAudioFilesPlayed,
     );
+  }
+
+  streamResponse(
+    String uid,
+    String messageID,
+    String chatID,
+    String message,
+    AudioPlayer? audioPlayer,
+    Function() allAudioFilesPlayed,
+  ) async {
+    String fullSentence = '';
+    String fullStreameAnswer = '';
+
+    int counter = 0;
+    _fileToPlay = 0;
+    _allSentencesCount = 0;
+    _allSentencesAudioFilesPlayed = false;
+    //final appCheckToken = await FirebaseAppCheck.instance.getToken();
+
+    Stream<OpenAIStreamChatCompletionModel> chatStream =
+        OpenAI.instance.chat.createStream(
+      appCheckToken: appCheckToken,
+      model: getCurrentModel,
+      messages: _openAIChatCompletionChoiceMessageHistory,
+    );
+
+    chatStream.listen((chatStreamEvent) {
+      console(chatStreamEvent); // ...
+
+      final content = chatStreamEvent.choices.first.delta.content;
+      console(content);
+
+      var streamedAnswer = content;
+      fullSentence += streamedAnswer!;
+      fullStreameAnswer += streamedAnswer;
+
+      questionAnswers.last.answer.write(streamedAnswer);
+
+      _completeStreamAnswerString += streamedAnswer;
+      notifyListeners();
+
+      // // Check if a full sentence is available
+      if (streamedAnswer.endsWith('.') ||
+          streamedAnswer.endsWith('!') ||
+          streamedAnswer.endsWith('?')) {
+        // play and transcribe each sentence as we receive it
+        transcribeAndPlaySentenceAsWeReceive(
+          counter++,
+          fullSentence,
+          audioPlayer!,
+        );
+
+        // Clear the accumulated streamed answer
+        fullSentence = '';
+      }
+    }, onDone: () async {
+      console("Done");
+      //   if (event.streamMessageEnd) {
+      _isStreaming = false;
+      subscription?.cancel();
+      setAllSentencesCount = counter;
+
+      // add a assistance answer to history messages
+      // _historyMessages.add(MessageModel(
+      //   role: Role.assistant.name,
+      //   content: fullStreameAnswer,
+      // ));
+
+      _openAIChatCompletionChoiceMessageHistory.add(
+        OpenAIChatCompletionChoiceMessageModel(
+          content: fullStreameAnswer,
+          role: OpenAIChatMessageRole.assistant,
+        ),
+      );
+      notifyListeners();
+
+      // we initialize an empty the list of sentences file url - String
+      List<String> sentencesUrls = [];
+
+      // Save the message to Firestore
+      await firebaseFirestore
+          .collection(Constants.chats)
+          .doc(uid)
+          .collection(Constants.lemurChatsLocation)
+          .doc(getChatId)
+          .collection(Constants.myChats)
+          .doc(messageId)
+          .set({
+        Constants.senderId: uid,
+        Constants.messageId: messageId,
+        Constants.chatId: getChatId,
+        Constants.message: message,
+        Constants.answer: fullStreameAnswer,
+        Constants.messageTime: DateTime.now(),
+        Constants.isText: isText,
+        Constants.sentencesUrls: sentencesUrls,
+      });
+
+      // we update our recent chats directory with required data
+      var recentChatSnapShot = await firebaseFirestore
+          .collection(Constants.chats)
+          .doc(uid)
+          .collection(Constants.lemurChatsLocation)
+          .doc(getChatId)
+          .get();
+
+      if (!recentChatSnapShot.exists) {
+        await firebaseFirestore
+            .collection(Constants.chats)
+            .doc(uid)
+            .collection(Constants.lemurChatsLocation)
+            .doc(getChatId)
+            .set({
+          Constants.senderId: uid,
+          Constants.chatId: getChatId,
+          Constants.lastUserMessage: message,
+          Constants.messageId: messageId,
+          Constants.lastLemurChatMessage: fullStreameAnswer,
+          Constants.messageTime: FieldValue.serverTimestamp(),
+          Constants.fromLemurTeam: false,
+        });
+      } else {
+        await firebaseFirestore
+            .collection(Constants.chats)
+            .doc(uid)
+            .collection(Constants.lemurChatsLocation)
+            .doc(getChatId)
+            .update({
+          Constants.lastUserMessage: message,
+          Constants.lastLemurChatMessage: fullStreameAnswer,
+          Constants.messageTime: FieldValue.serverTimestamp(),
+        });
+      }
+
+      // update sentencesUrls
+      await updateSentencesUrlsToFirestore(
+        counter: counter,
+        uid: uid,
+        messageId: messageId,
+      );
+      console("done with talking");
+      console(shouldSpeak);
+
+      if (!shouldSpeak) {
+        _isTyping = false;
+        notifyListeners();
+        return;
+      }
+
+      // while allSentencesCount is not equal to fileToPlay we wait for 1 second
+      // then we check again
+      while (allSentencesCount != fileToPlay) {
+        await Future.delayed(Duration(seconds: 1));
+      }
+      // wait for the last file to finish playing
+      await audioPlayer!.playerStateStream.firstWhere(
+          (state) => state.processingState == ProcessingState.completed);
+
+      // stop the audio player
+      await audioPlayer.stop();
+
+      // set all sentences played to true
+      _allSentencesAudioFilesPlayed = true;
+
+      await Future.delayed(Duration(seconds: 1));
+
+      _isChatGPTTalking = false;
+      allAudioFilesPlayed();
+      _isTyping = false;
+      notifyListeners();
+    });
+
+    /* try {
+      final stream = await chatGPT.createChatCompletionStream(request);
+      subscription = stream!.listen((event) async {
+        if (event.streamMessageEnd) {
+          _isStreaming = false;
+          subscription?.cancel();
+          setAllSentencesCount = counter;
+
+          // add a assistance answer to history messages
+          _historyMessages.add(MessageModel(
+            role: Role.assistant.name,
+            content: fullStreameAnswer,
+          ));
+          notifyListeners();
+
+          // we initialize an empty the list of sentences file url - String
+          List<String> sentencesUrls = [];
+
+          // Save the message to Firestore
+          await firebaseFirestore
+              .collection(Constants.chats)
+              .doc(uid)
+              .collection(Constants.lemurChatsLocation)
+              .doc(getChatId)
+              .collection(Constants.myChats)
+              .doc(messageId)
+              .set({
+            Constants.senderId: uid,
+            Constants.messageId: messageId,
+            Constants.chatId: getChatId,
+            Constants.message: message,
+            Constants.answer: fullStreameAnswer,
+            Constants.messageTime: DateTime.now(),
+            Constants.isText: isText,
+            Constants.sentencesUrls: sentencesUrls,
+          });
+
+          // we update our recent chats directory with required data
+          var recentChatSnapShot = await firebaseFirestore
+              .collection(Constants.chats)
+              .doc(uid)
+              .collection(Constants.lemurChatsLocation)
+              .doc(getChatId)
+              .get();
+
+          if (!recentChatSnapShot.exists) {
+            await firebaseFirestore
+                .collection(Constants.chats)
+                .doc(uid)
+                .collection(Constants.lemurChatsLocation)
+                .doc(getChatId)
+                .set({
+              Constants.senderId: uid,
+              Constants.chatId: getChatId,
+              Constants.lastUserMessage: message,
+              Constants.messageId: messageId,
+              Constants.lastLemurChatMessage: fullStreameAnswer,
+              Constants.messageTime: FieldValue.serverTimestamp(),
+              Constants.fromLemurTeam: false,
+            });
+          } else {
+            await firebaseFirestore
+                .collection(Constants.chats)
+                .doc(uid)
+                .collection(Constants.lemurChatsLocation)
+                .doc(getChatId)
+                .update({
+              Constants.lastUserMessage: message,
+              Constants.lastLemurChatMessage: fullStreameAnswer,
+              Constants.messageTime: FieldValue.serverTimestamp(),
+            });
+          }
+
+          //update sentencesUrls
+          await updateSentencesUrlsToFirestore(
+            counter: counter,
+            uid: uid,
+            messageId: messageId,
+          );
+
+          if (!shouldSpeak) {
+            _isTyping = false;
+            notifyListeners();
+            return;
+          }
+
+          // while allSentencesCount is not equal to fileToPlay we wait for 1 second
+          // then we check again
+          while (allSentencesCount != fileToPlay) {
+            await Future.delayed(Duration(seconds: 1));
+          }
+          // wait for the last file to finish playing
+          await audioPlayer!.playerStateStream.firstWhere(
+                  (state) => state.processingState == ProcessingState.completed);
+
+          // stop the audio player
+          await audioPlayer.stop();
+
+          // set all sentences played to true
+          _allSentencesAudioFilesPlayed = true;
+
+          await Future.delayed(Duration(seconds: 1));
+
+          _isChatGPTTalking = false;
+          allAudioFilesPlayed();
+          _isTyping = false;
+          notifyListeners();
+        } else {
+          var streamedAnswer = event.choices?.first.delta?.content;
+          fullSentence += streamedAnswer!;
+          fullStreameAnswer += streamedAnswer;
+
+          questionAnswers.last.answer.write(streamedAnswer);
+
+          completeStreamAnswerString += streamedAnswer;
+          notifyListeners();
+
+          // // Check if a full sentence is available
+          if (streamedAnswer.endsWith('.') ||
+              streamedAnswer.endsWith('!') ||
+              streamedAnswer.endsWith('?')) {
+            // play and transcribe each sentence as we receive it
+            transcribeAndPlaySentenceAsWeReceive2(
+              counter++,
+              fullSentence,
+              audioPlayer!,
+            );
+
+            // Clear the accumulated streamed answer
+            fullSentence = '';
+          }
+        }
+      });
+    } catch (e) {
+      console('error : ${e.toString()}');
+    }*/
   }
 
   // page controller
