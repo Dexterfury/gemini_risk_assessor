@@ -325,8 +325,9 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                         .updateOrganisationDataInFireStore();
 
                     if (isSaved) {
-                      Future.delayed(const Duration(milliseconds: 200))
+                      Future.delayed(const Duration(milliseconds: 100))
                           .whenComplete(() {
+                        log('Scaockbar: $isSaved');
                         showSnackBar(
                           context: context,
                           message: 'Requests sent to added members',
@@ -334,6 +335,12 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                       });
                     }
                   }
+
+                  Future.delayed(const Duration(milliseconds: 100))
+                      .whenComplete(() async {
+                    // clear search query
+                    context.read<OrganisationProvider>().setSearchQuery('');
+                  });
                 });
           },
           child: const IconContainer(icon: Icons.person_add),
@@ -352,8 +359,8 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
               onActionTap(false);
+              Navigator.pop(context);
             },
             child: const Text(
               'Cancel',
@@ -362,8 +369,8 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
               onActionTap(true);
+              Navigator.pop(context);
             },
             child: const Text(
               'Save',

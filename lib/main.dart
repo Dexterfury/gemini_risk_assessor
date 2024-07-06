@@ -12,6 +12,7 @@ import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
+import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/screens/create_organisation_screen.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
           Constants.profileRoute: (context) => const ProfileScreen(),
           Constants.createOrganisationRoute: (context) =>
               const CreateOrganisationScreen(),
+          Constants.chatRoute: (context) => const ChatScreen(),
         });
   }
 }

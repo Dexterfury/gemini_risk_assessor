@@ -81,7 +81,7 @@ class UserWidget extends StatelessWidget {
         );
       case UserViewType.tempPlus:
         return orgProvider.awaitApprovalsList.contains(
-              userData,
+              userData.uid,
             ) ||
             orgProvider.tempOrgMemberUIDs.contains(
               userData.uid,

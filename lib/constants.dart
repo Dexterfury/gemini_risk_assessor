@@ -50,6 +50,7 @@ class Constants {
   static const String optRoute = '/opt';
   static const String createToolRoute = '/createTool';
   static const String createOrganisationRoute = '/createOrganisation';
+  static const String chatRoute = '/chat';
 
   static const String verificationId = 'verificationId';
   static const String phoneNumber = 'phoneNumber';

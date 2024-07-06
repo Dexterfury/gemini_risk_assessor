@@ -58,7 +58,7 @@ class UsersSearchStream extends StatelessWidget {
                   return UserWidget(
                     userData: userData,
                     showCheckMark: true,
-                    viewType: UserViewType.creator,
+                    viewType: userViewType,
                   );
                 }
               },
