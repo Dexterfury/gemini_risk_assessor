@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
-import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
-import 'package:gemini_risk_assessor/search/animated_search_bar.dart';
+import 'package:gemini_risk_assessor/search/assessments_search_stream.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -49,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen>
     final tabProvider = context.read<TabProvider>();
     print('Searching for "$query" in tab: ${tabProvider.currentTabIndex}');
     // Implement your search logic here
-    // Implement your search logic here
     tabProvider.setSearchQuery(query);
   }
 
@@ -73,6 +71,23 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  List<Tab> _buildTabs() {
+    return const [
+      Tab(
+        icon: Icon(Icons.assignment_add),
+        text: Constants.dailyTaskInstructions,
+      ),
+      Tab(
+        icon: Icon(Icons.assignment_late_outlined),
+        text: Constants.riskAssessments,
+      ),
+      Tab(
+        icon: Icon(Icons.handyman),
+        text: Constants.tools,
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TabProvider>(
@@ -86,32 +101,30 @@ class _HomeScreenState extends State<HomeScreen>
             ],
             bottom: TabBar(
               controller: _tabController,
-              tabs: const [
-                Tab(
-                  icon: Icon(Icons.assignment_add),
-                  text: Constants.dailyTaskInstructions,
-                ),
-                Tab(
-                  icon: Icon(Icons.assignment_late_outlined),
-                  text: Constants.riskAssessments,
-                ),
-                Tab(
-                  icon: Icon(Icons.handyman),
-                  text: Constants.tools,
-                ),
-              ],
+              tabs: _buildTabs(),
             ),
           ),
           body: TabBarView(
             controller: _tabController,
-            children: const [
-              DSTIScreen(),
-              RistAssessmentsScreen(),
-              ToolsScreen(),
+            children: [
+              _buildTabContent(tabProvider, 0, const DSTIScreen()),
+              _buildTabContent(tabProvider, 1, const RistAssessmentsScreen()),
+              _buildTabContent(tabProvider, 2, const ToolsScreen()),
             ],
           ),
         );
       },
     );
+  }
+
+  Widget _buildTabContent(
+    TabProvider tabProvider,
+    int tabIndex,
+    Widget defaultScreen,
+  ) {
+    return tabProvider.searchQuery.isEmpty &&
+            tabProvider.currentTabIndex == tabIndex
+        ? defaultScreen
+        : const AssessmentsSearchStream();
   }
 }

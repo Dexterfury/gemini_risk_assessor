@@ -98,7 +98,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
         SizeTransition(
           sizeFactor: _animation,
           child: Card(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            //color: Theme.of(context).colorScheme.surfaceVariant,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: SizedBox(

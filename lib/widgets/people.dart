@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
-import 'package:gemini_risk_assessor/streams/search_stream.dart';
+import 'package:gemini_risk_assessor/search/users_search_stream.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +49,7 @@ class People extends StatelessWidget {
                   ),
                 );
               } else {
-                return SearchStream(
+                return UsersSearchStream(
                   uid: uid,
                   userViewType: userViewType,
                 );

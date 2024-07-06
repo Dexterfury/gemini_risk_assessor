@@ -88,18 +88,6 @@ class OrganisationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // stream organisations from firestore
-  Stream<QuerySnapshot> organisationsStream({
-    required String userId,
-  }) {
-    return _organisationCollection
-        .where(
-          Constants.membersUIDs,
-          arrayContains: userId,
-        )
-        .snapshots();
-  }
-
   // set the temp lists to empty
   Future<void> setEmptyTemps() async {
     _isSaved = false;

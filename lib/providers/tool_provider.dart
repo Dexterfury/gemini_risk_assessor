@@ -132,24 +132,6 @@ class ToolsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // stream my tools from firestore
-  Stream<QuerySnapshot> toolsStream({
-    required String userId,
-    required String orgID,
-  }) {
-    if (orgID.isNotEmpty) {
-      return toolsCollection
-          .doc(orgID)
-          .collection(Constants.toolsCollection)
-          .snapshots();
-    } else {
-      return toolsCollection
-          .doc(userId)
-          .collection(Constants.toolsCollection)
-          .snapshots();
-    }
-  }
-
   // set max images
   void setMaxImages(int value) {
     _maxImages = value;

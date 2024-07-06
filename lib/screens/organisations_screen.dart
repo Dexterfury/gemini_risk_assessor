@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/search/org_serach_stream.dart';
 import 'package:gemini_risk_assessor/streams/organisations_stream.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
@@ -12,10 +14,19 @@ class OrganisationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isAnonymous = context.watch<AuthProvider>().isUserAnonymous();
-    return Scaffold(
+    return Consumer<OrganisationProvider>(
+        builder: (context, organisationProvider, child) {
+      handleSearch(String query) {
+        print('Searching for "$query" ');
+        if (!isAnonymous) {
+          organisationProvider.setSearchQuery(query);
+        }
+      }
+
+      return Scaffold(
         appBar: MyAppBar(
           title: '',
-          onSearch: _handleSearch, // Pass the search function
+          onSearch: handleSearch, // Pass the search function
           actions: [
             DisplayUserImage(
               radius: 20,
@@ -25,12 +36,12 @@ class OrganisationsScreen extends StatelessWidget {
             ),
           ],
         ),
-        body:
-            isAnonymous ? const AnonymouseView() : const OrganisationsStream());
-  }
-
-  void _handleSearch(String query) {
-    print('Searching for "$query" in tab: ');
-    // Implement your search logic here
+        body: isAnonymous
+            ? const AnonymouseView()
+            : organisationProvider.searchQuery.isEmpty
+                ? const OrganisationsStream()
+                : const OrgSearchStream(),
+      );
+    });
   }
 }

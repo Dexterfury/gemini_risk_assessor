@@ -7,8 +7,8 @@ import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
 
-class SearchStream extends StatelessWidget {
-  const SearchStream({
+class UsersSearchStream extends StatelessWidget {
+  const UsersSearchStream({
     super.key,
     required this.uid,
     this.organisationID = '',

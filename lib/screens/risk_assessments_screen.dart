@@ -6,6 +6,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/streams/data_stream.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,6 @@ class RistAssessmentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
-    final assessmentProvider = context.read<AssessmentProvider>();
 
     handleSearch(String query) {
       // Implement your search logic here
@@ -30,7 +30,7 @@ class RistAssessmentsScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: assessmentProvider.ristAssessmentsStream(
+          stream: DataStream.ristAssessmentsStream(
             userId: uid,
             orgID: orgID,
           ),

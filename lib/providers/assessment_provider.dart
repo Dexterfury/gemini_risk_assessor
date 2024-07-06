@@ -221,42 +221,6 @@ class AssessmentProvider extends ChangeNotifier {
     return await PDFHandler.getDownloadStatus(filename);
   }
 
-  // stream dsti's from firestore
-  Stream<QuerySnapshot> dstiStream({
-    required String userId,
-    required String orgID,
-  }) {
-    if (orgID.isNotEmpty) {
-      return _organisationCollection
-          .doc(orgID)
-          .collection(Constants.dstiCollections)
-          .snapshots();
-    } else {
-      return _dstiCollection
-          .doc(userId)
-          .collection(Constants.dstiCollections)
-          .snapshots();
-    }
-  }
-
-  // stream risk assessments from firestore
-  Stream<QuerySnapshot> ristAssessmentsStream({
-    required String userId,
-    required String orgID,
-  }) {
-    if (orgID.isNotEmpty) {
-      return _assessmentCollection
-          .doc(orgID)
-          .collection(Constants.assessmentCollection)
-          .snapshots();
-    } else {
-      return _assessmentCollection
-          .doc(userId)
-          .collection(Constants.assessmentCollection)
-          .snapshots();
-    }
-  }
-
   // set has signed
   void setHasSigned(bool hasSigned) {
     _hasSigned = hasSigned;
