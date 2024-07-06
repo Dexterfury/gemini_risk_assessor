@@ -85,7 +85,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
           color: Theme.of(context).textTheme.titleLarge!.color!,
@@ -96,18 +96,18 @@ class _BottomChatFieldState extends State<BottomChatField> {
           if (hasImages) const PreviewImages(),
           Row(
             children: [
-              IconButton(
-                onPressed: () {
-                  if (hasImages) {
-                    // show the delete dialog
-                  } else {
-                    pickImage();
-                  }
-                },
-                icon: Icon(hasImages ? Icons.delete_forever : Icons.image),
-              ),
+              // IconButton(
+              //   onPressed: () {
+              //     if (hasImages) {
+              //       // show the delete dialog
+              //     } else {
+              //       pickImage();
+              //     }
+              //   },
+              //   icon: Icon(hasImages ? Icons.delete_forever : Icons.image),
+              // ),
               const SizedBox(
-                width: 5,
+                width: 10,
               ),
               Expanded(
                 child: TextField(
@@ -127,7 +127,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
                           }
                         },
                   decoration: InputDecoration.collapsed(
-                      hintText: 'Enter  a promt...',
+                      hintText: 'Enter a message...',
                       border: OutlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.circular(30),

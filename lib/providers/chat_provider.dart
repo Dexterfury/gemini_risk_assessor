@@ -372,7 +372,7 @@ class ChatProvider extends ChangeNotifier {
     } catch (error) {
       _isLoading = false;
       notifyListeners();
-      log(error.toString());
+      log('error XXX: ${error.toString()}');
       onError(error.toString());
     }
   }
@@ -435,19 +435,23 @@ class ChatProvider extends ChangeNotifier {
 
     final content = await getContent(message: message);
 
-    final chatMessage = Message(
-      senderID: uid,
-      messageID: messageID,
-      chatID: chatID,
-      question: message,
-      answer: StringBuffer(),
-      imagesUrls: [],
-      sentencesUrls: [],
-      finalWords: false,
-      timeSent: DateTime.now(),
-    );
+    // log('content: $content');
 
-    _messages.add(chatMessage);
+    // final chatMessage = Message(
+    //   senderID: uid,
+    //   messageID: messageID,
+    //   chatID: chatID,
+    //   question: message,
+    //   answer: StringBuffer(),
+    //   imagesUrls: [],
+    //   sentencesUrls: [],
+    //   finalWords: false,
+    //   timeSent: DateTime.now(),
+    // );
+
+    // _messages.add(chatMessage);
+
+    //log('messages: $_messages');
 
     await for (final eventData in chatSession.sendMessageStream(content)) {
       final streamedAnswer = eventData.text;
@@ -470,14 +474,14 @@ class ChatProvider extends ChangeNotifier {
       }
     }
 
+    log('full Streamed answer $fullStreamedAnswer');
+
     _historyMessages.add(Content.text(message));
     _historyMessages.add(Content.model([TextPart(fullStreamedAnswer)]));
 
     List<String> sentencesUrls = [];
 
-    final lastMessage =
-        Message.fromJson(_messages.last as Map<String, dynamic>);
-    log('lastMessage: $lastMessage');
+    log('lastMessage: ');
 
     // TODO: Save the message to Firestore
     // Save the message to Firestore

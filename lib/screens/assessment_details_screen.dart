@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/widgets/chat_button.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -148,10 +149,6 @@ class AssessmentDetailsScreen extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // GRID ABOVE HERE
-
-                // ANIMATED CARD OF LIST HERE BELOW THE GRID
-
                 ppeList.isNotEmpty
                     ? PpeItemsWidget(
                         label: ListHeader.ppe,
@@ -172,7 +169,13 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 ),
                 Text('Created at: $formattedTime'),
                 const SizedBox(height: 10),
+
                 const BottonButtonsField(),
+
+                // ChatButton(
+                //   docID: assessmentModel.id,
+                // ),
+
                 const SizedBox(
                   height: 20,
                 ),

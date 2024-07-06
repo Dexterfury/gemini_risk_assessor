@@ -9,9 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 class BottonButtonsField extends StatelessWidget {
-  const BottonButtonsField({
-    super.key,
-  });
+  const BottonButtonsField({super.key});
 
   @override
   Widget build(BuildContext context) {
