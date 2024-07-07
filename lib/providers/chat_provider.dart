@@ -276,7 +276,9 @@ class ChatProvider extends ChangeNotifier {
   Future<void> getChatHistoryFromFirebase({
     required String uid,
     required String chatID,
-    required bool isTool,
+    required bool isDSTI,
+    AssessmentModel? assessmentModel,
+    ToolModel? toolModel,
   }) async {
     // empty all messages
     _historyMessages = [];
@@ -284,7 +286,7 @@ class ChatProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final collection = isTool
+    final collection = toolModel != null
         ? Constants.toolsChatsCollection
         : Constants.assessmentsChatsCollection;
 
@@ -317,9 +319,16 @@ class ChatProvider extends ChangeNotifier {
             ),
           );
         }
-        _isLoading = false;
-        notifyListeners();
       });
+
+      await setChatContext(
+        assessment: assessmentModel,
+        tool: toolModel,
+        isDSTI: isDSTI,
+      );
+
+      _isLoading = false;
+      notifyListeners();
     } on FirebaseException catch (e) {
       _isLoading = false;
       notifyListeners();

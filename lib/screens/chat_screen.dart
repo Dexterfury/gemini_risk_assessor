@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_chat_field.dart';
@@ -11,12 +13,12 @@ import 'package:speech_to_text/speech_to_text.dart';
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
     super.key,
-    this.docID = '',
-    this.isTool = false,
+    this.assesmentModel,
+    this.toolModel,
   });
 
-  final String docID;
-  final bool isTool;
+  final AssessmentModel? assesmentModel;
+  final ToolModel? toolModel;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -27,10 +29,16 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
 
   SpeechToText _speechToText = SpeechToText();
-  AudioPlayer? _audioPlayer = AudioPlayer();
-  AudioPlayer? _audioPlayer2 = AudioPlayer();
 
   String _spokenWords = '';
+  String docID = '';
+  bool isTool = false;
+
+  @override
+  void initState() {
+    setData();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -38,21 +46,23 @@ class _ChatScreenState extends State<ChatScreen> {
       _speechToText.stop();
     }
     _scrollController.dispose();
-    _audioPlayer!.dispose();
-    _audioPlayer2!.dispose();
     super.dispose();
   }
 
-  setPlayerListener() async {
-    final chatProvider = context.read<ChatProvider>();
-
-    // for replay audio
-    await _audioPlayer2!.playerStateStream.firstWhere(
-        (state) => state.processingState == ProcessingState.completed);
-    chatProvider.setGeminiTalking(value: false);
-    // Reset player for the next audio
-    await _audioPlayer2!.stop();
-    await _audioPlayer2!.seek(Duration.zero);
+  void setData() {
+    // wait for screen to build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        // set doc id depending on widget type
+        if (widget.assesmentModel != null) {
+          docID = widget.assesmentModel!.id;
+          isTool = false;
+        } else if (widget.toolModel != null) {
+          docID = widget.toolModel!.id;
+          isTool = true;
+        }
+      });
+    });
   }
 
   void _scrollToBottom() {
@@ -73,6 +83,12 @@ class _ChatScreenState extends State<ChatScreen> {
     final uid = context.read<AuthProvider>().userModel!.uid;
     bool isAvailable = await _speechToText.initialize();
 
+    String docID = widget.assesmentModel != null
+        ? widget.assesmentModel!.id
+        : widget.toolModel != null
+            ? widget.toolModel!.id
+            : '';
+
     if (isClicked && isAvailable) {
       chatProvider.setIsListening(listening: true);
 
@@ -82,8 +98,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
           await chatProvider.addAndDisplayMessage(
             uid: uid,
-            chatID: widget.docID,
-            isTool: widget.isTool,
+            chatID: docID,
+            isTool: isTool,
             finalWords: result.finalResult,
             spokenWords: _spokenWords,
             onSuccess: () {},
@@ -148,8 +164,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   // input field
                   BottomChatField(
                     chatProvider: chatProvider,
-                    docID: widget.docID,
-                    isTool: widget.isTool,
+                    docID: docID,
+                    isTool: isTool,
                   )
                 ],
               ),

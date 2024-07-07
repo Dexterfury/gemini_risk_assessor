@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 
 class ChatButton extends StatelessWidget {
   const ChatButton({
     super.key,
-    this.docID = '',
-    this.orgID = '',
+    this.assesmentModel,
+    this.toolModel,
+    this.isTool = false,
   });
 
-  final String docID;
-  final String orgID;
+  final AssessmentModel? assesmentModel;
+  final ToolModel? toolModel;
+  final bool isTool;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +27,8 @@ class ChatButton extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => ChatScreen(
-                docID: docID,
-                isTool: false,
+                assesmentModel: assesmentModel,
+                toolModel: toolModel,
               ),
             ),
           );
