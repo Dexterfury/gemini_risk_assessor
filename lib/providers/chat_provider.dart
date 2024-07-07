@@ -145,7 +145,7 @@ class ChatProvider extends ChangeNotifier {
       temperature: 0.4,
       topK: 32,
       topP: 1,
-      maxOutputTokens: 4096,
+      //maxOutputTokens: 4096,
     );
 
     final List<SafetySetting> safetySettings = [
@@ -550,12 +550,17 @@ class ChatProvider extends ChangeNotifier {
     onSuccess();
   }
 
-  Future<void> setChatContext(AssessmentModel assessment) async {
+  Future<void> setChatContext(
+    AssessmentModel assessment,
+    bool isDSTI,
+  ) async {
+    String docType =
+        isDSTI ? 'daily safety tast instruction' : 'risk assessment';
     _currentAssessment = assessment;
 
     // Create a context prompt for Gemini
     final contextPrompt = '''
-You are a Safety officer discussing a specific risk assessment. Here are the details of the assessment:
+You are a Safety officer discussing a specific $docType. Here are the details of the assessment:
 
 Title: ${assessment.title}
 Task to Achieve: ${assessment.taskToAchieve}
