@@ -23,14 +23,7 @@ class ImagesDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = getProvider(assessmentProvider, toolProvider);
-    return isViewOnly && provider.imagesFileList!.isEmpty
-        ? const Text('No images added')
-        : isViewOnly && assessmentModel != null
-            ? _assessmentViewImages()
-            : ProviderViewImages(
-                isViewOnly: isViewOnly,
-                provider: provider,
-              );
+    return getImagesToShow(provider);
   }
 
   Container _assessmentViewImages() {
@@ -51,9 +44,13 @@ class ImagesDisplay extends StatelessWidget {
                   children: [
                     ClipRRect(
                         borderRadius: BorderRadius.circular(15.0),
-                        child: MyImageCacheManager.showImage(
-                          imageUrl: image,
-                          isTool: false,
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: MyImageCacheManager.showImage(
+                            imageUrl: image,
+                            isTool: false,
+                          ),
                         )),
                   ],
                 ),
@@ -62,6 +59,19 @@ class ImagesDisplay extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  getImagesToShow(dynamic provider) {
+    if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
+      return const Text('No images added');
+    } else if (isViewOnly && assessmentModel != null) {
+      return _assessmentViewImages();
+    } else {
+      return ProviderViewImages(
+        isViewOnly: isViewOnly,
+        provider: provider,
+      );
+    }
   }
 
   getProvider(
@@ -73,7 +83,7 @@ class ImagesDisplay extends StatelessWidget {
     } else if (toolProvider != null) {
       return toolProvider;
     } else {
-      throw Exception('No provider found');
+      return null;
     }
   }
 }
