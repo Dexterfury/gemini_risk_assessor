@@ -13,6 +13,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini.dart';
+import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
@@ -23,6 +24,7 @@ import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:uuid/uuid.dart';
 
 class AssessmentProvider extends ChangeNotifier {
+  final GeminiModelManager _modelManager = GeminiModelManager();
   List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
   bool _isLoading = false;
@@ -465,7 +467,11 @@ class AssessmentProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     // get model to use text or vision
-    var model = await GeminiService.getModel(images: _maxImages);
+    //var model = await GeminiService.getModel(images: _maxImages);
+    var model = await _modelManager.getModel(
+      isVision: _maxImages < 10,
+      isDocumentSpecific: true,
+    );
 
     // set description to use in prompt
     await setDocData(
@@ -479,7 +485,7 @@ class AssessmentProvider extends ChangeNotifier {
     final prompt = getPromptData();
 
     try {
-      final content = await GeminiService.generateContent(model, prompt);
+      final content = await _modelManager.generateContent(model, prompt);
 
       // handle no image or image of not-food
       if (content.text != null && content.text!.contains(noRiskFound)) {

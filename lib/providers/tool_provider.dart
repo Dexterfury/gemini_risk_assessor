@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,6 +16,7 @@ import '../service/gemini.dart';
 import '../utilities/global.dart';
 
 class ToolsProvider extends ChangeNotifier {
+  final GeminiModelManager _modelManager = GeminiModelManager();
   bool _isLoading = false;
   int _maxImages = 10;
   String _description = '';
@@ -295,7 +297,11 @@ class ToolsProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     // get model to use text or vision
-    var model = await GeminiService.getModel(images: _maxImages);
+    //var model = await GeminiService.getModel(images: _maxImages);
+    var model = await _modelManager.getModel(
+      isVision: _maxImages < 10,
+      isDocumentSpecific: true,
+    );
 
     // set description to use in prompt
     await setToolData(
@@ -308,7 +314,8 @@ class ToolsProvider extends ChangeNotifier {
     final prompt = getPromptData();
 
     try {
-      final content = await GeminiService.generateContent(model, prompt);
+      //final content = await GeminiService.generateContent(model, prompt);
+      final content = await _modelManager.generateContent(model, prompt);
 
       // handle no image or image of not-food
       if (content.text != null && content.text!.contains(noToolFound)) {

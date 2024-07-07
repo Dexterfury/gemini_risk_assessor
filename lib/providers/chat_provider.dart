@@ -6,6 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -13,6 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatProvider extends ChangeNotifier {
+  final GeminiModelManager _modelManager = GeminiModelManager();
+  GenerativeModel? _model;
+
   // list of messages
   List<Message> _messages = [];
 
@@ -24,6 +29,7 @@ class ChatProvider extends ChangeNotifier {
 
   // current assessment
   AssessmentModel? _currentAssessment;
+  ToolModel? _toolModel;
 
   int _selectedVoiceIndex = 0;
   double _audioSpeed = 1.0;
@@ -35,15 +41,6 @@ class ChatProvider extends ChangeNotifier {
   bool _geminiTalking = false;
   bool _isAudioSending = false;
   bool _isStreaming = false;
-
-  // initialize generative model
-  GenerativeModel? _model;
-
-  // itialize text model
-  GenerativeModel? _textModel;
-
-  // initialize vision model
-  GenerativeModel? _visionModel;
 
   // current mode
   String _modelType = 'gemini-1.0-pro';
@@ -70,8 +67,6 @@ class ChatProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   List<XFile>? get imagesFileList => _imagesFileList;
   GenerativeModel? get model => _model;
-  GenerativeModel? get textModel => _textModel;
-  GenerativeModel? get visionModel => _visionModel;
   String get modelType => _modelType;
 
   final CollectionReference _chatsCollection =
@@ -141,54 +136,60 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> setModel() async {
-    final GenerationConfig config = GenerationConfig(
-      temperature: 0.4,
-      topK: 32,
-      topP: 1,
-      //maxOutputTokens: 4096,
+    _model = await _modelManager.getModel(
+      isVision: _imagesFileList?.isNotEmpty ?? false,
+      isDocumentSpecific: _currentAssessment != null || _toolModel != null,
     );
-
-    final List<SafetySetting> safetySettings = [
-      SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-      SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-    ];
-
-    if (_currentAssessment != null) {
-      // We're in an assessment chat context
-      _model = GenerativeModel(
-        model: setCurrentModel(newModel: 'gemini-1.0-pro'),
-        apiKey: getApiKey(),
-        generationConfig: config,
-        safetySettings: safetySettings,
-      );
-    } else if (_imagesFileList!.isEmpty) {
-      // Text-only model
-      _model = _textModel ??
-          GenerativeModel(
-            model: setCurrentModel(newModel: 'gemini-1.0-pro'),
-            apiKey: getApiKey(),
-            generationConfig: config,
-            safetySettings: safetySettings,
-          );
-      _textModel = _model;
-    } else {
-      // Vision model
-      _model = _visionModel ??
-          GenerativeModel(
-            model: setCurrentModel(newModel: 'gemini-1.5-flash'),
-            apiKey: getApiKey(),
-            generationConfig: config,
-            safetySettings: safetySettings,
-          );
-      _visionModel = _model;
-    }
-
     notifyListeners();
   }
 
-  String getApiKey() {
-    return dotenv.env['GEMINI_API_KEY'].toString();
-  }
+//   Future<void> setModel() async {
+//   final GenerationConfig config = GenerationConfig(
+//     temperature: 0.4,
+//     topK: 32,
+//     topP: 1,
+//     maxOutputTokens: 4096,
+//   );
+
+//   final List<SafetySetting> safetySettings = [
+//     SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+//     SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+//   ];
+
+//   if (_currentAssessment != null || _toolModel != null) {
+//     // We're in a document-specific chat context (assessment, DSTI, or tool)
+//     _model = GenerativeModel(
+//       model: setCurrentModel(newModel: 'gemini-1.0-pro'),
+//       apiKey: getApiKey(),
+//       generationConfig: config,
+//       safetySettings: safetySettings,
+//     );
+//   } else if (_imagesFileList!.isEmpty) {
+//     // Text-only model for general chats
+//     _model = _textModel ?? GenerativeModel(
+//       model: setCurrentModel(newModel: 'gemini-1.0-pro'),
+//       apiKey: getApiKey(),
+//       generationConfig: config,
+//       safetySettings: safetySettings,
+//     );
+//     _textModel = _model;
+//   } else {
+//     // Vision model for general chats with images
+//     _model = _visionModel ?? GenerativeModel(
+//       model: setCurrentModel(newModel: 'gemini-1.5-flash'),
+//       apiKey: getApiKey(),
+//       generationConfig: config,
+//       safetySettings: safetySettings,
+//     );
+//     _visionModel = _model;
+//   }
+
+//   notifyListeners();
+// }
+
+//   String getApiKey() {
+//     return dotenv.env['GEMINI_API_KEY'].toString();
+//   }
 
   // save volume to shared preferences
   Future<void> saveVolumeToSharedPreferences({required double value}) async {
@@ -550,17 +551,19 @@ class ChatProvider extends ChangeNotifier {
     onSuccess();
   }
 
-  Future<void> setChatContext(
-    AssessmentModel assessment,
-    bool isDSTI,
-  ) async {
-    String docType =
-        isDSTI ? 'daily safety tast instruction' : 'risk assessment';
-    _currentAssessment = assessment;
+  Future<void> setChatContext({
+    AssessmentModel? assessment,
+    ToolModel? tool,
+    bool isDSTI = false,
+  }) async {
+    if (assessment != null) {
+      String docType =
+          isDSTI ? 'daily safety task instruction' : 'risk assessment';
+      _currentAssessment = assessment;
+      _toolModel = null;
 
-    // Create a context prompt for Gemini
-    final contextPrompt = '''
-You are a Safety officer discussing a specific $docType. Here are the details of the assessment:
+      final contextPrompt = '''
+You are a Safety officer discussing a specific $docType. Here are the details:
 
 Title: ${assessment.title}
 Task to Achieve: ${assessment.taskToAchieve}
@@ -572,15 +575,32 @@ PPE: ${assessment.ppe.join(', ')}
 Weather: ${assessment.weather}
 Summary: ${assessment.summary}
 
-Only answer questions related to this specific assessment. If asked about something unrelated, politely remind the user that you can only discuss this particular assessment.
+Only answer questions related to this specific $docType. If asked about something unrelated, politely remind the user that you can only discuss this particular $docType.
 ''';
 
-    // Reset chat history and add the context prompt
-    _historyMessages = [Content.text(contextPrompt)];
+      _historyMessages = [Content.text(contextPrompt)];
+    } else if (tool != null) {
+      _toolModel = tool;
+      _currentAssessment = null;
 
-    // Reset the chat model with the new context
+      final contextPrompt = '''
+You are a tools expert discussing a specific tool. Here are the details:
+
+Name: ${tool.name}
+Description: ${tool.description}
+Summary: ${tool.summary}
+
+Explain how to use this tool and give practical use case examples. Adhere to safety standards and regulations, providing guidance on safe and effective use of the tool.
+
+Only answer questions related to this specific tool. If asked about something unrelated, politely remind the user that you can only discuss this particular tool.
+''';
+
+      _historyMessages = [Content.text(contextPrompt)];
+    } else {
+      throw ArgumentError('Either assessment or tool must be provided');
+    }
+
     await setModel();
-
     notifyListeners();
   }
 }
