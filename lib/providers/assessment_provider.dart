@@ -110,10 +110,10 @@ class AssessmentProvider extends ChangeNotifier {
     _pdfAssessmentFile = file;
     await OpenFile.open((file.path));
     // savePdf to firestore here
-    // await saveFileToFirestore(
-    //   file,
-    //   _pdfHeading,
-    // );
+    await saveFileToFirestore(
+      file,
+      _pdfHeading,
+    );
   }
 
   Future<String> getCreatorName(String creatorId) async {
@@ -466,6 +466,7 @@ class AssessmentProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
+
     // get model to use text or vision
     //var model = await GeminiService.getModel(images: _maxImages);
     var model = await _modelManager.getModel(
