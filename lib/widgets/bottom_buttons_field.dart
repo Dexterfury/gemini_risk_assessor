@@ -95,7 +95,7 @@ class BottonButtonsField extends StatelessWidget {
                   // show my alert dialog for loading
                   MyDialogs.showMyAnimatedDialog(
                     context: context,
-                    title: 'Generating PDF file',
+                    title: 'Saving the document',
                     content: 'Please wait...',
                     loadingIndicator: const SizedBox(
                         height: 40,

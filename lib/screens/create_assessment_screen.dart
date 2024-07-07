@@ -212,8 +212,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                             .whenComplete(() {
                           Navigator.pop(context);
                           showSnackBar(
-                              context: context,
-                              message: 'Tool successfully saved');
+                              context: context, message: 'Successfully saved');
                         });
                       }
                     });

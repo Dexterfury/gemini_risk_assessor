@@ -22,6 +22,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:uuid/uuid.dart';
+import 'package:path/path.dart' as path;
 
 class AssessmentProvider extends ChangeNotifier {
   final GeminiModelManager _modelManager = GeminiModelManager();
@@ -100,12 +101,15 @@ class AssessmentProvider extends ChangeNotifier {
     );
 
     _pdfAssessmentFile = file;
-    await OpenFile.open((file.path));
-    // savePdf to firestore here
-    await saveFileToFirestore(
-      file,
-      _pdfHeading,
-    );
+    print("PDF file path: ${file.absolute.path}");
+    print("PDF file exists: ${file.existsSync()}");
+
+    if (file.existsSync()) {
+      await OpenFile.open((file.path));
+      await saveFileToFirestore(file.absolute, _pdfHeading);
+    } else {
+      throw FileSystemException("PDF file does not exist", file.path);
+    }
   }
 
   Future<String> getCreatorName(String creatorId) async {
@@ -125,19 +129,20 @@ class AssessmentProvider extends ChangeNotifier {
     // get folder directory
     final folderName = Constants.getFolderName(pdfHeading);
 
-    // upload pdf to storage
     String fileUrl = await FileUploadHandler.uploadFileAndGetUrl(
-        file: file,
-        reference:
-            '${Constants.pdfFiles}/$folderName/$id/${assessmentModel.id}.pdf');
+      file: file,
+      reference:
+          '${Constants.pdfFiles}/$folderName/$id/${assessmentModel.id}.pdf',
+    );
 
     if (_assessmentModel.images.isNotEmpty) {
       List<String> imagesUrls = [];
       for (var image in _assessmentModel.images) {
         final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
-            file: File(image),
-            reference:
-                '${Constants.images}/$folderName/$id${DateTime.now().toIso8601String()}.jpg');
+          file: File(image),
+          reference:
+              '${Constants.images}/$folderName/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
+        );
         imagesUrls.add(imageUrl);
       }
 
