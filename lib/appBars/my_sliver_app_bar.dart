@@ -41,6 +41,7 @@ class MySliverAppBar extends StatelessWidget {
                 final data = doc.data() as Map<String, dynamic>;
                 final item = AssessmentModel.fromJson(data);
                 return ListItem(
+                  docTitle: title,
                   data: item,
                 );
               },

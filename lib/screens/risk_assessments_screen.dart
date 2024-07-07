@@ -78,6 +78,7 @@ class RistAssessmentsScreen extends StatelessWidget {
                         final data = doc.data() as Map<String, dynamic>;
                         final assessment = AssessmentModel.fromJson(data);
                         return ListItem(
+                          docTitle: Constants.riskAssessment,
                           data: assessment,
                         );
                       },

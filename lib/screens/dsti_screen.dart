@@ -79,6 +79,7 @@ class DSTIScreen extends StatelessWidget {
                         final data = doc.data() as Map<String, dynamic>;
                         final dsti = AssessmentModel.fromJson(data);
                         return ListItem(
+                          docTitle: Constants.dailySafetyTaskInstructions,
                           data: dsti,
                         );
                       },

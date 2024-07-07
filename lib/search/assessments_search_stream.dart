@@ -25,6 +25,9 @@ class AssessmentsSearchStream extends StatelessWidget {
     return Scaffold(
       body: Consumer<TabProvider>(
         builder: (context, tabProvider, child) {
+          final String docTitle = tabProvider.currentTabIndex == 0
+              ? Constants.dailySafetyTaskInstructions
+              : Constants.riskAssessment;
           return SafeArea(
             child: StreamBuilder<QuerySnapshot>(
               stream: DataStream.dstiStream(
@@ -86,6 +89,7 @@ class AssessmentsSearchStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
                             final dsti = AssessmentModel.fromJson(data);
                             return ListItem(
+                              docTitle: docTitle,
                               data: dsti,
                             );
                           },

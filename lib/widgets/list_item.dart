@@ -7,9 +7,11 @@ import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 class ListItem extends StatelessWidget {
   const ListItem({
     super.key,
+    required this.docTitle,
     required this.data,
   });
 
+  final String docTitle;
   final AssessmentModel data;
 
   @override
@@ -51,7 +53,7 @@ class ListItem extends StatelessWidget {
           opaque: false,
           pageBuilder: (BuildContext context, animation, secondaryAnimation) =>
               AssessmentDetailsScreen(
-                appBarTitle: ,
+            appBarTitle: docTitle,
             animation: animation,
             currentModel: data,
           ),
