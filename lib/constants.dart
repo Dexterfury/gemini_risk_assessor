@@ -149,6 +149,14 @@ class Constants {
   static const String audioSpeed = 'audioSpeed';
   static const String shouldSpeak = 'ShouldSpeak';
 
+  static String getDoctTitle(String docTitle) {
+    if (docTitle == createAssessment) {
+      return riskAssessment;
+    } else {
+      return dailySafetyTaskInstructions;
+    }
+  }
+
   // list of ppe icons
   static List<PpeModel> getPPEIcons({
     double radius = 20.0,

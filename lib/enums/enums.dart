@@ -7,9 +7,13 @@ enum Weather {
 }
 
 extension WeatherExtension on Weather {
+  String get name {
+    return toString().split('.').last;
+  }
+
   static Weather fromString(String weather) {
     return Weather.values.firstWhere(
-      (e) => e.toString().split('.').last == weather,
+      (e) => e.name.toLowerCase() == weather.toLowerCase(),
       orElse: () => Weather.sunny, // Default to sunny if unknown weather
     );
   }

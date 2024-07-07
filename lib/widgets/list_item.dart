@@ -51,6 +51,7 @@ class ListItem extends StatelessWidget {
           opaque: false,
           pageBuilder: (BuildContext context, animation, secondaryAnimation) =>
               AssessmentDetailsScreen(
+                appBarTitle: ,
             animation: animation,
             currentModel: data,
           ),

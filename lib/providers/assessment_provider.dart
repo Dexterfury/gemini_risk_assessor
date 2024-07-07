@@ -76,16 +76,8 @@ class AssessmentProvider extends ChangeNotifier {
     _description = desc;
     _uid = creatorID;
     _organisationID = orgID;
-    _pdfHeading = getDoctTitle(docTitle);
+    _pdfHeading = docTitle;
     notifyListeners();
-  }
-
-  String getDoctTitle(String docTitle) {
-    if (docTitle == Constants.createAssessment) {
-      return Constants.riskAssessment;
-    } else {
-      return Constants.dailySafetyTaskInstructions;
-    }
   }
 
   // set loading

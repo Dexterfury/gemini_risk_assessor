@@ -7,7 +7,6 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/widgets/chat_button.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -19,10 +18,12 @@ import 'package:provider/provider.dart';
 class AssessmentDetailsScreen extends StatelessWidget {
   AssessmentDetailsScreen({
     super.key,
+    required this.appBarTitle,
     required this.animation,
     this.currentModel,
   }) : _scrollController = ScrollController();
 
+  final String appBarTitle;
   final Animation<double> animation;
   final ScrollController _scrollController;
   final AssessmentModel? currentModel;
@@ -74,7 +75,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
         scale: Tween(begin: 3.0, end: 1.0).animate(animation),
         child: Scaffold(
           appBar: MyAppBar(
-            title: title,
+            title: appBarTitle,
             leading: BackButton(
               onPressed: () {
                 // pop the screen with save as false
@@ -104,6 +105,17 @@ class AssessmentDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                FittedBox(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

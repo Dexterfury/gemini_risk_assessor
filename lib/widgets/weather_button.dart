@@ -16,15 +16,15 @@ class WeatherButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final capitalizedTitle = title[0].toUpperCase() + title.substring(1);
+    final capitalizedTitle = title.isNotEmpty
+        ? title[0].toUpperCase() + title.substring(1)
+        : 'Unknown';
     return GestureDetector(
       onTap: onChanged,
       child: Container(
         decoration: BoxDecoration(
           color: value
-              ?
-              // Colors.blue[100]
-              Theme.of(context).colorScheme.primaryContainer
+              ? Theme.of(context).colorScheme.primaryContainer
               : Colors.grey[300],
           borderRadius: BorderRadius.circular(10),
         ),
@@ -35,19 +35,14 @@ class WeatherButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Icon(iconData),
-                const SizedBox(
-                  width: 4,
-                ),
+                const SizedBox(width: 4),
                 Text(capitalizedTitle),
-                const SizedBox(
-                  width: 4,
-                ),
-                value
-                    ? const Icon(
-                        Icons.check,
-                        size: 15,
-                      )
-                    : const SizedBox(),
+                const SizedBox(width: 4),
+                if (value)
+                  const Icon(
+                    Icons.check,
+                    size: 15,
+                  ),
               ],
             ),
           ),

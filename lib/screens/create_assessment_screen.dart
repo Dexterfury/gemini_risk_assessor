@@ -42,6 +42,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     final orgID = args[Constants.orgArg] as String;
     final assessmentProvider = context.watch<AssessmentProvider>();
 
+    final String docTitle = Constants.getDoctTitle(title);
+
     log('$title: $orgID');
     return Scaffold(
       appBar: MyAppBar(
@@ -180,40 +182,39 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       creatorID: creatorID,
                       orgID: orgID,
                       description: _descriptionController.text,
-                      docTitle: title,
+                      docTitle: docTitle,
                     )
                         .then((_) async {
                       // pop the the dialog
                       Navigator.pop(context);
                       if (!context.mounted) return;
                       // display the results
-                      if (assessmentProvider.assessmentModel != null) {
-                        // display the risk assessment details screen
-                        PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                          opaque: false,
-                          pageBuilder: (BuildContext context, animation,
-                                  secondaryAnimation) =>
-                              AssessmentDetailsScreen(
-                            animation: animation,
-                          ),
-                        );
-                        bool shouldSave =
-                            await Navigator.of(context).push(pageRouteBuilder);
-                        if (shouldSave) {
-                          // reset the data
-                          assessmentProvider.resetPromptData();
+                      // display the risk assessment details screen
+                      PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+                        opaque: false,
+                        pageBuilder: (BuildContext context, animation,
+                                secondaryAnimation) =>
+                            AssessmentDetailsScreen(
+                          appBarTitle: docTitle,
+                          animation: animation,
+                        ),
+                      );
+                      bool shouldSave =
+                          await Navigator.of(context).push(pageRouteBuilder);
+                      if (shouldSave) {
+                        // reset the data
+                        assessmentProvider.resetPromptData();
 
-                          setState(() {
-                            _descriptionController.clear();
-                          });
-                          Future.delayed(const Duration(milliseconds: 200))
-                              .whenComplete(() {
-                            Navigator.pop(context);
-                            showSnackBar(
-                                context: context,
-                                message: 'Tool successfully saved');
-                          });
-                        }
+                        setState(() {
+                          _descriptionController.clear();
+                        });
+                        Future.delayed(const Duration(milliseconds: 200))
+                            .whenComplete(() {
+                          Navigator.pop(context);
+                          showSnackBar(
+                              context: context,
+                              message: 'Tool successfully saved');
+                        });
                       }
                     });
                   },

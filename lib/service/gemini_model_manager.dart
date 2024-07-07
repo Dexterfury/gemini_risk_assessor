@@ -33,12 +33,12 @@ class GeminiModelManager {
     required bool isDocumentSpecific,
   }) async {
     if (isDocumentSpecific) {
-      return _createModel('gemini-1.0-pro');
+      return _createModel('gemini-1.5-flash');
     } else if (!isVision) {
-      _textModel ??= _createModel('gemini-1.0-pro');
+      _textModel ??= _createModel('gemini-1.5-flash');
       return _textModel!;
     } else {
-      _visionModel ??= _createModel('gemini-1.5-flash');
+      _visionModel ??= _createModel('gemini-1.0-pro');
       return _visionModel!;
     }
   }
