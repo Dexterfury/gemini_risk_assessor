@@ -1,11 +1,10 @@
 import 'dart:developer';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,21 +22,16 @@ class ChatProvider extends ChangeNotifier {
   // history of messages
   List<Content> _historyMessages = [];
 
-  List<dynamic> _sentencesAudioFileList = [];
-
-  bool _allSentencesAudioFilesPlayed = false;
+  // current assessment
+  AssessmentModel? _currentAssessment;
 
   int _selectedVoiceIndex = 0;
   double _audioSpeed = 1.0;
   double _audioVolume = 0.5;
 
-  int _fileToPlay = 0;
-  int _allSentencesCount = 0;
-
   bool _isListening = false;
   bool _isPlaySample = false;
   bool _shouldSpeak = true;
-  bool _startListeningOnNew = true;
   bool _geminiTalking = false;
   bool _isAudioSending = false;
   bool _isStreaming = false;
@@ -68,15 +62,11 @@ class ChatProvider extends ChangeNotifier {
   bool get isListening => _isListening;
   bool get isPlaySample => _isPlaySample;
   bool get shouldSpeak => _shouldSpeak;
-  bool get startListeningOnNew => _startListeningOnNew;
   bool get geminiTalking => _geminiTalking;
   bool get isAudioSending => _isAudioSending;
   bool get isStreaming => _isStreaming;
   String get googleVoiceName => _googleVoiceName;
   String get googelVoiceLanguageCode => _googelVoiceLanguageCode;
-  List<dynamic> get sentencesAudioFileList => _sentencesAudioFileList;
-  bool get allSentencesAudioFilesPlayed => _allSentencesAudioFilesPlayed;
-  int get fileToPlay => _fileToPlay;
   bool get isLoading => _isLoading;
   List<XFile>? get imagesFileList => _imagesFileList;
   GenerativeModel? get model => _model;
@@ -86,11 +76,6 @@ class ChatProvider extends ChangeNotifier {
 
   final CollectionReference _chatsCollection =
       FirebaseFirestore.instance.collection(Constants.chatsCollection);
-
-  set fileToPlay(int value) {
-    _fileToPlay = value;
-    notifyListeners();
-  }
 
   // set loading
   void setLoading({required bool value}) {
@@ -155,39 +140,49 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // function to set the model based on bool - isTextOnly
   Future<void> setModel() async {
-    if (_imagesFileList!.isEmpty) {
+    final GenerationConfig config = GenerationConfig(
+      temperature: 0.4,
+      topK: 32,
+      topP: 1,
+      maxOutputTokens: 4096,
+    );
+
+    final List<SafetySetting> safetySettings = [
+      SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
+      SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+    ];
+
+    if (_currentAssessment != null) {
+      // We're in an assessment chat context
+      _model = GenerativeModel(
+        model: setCurrentModel(newModel: 'gemini-1.0-pro'),
+        apiKey: getApiKey(),
+        generationConfig: config,
+        safetySettings: safetySettings,
+      );
+    } else if (_imagesFileList!.isEmpty) {
+      // Text-only model
       _model = _textModel ??
           GenerativeModel(
-              model: setCurrentModel(newModel: 'gemini-1.0-pro'),
-              apiKey: getApiKey(),
-              generationConfig: GenerationConfig(
-                temperature: 0.4,
-                topK: 32,
-                topP: 1,
-                maxOutputTokens: 4096,
-              ),
-              safetySettings: [
-                SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-                SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-              ]);
+            model: setCurrentModel(newModel: 'gemini-1.0-pro'),
+            apiKey: getApiKey(),
+            generationConfig: config,
+            safetySettings: safetySettings,
+          );
+      _textModel = _model;
     } else {
+      // Vision model
       _model = _visionModel ??
           GenerativeModel(
-              model: setCurrentModel(newModel: 'gemini-1.5-flash'),
-              apiKey: getApiKey(),
-              generationConfig: GenerationConfig(
-                temperature: 0.4,
-                topK: 32,
-                topP: 1,
-                maxOutputTokens: 4096,
-              ),
-              safetySettings: [
-                SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-                SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-              ]);
+            model: setCurrentModel(newModel: 'gemini-1.5-flash'),
+            apiKey: getApiKey(),
+            generationConfig: config,
+            safetySettings: safetySettings,
+          );
+      _visionModel = _model;
     }
+
     notifyListeners();
   }
 
@@ -364,7 +359,6 @@ class ChatProvider extends ChangeNotifier {
         messageID: messageID,
         message: message,
         isTool: isTool,
-        audioPlayer: audioPlayer,
         onError: onError,
       );
 
@@ -383,7 +377,6 @@ class ChatProvider extends ChangeNotifier {
     required String messageID,
     required String message,
     required bool isTool,
-    AudioPlayer? audioPlayer,
     required Function(String) onError,
   }) async {
     await setModel();
@@ -395,19 +388,12 @@ class ChatProvider extends ChangeNotifier {
         ? Constants.toolsChatsCollection
         : Constants.assessmentsChatsCollection;
 
-    audioPlayer?.stop();
-
-    _isStreaming = true;
-    _sentencesAudioFileList = [];
-    notifyListeners();
-
     await streamResponse(
       uid,
       messageID,
       chatID,
       message,
       collection,
-      audioPlayer,
     );
   }
 
@@ -417,46 +403,16 @@ class ChatProvider extends ChangeNotifier {
     String chatID,
     String message,
     String collectionRef,
-    AudioPlayer? audioPlayer,
   ) async {
-    String fullSentence = '';
     String fullStreamedAnswer = '';
 
-    int counter = 0;
-    _fileToPlay = 0;
-    _allSentencesCount = 0;
-    _allSentencesAudioFilesPlayed = false;
-
-    final chatSession = _model!.startChat(
-      history: _historyMessages.isEmpty || _imagesFileList!.isNotEmpty
-          ? null
-          : _historyMessages,
-    );
+    final chatSession = _model!.startChat(history: _historyMessages);
 
     final content = await getContent(message: message);
 
-    // log('content: $content');
-
-    // final chatMessage = Message(
-    //   senderID: uid,
-    //   messageID: messageID,
-    //   chatID: chatID,
-    //   question: message,
-    //   answer: StringBuffer(),
-    //   imagesUrls: [],
-    //   sentencesUrls: [],
-    //   finalWords: false,
-    //   timeSent: DateTime.now(),
-    // );
-
-    // _messages.add(chatMessage);
-
-    //log('messages: $_messages');
-
     await for (final eventData in chatSession.sendMessageStream(content)) {
       final streamedAnswer = eventData.text;
-      fullSentence += streamedAnswer!;
-      fullStreamedAnswer += streamedAnswer;
+      fullStreamedAnswer += streamedAnswer!;
 
       _messages
           .firstWhere((element) => element.messageID == messageID)
@@ -464,27 +420,12 @@ class ChatProvider extends ChangeNotifier {
           .write(streamedAnswer);
       log('event: $streamedAnswer');
       notifyListeners();
-
-      if (streamedAnswer.endsWith('.') ||
-          streamedAnswer.endsWith('!') ||
-          streamedAnswer.endsWith('?')) {
-        log('counter ${counter++}');
-        log('full sentence $fullSentence');
-        fullSentence = '';
-      }
     }
-
-    log('full Streamed answer $fullStreamedAnswer');
 
     _historyMessages.add(Content.text(message));
     _historyMessages.add(Content.model([TextPart(fullStreamedAnswer)]));
 
-    List<String> sentencesUrls = [];
-
-    log('lastMessage: ');
-
     // TODO: Save the message to Firestore
-    // Save the message to Firestore
     // await _chatsCollection
     //     .doc(uid)
     //     .collection(collectionRef)
@@ -492,7 +433,6 @@ class ChatProvider extends ChangeNotifier {
     //     .collection(Constants.chatDataCollection)
     //     .doc(messageID)
     //     .set(lastMessage.toJson());
-
     _isLoading = false;
     notifyListeners();
   }
@@ -580,7 +520,6 @@ class ChatProvider extends ChangeNotifier {
           messageID: messageID,
           message: spokenWords,
           isTool: isTool,
-          audioPlayer: audioPlayer,
           onError: onError,
         );
       } else {
@@ -611,25 +550,32 @@ class ChatProvider extends ChangeNotifier {
     onSuccess();
   }
 
-  String get mainPrompt {
-    return '''
-You are a Safety officer who ensures safe work practices.
+  Future<void> setChatContext(AssessmentModel assessment) async {
+    _currentAssessment = assessment;
 
-Generate a risk assessment based on the data information provided below.
-The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
-If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
+    // Create a context prompt for Gemini
+    final contextPrompt = '''
+You are a Safety officer discussing a specific risk assessment. Here are the details of the assessment:
 
-Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
-The number of people is: $_numberOfPeople
-The weather is: ${_weather.name}
+Title: ${assessment.title}
+Task to Achieve: ${assessment.taskToAchieve}
+Equipments: ${assessment.equipments.join(', ')}
+Hazards: ${assessment.hazards.join(', ')}
+Risks: ${assessment.risks.join(', ')}
+Control Measures: ${assessment.control.join(', ')}
+PPE: ${assessment.ppe.join(', ')}
+Weather: ${assessment.weather}
+Summary: ${assessment.summary}
 
-After providing the assessment, advice the equipment and tools to be used if required.
-Advise about the dangers that could injure people or harm the enviroment, the hazards and risks involved.
-Propose practical measures to eliminate or minimize each risk identified.
-Suggest use of proper personal protective equipment if not among these: ${getSelectedPpe.toString()}
-Provide a summary of this assessment.
-
-${_description.isNotEmpty ? _description : ''}
+Only answer questions related to this specific assessment. If asked about something unrelated, politely remind the user that you can only discuss this particular assessment.
 ''';
+
+    // Reset chat history and add the context prompt
+    _historyMessages = [Content.text(contextPrompt)];
+
+    // Reset the chat model with the new context
+    await setModel();
+
+    notifyListeners();
   }
 }
