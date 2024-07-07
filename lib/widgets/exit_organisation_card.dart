@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 
 class ExitCard extends StatelessWidget {

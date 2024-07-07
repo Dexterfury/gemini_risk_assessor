@@ -610,4 +610,26 @@ class ChatProvider extends ChangeNotifier {
 
     onSuccess();
   }
+
+  String get mainPrompt {
+    return '''
+You are a Safety officer who ensures safe work practices.
+
+Generate a risk assessment based on the data information provided below.
+The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
+If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
+
+Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
+The number of people is: $_numberOfPeople
+The weather is: ${_weather.name}
+
+After providing the assessment, advice the equipment and tools to be used if required.
+Advise about the dangers that could injure people or harm the enviroment, the hazards and risks involved.
+Propose practical measures to eliminate or minimize each risk identified.
+Suggest use of proper personal protective equipment if not among these: ${getSelectedPpe.toString()}
+Provide a summary of this assessment.
+
+${_description.isNotEmpty ? _description : ''}
+''';
+  }
 }
