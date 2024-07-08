@@ -12,10 +12,8 @@ import '../appBars/my_app_bar.dart';
 class ExplainerDetailsScreen extends StatelessWidget {
   ExplainerDetailsScreen({
     super.key,
-    required this.animation,
   }) : _scrollController = ScrollController();
 
-  final Animation<double> animation;
   final ScrollController _scrollController;
 
   @override
@@ -29,71 +27,69 @@ class ExplainerDetailsScreen extends StatelessWidget {
     // Format the datetime using Intl package
     String formattedTime = DateFormat.yMMMEd().format(time);
 
-    return SafeArea(
-      child: ScaleTransition(
-        scale: Tween(begin: 3.0, end: 1.0).animate(animation),
-        child: Scaffold(
-          appBar: MyAppBar(
-            title: title,
-            leading: BackButton(
-              onPressed: () {
-                // pop the screen with save as false
-                Navigator.of(context).pop(false);
-              },
-            ),
-          ),
-          body: SingleChildScrollView(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ImagesDisplay(
-                  isViewOnly: true,
-                  toolProvider: toolProvider,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
+    return Scaffold(
+      appBar: MyAppBar(
+        title: title,
+        leading: BackButton(
+          onPressed: () {
+            // pop the screen with save as false
+            Navigator.of(context).pop(false);
+          },
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ImagesDisplay(
+                isViewOnly: true,
+                toolProvider: toolProvider,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
 
-                // descpription
-                Text(
-                  toolProvider.toolModel!.description,
-                  style: textStyle16w600,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
+              // descpription
+              Text(
+                toolProvider.toolModel!.description,
+                style: textStyle16w600,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: MainAppButton(
-                    icon: Icons.save,
-                    label: "Save",
-                    onTap: () async {
-                      // show my alert dialog for loading
-                      MyDialogs.showMyAnimatedDialog(
-                        context: context,
-                        title: 'Saving',
-                        content: 'Please wait...',
-                        loadingIndicator: const SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: CircularProgressIndicator()),
-                      );
-                      // save tool to firestore
-                      await toolProvider.saveToolToFirestore().whenComplete(() {
-                        // pop the loading dialog
-                        Navigator.pop(context);
+              Align(
+                alignment: Alignment.centerRight,
+                child: MainAppButton(
+                  icon: Icons.save,
+                  label: "Save",
+                  onTap: () async {
+                    // show my alert dialog for loading
+                    MyDialogs.showMyAnimatedDialog(
+                      context: context,
+                      title: 'Saving',
+                      content: 'Please wait...',
+                      loadingIndicator: const SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: CircularProgressIndicator()),
+                    );
+                    // save tool to firestore
+                    await toolProvider.saveToolToFirestore().whenComplete(() {
+                      // pop the loading dialog
+                      Navigator.pop(context);
 
-                        // pop the screen with save as true
-                        Navigator.of(context).pop(true);
-                      });
-                    },
-                  ),
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        Navigator.pop(context); // pop the current screen
+                      }); // delay for better UI experience
+                    });
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

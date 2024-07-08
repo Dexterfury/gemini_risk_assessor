@@ -70,29 +70,29 @@ class AssessmentDetailsScreen extends StatelessWidget {
     // Format the datetime using Intl package
     String formattedTime = DateFormat.yMMMEd().format(time);
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: MyAppBar(
-          title: appBarTitle,
-          leading: const BackButton(),
-          actions: [
-            IconButton(
-              onPressed: () {
-                _scrollController.animateTo(
-                  _scrollController.position.maxScrollExtent,
-                  duration: const Duration(
-                    milliseconds: 500,
-                  ),
-                  curve: Curves.easeInOut,
-                );
-              },
-              icon: const Icon(
-                Icons.keyboard_double_arrow_down,
-              ),
+    return Scaffold(
+      appBar: MyAppBar(
+        title: appBarTitle,
+        leading: const BackButton(),
+        actions: [
+          IconButton(
+            onPressed: () {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(
+                  milliseconds: 500,
+                ),
+                curve: Curves.easeInOut,
+              );
+            },
+            icon: const Icon(
+              Icons.keyboard_double_arrow_down,
             ),
-          ],
-        ),
-        body: SingleChildScrollView(
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
           controller: _scrollController,
           padding: const EdgeInsets.all(16.0),
           child: Column(

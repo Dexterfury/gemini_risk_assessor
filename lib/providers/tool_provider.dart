@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
+import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-
 import '../models/prompt_data_model.dart';
-import '../service/gemini.dart';
 import '../utilities/global.dart';
+import 'package:path/path.dart' as path;
 
 class ToolsProvider extends ChangeNotifier {
   final GeminiModelManager _modelManager = GeminiModelManager();
@@ -44,23 +44,47 @@ class ToolsProvider extends ChangeNotifier {
   // save tool to firestore
   Future<void> saveToolToFirestore() async {
     if (_toolModel != null) {
-      if (_organisationID.isNotEmpty) {
-        await toolsCollection
-            .doc(_organisationID)
-            .collection(Constants.toolsCollection)
-            .doc(_toolModel!.id)
-            .set(
-              _toolModel!.toJson(),
-            );
-      } else {
-        await toolsCollection
-            .doc(_uid)
-            .collection(Constants.toolsCollection)
-            .doc(toolModel!.id)
-            .set(
-              _toolModel!.toJson(),
-            );
+      String id = _organisationID.isNotEmpty ? _organisationID : _uid;
+
+      if (_toolModel!.images.isNotEmpty) {
+        List<String> imagesUrls = [];
+        for (var image in _toolModel!.images) {
+          final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
+            file: File(image),
+            reference:
+                '${Constants.images}/tools/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
+          );
+          imagesUrls.add(imageUrl);
+        }
+
+        _toolModel!.images = imagesUrls;
       }
+
+      await toolsCollection
+          .doc(id)
+          .collection(Constants.toolsCollection)
+          .doc(_toolModel!.id)
+          .set(
+            _toolModel!.toJson(),
+          );
+
+      // if (_organisationID.isNotEmpty) {
+      //   await toolsCollection
+      //       .doc(_organisationID)
+      //       .collection(Constants.toolsCollection)
+      //       .doc(_toolModel!.id)
+      //       .set(
+      //         _toolModel!.toJson(),
+      //       );
+      // } else {
+      //   await toolsCollection
+      //       .doc(_uid)
+      //       .collection(Constants.toolsCollection)
+      //       .doc(toolModel!.id)
+      //       .set(
+      //         _toolModel!.toJson(),
+      //       );
+      // }
     }
   }
 

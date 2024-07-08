@@ -107,8 +107,11 @@ class BottonButtonsField extends StatelessWidget {
                     // close the loading dialog
                     Navigator.pop(context);
 
-                    // pop the current screen with save as true
-                    Navigator.of(context).pop(true);
+                    Future.delayed(const Duration(seconds: 1))
+                        .whenComplete(() async {
+                      // pop the screen
+                      Navigator.pop(context);
+                    });
 
                     // // navigate to home screen
                     // navigationController(
