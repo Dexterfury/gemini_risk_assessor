@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/widgets/chat_button.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -19,12 +20,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
   AssessmentDetailsScreen({
     super.key,
     required this.appBarTitle,
-    //required this.animation,
     this.currentModel,
   }) : _scrollController = ScrollController();
 
   final String appBarTitle;
-  //final Animation<double> animation;
   final ScrollController _scrollController;
   final AssessmentModel? currentModel;
 
@@ -59,8 +58,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
     final control = assessmentModel.control;
     // summary
     final summary = assessmentModel.summary;
-    // createdBy
-    final createdBy = getCreatedBy(context, currentModel);
+
     // ppe list
     final ppeList = getPPEList(
       context,
@@ -144,16 +142,13 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 assessmentModel: currentModel,
               ),
               const SizedBox(height: 10),
-
               AssessmentGridItems(
                 equipments: equipments,
                 hazards: hazards,
                 risks: risks,
                 controlMeasures: control,
               ),
-
               const SizedBox(height: 10),
-
               ppeList.isNotEmpty
                   ? PpeItemsWidget(
                       label: ListHeader.ppe,
@@ -167,20 +162,22 @@ class AssessmentDetailsScreen extends StatelessWidget {
               ),
               Text(summary),
               const SizedBox(height: 10),
-              Text(
-                createdBy,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              getCreatedBy(
+                context,
+                currentModel,
               ),
-              Text('Created at: $formattedTime'),
+              Text('Date: $formattedTime'),
               const SizedBox(height: 10),
-
-              const BottonButtonsField(),
-
-              // ChatButton(
-              //   docID: assessmentModel.id,
-              // ),
-
+              currentModel == null
+                  ? const BottonButtonsField()
+                  : Align(
+                      alignment: Alignment.centerRight,
+                      child: ChatButton(
+                        isDSTI: appBarTitle ==
+                            Constants.dailySafetyTaskInstructions,
+                        assesmentModel: assessmentModel,
+                      ),
+                    ),
               const SizedBox(
                 height: 20,
               ),
@@ -208,9 +205,35 @@ class AssessmentDetailsScreen extends StatelessWidget {
     AssessmentModel? currentModel,
   ) {
     if (currentModel != null) {
-      return currentModel.createdBy;
+      return FutureBuilder<String>(
+        future: AuthProvider.getCreatorName(currentModel.createdBy),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+              width: 100,
+              child: LinearProgressIndicator(),
+            );
+          } else {
+            String creatorName = snapshot.data ?? '';
+            return Text(
+              'Created by: $creatorName',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            );
+          }
+        },
+      );
     } else {
-      return context.read<AuthProvider>().userModel!.name;
+      String creatorName = context.read<AuthProvider>().userModel!.name;
+      return Text(
+        creatorName,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      );
     }
   }
 

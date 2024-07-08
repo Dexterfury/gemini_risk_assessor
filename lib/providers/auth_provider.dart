@@ -485,6 +485,19 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  static Future<String> getCreatorName(String creatorUid) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection(Constants.usersCollection)
+          .doc(creatorUid)
+          .get();
+      return userDoc.get(Constants.name) as String;
+    } catch (e) {
+      print('Error fetching creator name: $e');
+      return 'Unknown Creator';
+    }
+  }
+
   // update groupName
   Future<void> _updateOrgName(String id, String newName) async {
     await _organisationCollection.doc(id).update({

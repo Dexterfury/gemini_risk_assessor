@@ -192,30 +192,33 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
       child: Card(
         color:
             isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 32,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimaryContainer
-                  : Theme.of(context).iconTheme.color,
-            ),
-            const SizedBox(height: 8),
-            FittedBox(
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                style: textStyle18w500.copyWith(
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.onPrimaryContainer
-                      : Theme.of(context).textTheme.bodyLarge?.color,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimaryContainer
+                    : Theme.of(context).iconTheme.color,
+              ),
+              const SizedBox(height: 8),
+              FittedBox(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  style: textStyle18w500.copyWith(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimaryContainer
+                        : Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

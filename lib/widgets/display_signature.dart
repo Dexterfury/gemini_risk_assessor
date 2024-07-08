@@ -23,24 +23,32 @@ class DisplaySignature extends StatelessWidget {
         const SizedBox(
           width: 10,
         ),
+
         GestureDetector(
           onTap: () {
             // reset the signature
             assessmentProvider.resetSignature();
           },
-          child: Container(
-            padding: const EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).dialogBackgroundColor,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                width: 1,
-                color: Colors.grey,
-              ),
-            ),
-            child: const Icon(Icons.clear),
-          ),
-        )
+          child: const Icon(Icons.cancel, color: Colors.grey),
+        ),
+        // GestureDetector(
+        //   onTap: () {
+        //     // reset the signature
+        //     assessmentProvider.resetSignature();
+        //   },
+        //   child: Container(
+        //     padding: const EdgeInsets.all(6.0),
+        //     decoration: BoxDecoration(
+        //       color: Theme.of(context).dialogBackgroundColor,
+        //       borderRadius: BorderRadius.circular(30),
+        //       border: Border.all(
+        //         width: 1,
+        //         color: Colors.grey,
+        //       ),
+        //     ),
+        //     child: const Icon(Icons.clear),
+        //   ),
+        // )
       ],
     );
   }

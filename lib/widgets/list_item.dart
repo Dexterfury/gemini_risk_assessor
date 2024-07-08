@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
@@ -50,7 +51,6 @@ class ListItem extends StatelessWidget {
         );
       },
       openBuilder: (context, action) {
-        // navigate to details screen
         return AssessmentDetailsScreen(
           appBarTitle: docTitle,
           currentModel: data,

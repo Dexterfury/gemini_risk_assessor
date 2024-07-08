@@ -275,7 +275,6 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> getChatHistoryFromFirebase({
     required String uid,
-    required String chatID,
     required bool isDSTI,
     AssessmentModel? assessmentModel,
     ToolModel? toolModel,
@@ -289,6 +288,8 @@ class ChatProvider extends ChangeNotifier {
     final collection = toolModel != null
         ? Constants.toolsChatsCollection
         : Constants.assessmentsChatsCollection;
+    final chatID =
+        toolModel != null ? toolModel.id : assessmentModel!.id; // get chat id
 
     try {
       await _chatsCollection
