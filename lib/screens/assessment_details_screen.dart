@@ -19,12 +19,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
   AssessmentDetailsScreen({
     super.key,
     required this.appBarTitle,
-    required this.animation,
+    //required this.animation,
     this.currentModel,
   }) : _scrollController = ScrollController();
 
   final String appBarTitle;
-  final Animation<double> animation;
+  //final Animation<double> animation;
   final ScrollController _scrollController;
   final AssessmentModel? currentModel;
 
@@ -71,128 +71,120 @@ class AssessmentDetailsScreen extends StatelessWidget {
     String formattedTime = DateFormat.yMMMEd().format(time);
 
     return SafeArea(
-      child: ScaleTransition(
-        scale: Tween(begin: 3.0, end: 1.0).animate(animation),
-        child: Scaffold(
-          appBar: MyAppBar(
-            title: appBarTitle,
-            leading: BackButton(
+      child: Scaffold(
+        appBar: MyAppBar(
+          title: appBarTitle,
+          leading: const BackButton(),
+          actions: [
+            IconButton(
               onPressed: () {
-                // pop the screen with save as false
-                Navigator.of(context).pop(false);
+                _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: const Duration(
+                    milliseconds: 500,
+                  ),
+                  curve: Curves.easeInOut,
+                );
               },
+              icon: const Icon(
+                Icons.keyboard_double_arrow_down,
+              ),
             ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  _scrollController.animateTo(
-                    _scrollController.position.maxScrollExtent,
-                    duration: const Duration(
-                      milliseconds: 500,
-                    ),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                icon: const Icon(
-                  Icons.keyboard_double_arrow_down,
+          ],
+        ),
+        body: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FittedBox(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    style: const TextStyle(
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Task to Achieve:',
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Task to Achieve:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: SizedBox(
-                        width: 100,
-                        child: WeatherButton(
-                            title: weather,
-                            value: true,
-                            iconData: getWeatherIcon(
-                              WeatherExtension.fromString(
-                                weather,
-                              ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: SizedBox(
+                      width: 100,
+                      child: WeatherButton(
+                          title: weather,
+                          value: true,
+                          iconData: getWeatherIcon(
+                            WeatherExtension.fromString(
+                              weather,
                             ),
-                            onChanged: () {}),
-                      ),
+                          ),
+                          onChanged: () {}),
                     ),
-                  ],
-                ),
-                Text(task),
-                const SizedBox(height: 10),
-                ImagesDisplay(
-                  isViewOnly: true,
-                  assessmentProvider: assessmentProvider,
-                  assessmentModel: currentModel,
-                ),
-                const SizedBox(height: 10),
+                  ),
+                ],
+              ),
+              Text(task),
+              const SizedBox(height: 10),
+              ImagesDisplay(
+                isViewOnly: true,
+                assessmentProvider: assessmentProvider,
+                assessmentModel: currentModel,
+              ),
+              const SizedBox(height: 10),
 
-                AssessmentGridItems(
-                  equipments: equipments,
-                  hazards: hazards,
-                  risks: risks,
-                  controlMeasures: control,
-                ),
+              AssessmentGridItems(
+                equipments: equipments,
+                hazards: hazards,
+                risks: risks,
+                controlMeasures: control,
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                ppeList.isNotEmpty
-                    ? PpeItemsWidget(
-                        label: ListHeader.ppe,
-                        ppeModelList: ppeList,
-                      )
-                    : const SizedBox.shrink(),
-                const SizedBox(height: 10),
-                const Text(
-                  'Summary:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Text(summary),
-                const SizedBox(height: 10),
-                Text(
-                  createdBy,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Text('Created at: $formattedTime'),
-                const SizedBox(height: 10),
+              ppeList.isNotEmpty
+                  ? PpeItemsWidget(
+                      label: ListHeader.ppe,
+                      ppeModelList: ppeList,
+                    )
+                  : const SizedBox.shrink(),
+              const SizedBox(height: 10),
+              const Text(
+                'Summary:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(summary),
+              const SizedBox(height: 10),
+              Text(
+                createdBy,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text('Created at: $formattedTime'),
+              const SizedBox(height: 10),
 
-                const BottonButtonsField(),
+              const BottonButtonsField(),
 
-                // ChatButton(
-                //   docID: assessmentModel.id,
-                // ),
+              // ChatButton(
+              //   docID: assessmentModel.id,
+              // ),
 
-                const SizedBox(
-                  height: 20,
-                ),
-              ],
-            ),
+              const SizedBox(
+                height: 20,
+              ),
+            ],
           ),
         ),
       ),

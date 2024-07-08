@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen>
             controller: _tabController,
             children: [
               _buildTabContent(tabProvider, 0, const DSTIScreen()),
-              _buildTabContent(tabProvider, 1, const RistAssessmentsScreen()),
+              _buildTabContent(tabProvider, 1, const RiskAssessmentsScreen()),
               _buildTabContent(tabProvider, 2, const ToolsScreen()),
             ],
           ),

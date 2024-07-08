@@ -10,46 +10,117 @@ class MySliverAppBar extends StatelessWidget {
     required this.snapshot,
     required this.title,
     required this.onSearch,
+    required this.searchResults,
+    required this.searchController,
   });
 
   final AsyncSnapshot<QuerySnapshot> snapshot;
   final String title;
   final Function(String) onSearch;
+  final Iterable<QueryDocumentSnapshot<Object?>> searchResults;
+  final TextEditingController searchController;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-            leading: const BackButton(),
-            title: Text(title),
-            pinned: true,
-            floating: true,
-            snap: true,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(56.0),
-              child: MySearchBar(
-                onSearch: onSearch,
-              ),
-            )),
+          leading: const BackButton(),
+          title: Text(title),
+          pinned: true,
+          floating: true,
+          snap: true,
+          expandedHeight: 120.0,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Padding(
+                padding: const EdgeInsets.only(top: 56.0), child: Container()
+
+                // MySearchBar(
+                //   onSearch: onSearch,
+                //   controller: searchController,
+                // ),
+                ),
+          ),
+        ),
         SliverPadding(
           padding: const EdgeInsets.all(8.0),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final doc = snapshot.data!.docs[index];
-                final data = doc.data() as Map<String, dynamic>;
-                final item = AssessmentModel.fromJson(data);
-                return ListItem(
-                  docTitle: title,
-                  data: item,
-                );
-              },
-              childCount: snapshot.data!.docs.length,
-            ),
-          ),
+          sliver: searchResults.isEmpty
+              ? const SliverFillRemaining(
+                  child: Center(child: Text('No matching results')),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final doc = searchResults.elementAt(index);
+                      final data = doc.data() as Map<String, dynamic>;
+                      final item = AssessmentModel.fromJson(data);
+                      return ListItem(
+                        docTitle: title,
+                        data: item,
+                      );
+                    },
+                    childCount: searchResults.length,
+                  ),
+                ),
         ),
       ],
     );
   }
 }
+// class MySliverAppBar extends StatelessWidget {
+//   const MySliverAppBar({
+//     super.key,
+//     required this.snapshot,
+//     required this.title,
+//     required this.onSearch,
+//     required this.searchResults,
+//   });
+
+//   final AsyncSnapshot<QuerySnapshot> snapshot;
+//   final String title;
+//   final Function(String) onSearch;
+//   final Iterable<QueryDocumentSnapshot<Object?>> searchResults;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return CustomScrollView(
+//       slivers: [
+//         SliverAppBar(
+//           leading: const BackButton(),
+//           title: Text(title),
+//           pinned: true,
+//           floating: true,
+//           snap: true,
+//           expandedHeight: 120.0,
+//           flexibleSpace: FlexibleSpaceBar(
+//             background: Padding(
+//               padding: const EdgeInsets.only(top: 56.0),
+//               child: MySearchBar(onSearch: onSearch),
+//             ),
+//           ),
+//         ),
+//         SliverPadding(
+//           padding: const EdgeInsets.all(8.0),
+//           sliver: searchResults.isEmpty
+//               ? const SliverFillRemaining(
+//                   child: Center(child: Text('No matching results')),
+//                 )
+//               : SliverList(
+//                   delegate: SliverChildBuilderDelegate(
+//                     (context, index) {
+//                       final doc = searchResults.elementAt(index);
+//                       final data = doc.data() as Map<String, dynamic>;
+//                       final item = AssessmentModel.fromJson(data);
+//                       return ListItem(
+//                         docTitle: title,
+//                         data: item,
+//                       );
+//                     },
+//                     childCount: searchResults.length,
+//                   ),
+//                 ),
+//         ),
+//       ],
+//     );
+//   }
+// }

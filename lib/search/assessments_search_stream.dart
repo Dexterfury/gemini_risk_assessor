@@ -75,11 +75,13 @@ class AssessmentsSearchStream extends StatelessWidget {
                   );
                 }
                 return orgID.isNotEmpty
-                    ? MySliverAppBar(
-                        snapshot: snapshot,
-                        title: Constants.dailySafetyTaskInstructions,
-                        onSearch: (handleSearch) {},
-                      )
+                    ? Container()
+
+                    // MySliverAppBar(
+                    //     snapshot: snapshot,
+                    //     title: Constants.dailySafetyTaskInstructions,
+                    //     onSearch: (handleSearch) {},
+                    //   )
                     : Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ListView.builder(

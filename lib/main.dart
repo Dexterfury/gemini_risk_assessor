@@ -10,6 +10,7 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
@@ -38,6 +39,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => OrganisationProvider()),
       ChangeNotifierProvider(create: (context) => TabProvider()),
       ChangeNotifierProvider(create: (context) => ChatProvider()),
+      ChangeNotifierProvider(create: (context) => SearchProvider())
     ], child: const MyApp()),
   );
 }

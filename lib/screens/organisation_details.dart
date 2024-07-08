@@ -154,7 +154,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
               const SizedBox(height: 10),
 
               //  add members button if the user is an admin
-              buildAddMembers(
+              buildButtonsRow(
                 membersCount,
                 context,
                 orgID,
@@ -162,7 +162,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
 
               const SizedBox(height: 10),
 
-              //   members list if the user is an admin
+              // members list if the user is an admin
               buildMembersList(
                 isAdmin,
                 uid,
@@ -263,7 +263,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
     );
   }
 
-  Row buildAddMembers(
+  Row buildButtonsRow(
     String membersCount,
     BuildContext context,
     String orgID,
@@ -566,7 +566,7 @@ Widget _navigateToScreen(IconData icon, String orgID) {
         orgID: orgID,
       );
     case Icons.assignment_late_outlined:
-      return RistAssessmentsScreen(orgID: orgID);
+      return RiskAssessmentsScreen(orgID: orgID);
     case Icons.handyman:
       return ToolsScreen(
         orgID: orgID,
