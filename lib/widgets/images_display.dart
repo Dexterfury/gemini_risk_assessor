@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
@@ -12,18 +13,55 @@ class ImagesDisplay extends StatelessWidget {
     this.isViewOnly = false,
     this.assessmentProvider,
     this.toolProvider,
-    this.assessmentModel,
+    this.currentAssessmentModel,
+    this.currentToolModel,
   });
 
   final bool isViewOnly;
   final AssessmentProvider? assessmentProvider;
   final ToolsProvider? toolProvider;
-  final AssessmentModel? assessmentModel;
+  final AssessmentModel? currentAssessmentModel;
+  final ToolModel? currentToolModel;
 
   @override
   Widget build(BuildContext context) {
     final provider = getProvider(assessmentProvider, toolProvider);
     return getImagesToShow(provider);
+  }
+
+  Container _toolViewImages() {
+    return Container(
+      height: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: SizedBox(
+        height: 100,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            for (var image in currentToolModel!.images)
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: MyImageCacheManager.showImage(
+                            imageUrl: image,
+                            isTool: false,
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Container _assessmentViewImages() {
@@ -37,7 +75,7 @@ class ImagesDisplay extends StatelessWidget {
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: [
-            for (var image in assessmentModel!.images)
+            for (var image in currentAssessmentModel!.images)
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: Stack(
@@ -64,8 +102,10 @@ class ImagesDisplay extends StatelessWidget {
   getImagesToShow(dynamic provider) {
     if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
       return const Text('No images added');
-    } else if (isViewOnly && assessmentModel != null) {
+    } else if (isViewOnly && currentAssessmentModel != null) {
       return _assessmentViewImages();
+    } else if (isViewOnly && currentToolModel != null) {
+      return _toolViewImages();
     } else {
       return ProviderViewImages(
         isViewOnly: isViewOnly,

@@ -38,4 +38,16 @@ enum GenerationType {
 }
 
 // user Type enum
-enum UserViewType { admin, user, creator, tempPlus }
+enum UserViewType {
+  admin,
+  user,
+  creator,
+  tempPlus,
+}
+
+// chat button size
+enum ChatButtonSize {
+  small,
+  medium,
+  large,
+}

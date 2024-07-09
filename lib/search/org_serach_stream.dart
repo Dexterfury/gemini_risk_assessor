@@ -43,27 +43,29 @@ class OrgSearchStream extends StatelessWidget {
             );
           }
 
-          final results = snapshot.data!.docs.where(
-            (element) => element[Constants.organisationName]
-                .toString()
-                .toLowerCase()
-                .contains(
-                  organisationProvider.searchQuery.toLowerCase(),
-                ),
-          );
+          final results = snapshot.data!.docs
+              .where(
+                (element) => element[Constants.organisationName]
+                    .toString()
+                    .toLowerCase()
+                    .contains(
+                      organisationProvider.searchQuery.toLowerCase(),
+                    ),
+              )
+              .toList();
 
           if (results.isEmpty) {
             return const Center(child: Text('No matching results'));
           }
 
           return GridView.builder(
-              itemCount: snapshot.data!.docs.length,
+              itemCount: results.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 1,
               ),
               itemBuilder: (context, index) {
-                final doc = snapshot.data!.docs[index];
+                final doc = results[index];
                 final orgData = doc.data() as Map<String, dynamic>;
                 final org = OrganisationModel.fromJson(orgData);
                 return GridItem(orgModel: org);

@@ -73,11 +73,14 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
 
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                final results = snapshot.data!.docs.where((element) =>
-                    element[Constants.title]
-                        .toString()
-                        .toLowerCase()
-                        .contains(_searchQuery.toLowerCase()));
+                final results = snapshot.data!.docs.where(
+                  (element) => element[Constants.title]
+                      .toString()
+                      .toLowerCase()
+                      .contains(
+                        _searchQuery.toLowerCase(),
+                      ),
+                );
 
                 return widget.orgID.isNotEmpty
                     ? CustomScrollView(

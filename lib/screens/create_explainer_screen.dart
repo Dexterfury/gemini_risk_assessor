@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -199,7 +197,24 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
               },
               openBuilder: (context, action) {
                 // navigate to details screen
-                return ExplainerDetailsScreen();
+                return ExplainerDetailsScreen(
+                  onSave: (value) {
+                    if (value) {
+                      // clear data
+                      toolProvider.clearImages();
+                      _descriptionController.clear();
+
+                      // setState(() {
+
+                      // });
+                      showSnackBar(
+                          context: context, message: 'Tool Successfully saved');
+                    } else {
+                      showSnackBar(
+                          context: context, message: 'Error saving tool');
+                    }
+                  },
+                );
               },
               transitionType: ContainerTransitionType.fadeThrough,
               transitionDuration: const Duration(milliseconds: 500),

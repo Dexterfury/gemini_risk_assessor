@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/buttons/pdf_and_chat_buttons.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -7,9 +8,12 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/chat_provider.dart';
+import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/buttons/chat_button.dart';
+import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/buttons/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -23,25 +27,27 @@ class AssessmentDetailsScreen extends StatelessWidget {
     super.key,
     required this.appBarTitle,
     this.currentModel,
-  })  : _scrollController = ScrollController(),
-        _showScrollToBottomButton = ValueNotifier<bool>(true) {
-    _scrollController.addListener(_scrollListener);
-  }
+  });
+
+  //  : _scrollController = ScrollController(),
+  //       _showScrollToBottomButton = ValueNotifier<bool>(true) {
+  //   _scrollController.addListener(_scrollListener);
+  // }
 
   final String appBarTitle;
-  final ScrollController _scrollController;
-  final ValueNotifier<bool> _showScrollToBottomButton;
+  //final ScrollController _scrollController;
+  //final ValueNotifier<bool> _showScrollToBottomButton;
   final AssessmentModel? currentModel;
 
-  void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      _showScrollToBottomButton.value = false;
-    } else if (!_showScrollToBottomButton.value) {
-      _showScrollToBottomButton.value = true;
-    }
-  }
+  // void _scrollListener() {
+  //   if (_scrollController.offset >=
+  //           _scrollController.position.maxScrollExtent &&
+  //       !_scrollController.position.outOfRange) {
+  //     _showScrollToBottomButton.value = false;
+  //   } else if (!_showScrollToBottomButton.value) {
+  //     _showScrollToBottomButton.value = true;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -89,28 +95,60 @@ class AssessmentDetailsScreen extends StatelessWidget {
         title: appBarTitle,
         leading: const BackButton(),
         actions: [
-          ValueListenableBuilder<bool>(
-            valueListenable: _showScrollToBottomButton,
-            builder: (context, showButton, child) {
-              return showButton
-                  ? IconButton(
-                      onPressed: () {
-                        _scrollController.animateTo(
-                          _scrollController.position.maxScrollExtent,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
+          currentModel != null
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: AnimatedChatButton(
+                    onPressed: () async {
+                      // Open chat or navigate to chat screen
+                      final uid = context.read<AuthProvider>().userModel!.uid;
+                      final chatProvider = context.read<ChatProvider>();
+                      await chatProvider
+                          .getChatHistoryFromFirebase(
+                        uid: uid,
+                        isDSTI: appBarTitle ==
+                            Constants.dailySafetyTaskInstructions,
+                        assessmentModel: assessmentModel,
+                      )
+                          .whenComplete(() {
+                        // Navigate to the chat screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              assesmentModel: assessmentModel,
+                            ),
+                          ),
                         );
-                      },
-                      icon: const Icon(Icons.keyboard_double_arrow_down),
-                    )
-                  : const SizedBox.shrink();
-            },
-          ),
+                      });
+                    },
+                    size: ChatButtonSize.small,
+                    iconColor: Colors.white,
+                  ),
+                )
+              : const SizedBox()
+          // ValueListenableBuilder<bool>(
+          //   valueListenable: _showScrollToBottomButton,
+          //   builder: (context, showButton, child) {
+          //     return showButton
+          //         ? IconButton(
+          //             onPressed: () {
+          //               _scrollController.animateTo(
+          //                 _scrollController.position.maxScrollExtent,
+          //                 duration: const Duration(milliseconds: 500),
+          //                 curve: Curves.easeInOut,
+          //               );
+          //             },
+          //             icon: const Icon(Icons.keyboard_double_arrow_down),
+          //           )
+          //         : const SizedBox.shrink();
+          //   },
+          // ),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          controller: _scrollController,
+          //controller: _scrollController,
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +196,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
               ImagesDisplay(
                 isViewOnly: true,
                 assessmentProvider: assessmentProvider,
-                assessmentModel: currentModel,
+                currentAssessmentModel: currentModel,
               ),
               const SizedBox(height: 10),
               AssessmentGridItems(
@@ -181,29 +219,50 @@ class AssessmentDetailsScreen extends StatelessWidget {
               ),
               Text(summary),
               const SizedBox(height: 10),
-              getCreatedBy(
-                context,
-                currentModel,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      getCreatedBy(
+                        context,
+                        currentModel,
+                      ),
+                      Text('Date: $formattedTime'),
+                    ],
+                  ),
+                  // pdf icon
+                  GestureDetector(
+                    onTap: () {
+                      // open pdf
+                    },
+                    child: const IconContainer(
+                      icon: Icons.picture_as_pdf_rounded,
+                      containerColor: Colors.blue,
+                    ),
+                  ),
+                ],
               ),
-              Text('Date: $formattedTime'),
 
               const SizedBox(height: 10),
               currentModel == null
                   ? const BottonButtonsField()
-                  : PdfAndChatButtons(
-                      isDSTI:
-                          appBarTitle == Constants.dailySafetyTaskInstructions,
-                      assessmentModel: assessmentModel,
+                  : const SizedBox(
+                      height: 20,
                     ),
+
+              // PdfAndChatButtons(
+              //     isDSTI:
+              //         appBarTitle == Constants.dailySafetyTaskInstructions,
+              //     assessmentModel: assessmentModel,
+              //   ),
 
               // ChatButton(
               //     isDSTI:
               //         appBarTitle == Constants.dailySafetyTaskInstructions,
               //     assesmentModel: assessmentModel,
               //   ),
-              const SizedBox(
-                height: 20,
-              ),
             ],
           ),
         ),
@@ -239,7 +298,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
           } else {
             String creatorName = snapshot.data ?? '';
             return Text(
-              'Created by: $creatorName',
+              'Creator: $creatorName',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,

@@ -41,51 +41,101 @@ class ToolsProvider extends ChangeNotifier {
   final CollectionReference toolsCollection =
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
 
-  // save tool to firestore
-  Future<void> saveToolToFirestore() async {
+  Future<bool> saveToolToFirestore() async {
     if (_toolModel != null) {
-      String id = _organisationID.isNotEmpty ? _organisationID : _uid;
+      try {
+        String id = _organisationID.isNotEmpty ? _organisationID : _uid;
 
-      if (_toolModel!.images.isNotEmpty) {
-        List<String> imagesUrls = [];
-        for (var image in _toolModel!.images) {
-          final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
-            file: File(image),
-            reference:
-                '${Constants.images}/tools/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
-          );
-          imagesUrls.add(imageUrl);
+        if (_toolModel!.images.isNotEmpty) {
+          List<String> imagesUrls = [];
+          for (var image in _toolModel!.images) {
+            final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
+              file: File(image),
+              reference:
+                  '${Constants.images}/tools/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
+            );
+            imagesUrls.add(imageUrl);
+          }
+
+          _toolModel!.images = imagesUrls;
         }
 
-        _toolModel!.images = imagesUrls;
+        await toolsCollection
+            .doc(id)
+            .collection(Constants.toolsCollection)
+            .doc(_toolModel!.id)
+            .set(
+              _toolModel!.toJson(),
+            );
+
+        return true; // Indicate successful save
+      } catch (e) {
+        print("Error saving tool: $e");
+        return false; // Indicate failed save
       }
-
-      await toolsCollection
-          .doc(id)
-          .collection(Constants.toolsCollection)
-          .doc(_toolModel!.id)
-          .set(
-            _toolModel!.toJson(),
-          );
-
-      // if (_organisationID.isNotEmpty) {
-      //   await toolsCollection
-      //       .doc(_organisationID)
-      //       .collection(Constants.toolsCollection)
-      //       .doc(_toolModel!.id)
-      //       .set(
-      //         _toolModel!.toJson(),
-      //       );
-      // } else {
-      //   await toolsCollection
-      //       .doc(_uid)
-      //       .collection(Constants.toolsCollection)
-      //       .doc(toolModel!.id)
-      //       .set(
-      //         _toolModel!.toJson(),
-      //       );
-      // }
     }
+    return false; // No tool model to save
+  }
+
+  // Add a method to clear the entered data
+  void clearImages() {
+    _imagesFileList = [];
+    notifyListeners();
+  }
+
+  // // save tool to firestore
+  // Future<void> saveToolToFirestore() async {
+  //   if (_toolModel != null) {
+  //     String id = _organisationID.isNotEmpty ? _organisationID : _uid;
+
+  //     if (_toolModel!.images.isNotEmpty) {
+  //       List<String> imagesUrls = [];
+  //       for (var image in _toolModel!.images) {
+  //         final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
+  //           file: File(image),
+  //           reference:
+  //               '${Constants.images}/tools/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
+  //         );
+  //         imagesUrls.add(imageUrl);
+  //       }
+
+  //       _toolModel!.images = imagesUrls;
+  //     }
+
+  //     await toolsCollection
+  //         .doc(id)
+  //         .collection(Constants.toolsCollection)
+  //         .doc(_toolModel!.id)
+  //         .set(
+  //           _toolModel!.toJson(),
+  //         );
+
+  //     await resetToolModel();
+
+  //     // if (_organisationID.isNotEmpty) {
+  //     //   await toolsCollection
+  //     //       .doc(_organisationID)
+  //     //       .collection(Constants.toolsCollection)
+  //     //       .doc(_toolModel!.id)
+  //     //       .set(
+  //     //         _toolModel!.toJson(),
+  //     //       );
+  //     // } else {
+  //     //   await toolsCollection
+  //     //       .doc(_uid)
+  //     //       .collection(Constants.toolsCollection)
+  //     //       .doc(toolModel!.id)
+  //     //       .set(
+  //     //         _toolModel!.toJson(),
+  //     //       );
+  //     // }
+  //   }
+  // }
+
+  // reset toolModel
+  Future<void> resetToolModel() async {
+    _toolModel = null;
+    notifyListeners();
   }
 
   setMacTestToolsList() {

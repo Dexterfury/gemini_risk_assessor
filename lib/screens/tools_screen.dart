@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -79,12 +78,16 @@ class _ToolsScreenState extends State<ToolsScreen> {
             }
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                final results = snapshot.data!.docs.where(
-                  (element) =>
-                      element[Constants.name].toString().toLowerCase().contains(
+                final results = snapshot.data!.docs
+                    .where(
+                      (element) => element[Constants.name]
+                          .toString()
+                          .toLowerCase()
+                          .contains(
                             _searchQuery.toLowerCase(),
                           ),
-                );
+                    )
+                    .toList();
                 return widget.orgID.isNotEmpty
                     ? CustomScrollView(
                         slivers: [
@@ -124,16 +127,14 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                       ),
                                       delegate: SliverChildBuilderDelegate(
                                         (context, index) {
-                                          final doc = results.elementAt(index);
+                                          final doc = results[index];
                                           final data = doc.data()
                                               as Map<String, dynamic>;
 
                                           final tool = ToolModel.fromJson(data);
-
-                                          log('image: ${tool.images[0]}');
                                           return GridItem(toolModel: tool);
                                         },
-                                        childCount: snapshot.data!.docs.length,
+                                        childCount: results.length,
                                       ),
                                     )),
                         ],
@@ -153,20 +154,17 @@ class _ToolsScreenState extends State<ToolsScreen> {
                           ),
                           Expanded(
                             child: GridView.builder(
-                              itemCount: snapshot.data!.docs.length,
+                              itemCount: results.length,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
                                 childAspectRatio: 1,
                               ),
                               itemBuilder: (context, index) {
-                                // final doc = results.elementAt(index);
-                                //         final data =
-                                //             doc.data() as Map<String, dynamic>;
+                                final doc = results[index];
+                                final data = doc.data() as Map<String, dynamic>;
 
-                                //final tool = ToolModel.fromJson(data);
-                                final tool = ToolModel.fromJson(snapshot
-                                    .data!.docs[index] as Map<String, dynamic>);
+                                final tool = ToolModel.fromJson(data);
                                 return GridItem(toolModel: tool);
                               },
                             ),
