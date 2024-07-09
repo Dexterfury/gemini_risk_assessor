@@ -12,7 +12,6 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
-import 'package:gemini_risk_assessor/service/gemini.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -101,8 +100,6 @@ class AssessmentProvider extends ChangeNotifier {
     );
 
     _pdfAssessmentFile = file;
-    print("PDF file path: ${file.absolute.path}");
-    print("PDF file exists: ${file.existsSync()}");
 
     if (file.existsSync()) {
       await OpenFile.open((file.path));

@@ -78,6 +78,9 @@ class AssessmentDetailsScreen extends StatelessWidget {
     // summary
     final summary = assessmentModel.summary;
 
+    // get generationType
+    final generationType = getGenerationType(appBarTitle);
+
     // ppe list
     final ppeList = getPPEList(
       context,
@@ -103,8 +106,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                       await chatProvider
                           .getChatHistoryFromFirebase(
                         uid: uid,
-                        isDSTI: appBarTitle ==
-                            Constants.dailySafetyTaskInstructions,
+                        generationType: generationType,
                         assessmentModel: assessmentModel,
                       )
                           .whenComplete(() {
@@ -114,6 +116,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => ChatScreen(
                               assesmentModel: assessmentModel,
+                              generationType: generationType,
                             ),
                           ),
                         );
@@ -357,6 +360,14 @@ class AssessmentDetailsScreen extends StatelessWidget {
     } else {
       // If no current model is available, return the default PPE list from the provider
       return context.watch<AssessmentProvider>().ppeModelList;
+    }
+  }
+
+  getGenerationType(String appBarTitle) {
+    if (appBarTitle == Constants.dailySafetyTaskInstructions) {
+      return GenerationType.dsti;
+    } else {
+      return GenerationType.riskAssessment;
     }
   }
 }

@@ -124,6 +124,7 @@ class Constants {
   static const String chatsCollection = 'chats';
   static const String toolsChatsCollection = 'toolsChats';
   static const String assessmentsChatsCollection = 'assessmentsChats';
+  static const String dstisChatsCollection = 'dstisChats';
   static const String chatDataCollection = 'chatData';
 
   static const String organisationImage = 'organisationImage';

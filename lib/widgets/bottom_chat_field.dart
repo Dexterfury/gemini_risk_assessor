@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/widgets/preview_images.dart';
@@ -12,12 +13,12 @@ class BottomChatField extends StatefulWidget {
     super.key,
     required this.chatProvider,
     required this.docID,
-    required this.isTool,
+    required this.generationType,
   });
 
   final ChatProvider chatProvider;
   final String docID;
-  final bool isTool;
+  final GenerationType generationType;
 
   @override
   State<BottomChatField> createState() => _BottomChatFieldState();
@@ -51,7 +52,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
         uid: uid,
         chatID: widget.docID,
         message: message,
-        isTool: widget.isTool,
+        generationType: widget.generationType,
         onSuccess: () {},
         onError: (onError) {},
       );
@@ -96,16 +97,6 @@ class _BottomChatFieldState extends State<BottomChatField> {
           if (hasImages) const PreviewImages(),
           Row(
             children: [
-              // IconButton(
-              //   onPressed: () {
-              //     if (hasImages) {
-              //       // show the delete dialog
-              //     } else {
-              //       pickImage();
-              //     }
-              //   },
-              //   icon: Icon(hasImages ? Icons.delete_forever : Icons.image),
-              // ),
               const SizedBox(
                 width: 10,
               ),

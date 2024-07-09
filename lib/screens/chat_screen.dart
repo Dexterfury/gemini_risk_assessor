@@ -1,22 +1,23 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_chat_field.dart';
 import 'package:gemini_risk_assessor/widgets/message_bubble.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
     super.key,
+    required this.generationType,
     this.assesmentModel,
     this.toolModel,
   });
 
+  final GenerationType generationType; // 'assessment', 'dsti' or 'tool'
   final AssessmentModel? assesmentModel;
   final ToolModel? toolModel;
 
@@ -31,14 +32,6 @@ class _ChatScreenState extends State<ChatScreen> {
   SpeechToText _speechToText = SpeechToText();
 
   String _spokenWords = '';
-  String docID = '';
-  bool isTool = false;
-
-  @override
-  void initState() {
-    setData();
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -47,22 +40,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void setData() {
-    // wait for screen to build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // set doc id depending on widget type
-        if (widget.assesmentModel != null) {
-          docID = widget.assesmentModel!.id;
-          isTool = false;
-        } else if (widget.toolModel != null) {
-          docID = widget.toolModel!.id;
-          isTool = true;
-        }
-      });
-    });
   }
 
   void _scrollToBottom() {
@@ -78,6 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  // speech to text method for later
   Future<void> _start({required bool isClicked}) async {
     final chatProvider = context.read<ChatProvider>();
     final uid = context.read<AuthProvider>().userModel!.uid;
@@ -99,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
           await chatProvider.addAndDisplayMessage(
             uid: uid,
             chatID: docID,
-            isTool: isTool,
+            generationType: widget.generationType,
             finalWords: result.finalResult,
             spokenWords: _spokenWords,
             onSuccess: () {},
@@ -112,6 +90,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final docID = getDocID(
+      widget.generationType,
+      widget.assesmentModel,
+      widget.toolModel,
+    );
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, child) {
         if (chatProvider.messages.isNotEmpty) {
@@ -165,7 +148,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   BottomChatField(
                     chatProvider: chatProvider,
                     docID: docID,
-                    isTool: isTool,
+                    generationType: widget.generationType,
                   )
                 ],
               ),
@@ -174,5 +157,18 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       },
     );
+  }
+
+  getDocID(
+    GenerationType generationType,
+    AssessmentModel? assesmentModel,
+    ToolModel? toolModel,
+  ) {
+    if (generationType == GenerationType.riskAssessment ||
+        generationType == GenerationType.dsti) {
+      return assesmentModel!.id;
+    } else {
+      return toolModel!.id;
+    }
   }
 }

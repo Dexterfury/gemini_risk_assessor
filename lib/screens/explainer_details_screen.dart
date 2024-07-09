@@ -57,9 +57,9 @@ class ExplainerDetailsScreen extends StatelessWidget {
                       final chatProvider = context.read<ChatProvider>();
                       await chatProvider
                           .getChatHistoryFromFirebase(
-                        uid: uid,
-                        toolModel: toolModel,
-                      )
+                              uid: uid,
+                              toolModel: toolModel,
+                              generationType: GenerationType.tool)
                           .whenComplete(() {
                         // Navigate to the chat screen
                         Navigator.push(
@@ -67,6 +67,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => ChatScreen(
                               toolModel: toolModel,
+                              generationType: GenerationType.tool,
                             ),
                           ),
                         );

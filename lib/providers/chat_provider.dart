@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
@@ -143,54 +144,6 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-//   Future<void> setModel() async {
-//   final GenerationConfig config = GenerationConfig(
-//     temperature: 0.4,
-//     topK: 32,
-//     topP: 1,
-//     maxOutputTokens: 4096,
-//   );
-
-//   final List<SafetySetting> safetySettings = [
-//     SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
-//     SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-//   ];
-
-//   if (_currentAssessment != null || _toolModel != null) {
-//     // We're in a document-specific chat context (assessment, DSTI, or tool)
-//     _model = GenerativeModel(
-//       model: setCurrentModel(newModel: 'gemini-1.0-pro'),
-//       apiKey: getApiKey(),
-//       generationConfig: config,
-//       safetySettings: safetySettings,
-//     );
-//   } else if (_imagesFileList!.isEmpty) {
-//     // Text-only model for general chats
-//     _model = _textModel ?? GenerativeModel(
-//       model: setCurrentModel(newModel: 'gemini-1.0-pro'),
-//       apiKey: getApiKey(),
-//       generationConfig: config,
-//       safetySettings: safetySettings,
-//     );
-//     _textModel = _model;
-//   } else {
-//     // Vision model for general chats with images
-//     _model = _visionModel ?? GenerativeModel(
-//       model: setCurrentModel(newModel: 'gemini-1.5-flash'),
-//       apiKey: getApiKey(),
-//       generationConfig: config,
-//       safetySettings: safetySettings,
-//     );
-//     _visionModel = _model;
-//   }
-
-//   notifyListeners();
-// }
-
-//   String getApiKey() {
-//     return dotenv.env['GEMINI_API_KEY'].toString();
-//   }
-
   // save volume to shared preferences
   Future<void> saveVolumeToSharedPreferences({required double value}) async {
     final SharedPreferences sharedPreferences =
@@ -273,9 +226,17 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // reset chat
+  Future<void> resetChat({
+    required String uid,
+    required String chatID,
+  }) async {
+    _historyMessages = [];
+  }
+
   Future<void> getChatHistoryFromFirebase({
     required String uid,
-    bool isDSTI = false,
+    required GenerationType generationType,
     AssessmentModel? assessmentModel,
     ToolModel? toolModel,
   }) async {
@@ -285,9 +246,7 @@ class ChatProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final collection = toolModel != null
-        ? Constants.toolsChatsCollection
-        : Constants.assessmentsChatsCollection;
+    final collection = getCollectionRef(generationType);
     final chatID =
         toolModel != null ? toolModel.id : assessmentModel!.id; // get chat id
 
@@ -325,7 +284,7 @@ class ChatProvider extends ChangeNotifier {
       await setChatContext(
         assessment: assessmentModel,
         tool: toolModel,
-        isDSTI: isDSTI,
+        generationType: generationType,
       );
 
       _isLoading = false;
@@ -333,7 +292,6 @@ class ChatProvider extends ChangeNotifier {
     } on FirebaseException catch (e) {
       _isLoading = false;
       notifyListeners();
-      log('getting history error : ${e.message}');
     }
   }
 
@@ -341,7 +299,7 @@ class ChatProvider extends ChangeNotifier {
     required String uid,
     required String chatID,
     required String message,
-    required bool isTool,
+    required GenerationType generationType,
     required Function onSuccess,
     required Function(String) onError,
     AudioPlayer? audioPlayer,
@@ -369,7 +327,7 @@ class ChatProvider extends ChangeNotifier {
         chatID: chatID,
         messageID: messageID,
         message: message,
-        isTool: isTool,
+        generationType: generationType,
         onError: onError,
       );
 
@@ -377,7 +335,6 @@ class ChatProvider extends ChangeNotifier {
     } catch (error) {
       _isLoading = false;
       notifyListeners();
-      log('error XXX: ${error.toString()}');
       onError(error.toString());
     }
   }
@@ -387,7 +344,7 @@ class ChatProvider extends ChangeNotifier {
     required String chatID,
     required String messageID,
     required String message,
-    required bool isTool,
+    required GenerationType generationType,
     required Function(String) onError,
   }) async {
     await setModel();
@@ -395,9 +352,7 @@ class ChatProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final collection = isTool
-        ? Constants.toolsChatsCollection
-        : Constants.assessmentsChatsCollection;
+    final collection = getCollectionRef(generationType);
 
     await streamResponse(
       uid,
@@ -406,6 +361,16 @@ class ChatProvider extends ChangeNotifier {
       message,
       collection,
     );
+  }
+
+  getCollectionRef(GenerationType generationType) {
+    if (generationType == GenerationType.tool) {
+      return Constants.toolsChatsCollection;
+    } else if (generationType == GenerationType.riskAssessment) {
+      return Constants.assessmentsChatsCollection;
+    } else if (generationType == GenerationType.dsti) {
+      return Constants.dstisChatsCollection;
+    }
   }
 
   Future<void> streamResponse(
@@ -429,21 +394,32 @@ class ChatProvider extends ChangeNotifier {
           .firstWhere((element) => element.messageID == messageID)
           .answer
           .write(streamedAnswer);
-      log('event: $streamedAnswer');
       notifyListeners();
     }
 
     _historyMessages.add(Content.text(message));
     _historyMessages.add(Content.model([TextPart(fullStreamedAnswer)]));
 
-    // TODO: Save the message to Firestore
-    // await _chatsCollection
-    //     .doc(uid)
-    //     .collection(collectionRef)
-    //     .doc(chatID)
-    //     .collection(Constants.chatDataCollection)
-    //     .doc(messageID)
-    //     .set(lastMessage.toJson());
+    // Save the message to Firestore
+    final messageModel = Message(
+      senderID: uid,
+      messageID: messageID,
+      chatID: chatID,
+      question: message,
+      answer: StringBuffer(fullStreamedAnswer),
+      imagesUrls: [],
+      sentencesUrls: [],
+      finalWords: true,
+      timeSent: DateTime.now(),
+    );
+
+    await _chatsCollection
+        .doc(uid)
+        .collection(collectionRef)
+        .doc(chatID)
+        .collection(Constants.chatDataCollection)
+        .doc(messageID)
+        .set(messageModel.toJson());
     _isLoading = false;
     notifyListeners();
   }
@@ -499,7 +475,7 @@ class ChatProvider extends ChangeNotifier {
   Future<void> addAndDisplayMessage({
     required String uid,
     required String chatID,
-    required bool isTool,
+    required GenerationType generationType,
     required bool finalWords,
     AudioPlayer? audioPlayer,
     String? spokenWords,
@@ -530,7 +506,7 @@ class ChatProvider extends ChangeNotifier {
           chatID: chatID,
           messageID: messageID,
           message: spokenWords,
-          isTool: isTool,
+          generationType: generationType,
           onError: onError,
         );
       } else {
@@ -564,11 +540,12 @@ class ChatProvider extends ChangeNotifier {
   Future<void> setChatContext({
     AssessmentModel? assessment,
     ToolModel? tool,
-    bool isDSTI = false,
+    GenerationType? generationType,
   }) async {
     if (assessment != null) {
-      String docType =
-          isDSTI ? 'daily safety task instruction' : 'risk assessment';
+      String docType = generationType == GenerationType.dsti
+          ? 'daily safety task instruction'
+          : 'risk assessment';
       _currentAssessment = assessment;
       _toolModel = null;
 
