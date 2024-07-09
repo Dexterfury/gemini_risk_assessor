@@ -4,7 +4,10 @@ import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
+import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:provider/provider.dart';
 import '../widgets/images_display.dart';
@@ -47,8 +50,27 @@ class ExplainerDetailsScreen extends StatelessWidget {
               ? Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: AnimatedChatButton(
-                    onPressed: () {
+                    onPressed: () async {
                       // Open chat or navigate to chat screen
+                      // Open chat or navigate to chat screen
+                      final uid = context.read<AuthProvider>().userModel!.uid;
+                      final chatProvider = context.read<ChatProvider>();
+                      await chatProvider
+                          .getChatHistoryFromFirebase(
+                        uid: uid,
+                        toolModel: toolModel,
+                      )
+                          .whenComplete(() {
+                        // Navigate to the chat screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              toolModel: toolModel,
+                            ),
+                          ),
+                        );
+                      });
                     },
                     size: ChatButtonSize.small,
                     iconColor: Colors.white,

@@ -275,7 +275,7 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> getChatHistoryFromFirebase({
     required String uid,
-    required bool isDSTI,
+    bool isDSTI = false,
     AssessmentModel? assessmentModel,
     ToolModel? toolModel,
   }) async {
