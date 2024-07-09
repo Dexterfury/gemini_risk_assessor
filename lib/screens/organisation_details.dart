@@ -187,6 +187,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
   ) {
     return Column(
       children: [
+        // members list
         MembersCard(
           orgModel: widget.orgModel,
           isAdmin: isAdmin,
@@ -327,7 +328,6 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                     if (isSaved) {
                       Future.delayed(const Duration(milliseconds: 100))
                           .whenComplete(() {
-                        log('Scaockbar: $isSaved');
                         showSnackBar(
                           context: context,
                           message: 'Requests sent to added members',

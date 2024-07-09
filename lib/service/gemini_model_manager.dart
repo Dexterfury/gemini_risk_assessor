@@ -18,7 +18,7 @@ class GeminiModelManager {
     temperature: 0.4,
     topK: 32,
     topP: 1,
-    maxOutputTokens: 4096,
+    //maxOutputTokens: 4096,
   );
 
   final List<SafetySetting> _safetySettings = [

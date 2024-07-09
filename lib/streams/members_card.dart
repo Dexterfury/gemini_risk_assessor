@@ -31,8 +31,11 @@ class MembersCard extends StatelessWidget {
             // builder: (context, snapshot)
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+                return const SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 );
               }
               if (snapshot.hasError) {

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 
 class DataStream {
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final CollectionReference _usersCollections =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
   static final CollectionReference _organisationCollection =
