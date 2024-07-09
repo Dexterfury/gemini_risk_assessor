@@ -57,14 +57,10 @@ class PDFHandler {
     final filePath = await getLocalFilePath(filename);
 
     if (await isFileDownloaded(filePath) && await getDownloadStatus(filename)) {
-      print("Opening existing file: $filePath");
       await OpenFile.open(filePath);
     } else {
-      print("Downloading file from: $url");
       final downloadedFile = await downloadFile(url, filePath);
       if (downloadedFile != null) {
-        print(
-            "File downloaded successfully. Size: ${await downloadedFile.length()} bytes");
         await OpenFile.open(downloadedFile.path);
       } else {
         print("Failed to download the file");

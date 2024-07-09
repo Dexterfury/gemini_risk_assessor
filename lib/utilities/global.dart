@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../providers/tool_provider.dart';
 import '../themes/my_themes.dart';
-import '../widgets/main_app_button.dart';
 
 String cleanJson(String maybeInvalidJson) {
   if (maybeInvalidJson.contains('```')) {

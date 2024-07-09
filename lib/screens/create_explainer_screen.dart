@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
@@ -11,7 +13,6 @@ import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
-import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/page_indicator.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,6 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     final bool isViewOnly = widget.tool != null;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    log('$title: $orgID');
     return Scaffold(
       appBar: MyAppBar(
         leading: const BackButton(),
@@ -128,7 +128,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             child: OpenContainer(
               closedBuilder: (context, action) {
                 return MainAppButton(
-                  icon: Icons.create,
+                  icon: FontAwesomeIcons.wandMagicSparkles,
                   label: 'Generate Explainer',
                   onTap: () async {
                     //check if images are added

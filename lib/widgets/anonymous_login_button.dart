@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
-import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 
 class AnonymousLoginButton extends StatelessWidget {
   const AnonymousLoginButton({

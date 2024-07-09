@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
@@ -8,7 +9,6 @@ import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
-import 'package:gemini_risk_assessor/widgets/main_app_button.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/number_of_people.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_gridview_widget.dart';
@@ -16,6 +16,7 @@ import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/title_widget.dart';
 import 'package:gemini_risk_assessor/widgets/weather_buttons.dart';
 import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CreateAssessmentScreen extends StatefulWidget {
   const CreateAssessmentScreen({super.key});
@@ -116,7 +117,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                 child: OpenContainer(
                   closedBuilder: (context, action) {
                     return MainAppButton(
-                      icon: Icons.create,
+                      icon: FontAwesomeIcons.wandMagicSparkles,
                       label: 'Generate Assessment',
                       onTap: () async {
                         // check if description field is not empty and description length is more 10 characters or more
