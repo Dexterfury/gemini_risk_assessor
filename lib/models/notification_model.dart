@@ -2,9 +2,10 @@ import 'package:gemini_risk_assessor/constants.dart';
 
 class NotificationModel {
   String creatorUID;
-  String ownerUID;
+  String recieverUID;
   String organisationID;
-  String organisationName;
+  String title;
+  String description;
   String imageUrl;
   String aboutOrganisation;
   String notificationType;
@@ -15,9 +16,10 @@ class NotificationModel {
 // constructor
   NotificationModel({
     required this.creatorUID,
-    required this.ownerUID,
+    required this.recieverUID,
     required this.organisationID,
-    required this.organisationName,
+    required this.title,
+    required this.description,
     required this.imageUrl,
     required this.aboutOrganisation,
     required this.notificationType,
@@ -30,9 +32,10 @@ class NotificationModel {
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
       creatorUID: json[Constants.creatorUID] ?? '',
-      ownerUID: json[Constants.ownerUID] ?? '',
+      recieverUID: json[Constants.recieverUID] ?? '',
       organisationID: json[Constants.organisationID] ?? '',
-      organisationName: json[Constants.organisationName] ?? '',
+      title: json[Constants.title] ?? '',
+      description: json[Constants.description] ?? '',
       imageUrl: json[Constants.imageUrl] ?? '',
       aboutOrganisation: json[Constants.aboutOrganisation] ?? '',
       notificationType: json[Constants.notificationType] ?? '',
@@ -47,9 +50,10 @@ class NotificationModel {
   Map<String, dynamic> toJson() {
     return {
       Constants.creatorUID: creatorUID,
-      Constants.ownerUID: ownerUID,
+      Constants.recieverUID: recieverUID,
       Constants.organisationID: organisationID,
-      Constants.organisationName: organisationName,
+      Constants.title: title,
+      Constants.description: description,
       Constants.imageUrl: imageUrl,
       Constants.aboutOrganisation: aboutOrganisation,
       Constants.notificationType: notificationType,

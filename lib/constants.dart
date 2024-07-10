@@ -152,10 +152,18 @@ class Constants {
   static const String shouldSpeak = 'ShouldSpeak';
 
   // notification constants
-  static const String ownerUID = 'ownerUID';
+  static const String recieverUID = 'recieverUID';
   static const String notificationType = 'notificationType';
   static const String wasClicked = 'wasClicked';
   static const String notificationDate = 'notificationDate';
+
+  // notification types
+  static const String dstiNotification = 'dstiNotification';
+  static const String assessmentNotification = 'assessmentNotification';
+  static const String toolsNotification = 'toolsNotification';
+  static const String newOrganisationNotification =
+      'newOrganisationNotification';
+  static const String requestNotification = 'requestNotification';
 
   // dialog content
   static const String loading = 'loading';

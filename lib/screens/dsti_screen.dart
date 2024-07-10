@@ -4,7 +4,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
-import 'package:gemini_risk_assessor/streams/data_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -39,7 +39,7 @@ class _DSTIScreenState extends State<DSTIScreen> {
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: DataStream.dstiStream(
+          stream: FirebaseMethods.dstiStream(
             userId: uid,
             orgID: widget.orgID,
           ),

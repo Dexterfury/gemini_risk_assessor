@@ -4,7 +4,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
-import 'package:gemini_risk_assessor/streams/data_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class OrgSearchStream extends StatelessWidget {
     return Consumer<OrganisationProvider>(
         builder: (context, organisationProvider, child) {
       return StreamBuilder<QuerySnapshot>(
-        stream: DataStream.organisationsStream(
+        stream: FirebaseMethods.organisationsStream(
           userId: uid,
         ),
         builder: (

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/firebase_methods/notifications_stream.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -26,6 +27,7 @@ class NotificationsScreen extends StatelessWidget {
           ),
         ),
       ),
+      body: const NotificationsStream(isAll: true),
     );
   }
 }

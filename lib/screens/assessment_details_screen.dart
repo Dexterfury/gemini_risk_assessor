@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
@@ -241,7 +242,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
   ) {
     if (currentModel != null) {
       return FutureBuilder<String>(
-        future: AuthProvider.getCreatorName(currentModel.createdBy),
+        future: FirebaseMethods.getCreatorName(currentModel.createdBy),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const SizedBox(

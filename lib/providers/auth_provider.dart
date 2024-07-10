@@ -8,9 +8,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utilities/file_upload_handler.dart';
@@ -30,8 +30,6 @@ class AuthProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
-  final CollectionReference _organisationsCollection =
-      FirebaseFirestore.instance.collection(Constants.organisationCollection);
 
   // getters
   bool get isSignedIn => _isSignedIn;
@@ -390,19 +388,6 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
-  // get user stream
-  Stream<DocumentSnapshot> userStream({required String userID}) {
-    return _usersCollection.doc(userID).snapshots();
-  }
-
-  // get organisations stream
-  Stream<DocumentSnapshot> organisationStream({required String orgID}) {
-    return _organisationsCollection.doc(orgID).snapshots();
-  }
-
-  final CollectionReference _organisationCollection =
-      FirebaseFirestore.instance.collection(Constants.organisationCollection);
-
   // update name
   Future<String> updateName({
     required bool isUser,
@@ -415,12 +400,12 @@ class AuthProvider extends ChangeNotifier {
     }
 
     if (!isUser) {
-      await _updateOrgName(id, newName);
+      await FirebaseMethods.updateOrgName(id, newName);
       final nameToReturn = newName;
       newName = '';
       return nameToReturn;
     } else {
-      await _updateUserName(id, newName);
+      await FirebaseMethods.updateUserName(id, newName);
 
       _userModel!.name = newName;
       // save user data to share preferences
@@ -443,12 +428,12 @@ class AuthProvider extends ChangeNotifier {
     }
 
     if (!isUser) {
-      await _updateOrgDesc(id, newDesc);
+      await FirebaseMethods.updateOrgDesc(id, newDesc);
       final descToReturn = newDesc;
       newDesc = '';
       return descToReturn;
     } else {
-      await _updateAboutMe(id, newDesc);
+      await FirebaseMethods.updateAboutMe(id, newDesc);
 
       _userModel!.aboutMe = newDesc;
       // save user data to share preferences
@@ -457,45 +442,6 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return _userModel!.aboutMe;
     }
-  }
-
-  static Future<String> getCreatorName(String creatorUid) async {
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection(Constants.usersCollection)
-          .doc(creatorUid)
-          .get();
-      return userDoc.get(Constants.name) as String;
-    } catch (e) {
-      print('Error fetching creator name: $e');
-      return 'Unknown Creator';
-    }
-  }
-
-  // update groupName
-  Future<void> _updateOrgName(String id, String newName) async {
-    await _organisationCollection.doc(id).update({
-      Constants.organisationName: newName,
-    });
-  }
-
-  // update userName
-  Future<void> _updateUserName(String id, String newName) async {
-    await _usersCollection.doc(id).update({
-      Constants.name: newName,
-    });
-  }
-
-  // update aboutMe
-  Future<void> _updateAboutMe(String id, String newDesc) async {
-    await _usersCollection.doc(id).update({Constants.aboutMe: newDesc});
-  }
-
-  // update group desc
-  Future<void> _updateOrgDesc(String id, String newDesc) async {
-    await _organisationsCollection
-        .doc(id)
-        .update({Constants.aboutOrganisation: newDesc});
   }
 
   // update the organisation image

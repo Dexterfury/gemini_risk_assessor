@@ -5,8 +5,10 @@ import 'package:gemini_risk_assessor/authentication/login_screen.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -71,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: 'Profile',
       ),
       body: StreamBuilder(
-        stream: context.read<AuthProvider>().userStream(userID: uid),
+        stream: FirebaseMethods.userStream(userID: uid),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something went wrong'));
@@ -334,6 +336,12 @@ class SettingsColumn extends StatelessWidget {
                 iconContainerColor: Colors.red,
                 onTap: () {
                   // navigate to account settings
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationsScreen(),
+                    ),
+                  );
                 },
               ),
               SettingsListTile(

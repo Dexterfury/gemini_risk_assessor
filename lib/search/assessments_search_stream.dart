@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
-import 'package:gemini_risk_assessor/streams/data_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +29,7 @@ class AssessmentsSearchStream extends StatelessWidget {
               : Constants.riskAssessment;
           return SafeArea(
             child: StreamBuilder<QuerySnapshot>(
-              stream: DataStream.dstiStream(
+              stream: FirebaseMethods.dstiStream(
                 userId: uid,
                 orgID: orgID,
               ),

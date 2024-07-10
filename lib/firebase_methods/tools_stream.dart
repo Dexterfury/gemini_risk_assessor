@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
-import 'package:gemini_risk_assessor/streams/data_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 
@@ -21,7 +21,7 @@ class ToolsStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: DataStream.toolsStream(
+      stream: FirebaseMethods.toolsStream(
         userId: uid,
         orgID: orgID,
       ),

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/streams/data_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +16,7 @@ class OrganisationsStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     return StreamBuilder<QuerySnapshot>(
-      stream: DataStream.organisationsStream(
+      stream: FirebaseMethods.organisationsStream(
         userId: uid,
       ),
       builder: (
