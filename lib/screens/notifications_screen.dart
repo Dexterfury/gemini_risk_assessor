@@ -6,14 +6,26 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar: MyAppBar(
-        leading: BackButton(),
+        leading: const BackButton(),
         title: 'Notifications',
-        bottom: Row(children: [
-          ElevatedButton(onPressed: (){}, child: Text('All'),
-          ElevatedButton(onPressed: (){}, child: Text('Unread'),)
-        ],),),
+        bottom: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(56.0), // Adjust the height as needed
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ElevatedButton(onPressed: () {}, child: Text('All')),
+                const SizedBox(width: 8), // Add some space between buttons
+                ElevatedButton(onPressed: () {}, child: Text('Unread')),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
