@@ -157,7 +157,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
 
                   final orgModel = OrganisationModel(
                     creatorUID: context.read<AuthProvider>().userModel!.uid,
-                    organisationName: _nameController.text,
+                    name: _nameController.text,
                     aboutOrganisation: _descriptionController.text,
                     imageUrl: '',
                   );

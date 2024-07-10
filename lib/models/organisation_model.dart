@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 class OrganisationModel {
   String creatorUID;
   String organisationID;
-  String organisationName;
+  String name;
   String? imageUrl;
   String aboutOrganisation;
   String address;
@@ -19,7 +19,7 @@ class OrganisationModel {
   OrganisationModel({
     this.creatorUID = '',
     this.organisationID = '',
-    this.organisationName = '',
+    this.name = '',
     this.imageUrl,
     this.aboutOrganisation = '',
     this.address = '',
@@ -40,7 +40,7 @@ class OrganisationModel {
     return OrganisationModel(
       creatorUID: json[Constants.creatorUID] ?? '',
       organisationID: json[Constants.organisationID] ?? '',
-      organisationName: json[Constants.organisationName] ?? '',
+      name: json[Constants.name] ?? '',
       imageUrl: json[Constants.imageUrl],
       aboutOrganisation: json[Constants.aboutOrganisation] ?? '',
       address: json[Constants.address] ?? '',
@@ -62,7 +62,7 @@ class OrganisationModel {
     return {
       Constants.creatorUID: creatorUID,
       Constants.organisationID: organisationID,
-      Constants.organisationName: organisationName,
+      Constants.name: name,
       Constants.imageUrl: imageUrl,
       Constants.aboutOrganisation: aboutOrganisation,
       Constants.address: address,

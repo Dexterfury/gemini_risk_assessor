@@ -495,7 +495,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                   children: [
                     Flexible(
                       child: Text(
-                        widget.orgModel.organisationName,
+                        widget.orgModel.name,
                         style: textStyle18Bold,
                         softWrap: true,
                         overflow: TextOverflow.visible,
@@ -509,7 +509,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                             context: context,
                             title: 'Edit Name',
                             content: Constants.changeName,
-                            hintText: widget.orgModel.organisationName,
+                            hintText: widget.orgModel.name,
                             textAction: "Change",
                             onActionTap: (value, updatedText) async {
                               if (value) {
@@ -519,7 +519,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                                   isUser: false,
                                   id: widget.orgModel.organisationID,
                                   newName: updatedText,
-                                  oldName: widget.orgModel.organisationName,
+                                  oldName: widget.orgModel.name,
                                 );
                                 if (name == 'Invalid name.') return;
                                 // set new name

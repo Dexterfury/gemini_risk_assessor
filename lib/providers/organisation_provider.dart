@@ -132,7 +132,7 @@ class OrganisationProvider extends ChangeNotifier {
 
   // up date the organisation name
   Future<void> setName(String name) async {
-    _organisationModel.organisationName = name;
+    _organisationModel.name = name;
     notifyListeners();
   }
 

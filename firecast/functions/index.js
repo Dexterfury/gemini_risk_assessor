@@ -7,13 +7,26 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const { log } = require("firebase-functions/logger");
+admin.initializeApp();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+const db = admin.firestore();
 
-exports.helloWorld = onRequest((request, response) => {
-  logger.info("Hello logs!", {structuredData: true});
-  response.send("Hello from Firebase!");
-});
+// oncreate organisation
+exports.onCreateOrganisation = functions.firestore.document(
+  'organisations/{orgId}').onCreate(async (snapshot, context) => {
+    const orgData = snapshot.data();
+    const creatorUID = orgData.creatorUID;
+    const orgName = orgData.name;
+    const orgID = context.params.orgId;
+    let orgImage = orgData.imageUrl;
+
+    if(!orgImage) {
+      // get the default image url from storage
+      //const defaultImageUrl = await storageRef.child('defaultImages/user_icon.png').getDownloadURL();
+      const defaultImageUrl = 'https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FdefaultImages%2Fgroup_icon.png?alt=media&token=657685ea-507c-4a4b-a05b-2d825ac2fc9f';
+      orgImage = defaultImageUrl;
+     }
+  });
