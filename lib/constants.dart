@@ -126,6 +126,7 @@ class Constants {
   static const String assessmentsChatsCollection = 'assessmentsChats';
   static const String dstisChatsCollection = 'dstisChats';
   static const String chatDataCollection = 'chatData';
+  static const String notificationsCollection = 'notifications';
 
   static const String organisationImage = 'organisationImage';
 
@@ -149,6 +150,12 @@ class Constants {
   static const String volume = 'volume';
   static const String audioSpeed = 'audioSpeed';
   static const String shouldSpeak = 'ShouldSpeak';
+
+  // notification constants
+  static const String ownerUID = 'ownerUID';
+  static const String notificationType = 'notificationType';
+  static const String wasClicked = 'wasClicked';
+  static const String notificationDate = 'notificationDate';
 
   // dialog content
   static const String loading = 'loading';

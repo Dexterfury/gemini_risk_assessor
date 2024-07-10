@@ -76,4 +76,14 @@ class DataStream {
         )
         .snapshots();
   }
+
+  // stream notifications from firestore
+  static Stream<QuerySnapshot> notificationsStream({
+    required String userId,
+  }) {
+    return _usersCollections
+        .doc(userId)
+        .collection(Constants.notificationsCollection)
+        .snapshots();
+  }
 }
