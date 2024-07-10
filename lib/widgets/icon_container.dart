@@ -5,12 +5,16 @@ class IconContainer extends StatelessWidget {
     super.key,
     required this.icon,
     this.containerColor,
+    this.padding = 8.0,
+    this.borderRadius = 10.0,
   });
 
   final Color?
       containerColor; // You can use this to change the color of the icon container
   final IconData
       icon; // This is the icon that will be displayed in the container
+  final double padding; // padding of the icon
+  final double borderRadius; // borderRadius of the container
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +22,10 @@ class IconContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: getColor(
             context), // This function is used to get the color of the icon container
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(padding),
         child: Icon(
           icon,
           color: Colors.white,

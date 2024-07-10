@@ -11,7 +11,6 @@ class ListItem extends StatelessWidget {
     required this.docTitle,
     required this.data,
   });
-
   final String docTitle;
   final AssessmentModel data;
 
@@ -22,28 +21,28 @@ class ListItem extends StatelessWidget {
         return ListTile(
           contentPadding: EdgeInsets.zero,
           leading: SizedBox(
-            height: 80,
-            width: 90,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: CachedNetworkImage(
-                  imageUrl: data.images.first,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Center(
-                      child: Icon(
-                    Icons.error,
-                    color: Colors.red,
-                  )),
-                  cacheManager: MyImageCacheManager.itemsCacheManager,
-                ),
+            width: 80,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: data.images.first,
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Center(
+                    child: Icon(
+                  Icons.error,
+                  color: Colors.red,
+                )),
+                cacheManager: MyImageCacheManager.itemsCacheManager,
               ),
             ),
           ),
-          title: Text(data.title),
+          title: Text(
+            data.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           subtitle: Text(
             data.summary,
             maxLines: 2,

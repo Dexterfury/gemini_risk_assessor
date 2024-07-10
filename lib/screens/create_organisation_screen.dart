@@ -167,11 +167,11 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                   MyDialogs.showMyAnimatedDialog(
                     context: context,
                     title: 'Creating organisation',
-                    content: 'Please wait...',
                     loadingIndicator: const SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: CircularProgressIndicator()),
+                      height: 100,
+                      width: 100,
+                      child: LoadingPPEIcons(),
+                    ),
                   );
 
                   // save organisation data to firestore

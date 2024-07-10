@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +21,6 @@ import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
 import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
-import 'package:gemini_risk_assessor/widgets/people.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:provider/provider.dart';
 
 class OrganisationDetails extends StatefulWidget {
@@ -53,16 +50,16 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
 
   void showLoadingDialog({
     required String title,
-    required String message,
   }) {
     if (mounted) {
       MyDialogs.showMyAnimatedDialog(
-        context: context,
-        title: title,
-        content: message,
-        loadingIndicator: const SizedBox(
-            height: 40, width: 40, child: CircularProgressIndicator()),
-      );
+          context: context,
+          title: title,
+          loadingIndicator: const SizedBox(
+            height: 100,
+            width: 100,
+            child: LoadingPPEIcons(),
+          ));
     }
   }
 
@@ -77,7 +74,11 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
   @override
   void initState() {
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 200,
+      ),
+    );
     _animation =
         CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
     setOrgModel();
@@ -213,7 +214,6 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                     // show loading dialog
                     showLoadingDialog(
                       title: 'Exiting',
-                      message: 'Please wait...',
                     );
                     final orgProvider = context.read<OrganisationProvider>();
 
@@ -285,6 +285,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
     String orgID,
   ) {
     return OpenContainer(
+      closedColor: Theme.of(context).colorScheme.primary,
       closedBuilder: (context, action) {
         return IconButton(
           onPressed: () async {
@@ -292,7 +293,10 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
             await _setSearchData(context, icon);
             action();
           },
-          icon: Icon(icon),
+          icon: Icon(
+            icon,
+            color: Colors.white,
+          ),
         );
       },
       openBuilder: (context, action) {
@@ -307,45 +311,40 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
   }
 
   Widget _buildMembersSection(String membersCount, BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          membersCount,
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(width: 5),
-        GestureDetector(
-          onTap: () {
-            // show people dialog
-            _showPeopleDialog(
-                context: context,
-                onActionTap: (value) async {
-                  if (value) {
-                    bool isSaved = await context
-                        .read<OrganisationProvider>()
-                        .updateOrganisationDataInFireStore();
+    return GestureDetector(
+      onTap: () {
+        // show people dialog
+        _showPeopleDialog(
+            context: context,
+            onActionTap: (value) async {
+              if (value) {
+                bool isSaved = await context
+                    .read<OrganisationProvider>()
+                    .updateOrganisationDataInFireStore();
 
-                    if (isSaved) {
-                      Future.delayed(const Duration(milliseconds: 100))
-                          .whenComplete(() {
-                        showSnackBar(
-                          context: context,
-                          message: 'Requests sent to added members',
-                        );
-                      });
-                    }
-                  }
-
+                if (isSaved) {
                   Future.delayed(const Duration(milliseconds: 100))
-                      .whenComplete(() async {
-                    // clear search query
-                    context.read<OrganisationProvider>().setSearchQuery('');
+                      .whenComplete(() {
+                    showSnackBar(
+                      context: context,
+                      message: 'Requests sent to added members',
+                    );
                   });
-                });
-          },
-          child: const IconContainer(icon: Icons.person_add),
-        ),
-      ],
+                }
+              }
+
+              Future.delayed(const Duration(milliseconds: 100))
+                  .whenComplete(() async {
+                // clear search query
+                context.read<OrganisationProvider>().setSearchQuery('');
+              });
+            });
+      },
+      child: const IconContainer(
+        icon: Icons.person_add,
+        padding: 12,
+        borderRadius: 4.0,
+      ),
     );
   }
 
@@ -437,35 +436,35 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
         ),
         Text(
           widget.orgModel.aboutOrganisation,
-          style: textStyle18w500,
+          style: textStyle16w600,
         ),
       ],
     );
   }
 
-  Row buildImageAndName(bool isAdmin, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        DisplayOrgImage(
-          isViewOnly: true,
-          fileImage: _finalFileImage,
-          imageUrl: widget.orgModel.imageUrl!,
-          onPressed: !isAdmin
-              ? null
-              : () async {
-                  final file = await ImagePickerHandler.showImagePickerDialog(
-                    context: context,
-                  );
-                  if (file != null) {
-                    setState(() async {
-                      _finalFileImage = file;
-
+  buildImageAndName(bool isAdmin, BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DisplayOrgImage(
+            isViewOnly: true,
+            fileImage: _finalFileImage,
+            imageUrl: widget.orgModel.imageUrl!,
+            onPressed: !isAdmin
+                ? null
+                : () async {
+                    final file = await ImagePickerHandler.showImagePickerDialog(
+                      context: context,
+                    );
+                    if (file != null) {
+                      setState(() async {
+                        _finalFileImage = file;
+                      });
                       // show loading dialog
                       showLoadingDialog(
                         title: 'Saving,',
-                        message: 'Please wait...',
                       );
 
                       final imageUrl = await FileUploadHandler.updateImage(
@@ -481,61 +480,72 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
 
                       // pop loading dialog
                       popDialog();
-                    });
-                  }
-                },
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            isAdmin
-                ? GestureDetector(
-                    onTap: () {
-                      // edit org name
-                      MyDialogs.showMyEditAnimatedDialog(
-                        context: context,
-                        title: 'Edit Name',
-                        content: Constants.changeName,
-                        hintText: widget.orgModel.organisationName,
-                        textAction: "Change",
-                        onActionTap: (value, updatedText) async {
-                          if (value) {
-                            final authProvider = context.read<AuthProvider>();
-                            final name = await authProvider.updateName(
-                              isUser: false,
-                              id: widget.orgModel.organisationID,
-                              newName: updatedText,
-                              oldName: widget.orgModel.organisationName,
-                            );
-                            if (name == 'Invalid name.') return;
-                            // set new name
-                            await setNewNameInProvider(name);
-                            Future.delayed(const Duration(milliseconds: 200))
-                                .whenComplete(() {
-                              showSnackBar(
-                                  context: context,
-                                  message: 'Change successful');
-                            });
-                          }
-                        },
-                      );
-                    },
-                    child: const Icon(
-                      Icons.edit,
+                    }
+                  },
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.orgModel.organisationName,
+                        style: textStyle18Bold,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
-                  )
-                : const SizedBox(),
-            const SizedBox(height: 10),
-            Text(
-              widget.orgModel.organisationName,
-              style: textStyle18w500,
-            )
-          ],
-        )
-      ],
+                    if (isAdmin)
+                      GestureDetector(
+                        onTap: () {
+                          // edit org name
+                          MyDialogs.showMyEditAnimatedDialog(
+                            context: context,
+                            title: 'Edit Name',
+                            content: Constants.changeName,
+                            hintText: widget.orgModel.organisationName,
+                            textAction: "Change",
+                            onActionTap: (value, updatedText) async {
+                              if (value) {
+                                final authProvider =
+                                    context.read<AuthProvider>();
+                                final name = await authProvider.updateName(
+                                  isUser: false,
+                                  id: widget.orgModel.organisationID,
+                                  newName: updatedText,
+                                  oldName: widget.orgModel.organisationName,
+                                );
+                                if (name == 'Invalid name.') return;
+                                // set new name
+                                await setNewNameInProvider(name);
+                                Future.delayed(
+                                        const Duration(milliseconds: 200))
+                                    .whenComplete(() {
+                                  showSnackBar(
+                                      context: context,
+                                      message: 'Change successful');
+                                });
+                              }
+                            },
+                          );
+                        },
+                        child: const Icon(
+                          Icons.edit,
+                        ),
+                      ),
+                  ],
+                )
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 

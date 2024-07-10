@@ -150,6 +150,10 @@ class Constants {
   static const String audioSpeed = 'audioSpeed';
   static const String shouldSpeak = 'ShouldSpeak';
 
+  // dialog content
+  static const String loading = 'loading';
+  static const String signature = 'signature';
+
   static String getDoctTitle(String docTitle) {
     if (docTitle == createAssessment) {
       return riskAssessment;

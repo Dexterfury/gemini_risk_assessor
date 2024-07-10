@@ -87,7 +87,11 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                         slivers: [
                           SliverAppBar(
                             leading: const BackButton(),
-                            title: const Text(Constants.riskAssessments),
+                            title: const FittedBox(
+                              child: Text(
+                                Constants.riskAssessments,
+                              ),
+                            ),
                             pinned: true,
                             floating: true,
                             snap: true,

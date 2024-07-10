@@ -400,32 +400,6 @@ class AuthProvider extends ChangeNotifier {
     return _organisationsCollection.doc(orgID).snapshots();
   }
 
-  // sign out
-  Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-      // set signed in to false
-      setIsSignedIn(false);
-      // set user model to null
-      _userModel = null;
-      // remove user data from shared preferences
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove(Constants.userModel);
-    } on FirebaseException catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-    } on PlatformException catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-    }
-  }
-
   final CollectionReference _organisationCollection =
       FirebaseFirestore.instance.collection(Constants.organisationCollection);
 
@@ -522,5 +496,49 @@ class AuthProvider extends ChangeNotifier {
     await _organisationsCollection
         .doc(id)
         .update({Constants.aboutOrganisation: newDesc});
+  }
+
+  // update the organisation image
+  Future<void> setImageUrl(String imageUrl) async {
+    _userModel!.imageUrl = imageUrl;
+    notifyListeners();
+  }
+
+  // up date the organisation name
+  Future<void> setName(String name) async {
+    _userModel!.name = name;
+    notifyListeners();
+  }
+
+  // up date the organisation description
+  Future<void> setDescription(String description) async {
+    _userModel!.aboutMe = description;
+    notifyListeners();
+  }
+
+  // sign out
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      // set signed in to false
+      setIsSignedIn(false);
+      // set user model to null
+      _userModel = null;
+      // remove user data from shared preferences
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove(Constants.userModel);
+    } on FirebaseException catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        log('Error occured: $e');
+      }
+    }
   }
 }

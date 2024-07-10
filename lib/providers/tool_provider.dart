@@ -83,61 +83,6 @@ class ToolsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // // save tool to firestore
-  // Future<void> saveToolToFirestore() async {
-  //   if (_toolModel != null) {
-  //     String id = _organisationID.isNotEmpty ? _organisationID : _uid;
-
-  //     if (_toolModel!.images.isNotEmpty) {
-  //       List<String> imagesUrls = [];
-  //       for (var image in _toolModel!.images) {
-  //         final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
-  //           file: File(image),
-  //           reference:
-  //               '${Constants.images}/tools/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
-  //         );
-  //         imagesUrls.add(imageUrl);
-  //       }
-
-  //       _toolModel!.images = imagesUrls;
-  //     }
-
-  //     await toolsCollection
-  //         .doc(id)
-  //         .collection(Constants.toolsCollection)
-  //         .doc(_toolModel!.id)
-  //         .set(
-  //           _toolModel!.toJson(),
-  //         );
-
-  //     await resetToolModel();
-
-  //     // if (_organisationID.isNotEmpty) {
-  //     //   await toolsCollection
-  //     //       .doc(_organisationID)
-  //     //       .collection(Constants.toolsCollection)
-  //     //       .doc(_toolModel!.id)
-  //     //       .set(
-  //     //         _toolModel!.toJson(),
-  //     //       );
-  //     // } else {
-  //     //   await toolsCollection
-  //     //       .doc(_uid)
-  //     //       .collection(Constants.toolsCollection)
-  //     //       .doc(toolModel!.id)
-  //     //       .set(
-  //     //         _toolModel!.toJson(),
-  //     //       );
-  //     // }
-  //   }
-  // }
-
-  // reset toolModel
-  Future<void> resetToolModel() async {
-    _toolModel = null;
-    notifyListeners();
-  }
-
   setMacTestToolsList() {
     final Map<String, dynamic> dataMap = {
       Constants.id: '774b4250-0628-4381-a921-636009b3941c',
@@ -190,21 +135,6 @@ class ToolsProvider extends ChangeNotifier {
     for (int i = 0; i < 10; i++) {
       _toolsList.add(_toolModel!);
     }
-    log('testTools');
-    notifyListeners();
-  }
-
-  // get tools list from firestore
-  Future<void> getToolsListFromFirestore() async {
-    final querySnapshot =
-        await toolsCollection.where(Constants.createdBy, isEqualTo: _uid).get();
-    _toolsList = [];
-    if (querySnapshot.docs.isNotEmpty) {
-      for (var doc in querySnapshot.docs) {
-        _toolsList.add(ToolModel.fromJson(doc.data() as Map<String, dynamic>));
-      }
-    }
-
     notifyListeners();
   }
 
@@ -363,7 +293,7 @@ class ToolsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> submitPrompt({
+  Future<bool> submitPrompt({
     required String creatorID,
     required String organisationID,
     required String description,
@@ -395,6 +325,7 @@ class ToolsProvider extends ChangeNotifier {
       if (content.text != null && content.text!.contains(noToolFound)) {
         // show error message
         _isLoading = false;
+        return false;
       } else {
         final List<String> images = [];
         if (_imagesFileList != null) {
@@ -414,16 +345,16 @@ class ToolsProvider extends ChangeNotifier {
         );
         _isLoading = false;
         notifyListeners();
+        return false;
       }
     } catch (error) {
       if (kDebugMode) {
         print(error);
       }
       _isLoading = false;
+      notifyListeners();
+      return false;
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   String get mainPrompt {
@@ -442,8 +373,8 @@ ${_description.isNotEmpty ? _description : ''}
 ''';
   }
 
-  String noToolFound =
-      "No tools identified based on information and images provided";
+  static String noToolFound =
+      "No tools identified based on information provided";
 
   final String format = '''
 Return the response as valid JSON using the following structure:

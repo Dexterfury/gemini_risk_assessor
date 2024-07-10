@@ -26,25 +26,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
     this.currentModel,
   });
 
-  //  : _scrollController = ScrollController(),
-  //       _showScrollToBottomButton = ValueNotifier<bool>(true) {
-  //   _scrollController.addListener(_scrollListener);
-  // }
-
   final String appBarTitle;
-  //final ScrollController _scrollController;
-  //final ValueNotifier<bool> _showScrollToBottomButton;
   final AssessmentModel? currentModel;
-
-  // void _scrollListener() {
-  //   if (_scrollController.offset >=
-  //           _scrollController.position.maxScrollExtent &&
-  //       !_scrollController.position.outOfRange) {
-  //     _showScrollToBottomButton.value = false;
-  //   } else if (!_showScrollToBottomButton.value) {
-  //     _showScrollToBottomButton.value = true;
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -127,23 +110,6 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   ),
                 )
               : const SizedBox()
-          // ValueListenableBuilder<bool>(
-          //   valueListenable: _showScrollToBottomButton,
-          //   builder: (context, showButton, child) {
-          //     return showButton
-          //         ? IconButton(
-          //             onPressed: () {
-          //               _scrollController.animateTo(
-          //                 _scrollController.position.maxScrollExtent,
-          //                 duration: const Duration(milliseconds: 500),
-          //                 curve: Curves.easeInOut,
-          //               );
-          //             },
-          //             icon: const Icon(Icons.keyboard_double_arrow_down),
-          //           )
-          //         : const SizedBox.shrink();
-          //   },
-          // ),
         ],
       ),
       body: SafeArea(
@@ -244,25 +210,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 10),
               currentModel == null
                   ? const BottonButtonsField()
                   : const SizedBox(
                       height: 20,
                     ),
-
-              // PdfAndChatButtons(
-              //     isDSTI:
-              //         appBarTitle == Constants.dailySafetyTaskInstructions,
-              //     assessmentModel: assessmentModel,
-              //   ),
-
-              // ChatButton(
-              //     isDSTI:
-              //         appBarTitle == Constants.dailySafetyTaskInstructions,
-              //     assesmentModel: assessmentModel,
-              //   ),
             ],
           ),
         ),

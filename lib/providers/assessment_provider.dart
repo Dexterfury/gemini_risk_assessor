@@ -452,7 +452,7 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> submitPrompt({
+  Future<bool> submitPrompt({
     required String creatorID,
     required String orgID,
     required String description,
@@ -486,6 +486,7 @@ class AssessmentProvider extends ChangeNotifier {
       if (content.text != null && content.text!.contains(noRiskFound)) {
         // show error message
         _isLoading = false;
+        return false;
       } else {
         final List<String> images = [];
         if (_imagesFileList != null) {
@@ -506,6 +507,7 @@ class AssessmentProvider extends ChangeNotifier {
         );
         _isLoading = false;
         notifyListeners();
+        return true;
       }
     } catch (error) {
       // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
@@ -518,6 +520,7 @@ class AssessmentProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+    return false;
   }
 
   String get mainPrompt {
@@ -542,7 +545,7 @@ ${_description.isNotEmpty ? _description : ''}
 ''';
   }
 
-  String noRiskFound =
+  static String noRiskFound =
       "No risks identified based on information and images provided";
 
   final String format = '''

@@ -120,16 +120,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       icon: FontAwesomeIcons.wandMagicSparkles,
                       label: 'Generate Assessment',
                       onTap: () async {
-                        // check if description field is not empty and description length is more 10 characters or more
-                        if (_descriptionController.text.isEmpty ||
-                            _descriptionController.text.length < 10) {
-                          showSnackBar(
-                              context: context,
-                              message:
-                                  'Description must be atleast 10 characters');
-                          return;
-                        }
-
                         final authProvider = context.read<AuthProvider>();
                         final creatorID = authProvider.userModel!.uid;
 
@@ -137,40 +127,11 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                         MyDialogs.showMyAnimatedDialog(
                           context: context,
                           title: 'Generating',
-                          content:
-                              'Please wait while we generate your assessment',
                           loadingIndicator: const SizedBox(
-                              height: 40,
-                              width: 40,
-                              child: CircularProgressIndicator()),
+                              height: 100,
+                              width: 100,
+                              child: LoadingPPEIcons()),
                         );
-                        // await assessmentProvider
-                        //     .submitTestAssessment(
-                        //   creatorID: creatorID,
-                        //   docTitle: title,
-                        //   orgID: orgID,
-                        // )
-                        //     .then((_) async {
-                        //   // pop the the dialog
-                        //   Navigator.pop(context);
-                        //   if (!context.mounted) return;
-                        //   if (assessmentProvider.assessmentModel != null) {
-                        //     // display the risk assessment details screen
-                        //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                        //       opaque: false,
-                        //       pageBuilder: (BuildContext context, animation,
-                        //               secondaryAnimation) =>
-                        //           AssessmentDetailsScreen(
-                        //         animation: animation,
-                        //       ),
-                        //     );
-                        //     bool shouldSave =
-                        //         await Navigator.of(context).push(pageRouteBuilder);
-                        //     if (shouldSave) {
-                        //       // TODO save the risk assessment to database
-                        //     }
-                        //   }
-                        // });
 
                         await assessmentProvider
                             .submitPrompt(
@@ -179,11 +140,17 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           description: _descriptionController.text,
                           docTitle: docTitle,
                         )
-                            .then((_) async {
+                            .then((value) async {
                           // pop the the dialog
                           Navigator.pop(context);
-
-                          action();
+                          if (value) {
+                            action();
+                          } else {
+                            showSnackBar(
+                              context: context,
+                              message: AssessmentProvider.noRiskFound,
+                            );
+                          }
                         });
                       },
                     );
@@ -192,7 +159,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     // navigate to screen depending on the clicked icon
                     return AssessmentDetailsScreen(
                       appBarTitle: docTitle,
-                      //animation: animation,
                     );
                   },
                   transitionType: ContainerTransitionType.fadeThrough,
@@ -200,112 +166,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                   closedElevation: 0,
                   openElevation: 4,
                 ),
-
-                // MainAppButton(
-                //   icon: Icons.create,
-                //   label: 'Generate Assessment',
-                //   onTap: () async {
-                //     // check if description field is not empty and description length is more 10 characters or more
-                //     if (_descriptionController.text.isEmpty ||
-                //         _descriptionController.text.length < 10) {
-                //       showSnackBar(
-                //           context: context,
-                //           message: 'Description must be atleast 10 characters');
-                //       return;
-                //     }
-
-                //     // check if atleast 3 ppe is selected
-                //     // if (assessmentProvider.ppeModelList.length < 3) {
-                //     //   showSnackBar(
-                //     //       context: context,
-                //     //       message: 'Please select atleast 3 PPE');
-                //     //   return;
-                //     // }
-
-                //     final authProvider = context.read<AuthProvider>();
-                //     final creatorID = authProvider.userModel!.uid;
-
-                //     log('creatorID: $creatorID');
-
-                //     // show my alert dialog for loading
-                //     MyDialogs.showMyAnimatedDialog(
-                //       context: context,
-                //       title: 'Generating',
-                //       content: 'Please wait while we generate your assessment',
-                //       loadingIndicator: const SizedBox(
-                //           height: 40,
-                //           width: 40,
-                //           child: CircularProgressIndicator()),
-                //     );
-                //     // await assessmentProvider
-                //     //     .submitTestAssessment(
-                //     //   creatorID: creatorID,
-                //     //   docTitle: title,
-                //     //   orgID: orgID,
-                //     // )
-                //     //     .then((_) async {
-                //     //   // pop the the dialog
-                //     //   Navigator.pop(context);
-                //     //   if (!context.mounted) return;
-                //     //   if (assessmentProvider.assessmentModel != null) {
-                //     //     // display the risk assessment details screen
-                //     //     PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                //     //       opaque: false,
-                //     //       pageBuilder: (BuildContext context, animation,
-                //     //               secondaryAnimation) =>
-                //     //           AssessmentDetailsScreen(
-                //     //         animation: animation,
-                //     //       ),
-                //     //     );
-                //     //     bool shouldSave =
-                //     //         await Navigator.of(context).push(pageRouteBuilder);
-                //     //     if (shouldSave) {
-                //     //       // TODO save the risk assessment to database
-                //     //     }
-                //     //   }
-                //     // });
-
-                //     await assessmentProvider
-                //         .submitPrompt(
-                //       creatorID: creatorID,
-                //       orgID: orgID,
-                //       description: _descriptionController.text,
-                //       docTitle: docTitle,
-                //     )
-                //         .then((_) async {
-                //       // pop the the dialog
-                //       Navigator.pop(context);
-                //       if (!context.mounted) return;
-                //       // display the results
-                //       // display the risk assessment details screen
-                //       PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
-                //         opaque: false,
-                //         pageBuilder: (BuildContext context, animation,
-                //                 secondaryAnimation) =>
-                //             AssessmentDetailsScreen(
-                //           appBarTitle: docTitle,
-                //           animation: animation,
-                //         ),
-                //       );
-                //       bool shouldSave =
-                //           await Navigator.of(context).push(pageRouteBuilder);
-                //       if (shouldSave) {
-                //         // reset the data
-                //         assessmentProvider.resetPromptData();
-
-                //         setState(() {
-                //           _descriptionController.clear();
-                //         });
-                //         Future.delayed(const Duration(milliseconds: 200))
-                //             .whenComplete(() {
-                //           Navigator.pop(context);
-                //           showSnackBar(
-                //               context: context, message: 'Successfully saved');
-                //         });
-                //       }
-                //     });
-                //   },
-                // ),
               ),
 
               const SizedBox(

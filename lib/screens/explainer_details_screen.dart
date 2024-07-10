@@ -83,11 +83,11 @@ class ExplainerDetailsScreen extends StatelessWidget {
                     MyDialogs.showMyAnimatedDialog(
                       context: context,
                       title: 'Saving',
-                      content: 'Please wait...',
                       loadingIndicator: const SizedBox(
-                          height: 40,
-                          width: 40,
-                          child: CircularProgressIndicator()),
+                        height: 100,
+                        width: 100,
+                        child: LoadingPPEIcons(),
+                      ),
                     );
                     bool success = await toolProvider.saveToolToFirestore();
                     Future.delayed(const Duration(milliseconds: 200))

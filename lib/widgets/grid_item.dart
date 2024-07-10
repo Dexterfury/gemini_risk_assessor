@@ -2,7 +2,6 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/organisation_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
-import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
 import 'package:gemini_risk_assessor/screens/organisation_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';

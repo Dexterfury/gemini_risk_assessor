@@ -27,7 +27,6 @@ class BottonButtonsField extends StatelessWidget {
                       MyDialogs.showMyAnimatedDialog(
                           context: context,
                           title: 'Signature',
-                          content: '',
                           signatureInput: Container(
                             height: 200,
                             decoration: BoxDecoration(
@@ -96,11 +95,11 @@ class BottonButtonsField extends StatelessWidget {
                   MyDialogs.showMyAnimatedDialog(
                     context: context,
                     title: 'Saving the document',
-                    content: 'Please wait...',
                     loadingIndicator: const SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: CircularProgressIndicator()),
+                      height: 100,
+                      width: 100,
+                      child: LoadingPPEIcons(),
+                    ),
                   );
                   // create the pdf file and save to local storage
                   assessmentProvider.createPdfAndSave().whenComplete(() async {

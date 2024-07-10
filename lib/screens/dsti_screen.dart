@@ -87,8 +87,11 @@ class _DSTIScreenState extends State<DSTIScreen> {
                         slivers: [
                           SliverAppBar(
                             leading: const BackButton(),
-                            title: const Text(
-                                Constants.dailySafetyTaskInstructions),
+                            title: const FittedBox(
+                              child: Text(
+                                Constants.dailySafetyTaskInstructions,
+                              ),
+                            ),
                             pinned: true,
                             floating: true,
                             snap: true,

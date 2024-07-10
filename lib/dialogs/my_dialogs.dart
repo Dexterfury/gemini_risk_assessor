@@ -1,6 +1,9 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/widgets/people.dart';
 
 class MyDialogs {
@@ -8,7 +11,7 @@ class MyDialogs {
   static void showMyAnimatedDialog({
     required BuildContext context,
     required String title,
-    required String content,
+    String content = '',
     Widget? loadingIndicator, // loading indicator
     Widget? signatureInput, // signature field
     List<Widget>? actions,
@@ -31,20 +34,10 @@ class MyDialogs {
                   title,
                   textAlign: TextAlign.center,
                 ),
-                content: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      content,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    loadingIndicator ?? const SizedBox(),
-                    signatureInput ?? const SizedBox(),
-                  ],
+                content: getContent(
+                  content,
+                  loadingIndicator,
+                  signatureInput,
                 ),
                 actions: actions,
               ),
@@ -152,6 +145,79 @@ class MyDialogs {
               ),
             ));
       },
+    );
+  }
+
+  static getContent(
+    String content,
+    Widget? loadingIndicator,
+    Widget? signatureInput,
+  ) {
+    if (loadingIndicator != null) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          loadingIndicator,
+        ],
+      );
+    } else if (signatureInput != null) {
+      return signatureInput;
+    } else {
+      return Text(
+        content,
+        textAlign: TextAlign.center,
+      );
+    }
+  }
+}
+
+class LoadingPPEIcons extends StatefulWidget {
+  const LoadingPPEIcons({
+    super.key,
+  });
+
+  @override
+  State<LoadingPPEIcons> createState() => _LoadingPPEIconsState();
+}
+
+class _LoadingPPEIconsState extends State<LoadingPPEIcons> {
+  late Timer _timer;
+  int _currentIconIndex = 0;
+  late List<PpeModel> _ppeIcons;
+
+  @override
+  void initState() {
+    super.initState();
+    _ppeIcons = Constants.getPPEIcons(radius: 30.0);
+    _ppeIcons.removeLast(); // Remove the "Other" option
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      setState(() {
+        _currentIconIndex = Random().nextInt(_ppeIcons.length);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ppeIcons[_currentIconIndex].icon,
+          const SizedBox(height: 8),
+          Text(
+            _ppeIcons[_currentIconIndex].label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 }

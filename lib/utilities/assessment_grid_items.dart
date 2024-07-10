@@ -76,13 +76,13 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text('Tap on the category to view its items',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600])
-            // style: const TextStyle(
-            //   fontWeight: FontWeight.bold,
-            //   fontSize: 16,
-            // ),
-            ),
+        Text(
+          'Tap on the category to view its items',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
+        ),
         GridView.count(
           crossAxisCount: 2,
           childAspectRatio: 2,

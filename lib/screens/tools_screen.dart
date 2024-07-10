@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -93,7 +92,11 @@ class _ToolsScreenState extends State<ToolsScreen> {
                         slivers: [
                           SliverAppBar(
                             leading: const BackButton(),
-                            title: const Text(Constants.tools),
+                            title: const FittedBox(
+                              child: Text(
+                                Constants.tools,
+                              ),
+                            ),
                             pinned: true,
                             floating: true,
                             snap: true,
