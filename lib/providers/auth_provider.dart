@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -486,5 +487,18 @@ class AuthProvider extends ChangeNotifier {
         log('Error occured: $e');
       }
     }
+  }
+
+  // generate a new token
+  Future<void> generateNewToken() async {
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+    String? token = await firebaseMessaging.getToken();
+
+    log('Token: $token');
+
+    // save token to firestore
+    _usersCollection.doc(_userModel!.uid).update({
+      Constants.token: token,
+    });
   }
 }

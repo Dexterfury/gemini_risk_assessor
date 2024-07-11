@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/landing_screen.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
@@ -20,8 +21,17 @@ import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  print("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +39,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(
     MultiProvider(providers: [
@@ -53,6 +64,7 @@ class MyApp extends StatelessWidget {
         title: Constants.riskAssessments,
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
         initialRoute: Constants.landingRoute,
         routes: {
           Constants.landingRoute: (context) => const LandingScreen(),

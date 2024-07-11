@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
@@ -14,6 +15,7 @@ import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
@@ -160,11 +162,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 10),
                   !isMyProfile
                       ? const SizedBox()
-                      : isAnonymous
-                          ? const AnonymouseView(
-                              message: 'Please Sign In for full access',
-                            )
-                          : SettingsColumn(isDarkMode: isDarkMode)
+                      : SettingsColumn(
+                          isDarkMode: isDarkMode,
+                          isAnonymous: isAnonymous,
+                        )
                 ],
               ),
             ),
@@ -234,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       if (isMyProfile) {
-        GestureDetector(
+        return GestureDetector(
           onTap: () {
             MyDialogs.showMyEditAnimatedDialog(
               context: context,
@@ -339,9 +340,11 @@ class SettingsColumn extends StatelessWidget {
   const SettingsColumn({
     super.key,
     required this.isDarkMode,
+    required this.isAnonymous,
   });
 
   final bool isDarkMode;
+  final bool isAnonymous;
 
   @override
   Widget build(BuildContext context) {
@@ -377,12 +380,16 @@ class SettingsColumn extends StatelessWidget {
                 icon: Icons.help,
                 iconContainerColor: Colors.yellow,
                 onTap: () {
-                  // navigate to account settings
+                  // navigate to help center
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HelpScreen()));
                 },
               ),
               SettingsListTile(
-                title: 'Share',
-                icon: Icons.share,
+                title: 'About',
+                icon: Icons.info,
                 iconContainerColor: Colors.blue,
                 onTap: () {
                   // navigate to account settings
@@ -424,10 +431,17 @@ class SettingsColumn extends StatelessWidget {
           child: Column(
             children: [
               SettingsListTile(
-                title: 'Logout',
+                title: isAnonymous ? 'Create Account' : 'Logout',
                 icon: Icons.logout_outlined,
                 iconContainerColor: Colors.red,
                 onTap: () {
+                  if (isAnonymous) {
+                    navigationController(
+                      context: context,
+                      route: Constants.logingRoute,
+                    );
+                    return;
+                  }
                   MyDialogs.showMyAnimatedDialog(
                       context: context,
                       title: 'Logout',

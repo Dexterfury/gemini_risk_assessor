@@ -31,7 +31,8 @@ class InputField extends StatelessWidget {
       textInputAction:
           isNameInput ? TextInputAction.next : TextInputAction.done,
       maxLength: isNameInput ? 20 : 500,
-      maxLines: isNameInput ? 1 : 3,
+      minLines: 1,
+      maxLines: 3,
       enabled: getEnabled(),
       decoration: InputDecoration(
         labelText: labelText,

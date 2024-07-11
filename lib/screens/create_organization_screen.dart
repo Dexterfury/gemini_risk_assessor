@@ -26,6 +26,7 @@ class CreateOrganizationScreen extends StatefulWidget {
 class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _termsController = TextEditingController();
 
   File? _finalFileImage;
 
@@ -33,6 +34,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _termsController.dispose();
     super.dispose();
   }
 
@@ -50,6 +52,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
           vertical: 20.0,
         ),
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
               Row(
@@ -116,6 +119,15 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                 organizationProvider: organizationProvider,
               ),
 
+              const SizedBox(height: 20),
+              // organization description input field
+              InputField(
+                labelText: Constants.enterTerms,
+                hintText: Constants.termsOptional,
+                controller: _termsController,
+                organizationProvider: organizationProvider,
+              ),
+
               const SizedBox(height: 40),
 
               MainAppButton(
@@ -133,6 +145,18 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                   final emptyDescription = _descriptionController.text.isEmpty;
                   final shortDescription =
                       _descriptionController.text.length < 10;
+
+                  // if terms controller is not null, check terms length, it shpuld not be less than 10
+                  final invalidTerms = _termsController.text.isNotEmpty &&
+                      _termsController.text.length < 10;
+                  if (invalidTerms) {
+                    showSnackBar(
+                      context: context,
+                      message:
+                          'Terms field must be empty or atleast atleast 10 Characters',
+                    );
+                    return;
+                  }
 
                   // check name
                   if (emptyName || shortName) {
@@ -159,6 +183,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                     creatorUID: context.read<AuthProvider>().userModel!.uid,
                     name: _nameController.text,
                     aboutOrganization: _descriptionController.text,
+                    organizationTerms: _termsController.text,
                     imageUrl: '',
                   );
 

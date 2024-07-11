@@ -116,9 +116,11 @@ class Constants {
   static const String adminsUIDs = 'adminsUIDs';
 
   static const String enterYourName = 'Enter your name';
-  static const String organizationName = 'Organization name';
+  static const String organizationName = 'Enter name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
   static const String enterDescription = 'Enter description';
+  static const String enterTerms = 'Organization terms';
+  static const String termsOptional = 'Enter organization terms (optional)';
 
   static const String changeName = 'Change Name';
   static const String changeDescription = 'Change Description';
@@ -172,7 +174,8 @@ class Constants {
   static const String assessmentNotification = 'ASSESSMENT_NOTIFICATION';
   static const String toolsNotification = 'TOOLS_NOTIFICATION';
   static const String organizationInvitation = 'ORGANIZATION_INVITATION';
-  static const String requestNotification = 'requestNotification';
+  static const String requestNotification = 'REQUEST_NOTIFICATION';
+  static const String descussNotification = 'DESCUSS_NOTIFICATION';
 
   // dialog content
   static const String loading = 'loading';

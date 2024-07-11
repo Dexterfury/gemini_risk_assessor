@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
+import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
+import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/search/assessments_search_stream.dart';
@@ -27,6 +32,9 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabChange);
+    requestNotificationPermissions();
+    NotificationServices.createNotificationChannelAndInitialize();
+    initCloudMessaging();
   }
 
   @override
@@ -88,6 +96,84 @@ class _HomeScreenState extends State<HomeScreen>
         text: Constants.tools,
       ),
     ];
+  }
+
+  // request notification permissions
+  void requestNotificationPermissions() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    if (Platform.isIOS) {
+      await messaging.requestPermission(
+        alert: true,
+        announcement: true,
+        badge: true,
+        carPlay: true,
+        criticalAlert: true,
+        provisional: true,
+        sound: true,
+      );
+    }
+
+    NotificationSettings notificationSettings =
+        await messaging.requestPermission(
+      alert: true,
+      announcement: true,
+      badge: true,
+      carPlay: true,
+      criticalAlert: true,
+      provisional: true,
+      sound: true,
+    );
+
+    if (notificationSettings.authorizationStatus ==
+        AuthorizationStatus.authorized) {
+      print('User granted permission');
+    } else if (notificationSettings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+    } else {
+      print('User declined or has not accepted permission');
+    }
+  }
+
+  // initialize cloud messaging
+  void initCloudMessaging() async {
+    // make sure widget is initialized before initializing cloud messaging
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      // 1. generate a new token
+      await context.read<AuthProvider>().generateNewToken();
+
+      // 2. initialize firebase messaging
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        if (message.notification != null) {
+          NotificationServices.displayNotification(message);
+        }
+      });
+
+      // 3. setup onMessage handler
+      setupInteractedMessage();
+    });
+  }
+
+  // It is assumed that all messages contain a data field with the key 'type'
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    navigationControler(context: context, message: message);
   }
 
   @override

@@ -32,14 +32,14 @@ class AnonymouseView extends StatelessWidget {
               label: 'Sign In',
               onTap: () {
                 // navigate to sign in screen and remove all routes
-                // navigationController(
-                //   context: context,
-                //   route: Constants.logingRoute,
-                // );
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HelpScreen()));
+                navigationController(
+                  context: context,
+                  route: Constants.logingRoute,
+                );
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => const HelpScreen()));
               },
             )
           ],

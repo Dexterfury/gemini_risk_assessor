@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import '../providers/tool_provider.dart';
 import '../themes/my_themes.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 String cleanJson(String maybeInvalidJson) {
   if (maybeInvalidJson.contains('```')) {
     final withoutLeading = maybeInvalidJson.split('```json').last;
