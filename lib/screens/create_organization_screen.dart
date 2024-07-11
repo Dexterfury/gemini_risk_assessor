@@ -78,6 +78,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                   ),
                   MainAppButton(
                     icon: Icons.person_add,
+                    contanerColor: Colors.blue,
                     label: 'People',
                     onTap: () {
                       if (organizationProvider.isLoading) {
