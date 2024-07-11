@@ -6,22 +6,25 @@ class MainAppButton extends StatelessWidget {
     this.icon,
     required this.label,
     this.color = Colors.white,
-    this.borderRadius = 15.0,
+    this.contanerColor,
+    this.borderRadius = 10.0,
     required this.onTap,
   });
 
   final IconData? icon;
   final String label;
   final Color color;
+  final Color? contanerColor;
   final double borderRadius;
   final Function() onTap;
 
   @override
   Widget build(BuildContext context) {
+    final btnColor = contanerColor ?? Theme.of(context).primaryColor;
     return Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
+          color: btnColor,
           borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(
             width: 1,

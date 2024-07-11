@@ -77,7 +77,7 @@ class UserWidget extends StatelessWidget {
         return orgProvider.orgAdminsList.contains(userData);
       case UserViewType.creator:
         return orgProvider.awaitApprovalsList.contains(
-          userData,
+          userData.uid,
         );
       case UserViewType.tempPlus:
         return orgProvider.awaitApprovalsList.contains(

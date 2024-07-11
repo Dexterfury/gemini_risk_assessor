@@ -45,12 +45,10 @@ class OrgSearchStream extends StatelessWidget {
 
           final results = snapshot.data!.docs
               .where(
-                (element) => element[Constants.organizationName]
-                    .toString()
-                    .toLowerCase()
-                    .contains(
-                      organizationProvider.searchQuery.toLowerCase(),
-                    ),
+                (element) =>
+                    element[Constants.name].toString().toLowerCase().contains(
+                          organizationProvider.searchQuery.toLowerCase(),
+                        ),
               )
               .toList();
 

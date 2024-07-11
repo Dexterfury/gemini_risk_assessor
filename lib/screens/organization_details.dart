@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -21,6 +22,7 @@ import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
 import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class OrganizationDetails extends StatefulWidget {
@@ -119,6 +121,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     bool isAdmin = widget.orgModel.adminsUIDs.contains(uid);
     String orgID = widget.orgModel.organizationID;
     String membersCount = getMembersCount(widget.orgModel);
+    bool showAcceptBtn = widget.orgModel.awaitingApprovalUIDs.contains(uid);
     return Scaffold(
       appBar: const MyAppBar(
         title: 'Organisation Details',
@@ -135,7 +138,11 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                   child: Column(
                     children: [
                       //  organisation name and image
-                      buildImageAndName(isAdmin, context),
+                      buildImageAndName(
+                        isAdmin,
+                        context,
+                        showAcceptBtn,
+                      ),
 
                       const SizedBox(height: 10),
 
@@ -155,10 +162,14 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
               const SizedBox(height: 10),
 
               //  add members button if the user is an admin
-              buildButtonsRow(
-                membersCount,
-                context,
-                orgID,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: buildButtonsRow(
+                  membersCount,
+                  context,
+                  orgID,
+                  isAdmin,
+                ),
               ),
 
               const SizedBox(height: 10),
@@ -268,6 +279,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     String membersCount,
     BuildContext context,
     String orgID,
+    bool isAdmin,
   ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -275,7 +287,6 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
         _buildIconButton(Icons.assignment_add, orgID),
         _buildIconButton(Icons.assignment_late_outlined, orgID),
         _buildIconButton(Icons.handyman, orgID),
-        _buildMembersSection(membersCount, context),
       ],
     );
   }
@@ -310,43 +321,19 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     );
   }
 
-  Widget _buildMembersSection(String membersCount, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // show people dialog
-        _showPeopleDialog(
-            context: context,
-            onActionTap: (value) async {
-              if (value) {
-                bool isSaved = await context
-                    .read<OrganizationProvider>()
-                    .updateOrganizationDataInFireStore();
+  // Widget _buildMembersSection(String membersCount, BuildContext context) {
+  //   return GestureDetector(
+  //     onTap: () {
 
-                if (isSaved) {
-                  Future.delayed(const Duration(milliseconds: 100))
-                      .whenComplete(() {
-                    showSnackBar(
-                      context: context,
-                      message: 'Requests sent to added members',
-                    );
-                  });
-                }
-              }
-
-              Future.delayed(const Duration(milliseconds: 100))
-                  .whenComplete(() async {
-                // clear search query
-                context.read<OrganizationProvider>().setSearchQuery('');
-              });
-            });
-      },
-      child: const IconContainer(
-        icon: Icons.person_add,
-        padding: 12,
-        borderRadius: 4.0,
-      ),
-    );
-  }
+  //     },
+  //     child: const IconContainer(
+  //       containerColor: Colors.blue,
+  //       icon: Icons.person_add,
+  //       padding: 12,
+  //       borderRadius: 4.0,
+  //     ),
+  //   );
+  // }
 
   void _showPeopleDialog({
     required BuildContext context,
@@ -381,6 +368,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
   Column buildDescription(bool isAdmin) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -442,7 +430,11 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     );
   }
 
-  buildImageAndName(bool isAdmin, BuildContext context) {
+  buildImageAndName(
+    bool isAdmin,
+    BuildContext context,
+    bool showAcceptBtn,
+  ) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Row(
@@ -488,7 +480,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
           ),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -540,7 +532,62 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                         ),
                       ),
                   ],
-                )
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                isAdmin
+                    ? MainAppButton(
+                        icon: Icons.person_add,
+                        label: 'People',
+                        contanerColor: Colors.blue,
+                        onTap: () {
+                          // show people dialog
+                          _showPeopleDialog(
+                              context: context,
+                              onActionTap: (value) async {
+                                if (value) {
+                                  bool isSaved = await context
+                                      .read<OrganizationProvider>()
+                                      .updateOrganizationDataInFireStore();
+
+                                  if (isSaved) {
+                                    Future.delayed(
+                                            const Duration(milliseconds: 100))
+                                        .whenComplete(() {
+                                      showSnackBar(
+                                        context: context,
+                                        message:
+                                            'Requests sent to added members',
+                                      );
+                                    });
+                                  }
+                                }
+
+                                Future.delayed(
+                                        const Duration(milliseconds: 100))
+                                    .whenComplete(() async {
+                                  // clear search query
+                                  context
+                                      .read<OrganizationProvider>()
+                                      .setSearchQuery('');
+                                });
+                              });
+                        },
+                      )
+                    : const SizedBox.shrink(),
+                showAcceptBtn
+                    ? MainAppButton(
+                        icon: Icons.person_add,
+                        label: 'Accept Invite',
+                        contanerColor: Colors.orangeAccent,
+                        onTap: () {},
+                      )
+                    : Container(),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text('Terms'),
+                ),
               ],
             ),
           )
