@@ -10,6 +10,7 @@ class ToolModel {
   String summary;
   String toolPdf;
   List<String> images;
+  List<String> reactions;
   String createdBy;
   String organizationID;
   bool isShared;
@@ -23,6 +24,7 @@ class ToolModel {
     required this.summary,
     required this.toolPdf,
     required this.images,
+    required this.reactions,
     required this.createdBy,
     required this.organizationID,
     required this.isShared,
@@ -50,6 +52,7 @@ class ToolModel {
         summary: json[Constants.summary] ?? '',
         toolPdf: json[Constants.toolPdf] ?? '',
         images: images,
+        reactions: List<String>.from(json[Constants.reactions] ?? []),
         createdBy: creatorID,
         organizationID: organizationID,
         isShared: json[Constants.isShared] ?? false,
@@ -69,6 +72,7 @@ class ToolModel {
       summary: json[Constants.summary] ?? '',
       toolPdf: json[Constants.toolPdf] ?? '',
       images: List<String>.from(json[Constants.images] ?? []),
+      reactions: List<String>.from(json[Constants.reactions] ?? []),
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
       isShared: json[Constants.isShared] ?? false,
@@ -85,6 +89,7 @@ class ToolModel {
       Constants.summary: summary,
       Constants.toolPdf: toolPdf,
       Constants.images: images,
+      Constants.reactions: reactions,
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
       Constants.isShared: isShared,

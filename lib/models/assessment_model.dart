@@ -15,6 +15,7 @@ class AssessmentModel {
   List<String> approvers;
   List<String> ppe;
   List<String> control;
+  List<String> reactions;
   String weather;
   String summary;
   String createdBy;
@@ -35,6 +36,7 @@ class AssessmentModel {
     required this.approvers,
     required this.ppe,
     required this.control,
+    required this.reactions,
     required this.weather,
     required this.summary,
     required this.createdBy,
@@ -70,6 +72,7 @@ class AssessmentModel {
         approvers: List<String>.from(json[Constants.approvers] ?? []),
         ppe: testppe,
         control: List<String>.from(json[Constants.control] ?? []),
+        reactions: List<String>.from(json[Constants.reactions] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
@@ -111,6 +114,7 @@ class AssessmentModel {
         approvers: List<String>.from(json[Constants.approvers] ?? []),
         ppe: ppe,
         control: List<String>.from(json[Constants.control] ?? []),
+        reactions: List<String>.from(json[Constants.reactions] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
@@ -137,6 +141,7 @@ class AssessmentModel {
       approvers: List<String>.from(json[Constants.approvers] ?? []),
       ppe: List<String>.from(json[Constants.ppe] ?? []),
       control: List<String>.from(json[Constants.control] ?? []),
+      reactions: List<String>.from(json[Constants.reactions] ?? []),
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
@@ -161,6 +166,7 @@ class AssessmentModel {
       Constants.approvers: approvers,
       Constants.ppe: ppe,
       Constants.control: control,
+      Constants.reactions: reactions,
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,

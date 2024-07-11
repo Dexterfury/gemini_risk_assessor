@@ -152,6 +152,7 @@ class Constants {
   static const String question = 'question';
   static const String answer = 'answer';
   static const String imagesUrls = 'imagesUrls';
+  static const String reactions = 'reactions';
   static const String sentencesUrls = 'sentencesUrls';
   static const String finalWords = 'finalWords';
   static const String timeSent = 'timeSent';
