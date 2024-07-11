@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -123,9 +124,19 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     String membersCount = getMembersCount(widget.orgModel);
     bool showAcceptBtn = widget.orgModel.awaitingApprovalUIDs.contains(uid);
     return Scaffold(
-      appBar: const MyAppBar(
+      appBar: MyAppBar(
         title: 'Organisation Details',
         leading: BackButton(),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: AnimatedChatButton(
+              onPressed: () async {},
+              size: ChatButtonSize.small,
+              iconColor: Colors.white,
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -316,7 +327,9 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
       },
       transitionType: ContainerTransitionType.fadeThrough,
       transitionDuration: const Duration(milliseconds: 500),
-      closedElevation: 0,
+      closedShape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      closedElevation: 4,
       openElevation: 4,
     );
   }
