@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/search/org_serach_stream.dart';
-import 'package:gemini_risk_assessor/firebase_methods/organisations_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/organizations_stream.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
-class OrganisationsScreen extends StatelessWidget {
-  const OrganisationsScreen({super.key});
+class OrganizationsScreen extends StatelessWidget {
+  const OrganizationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    bool isAnonymous = context.watch<AuthProvider>().isUserAnonymous();
-    return Consumer<OrganisationProvider>(
-        builder: (context, organisationProvider, child) {
+    bool isAnonymous = context.read<AuthProvider>().isUserAnonymous();
+    return Consumer<OrganizationProvider>(
+        builder: (context, organizationProvider, child) {
       handleSearch(String query) {
-        print('Searching for "$query" ');
         if (!isAnonymous) {
-          organisationProvider.setSearchQuery(query);
+          organizationProvider.setSearchQuery(query);
         }
       }
 
@@ -34,9 +33,11 @@ class OrganisationsScreen extends StatelessWidget {
           ],
         ),
         body: isAnonymous
-            ? const AnonymouseView()
-            : organisationProvider.searchQuery.isEmpty
-                ? const OrganisationsStream()
+            ? const AnonymouseView(
+                message: 'Please Sign In to view organizations',
+              )
+            : organizationProvider.searchQuery.isEmpty
+                ? const OrganizationsStream()
                 : const OrgSearchStream(),
       );
     });

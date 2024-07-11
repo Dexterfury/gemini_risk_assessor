@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:provider/provider.dart';
 
@@ -71,7 +71,7 @@ class UserWidget extends StatelessWidget {
     BuildContext context,
     UserViewType viewType,
   ) {
-    final orgProvider = context.watch<OrganisationProvider>();
+    final orgProvider = context.watch<OrganizationProvider>();
     switch (viewType) {
       case UserViewType.admin:
         return orgProvider.orgAdminsList.contains(userData);
@@ -98,7 +98,7 @@ void _handleCheckBox(
   bool? value,
   UserViewType viewType,
 ) {
-  final orgProvider = context.read<OrganisationProvider>();
+  final orgProvider = context.read<OrganizationProvider>();
   switch (viewType) {
     case UserViewType.admin:
       break;

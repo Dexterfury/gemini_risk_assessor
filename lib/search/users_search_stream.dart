@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -11,20 +11,20 @@ class UsersSearchStream extends StatelessWidget {
   const UsersSearchStream({
     super.key,
     required this.uid,
-    this.organisationID = '',
+    this.organizationID = '',
     required this.userViewType,
   });
 
   final String uid;
-  final String organisationID;
+  final String organizationID;
   final UserViewType userViewType;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<OrganisationProvider>(
-      builder: (context, organisationProvider, _) {
+    return Consumer<OrganizationProvider>(
+      builder: (context, organizationProvider, _) {
         return StreamBuilder<QuerySnapshot>(
-          stream: organisationProvider.allUsersStream(),
+          stream: organizationProvider.allUsersStream(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return const Center(child: Text('Something went wrong'));
@@ -40,7 +40,7 @@ class UsersSearchStream extends StatelessWidget {
                 element[Constants.name]
                     .toString()
                     .toLowerCase()
-                    .contains(organisationProvider.searchQuery.toLowerCase()));
+                    .contains(organizationProvider.searchQuery.toLowerCase()));
 
             if (results.isEmpty) {
               return const Center(child: Text('No matching results'));

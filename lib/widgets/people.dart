@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/search/users_search_stream.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +17,7 @@ class People extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
-    final orgProvider = context.read<OrganisationProvider>();
+    final orgProvider = context.read<OrganizationProvider>();
     final searchController = TextEditingController();
     return Column(
       children: [
@@ -38,7 +38,7 @@ class People extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Expanded(
-          child: Consumer<OrganisationProvider>(
+          child: Consumer<OrganizationProvider>(
             builder: (context, orgProvider, _) {
               if (orgProvider.searchQuery.isEmpty) {
                 return const Center(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/fab_buttons/organisation_fab_button.dart';
+import 'package:gemini_risk_assessor/fab_buttons/organization_fab_button.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
-import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
+import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
 import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +18,7 @@ class _ScreensControllerState extends State<ScreensController>
   int _selectedIndex = 0;
   final List<Widget> _tabs = [
     const HomeScreen(),
-    const OrganisationsScreen(),
+    const OrganizationsScreen(),
   ];
 
   late Animation<double> _animation;
@@ -55,7 +55,7 @@ class _ScreensControllerState extends State<ScreensController>
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.business),
-            label: 'Organisations',
+            label: 'Organizations',
           ),
         ],
         onTap: (value) {
@@ -66,14 +66,14 @@ class _ScreensControllerState extends State<ScreensController>
             // set search hintext
             context
                 .read<TabProvider>()
-                .setSearchHintText('Search Organisations');
+                .setSearchHintText('Search Organizations');
           }
         },
       ),
 
       // float action button to add new risk assessment
       floatingActionButton: _selectedIndex == 1
-          ? const OrganisationFabButton()
+          ? const OrganizationFabButton()
           : MyFabButton(
               animationController: _animationController,
               animation: _animation,

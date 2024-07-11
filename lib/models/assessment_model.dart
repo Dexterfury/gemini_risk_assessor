@@ -18,7 +18,7 @@ class AssessmentModel {
   String weather;
   String summary;
   String createdBy;
-  String organisationID;
+  String organizationID;
   String pdfUrl;
   DateTime createdAt;
 
@@ -37,7 +37,7 @@ class AssessmentModel {
     required this.weather,
     required this.summary,
     required this.createdBy,
-    required this.organisationID,
+    required this.organizationID,
     required this.pdfUrl,
     required this.createdAt,
   });
@@ -46,7 +46,7 @@ class AssessmentModel {
     String testString,
     String assessmentId,
     String creatorID,
-    String organisationID,
+    String organizationID,
     String weather,
     List<String> testppe,
     List<String> testImages,
@@ -71,7 +71,7 @@ class AssessmentModel {
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
-        organisationID: organisationID,
+        organizationID: organizationID,
         pdfUrl: Constants.pdfUrl,
         createdAt: createdAt,
       );
@@ -84,7 +84,7 @@ class AssessmentModel {
     GenerateContentResponse content,
     String assessmentId,
     String creatorID,
-    String organisationID,
+    String organizationID,
     String weather,
     List<String> ppe,
     List<String> images,
@@ -111,7 +111,7 @@ class AssessmentModel {
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
-        organisationID: organisationID,
+        organizationID: organizationID,
         pdfUrl: json[Constants.pdfUrl] ?? '',
         createdAt: createdAt,
       );
@@ -136,7 +136,7 @@ class AssessmentModel {
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
-      organisationID: json[Constants.organisationID] ?? '',
+      organizationID: json[Constants.organizationID] ?? '',
       pdfUrl: json[Constants.pdfUrl] ?? '',
       createdAt:
           DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt] ?? 0),
@@ -159,7 +159,7 @@ class AssessmentModel {
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
-      Constants.organisationID: organisationID,
+      Constants.organizationID: organizationID,
       Constants.pdfUrl: pdfUrl,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };

@@ -45,9 +45,12 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _handleSearch(String query) {
-    final tabProvider = context.read<TabProvider>();
-    // Implement your search logic here
-    tabProvider.setSearchQuery(query);
+    bool isAnonymous = context.read<AuthProvider>().isUserAnonymous();
+    if (!isAnonymous) {
+      final tabProvider = context.read<TabProvider>();
+      // Implement your search logic here
+      tabProvider.setSearchQuery(query);
+    }
   }
 
   GestureDetector _buildUserImage(

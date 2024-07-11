@@ -4,8 +4,8 @@ import 'package:gemini_risk_assessor/constants.dart';
 class FirebaseMethods {
   static final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
-  static final CollectionReference _organisationsCollection =
-      FirebaseFirestore.instance.collection(Constants.organisationCollection);
+  static final CollectionReference _organizationsCollection =
+      FirebaseFirestore.instance.collection(Constants.organizationCollection);
   static final CollectionReference _dstiCollection =
       FirebaseFirestore.instance.collection(Constants.dstiCollections);
   static final CollectionReference _toolsCollection =
@@ -35,7 +35,7 @@ class FirebaseMethods {
     required String orgID,
   }) {
     if (orgID.isNotEmpty) {
-      return _organisationsCollection
+      return _organizationsCollection
           .doc(orgID)
           .collection(Constants.dstiCollections)
           .snapshots();
@@ -53,7 +53,7 @@ class FirebaseMethods {
     required String orgID,
   }) {
     if (orgID.isNotEmpty) {
-      return _organisationsCollection
+      return _organizationsCollection
           .doc(orgID)
           .collection(Constants.assessmentCollection)
           .snapshots();
@@ -65,11 +65,11 @@ class FirebaseMethods {
     }
   }
 
-  // stream organisations from firestore
-  static Stream<QuerySnapshot> organisationsStream({
+  // stream organizations from firestore
+  static Stream<QuerySnapshot> organizationsStream({
     required String userId,
   }) {
-    return _organisationsCollection
+    return _organizationsCollection
         .where(
           Constants.membersUIDs,
           arrayContains: userId,
@@ -98,8 +98,8 @@ class FirebaseMethods {
 
   // update groupName
   static Future<void> updateOrgName(String id, String newName) async {
-    await _organisationsCollection.doc(id).update({
-      Constants.organisationName: newName,
+    await _organizationsCollection.doc(id).update({
+      Constants.organizationName: newName,
     });
   }
 
@@ -117,9 +117,9 @@ class FirebaseMethods {
 
   // update group desc
   static Future<void> updateOrgDesc(String id, String newDesc) async {
-    await _organisationsCollection
+    await _organizationsCollection
         .doc(id)
-        .update({Constants.aboutOrganisation: newDesc});
+        .update({Constants.aboutOrganization: newDesc});
   }
 
   static Future<String> getCreatorName(String creatorUid) async {
@@ -137,8 +137,8 @@ class FirebaseMethods {
     return _usersCollection.doc(userID).snapshots();
   }
 
-  // get organisations stream
-  static Stream<DocumentSnapshot> organisationStream({required String orgID}) {
-    return _organisationsCollection.doc(orgID).snapshots();
+  // get organizations stream
+  static Stream<DocumentSnapshot> organizationStream({required String orgID}) {
+    return _organizationsCollection.doc(orgID).snapshots();
   }
 }

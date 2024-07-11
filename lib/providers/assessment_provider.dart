@@ -38,7 +38,7 @@ class AssessmentProvider extends ChangeNotifier {
   File? _pdfAssessmentFile;
   bool _hasSigned = false;
   Uint8List? _signatureImage;
-  String _organisationID = '';
+  String _organizationID = '';
   String _uid = '';
   final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
 
@@ -55,15 +55,15 @@ class AssessmentProvider extends ChangeNotifier {
   File? get pdfAssessmentFile => _pdfAssessmentFile;
   bool get hasSigned => _hasSigned;
   Uint8List? get signatureImage => _signatureImage;
-  String get organisationID => _organisationID;
+  String get organizationID => _organizationID;
   String get uid => _uid;
   GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _assessmentCollection =
       FirebaseFirestore.instance.collection(Constants.assessmentCollection);
-  final CollectionReference _organisationCollection =
-      FirebaseFirestore.instance.collection(Constants.organisationCollection);
+  final CollectionReference _organizationCollection =
+      FirebaseFirestore.instance.collection(Constants.organizationCollection);
   final CollectionReference _dstiCollection =
       FirebaseFirestore.instance.collection(Constants.dstiCollections);
 
@@ -75,7 +75,7 @@ class AssessmentProvider extends ChangeNotifier {
   ) async {
     _description = desc;
     _uid = creatorID;
-    _organisationID = orgID;
+    _organizationID = orgID;
     _pdfHeading = docTitle;
     notifyListeners();
   }
@@ -122,7 +122,7 @@ class AssessmentProvider extends ChangeNotifier {
     File file,
     String pdfHeading,
   ) async {
-    final id = _organisationID.isNotEmpty ? _organisationID : _uid;
+    final id = _organizationID.isNotEmpty ? _organizationID : _uid;
     // get folder directory
     final folderName = Constants.getFolderName(pdfHeading);
 
@@ -149,7 +149,7 @@ class AssessmentProvider extends ChangeNotifier {
     // set pdf and images
     _assessmentModel.pdfUrl = fileUrl;
 
-    if (_organisationID.isEmpty) {
+    if (_organizationID.isEmpty) {
       if (_pdfHeading == Constants.riskAssessment) {
         // save to user's database
         await _assessmentCollection
@@ -168,20 +168,20 @@ class AssessmentProvider extends ChangeNotifier {
         // save to user's database end.
       }
     } else {
-      // add organisationID
-      assessmentModel.organisationID = _organisationID;
+      // add organizationID
+      assessmentModel.organizationID = _organizationID;
 
       if (_pdfHeading == Constants.riskAssessment) {
-        // save to organisation's database
-        await _organisationCollection
-            .doc(_organisationID)
+        // save to organization's database
+        await _organizationCollection
+            .doc(_organizationID)
             .collection(Constants.assessmentCollection)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
       } else {
-        // save to organisation's database
-        await _organisationCollection
-            .doc(_organisationID)
+        // save to organization's database
+        await _organizationCollection
+            .doc(_organizationID)
             .collection(Constants.dstiCollections)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
@@ -499,7 +499,7 @@ class AssessmentProvider extends ChangeNotifier {
           content,
           assessmentId,
           creatorID,
-          _organisationID,
+          _organizationID,
           _weather.name,
           _assessmentModel.ppe,
           images,
@@ -587,7 +587,7 @@ equipments, hazards and risks should be of type List<String> with a max length o
       testAssessment,
       assessmentId,
       creatorID,
-      organisationID,
+      organizationID,
       _weather.name,
       _assessmentModel.ppe,
       images,

@@ -6,7 +6,7 @@ import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/notification_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
-import 'package:gemini_risk_assessor/screens/organisations_screen.dart';
+import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -124,7 +124,7 @@ class NotificationItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => DSTIScreen(
-              orgID: notification.organisationID,
+              orgID: notification.organizationID,
             ),
           ),
         );
@@ -134,7 +134,7 @@ class NotificationItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => RiskAssessmentsScreen(
-              orgID: notification.organisationID,
+              orgID: notification.organizationID,
             ),
           ),
         );
@@ -144,16 +144,16 @@ class NotificationItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ToolsScreen(
-              orgID: notification.organisationID,
+              orgID: notification.organizationID,
             ),
           ),
         );
         break;
-      case Constants.newOrganisationNotification:
+      case Constants.organizationInvitation:
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const OrganisationsScreen(),
+            builder: (context) => const OrganizationsScreen(),
           ),
         );
         break;
@@ -161,7 +161,7 @@ class NotificationItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const OrganisationsScreen(),
+            builder: (context) => const OrganizationsScreen(),
           ),
         );
         break;

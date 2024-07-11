@@ -9,13 +9,13 @@ import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
-import 'package:gemini_risk_assessor/screens/create_organisation_screen.dart';
+import 'package:gemini_risk_assessor/screens/create_organization_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
@@ -35,7 +35,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
       ChangeNotifierProvider(create: (context) => ToolsProvider()),
-      ChangeNotifierProvider(create: (context) => OrganisationProvider()),
+      ChangeNotifierProvider(create: (context) => OrganizationProvider()),
       ChangeNotifierProvider(create: (context) => TabProvider()),
       ChangeNotifierProvider(create: (context) => ChatProvider()),
       ChangeNotifierProvider(create: (context) => SearchProvider())
@@ -67,8 +67,8 @@ class MyApp extends StatelessWidget {
               const CreateAssessmentScreen(),
           Constants.createToolRoute: (context) => const CreateExplainerScreen(),
           Constants.profileRoute: (context) => const ProfileScreen(),
-          Constants.createOrganisationRoute: (context) =>
-              const CreateOrganisationScreen(),
+          Constants.createOrganizationRoute: (context) =>
+              const CreateOrganizationScreen(),
         });
   }
 }

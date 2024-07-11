@@ -11,7 +11,7 @@ class ToolModel {
   String toolPdf;
   List<String> images;
   String createdBy;
-  String organisationID;
+  String organizationID;
   DateTime createdAt;
 
   // constructor
@@ -23,7 +23,7 @@ class ToolModel {
     required this.toolPdf,
     required this.images,
     required this.createdBy,
-    required this.organisationID,
+    required this.organizationID,
     required this.createdAt,
   });
 
@@ -31,7 +31,7 @@ class ToolModel {
     GenerateContentResponse content,
     String toolId,
     String creatorID,
-    String organisationID,
+    String organizationID,
     List<String> images,
     DateTime createdAt,
   ) {
@@ -49,7 +49,7 @@ class ToolModel {
         toolPdf: json[Constants.toolPdf] ?? '',
         images: images,
         createdBy: creatorID,
-        organisationID: organisationID,
+        organizationID: organizationID,
         createdAt: createdAt,
       );
     }
@@ -67,7 +67,7 @@ class ToolModel {
       toolPdf: json[Constants.toolPdf] ?? '',
       images: List<String>.from(json[Constants.images] ?? []),
       createdBy: json[Constants.createdBy] ?? '',
-      organisationID: json[Constants.organisationID] ?? '',
+      organizationID: json[Constants.organizationID] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
     );
   }
@@ -82,7 +82,7 @@ class ToolModel {
       Constants.toolPdf: toolPdf,
       Constants.images: images,
       Constants.createdBy: createdBy,
-      Constants.organisationID: organisationID,
+      Constants.organizationID: organizationID,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

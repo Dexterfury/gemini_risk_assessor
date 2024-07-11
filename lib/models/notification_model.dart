@@ -3,11 +3,12 @@ import 'package:gemini_risk_assessor/constants.dart';
 class NotificationModel {
   String creatorUID;
   String recieverUID;
-  String organisationID;
+  String organizationID;
+  String notificationID;
   String title;
   String description;
   String imageUrl;
-  String aboutOrganisation;
+  String aboutOrganization;
   String notificationType;
   bool wasClicked;
   DateTime createdAt;
@@ -17,11 +18,12 @@ class NotificationModel {
   NotificationModel({
     required this.creatorUID,
     required this.recieverUID,
-    required this.organisationID,
+    required this.organizationID,
+    required this.notificationID,
     required this.title,
     required this.description,
     required this.imageUrl,
-    required this.aboutOrganisation,
+    required this.aboutOrganization,
     required this.notificationType,
     required this.wasClicked,
     required this.createdAt,
@@ -33,11 +35,12 @@ class NotificationModel {
     return NotificationModel(
       creatorUID: json[Constants.creatorUID] ?? '',
       recieverUID: json[Constants.recieverUID] ?? '',
-      organisationID: json[Constants.organisationID] ?? '',
+      organizationID: json[Constants.organizationID] ?? '',
+      notificationID: json[Constants.notificationID] ?? '',
       title: json[Constants.title] ?? '',
       description: json[Constants.description] ?? '',
       imageUrl: json[Constants.imageUrl] ?? '',
-      aboutOrganisation: json[Constants.aboutOrganisation] ?? '',
+      aboutOrganization: json[Constants.aboutOrganization] ?? '',
       notificationType: json[Constants.notificationType] ?? '',
       wasClicked: json[Constants.wasClicked] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
@@ -51,11 +54,12 @@ class NotificationModel {
     return {
       Constants.creatorUID: creatorUID,
       Constants.recieverUID: recieverUID,
-      Constants.organisationID: organisationID,
+      Constants.organizationID: organizationID,
+      Constants.notificationID: notificationID,
       Constants.title: title,
       Constants.description: description,
       Constants.imageUrl: imageUrl,
-      Constants.aboutOrganisation: aboutOrganisation,
+      Constants.aboutOrganization: aboutOrganization,
       Constants.notificationType: notificationType,
       Constants.wasClicked: wasClicked,
       Constants.createdAt: createdAt,

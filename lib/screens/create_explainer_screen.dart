@@ -123,14 +123,25 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             height: 20,
           ),
           Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                  onPressed: () {
+            alignment: Alignment.centerRight,
+            child: OpenContainer(
+              closedBuilder: (context, action) {
+                return MainAppButton(
+                  icon: FontAwesomeIcons.wandMagicSparkles,
+                  label: 'Generate Explainer',
+                  onTap: () async {
+                    //check if images are added
+                    if (toolProvider.imagesFileList!.isEmpty) {
+                      showSnackBar(
+                          context: context, message: 'Please add images');
+                      return;
+                    }
+
                     // show my alert dialog for loading
                     MyDialogs.showMyAnimatedDialog(
                       context: context,
                       title: 'Generating',
-                      content: Constants.loading,
+                      content: 'Please wait...',
                       loadingIndicator: const SizedBox(
                         height: 100,
                         width: 100,
@@ -138,87 +149,58 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                       ),
                     );
 
-                    Future.delayed(const Duration(seconds: 10))
-                        .whenComplete(() {
+                    final authProvider = context.read<AuthProvider>();
+                    final description = _descriptionController.text;
+
+                    await toolProvider
+                        .submitPrompt(
+                      creatorID: authProvider.userModel!.uid,
+                      organizationID: orgID,
+                      description: description,
+                    )
+                        .then((value) async {
+                      // hide my alert dialog
                       Navigator.pop(context);
+
+                      if (value) {
+                        action();
+                      } else {
+                        showSnackBar(
+                          context: context,
+                          message: ToolsProvider.noToolFound,
+                        );
+                      }
                     });
                   },
-                  icon: Icon(Icons.add))
+                );
+              },
+              openBuilder: (context, action) {
+                // navigate to details screen
+                return ExplainerDetailsScreen(
+                  onSave: (value) {
+                    if (value) {
+                      // clear data
+                      toolProvider.clearImages();
+                      _descriptionController.clear();
 
-              // OpenContainer(
-              //   closedBuilder: (context, action) {
-              //     return MainAppButton(
-              //       icon: FontAwesomeIcons.wandMagicSparkles,
-              //       label: 'Generate Explainer',
-              //       onTap: () async {
-              //         //check if images are added
-              //         if (toolProvider.imagesFileList!.isEmpty) {
-              //           showSnackBar(
-              //               context: context, message: 'Please add images');
-              //           return;
-              //         }
+                      // setState(() {
 
-              //         // show my alert dialog for loading
-              //         MyDialogs.showMyAnimatedDialog(
-              //           context: context,
-              //           title: 'Generating',
-              //           content: 'Please wait...',
-              //           loadingIndicator: const SizedBox(
-              //               height: 60, width: 60, child: RotatingSafetyIcons()),
-              //         );
-
-              //         final authProvider = context.read<AuthProvider>();
-              //         final description = _descriptionController.text;
-
-              //         await toolProvider
-              //             .submitPrompt(
-              //           creatorID: authProvider.userModel!.uid,
-              //           organisationID: orgID,
-              //           description: description,
-              //         )
-              //             .then((value) async {
-              //           // hide my alert dialog
-              //           Navigator.pop(context);
-
-              //           if (value) {
-              //             action();
-              //           } else {
-              //             showSnackBar(
-              //               context: context,
-              //               message: ToolsProvider.noToolFound,
-              //             );
-              //           }
-              //         });
-              //       },
-              //     );
-              //   },
-              //   openBuilder: (context, action) {
-              //     // navigate to details screen
-              //     return ExplainerDetailsScreen(
-              //       onSave: (value) {
-              //         if (value) {
-              //           // clear data
-              //           toolProvider.clearImages();
-              //           _descriptionController.clear();
-
-              //           // setState(() {
-
-              //           // });
-              //           showSnackBar(
-              //               context: context, message: 'Tool Successfully saved');
-              //         } else {
-              //           showSnackBar(
-              //               context: context, message: 'Error saving tool');
-              //         }
-              //       },
-              //     );
-              //   },
-              //   transitionType: ContainerTransitionType.fadeThrough,
-              //   transitionDuration: const Duration(milliseconds: 500),
-              //   closedElevation: 0,
-              //   openElevation: 4,
-              // ),
-              ),
+                      // });
+                      showSnackBar(
+                          context: context, message: 'Tool Successfully saved');
+                    } else {
+                      showSnackBar(
+                          context: context, message: 'Error saving tool');
+                    }
+                  },
+                );
+              },
+              transitionType: ContainerTransitionType.fadeThrough,
+              transitionDuration: const Duration(milliseconds: 500),
+              closedElevation: 0,
+              openElevation: 4,
+            ),
+          ),
         ],
       ),
     );

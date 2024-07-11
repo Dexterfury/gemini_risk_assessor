@@ -444,19 +444,19 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // update the organisation image
+  // update the organization image
   Future<void> setImageUrl(String imageUrl) async {
     _userModel!.imageUrl = imageUrl;
     notifyListeners();
   }
 
-  // up date the organisation name
+  // up date the organization name
   Future<void> setName(String name) async {
     _userModel!.name = name;
     notifyListeners();
   }
 
-  // up date the organisation description
+  // up date the organization description
   Future<void> setDescription(String description) async {
     _userModel!.aboutMe = description;
     notifyListeners();

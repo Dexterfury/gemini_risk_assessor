@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
+import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
@@ -104,14 +106,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildImageView(isMyProfile, userModel, context),
+                              _buildImageView(
+                                context,
+                                isMyProfile,
+                                userModel,
+                                isAnonymous,
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     _buildNameView(
-                                        userModel, isMyProfile, context, uid),
+                                      userModel,
+                                      isMyProfile,
+                                      context,
+                                      uid,
+                                      isAnonymous,
+                                    ),
                                     // display phone number
                                     isMyProfile
                                         ? Text(userModel.phone,
@@ -133,6 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             context,
                             userModel,
                             uid,
+                            isAnonymous,
                           ),
                           Text(
                             userModel.aboutMe,
@@ -148,23 +161,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   !isMyProfile
                       ? const SizedBox()
                       : isAnonymous
-                          ? SizedBox(
-                              child: Center(
-                                child: MainAppButton(
-                                  label: 'Sign In For Full Access',
-                                  onTap: () {
-                                    // remove all routes and navigateo to loging screen
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen(),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  },
-                                ),
-                              ),
+                          ? const AnonymouseView(
+                              message: 'Please Sign In for full access',
                             )
                           : SettingsColumn(isDarkMode: isDarkMode)
                 ],
@@ -181,7 +179,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BuildContext context,
     UserModel userModel,
     String uid,
+    bool isAnonymous,
   ) {
+    editButton() {
+      if (isAnonymous) {
+        return const SizedBox.shrink();
+      }
+      if (isMyProfile) {
+        return GestureDetector(
+          onTap: () {
+            MyDialogs.showMyEditAnimatedDialog(
+              context: context,
+              title: Constants.aboutMe,
+              content: Constants.aboutMe,
+              hintText: userModel.aboutMe,
+              textAction: "Change",
+              onActionTap: (value, updatedText) async {
+                final authProvider = context.read<AuthProvider>();
+                if (value) {
+                  await authProvider.updateDescription(
+                    isUser: true,
+                    id: uid,
+                    newDesc: updatedText,
+                    oldDesc: userModel.aboutMe,
+                  );
+                }
+              },
+            );
+          },
+          child: const Icon(Icons.edit_rounded),
+        );
+      }
+      return const SizedBox.shrink();
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -190,42 +221,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
             )),
-        // check if user is admin
-        isMyProfile
-            ? GestureDetector(
-                onTap: () {
-                  MyDialogs.showMyEditAnimatedDialog(
-                    context: context,
-                    title: Constants.aboutMe,
-                    content: Constants.aboutMe,
-                    hintText: userModel.aboutMe,
-                    textAction: "Change",
-                    onActionTap: (value, updatedText) async {
-                      final authProvider = context.read<AuthProvider>();
-                      if (value) {
-                        await authProvider.updateDescription(
-                          isUser: true,
-                          id: uid,
-                          newDesc: updatedText,
-                          oldDesc: userModel.aboutMe,
-                        );
-                      }
-                    },
-                  );
-                },
-                child: const Icon(Icons.edit_rounded),
-              )
-            : const SizedBox(),
+        editButton(),
       ],
     );
   }
 
-  Row _buildNameView(
-    UserModel userModel,
-    bool isMyProfile,
-    BuildContext context,
-    String uid,
-  ) {
+  _buildNameView(UserModel userModel, bool isMyProfile, BuildContext context,
+      String uid, bool isAnonymous) {
+    editIcon() {
+      if (isAnonymous) {
+        return const SizedBox.shrink();
+      }
+
+      if (isMyProfile) {
+        GestureDetector(
+          onTap: () {
+            MyDialogs.showMyEditAnimatedDialog(
+              context: context,
+              title: Constants.changeName,
+              content: Constants.changeName,
+              hintText: userModel.name,
+              textAction: "Change",
+              onActionTap: (value, updatedText) async {
+                final authProvider = context.read<AuthProvider>();
+                if (value) {
+                  await authProvider.updateName(
+                    isUser: true,
+                    id: uid,
+                    newName: updatedText,
+                    oldName: userModel.name,
+                  );
+                }
+              },
+            );
+          },
+          child: const Icon(Icons.edit_rounded),
+        );
+      }
+      return const SizedBox.shrink();
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -236,47 +271,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(
           width: 10,
         ),
-        // check if user is admin
-        isMyProfile
-            ? GestureDetector(
-                onTap: () {
-                  MyDialogs.showMyEditAnimatedDialog(
-                    context: context,
-                    title: Constants.changeName,
-                    content: Constants.changeName,
-                    hintText: userModel.name,
-                    textAction: "Change",
-                    onActionTap: (value, updatedText) async {
-                      final authProvider = context.read<AuthProvider>();
-                      if (value) {
-                        await authProvider.updateName(
-                          isUser: true,
-                          id: uid,
-                          newName: updatedText,
-                          oldName: userModel.name,
-                        );
-                      }
-                    },
-                  );
-                },
-                child: const Icon(Icons.edit_rounded),
-              )
-            : const SizedBox(),
+        editIcon()
       ],
     );
   }
 
   DisplayUserImage _buildImageView(
+    BuildContext context,
     bool isMyProfile,
     UserModel userModel,
-    BuildContext context,
+    bool isAnonymous,
   ) {
+    viewOnly() {
+      if (isAnonymous) {
+        return true;
+      }
+      if (isMyProfile) {
+        return false;
+      }
+      return true;
+    }
+
     return DisplayUserImage(
       radius: 50,
-      isViewOnly: !isMyProfile,
+      isViewOnly: viewOnly(),
       fileImage: _finalFileImage,
       imageUrl: userModel.imageUrl,
       onPressed: () async {
+        if (isAnonymous) {
+          showSnackBar(
+            context: context,
+            message: 'Sign In to change image',
+          );
+          return;
+        }
         final file = await ImagePickerHandler.showImagePickerDialog(
           context: context,
         );

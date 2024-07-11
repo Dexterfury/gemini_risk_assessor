@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/organisation_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +13,7 @@ class MembersCard extends StatelessWidget {
     required this.isAdmin,
   });
 
-  final OrganisationModel orgModel;
+  final OrganizationModel orgModel;
   final bool isAdmin;
 
   @override
@@ -24,9 +24,9 @@ class MembersCard extends StatelessWidget {
         children: [
           FutureBuilder<List<UserModel>>(
             future: context
-                .read<OrganisationProvider>()
+                .read<OrganizationProvider>()
                 .getMembersDataFromFirestore(
-                  orgID: orgModel.organisationID,
+                  orgID: orgModel.organizationID,
                 ),
             // builder: (context, snapshot)
             builder: (context, snapshot) {

@@ -5,9 +5,9 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
-import 'package:gemini_risk_assessor/models/organisation_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
@@ -23,19 +23,19 @@ import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
-class OrganisationDetails extends StatefulWidget {
-  const OrganisationDetails({
+class OrganizationDetails extends StatefulWidget {
+  const OrganizationDetails({
     super.key,
     required this.orgModel,
   });
 
-  final OrganisationModel orgModel;
+  final OrganizationModel orgModel;
 
   @override
-  State<OrganisationDetails> createState() => _OrganisationDetailsState();
+  State<OrganizationDetails> createState() => _OrganizationDetailsState();
 }
 
-class _OrganisationDetailsState extends State<OrganisationDetails>
+class _OrganizationDetailsState extends State<OrganizationDetails>
     with SingleTickerProviderStateMixin {
   File? _finalFileImage;
 
@@ -90,34 +90,34 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
     // wait for widget  to be built before setting state
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context
-          .read<OrganisationProvider>()
-          .setOrganisationModel(orgModel: widget.orgModel);
+          .read<OrganizationProvider>()
+          .setOrganizationModel(orgModel: widget.orgModel);
     });
   }
 
   // set new image from file and update provider
   Future<void> setNewImageInProvider(String imageUrl) async {
     // set newimage in provider
-    await context.read<OrganisationProvider>().setImageUrl(imageUrl);
+    await context.read<OrganizationProvider>().setImageUrl(imageUrl);
   }
 
   // set new name  in provider
   Future<void> setNewNameInProvider(String newName) async {
     // set new name in provider
-    await context.read<OrganisationProvider>().setName(newName);
+    await context.read<OrganizationProvider>().setName(newName);
   }
 
   // set new description in provider
   Future<void> setNewDescriptionInProvider(String newDescription) async {
     // set new description in provider
-    await context.read<OrganisationProvider>().setDescription(newDescription);
+    await context.read<OrganizationProvider>().setDescription(newDescription);
   }
 
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     bool isAdmin = widget.orgModel.adminsUIDs.contains(uid);
-    String orgID = widget.orgModel.organisationID;
+    String orgID = widget.orgModel.organizationID;
     String membersCount = getMembersCount(widget.orgModel);
     return Scaffold(
       appBar: const MyAppBar(
@@ -176,7 +176,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
       floatingActionButton: MyFabButton(
         animationController: _animationController,
         animation: _animation,
-        organisationID: widget.orgModel.organisationID,
+        organisationID: widget.orgModel.organizationID,
       ),
     );
   }
@@ -215,9 +215,9 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                     showLoadingDialog(
                       title: 'Exiting',
                     );
-                    final orgProvider = context.read<OrganisationProvider>();
+                    final orgProvider = context.read<OrganizationProvider>();
 
-                    String result = await orgProvider.exitOrganisation(
+                    String result = await orgProvider.exitOrganization(
                       isAdmin: isAdmin,
                       uid: uid,
                       orgID: orgID,
@@ -319,8 +319,8 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
             onActionTap: (value) async {
               if (value) {
                 bool isSaved = await context
-                    .read<OrganisationProvider>()
-                    .updateOrganisationDataInFireStore();
+                    .read<OrganizationProvider>()
+                    .updateOrganizationDataInFireStore();
 
                 if (isSaved) {
                   Future.delayed(const Duration(milliseconds: 100))
@@ -336,7 +336,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
               Future.delayed(const Duration(milliseconds: 100))
                   .whenComplete(() async {
                 // clear search query
-                context.read<OrganisationProvider>().setSearchQuery('');
+                context.read<OrganizationProvider>().setSearchQuery('');
               });
             });
       },
@@ -400,16 +400,16 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                           context: context,
                           title: 'Edit Description',
                           content: Constants.changeDescription,
-                          hintText: widget.orgModel.aboutOrganisation,
+                          hintText: widget.orgModel.aboutOrganization,
                           textAction: "Change",
                           onActionTap: (value, updatedText) async {
                             if (value) {
                               final authProvider = context.read<AuthProvider>();
                               final desc = await authProvider.updateDescription(
                                 isUser: false,
-                                id: widget.orgModel.organisationID,
+                                id: widget.orgModel.organizationID,
                                 newDesc: updatedText,
-                                oldDesc: widget.orgModel.aboutOrganisation,
+                                oldDesc: widget.orgModel.aboutOrganization,
                               );
                               if (desc == 'Invalid description.') return;
                               await setNewDescriptionInProvider(desc);
@@ -435,7 +435,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
           height: 5,
         ),
         Text(
-          widget.orgModel.aboutOrganisation,
+          widget.orgModel.aboutOrganization,
           style: textStyle16w600,
         ),
       ],
@@ -470,9 +470,9 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                       final imageUrl = await FileUploadHandler.updateImage(
                         file: file,
                         isUser: false,
-                        id: widget.orgModel.organisationID,
+                        id: widget.orgModel.organizationID,
                         reference:
-                            '${Constants.organisationImage}/${widget.orgModel.organisationID}.jpg',
+                            '${Constants.organizationImage}/${widget.orgModel.organizationID}.jpg',
                       );
 
                       // set newimage in provider
@@ -517,7 +517,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
                                     context.read<AuthProvider>();
                                 final name = await authProvider.updateName(
                                   isUser: false,
-                                  id: widget.orgModel.organisationID,
+                                  id: widget.orgModel.organizationID,
                                   newName: updatedText,
                                   oldName: widget.orgModel.name,
                                 );
@@ -550,7 +550,7 @@ class _OrganisationDetailsState extends State<OrganisationDetails>
   }
 
   //  get member count function
-  String getMembersCount(OrganisationModel orgModel) {
+  String getMembersCount(OrganizationModel orgModel) {
     int count = orgModel.membersUIDs.length;
 
     if (count == 0) {

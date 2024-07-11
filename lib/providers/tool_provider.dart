@@ -22,7 +22,7 @@ class ToolsProvider extends ChangeNotifier {
   String _description = '';
   File? _pdfToolFile;
   String _uid = '';
-  String _organisationID = '';
+  String _organizationID = '';
   List<XFile>? _imagesFileList = [];
   ToolModel? _toolModel;
   List<ToolModel> _toolsList = [];
@@ -33,7 +33,7 @@ class ToolsProvider extends ChangeNotifier {
   String get description => _description;
   File? get pdfToolFile => _pdfToolFile;
   String get uid => _uid;
-  String get organisationID => _organisationID;
+  String get organizationID => _organizationID;
   List<XFile>? get imagesFileList => _imagesFileList;
   ToolModel? get toolModel => _toolModel;
   List<ToolModel> get toolsList => _toolsList;
@@ -44,7 +44,7 @@ class ToolsProvider extends ChangeNotifier {
   Future<bool> saveToolToFirestore() async {
     if (_toolModel != null) {
       try {
-        String id = _organisationID.isNotEmpty ? _organisationID : _uid;
+        String id = _organizationID.isNotEmpty ? _organizationID : _uid;
 
         if (_toolModel!.images.isNotEmpty) {
           List<String> imagesUrls = [];
@@ -159,7 +159,7 @@ class ToolsProvider extends ChangeNotifier {
   ) async {
     _description = desc;
     _uid = creatorID;
-    _organisationID = orgID;
+    _organizationID = orgID;
     notifyListeners();
   }
 
@@ -295,7 +295,7 @@ class ToolsProvider extends ChangeNotifier {
 
   Future<bool> submitPrompt({
     required String creatorID,
-    required String organisationID,
+    required String organizationID,
     required String description,
   }) async {
     _isLoading = true;
@@ -311,7 +311,7 @@ class ToolsProvider extends ChangeNotifier {
     await setToolData(
       description,
       creatorID,
-      organisationID,
+      organizationID,
     );
 
     // get promptDara
@@ -339,7 +339,7 @@ class ToolsProvider extends ChangeNotifier {
           content,
           toolId,
           creatorID,
-          organisationID,
+          organizationID,
           images,
           DateTime.now(),
         );

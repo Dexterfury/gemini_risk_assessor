@@ -1,11 +1,11 @@
 import 'package:gemini_risk_assessor/constants.dart';
 
-class OrganisationModel {
+class OrganizationModel {
   String creatorUID;
-  String organisationID;
+  String organizationID;
   String name;
   String? imageUrl;
-  String aboutOrganisation;
+  String aboutOrganization;
   String address;
   String phoneNumber;
   String emailAddress;
@@ -16,12 +16,12 @@ class OrganisationModel {
   DateTime createdAt;
 
   // Constructor with default values
-  OrganisationModel({
+  OrganizationModel({
     this.creatorUID = '',
-    this.organisationID = '',
+    this.organizationID = '',
     this.name = '',
     this.imageUrl,
-    this.aboutOrganisation = '',
+    this.aboutOrganization = '',
     this.address = '',
     this.phoneNumber = '',
     this.emailAddress = '',
@@ -36,13 +36,13 @@ class OrganisationModel {
         createdAt = createdAt ?? DateTime.now();
 
   // Factory constructor
-  factory OrganisationModel.fromJson(Map<String, dynamic> json) {
-    return OrganisationModel(
+  factory OrganizationModel.fromJson(Map<String, dynamic> json) {
+    return OrganizationModel(
       creatorUID: json[Constants.creatorUID] ?? '',
-      organisationID: json[Constants.organisationID] ?? '',
+      organizationID: json[Constants.organizationID] ?? '',
       name: json[Constants.name] ?? '',
       imageUrl: json[Constants.imageUrl],
-      aboutOrganisation: json[Constants.aboutOrganisation] ?? '',
+      aboutOrganization: json[Constants.aboutOrganization] ?? '',
       address: json[Constants.address] ?? '',
       phoneNumber: json[Constants.phoneNumber] ?? '',
       emailAddress: json[Constants.emailAddress] ?? '',
@@ -61,10 +61,10 @@ class OrganisationModel {
   Map<String, dynamic> toJson() {
     return {
       Constants.creatorUID: creatorUID,
-      Constants.organisationID: organisationID,
+      Constants.organizationID: organizationID,
       Constants.name: name,
       Constants.imageUrl: imageUrl,
-      Constants.aboutOrganisation: aboutOrganisation,
+      Constants.aboutOrganization: aboutOrganization,
       Constants.address: address,
       Constants.phoneNumber: phoneNumber,
       Constants.emailAddress: emailAddress,
@@ -77,7 +77,7 @@ class OrganisationModel {
   }
 
   // empty organization
-  factory OrganisationModel.empty() {
-    return OrganisationModel();
+  factory OrganizationModel.empty() {
+    return OrganizationModel();
   }
 }

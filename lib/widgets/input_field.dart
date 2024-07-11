@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
@@ -10,20 +10,20 @@ class InputField extends StatelessWidget {
     required this.hintText,
     required this.controller,
     this.authProvider,
-    this.organisationProvider,
+    this.organizationProvider,
   });
 
   final String labelText;
   final String hintText;
   final TextEditingController controller;
   final AuthProvider? authProvider;
-  final OrganisationProvider? organisationProvider;
+  final OrganizationProvider? organizationProvider;
 
   @override
   Widget build(BuildContext context) {
     // check if its name imput
     final isNameInput = labelText == Constants.enterYourName ||
-        labelText == Constants.organisationName;
+        labelText == Constants.organizationName;
     return TextField(
       controller: controller,
       textCapitalization: TextCapitalization.sentences,
@@ -50,7 +50,7 @@ class InputField extends StatelessWidget {
       return false;
     }
 
-    if (organisationProvider != null && organisationProvider!.isLoading) {
+    if (organizationProvider != null && organizationProvider!.isLoading) {
       return false;
     }
     return true;

@@ -1,9 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/models/organisation_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
-import 'package:gemini_risk_assessor/screens/organisation_details.dart';
+import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
@@ -15,7 +15,7 @@ class GridItem extends StatelessWidget {
   });
 
   final ToolModel? toolModel;
-  final OrganisationModel? orgModel;
+  final OrganizationModel? orgModel;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class GridItem extends StatelessWidget {
                   currentModel: toolModel!,
                 );
               } else {
-                return OrganisationDetails(
+                return OrganizationDetails(
                   orgModel: orgModel!,
                 );
               }
@@ -102,7 +102,7 @@ class GridItem extends StatelessWidget {
 
   String getTitle(
     ToolModel? toolModel,
-    OrganisationModel? orgModel,
+    OrganizationModel? orgModel,
   ) {
     if (toolModel != null) {
       return toolModel.name;
@@ -115,12 +115,12 @@ class GridItem extends StatelessWidget {
 
   String getSubTitle(
     ToolModel? toolModel,
-    OrganisationModel? orgModel,
+    OrganizationModel? orgModel,
   ) {
     if (toolModel != null) {
       return toolModel.summary;
     } else if (orgModel != null) {
-      return orgModel.aboutOrganisation;
+      return orgModel.aboutOrganization;
     } else {
       return "No subtitle";
     }
@@ -128,7 +128,7 @@ class GridItem extends StatelessWidget {
 
   String getImageUrl(
     ToolModel? toolModel,
-    OrganisationModel? orgModel,
+    OrganizationModel? orgModel,
   ) {
     if (toolModel != null) {
       return toolModel.images[0];

@@ -83,7 +83,7 @@ class FileUploadHandler {
           .update({Constants.imageUrl: imageURL});
     } else {
       await FirebaseFirestore.instance
-          .collection(Constants.organisationCollection)
+          .collection(Constants.organizationCollection)
           .doc(id)
           .update({Constants.imageUrl: imageURL});
     }

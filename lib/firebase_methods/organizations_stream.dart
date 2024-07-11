@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/models/organisation_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:provider/provider.dart';
 
-class OrganisationsStream extends StatelessWidget {
-  const OrganisationsStream({
+class OrganizationsStream extends StatelessWidget {
+  const OrganizationsStream({
     super.key,
   });
 
@@ -16,7 +16,7 @@ class OrganisationsStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseMethods.organisationsStream(
+      stream: FirebaseMethods.organizationsStream(
         userId: uid,
       ),
       builder: (
@@ -35,7 +35,7 @@ class OrganisationsStream extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('You are not part of any organisations yet!',
+              child: Text('You are not part of any organizations yet!',
                   textAlign: TextAlign.center, style: textStyle18w500),
             ),
           );
@@ -50,7 +50,7 @@ class OrganisationsStream extends StatelessWidget {
             itemBuilder: (context, index) {
               final doc = snapshot.data!.docs[index];
               final orgData = doc.data() as Map<String, dynamic>;
-              final org = OrganisationModel.fromJson(orgData);
+              final org = OrganizationModel.fromJson(orgData);
               return GridItem(orgModel: org);
             });
       },

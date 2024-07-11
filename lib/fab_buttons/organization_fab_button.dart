@@ -1,9 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/screens/create_organisation_screen.dart';
+import 'package:gemini_risk_assessor/screens/create_organization_screen.dart';
 
-class OrganisationFabButton extends StatelessWidget {
-  const OrganisationFabButton({
+class OrganizationFabButton extends StatelessWidget {
+  const OrganizationFabButton({
     super.key,
   });
 
@@ -12,7 +12,7 @@ class OrganisationFabButton extends StatelessWidget {
     return OpenContainer(
       transitionType: ContainerTransitionType.fade,
       openBuilder: (BuildContext context, VoidCallback _) {
-        return const CreateOrganisationScreen();
+        return const CreateOrganizationScreen();
       },
       closedElevation: 6.0,
       closedShape: const RoundedRectangleBorder(
@@ -34,26 +34,5 @@ class OrganisationFabButton extends StatelessWidget {
         );
       },
     );
-
-    // FloatingActionButton.extended(
-    //   backgroundColor: Theme.of(context).colorScheme.primary,
-    //   onPressed: () {
-    //     // navigate to create organisation screen
-    //     navigationController(
-    //       context: context,
-    //       route: Constants.createOrganisationRoute,
-    //     );
-    //   },
-    //   label: const Text(
-    //     'Create Organisation',
-    //     style: TextStyle(
-    //       color: Colors.white,
-    //     ),
-    //   ),
-    //   icon: const Icon(
-    //     Icons.add,
-    //     color: Colors.white,
-    //   ),
-    // );
   }
 }

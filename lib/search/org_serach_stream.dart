@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/models/organisation_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
@@ -15,10 +15,10 @@ class OrgSearchStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
-    return Consumer<OrganisationProvider>(
-        builder: (context, organisationProvider, child) {
+    return Consumer<OrganizationProvider>(
+        builder: (context, organizationProvider, child) {
       return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseMethods.organisationsStream(
+        stream: FirebaseMethods.organizationsStream(
           userId: uid,
         ),
         builder: (
@@ -37,7 +37,7 @@ class OrgSearchStream extends StatelessWidget {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('You are not part of any organisations yet!',
+                child: Text('You are not part of any organizations yet!',
                     textAlign: TextAlign.center, style: textStyle18w500),
               ),
             );
@@ -45,11 +45,11 @@ class OrgSearchStream extends StatelessWidget {
 
           final results = snapshot.data!.docs
               .where(
-                (element) => element[Constants.organisationName]
+                (element) => element[Constants.organizationName]
                     .toString()
                     .toLowerCase()
                     .contains(
-                      organisationProvider.searchQuery.toLowerCase(),
+                      organizationProvider.searchQuery.toLowerCase(),
                     ),
               )
               .toList();
@@ -67,7 +67,7 @@ class OrgSearchStream extends StatelessWidget {
               itemBuilder: (context, index) {
                 final doc = results[index];
                 final orgData = doc.data() as Map<String, dynamic>;
-                final org = OrganisationModel.fromJson(orgData);
+                final org = OrganizationModel.fromJson(orgData);
                 return GridItem(orgModel: org);
               });
         },

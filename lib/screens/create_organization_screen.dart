@@ -4,9 +4,9 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/organisation_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
-import 'package:gemini_risk_assessor/providers/organisation_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
@@ -15,15 +15,15 @@ import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
-class CreateOrganisationScreen extends StatefulWidget {
-  const CreateOrganisationScreen({super.key});
+class CreateOrganizationScreen extends StatefulWidget {
+  const CreateOrganizationScreen({super.key});
 
   @override
-  State<CreateOrganisationScreen> createState() =>
-      _CreateOrganisationScreenState();
+  State<CreateOrganizationScreen> createState() =>
+      _CreateOrganizationScreenState();
 }
 
-class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
+class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
@@ -38,10 +38,10 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final organisationProvider = context.watch<OrganisationProvider>();
+    final organizationProvider = context.watch<OrganizationProvider>();
     return Scaffold(
       appBar: const MyAppBar(
-        title: 'Create Organisation',
+        title: 'Create Organization',
         leading: BackButton(),
       ),
       body: Padding(
@@ -77,7 +77,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                     icon: Icons.person_add,
                     label: 'People',
                     onTap: () {
-                      if (organisationProvider.isLoading) {
+                      if (organizationProvider.isLoading) {
                         return;
                       }
 
@@ -99,21 +99,21 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
               ),
               const SizedBox(height: 30),
 
-              // organisation name input field
+              // organization name input field
               InputField(
-                labelText: Constants.organisationName,
-                hintText: Constants.organisationName,
+                labelText: Constants.organizationName,
+                hintText: Constants.organizationName,
                 controller: _nameController,
-                organisationProvider: organisationProvider,
+                organizationProvider: organizationProvider,
               ),
 
               const SizedBox(height: 20),
-              // organisation description input field
+              // organization description input field
               InputField(
                 labelText: Constants.enterDescription,
                 hintText: Constants.enterDescription,
                 controller: _descriptionController,
-                organisationProvider: organisationProvider,
+                organizationProvider: organizationProvider,
               ),
 
               const SizedBox(height: 40),
@@ -122,7 +122,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                 icon: Icons.save,
                 label: 'Save and Continue',
                 onTap: () {
-                  if (organisationProvider.isLoading) {
+                  if (organizationProvider.isLoading) {
                     return;
                   }
                   // check name
@@ -139,8 +139,8 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                     showSnackBar(
                       context: context,
                       message: emptyName
-                          ? 'Please enter organisation name'
-                          : 'organisation name must be at least 3 characters',
+                          ? 'Please enter organization name'
+                          : 'organization name must be at least 3 characters',
                     );
                     return;
                   }
@@ -149,16 +149,16 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                     showSnackBar(
                       context: context,
                       message: emptyDescription
-                          ? 'Please enter organisation description'
-                          : 'organisation description must be at least 10 characters',
+                          ? 'Please enter organization description'
+                          : 'organization description must be at least 10 characters',
                     );
                     return;
                   }
 
-                  final orgModel = OrganisationModel(
+                  final orgModel = OrganizationModel(
                     creatorUID: context.read<AuthProvider>().userModel!.uid,
                     name: _nameController.text,
-                    aboutOrganisation: _descriptionController.text,
+                    aboutOrganization: _descriptionController.text,
                     imageUrl: '',
                   );
 
@@ -166,7 +166,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                   // show my alert dialog for loading
                   MyDialogs.showMyAnimatedDialog(
                     context: context,
-                    title: 'Creating organisation',
+                    title: 'Creating organization',
                     loadingIndicator: const SizedBox(
                       height: 100,
                       width: 100,
@@ -174,10 +174,10 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                     ),
                   );
 
-                  // save organisation data to firestore
-                  organisationProvider.createOrganisation(
+                  // save organization data to firestore
+                  organizationProvider.createOrganization(
                     fileImage: _finalFileImage,
-                    newOrganisationModel: orgModel,
+                    newOrganizationModel: orgModel,
                     onSuccess: () {
                       // pop the loading dialog
                       Navigator.pop(context);
@@ -188,7 +188,7 @@ class _CreateOrganisationScreenState extends State<CreateOrganisationScreen> {
                         _finalFileImage = null;
                       });
                       showSnackBar(
-                          context: context, message: 'Organisation created');
+                          context: context, message: 'Organization created');
                       // pop to previous screen
                       Navigator.pop(context);
                     },

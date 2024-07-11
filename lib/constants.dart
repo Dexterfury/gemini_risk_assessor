@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/help/ai_tips_help_details.dart';
+import 'package:gemini_risk_assessor/help/dsti_help_details.dart';
+import 'package:gemini_risk_assessor/help/help_item.dart';
+import 'package:gemini_risk_assessor/help/navigation_help_details.dart';
+import 'package:gemini_risk_assessor/help/organisation_help_details.dart';
+import 'package:gemini_risk_assessor/help/risk_assessment_help_details.dart';
+import 'package:gemini_risk_assessor/help/tools_help_details.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 
@@ -49,7 +56,7 @@ class Constants {
   static const String screensControllerRoute = '/screensController';
   static const String optRoute = '/opt';
   static const String createToolRoute = '/createTool';
-  static const String createOrganisationRoute = '/createOrganisation';
+  static const String createOrganizationRoute = '/createOrganization';
   static const String chatRoute = '/chat';
 
   static const String verificationId = 'verificationId';
@@ -91,14 +98,14 @@ class Constants {
   static const String weather = 'weather';
   static const String summary = 'summary';
   static const String createdBy = 'createdBy';
-  static const String organisationID = 'organisationID';
+  static const String organizationID = 'organizationID';
   static const String pdfUrl = 'pdfUrl';
 
   static const String orgArg = 'orgArg';
 
-  // organisation model constants
+  // organization model constants
   static const String creatorUID = 'creatorUID';
-  static const String aboutOrganisation = 'aboutOrganisation';
+  static const String aboutOrganization = 'aboutOrganization';
   static const String address = 'address';
   static const String emailAddress = 'emailAddress';
   static const String websiteURL = 'websiteURL';
@@ -107,7 +114,7 @@ class Constants {
   static const String adminsUIDs = 'adminsUIDs';
 
   static const String enterYourName = 'Enter your name';
-  static const String organisationName = 'Organisation name';
+  static const String organizationName = 'Organization name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
   static const String enterDescription = 'Enter description';
 
@@ -118,7 +125,7 @@ class Constants {
   static const String usersCollection = 'users';
   static const String promptCollection = 'prompts';
   static const String assessmentCollection = 'assessments';
-  static const String organisationCollection = 'organisations';
+  static const String organizationCollection = 'organizations';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
   static const String chatsCollection = 'chats';
@@ -128,7 +135,7 @@ class Constants {
   static const String chatDataCollection = 'chatData';
   static const String notificationsCollection = 'notifications';
 
-  static const String organisationImage = 'organisationImage';
+  static const String organizationImage = 'organizationImage';
 
   static const String exitSuccessful = 'Exit Successful';
   static const String exitFailed = 'Exit Failed';
@@ -158,11 +165,11 @@ class Constants {
   static const String notificationDate = 'notificationDate';
 
   // notification types
-  static const String dstiNotification = 'dstiNotification';
-  static const String assessmentNotification = 'assessmentNotification';
-  static const String toolsNotification = 'toolsNotification';
-  static const String newOrganisationNotification =
-      'newOrganisationNotification';
+  static const String notificationID = 'notificationID';
+  static const String dstiNotification = 'DSTI_NOTIFICATION';
+  static const String assessmentNotification = 'ASSESSMENT_NOTIFICATION';
+  static const String toolsNotification = 'TOOLS_NOTIFICATION';
+  static const String organizationInvitation = 'ORGANIZATION_INVITATION';
   static const String requestNotification = 'requestNotification';
 
   // dialog content
@@ -227,5 +234,38 @@ class Constants {
     'Safety Glasses',
     'Safety Harness',
     'Other',
+  ];
+
+  static final List<HelpItem> helpItems = [
+    HelpItem(
+      title: 'Creating a DSTI',
+      description: 'Learn how to create a Daily Safety Task Instruction',
+      detailScreen: const DstiHelpDetails(),
+    ),
+    HelpItem(
+      title: 'Risk Assessments',
+      description: 'Understanding and creating Risk Assessments',
+      detailScreen: const RiskAssessmentHelpDetails(),
+    ),
+    HelpItem(
+      title: 'Tools Explainer',
+      description: 'How to use the Tools feature effectively',
+      detailScreen: const ToolsHelpDetails(),
+    ),
+    HelpItem(
+      title: 'Organization Management',
+      description: 'Managing and interacting with organizations',
+      detailScreen: const OrganizationHelpDetails(),
+    ),
+    HelpItem(
+      title: 'AI Integration Tips',
+      description: 'Get the most out of AI-generated content',
+      detailScreen: const AiTipsHelpDetails(),
+    ),
+    HelpItem(
+      title: 'App Navigation',
+      description: 'Learn how to navigate the app efficiently',
+      detailScreen: const NavigationHelpDetails(),
+    ),
   ];
 }
