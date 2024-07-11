@@ -10,6 +10,7 @@ class OrganizationModel {
   String phoneNumber;
   String emailAddress;
   String websiteURL;
+  String organizationTerms;
   List<String> awaitingApprovalUIDs;
   List<String> membersUIDs;
   List<String> adminsUIDs;
@@ -26,6 +27,7 @@ class OrganizationModel {
     this.phoneNumber = '',
     this.emailAddress = '',
     this.websiteURL = '',
+    this.organizationTerms = '',
     List<String>? awaitingApprovalUIDs,
     List<String>? membersUIDs,
     List<String>? adminsUIDs,
@@ -47,6 +49,7 @@ class OrganizationModel {
       phoneNumber: json[Constants.phoneNumber] ?? '',
       emailAddress: json[Constants.emailAddress] ?? '',
       websiteURL: json[Constants.websiteURL] ?? '',
+      organizationTerms: json[Constants.organizationTerms] ?? '',
       awaitingApprovalUIDs:
           List<String>.from(json[Constants.awaitingApprovalUIDs] ?? []),
       membersUIDs: List<String>.from(json[Constants.membersUIDs] ?? []),
@@ -69,6 +72,7 @@ class OrganizationModel {
       Constants.phoneNumber: phoneNumber,
       Constants.emailAddress: emailAddress,
       Constants.websiteURL: websiteURL,
+      Constants.organizationTerms: organizationTerms,
       Constants.awaitingApprovalUIDs: awaitingApprovalUIDs,
       Constants.membersUIDs: membersUIDs,
       Constants.adminsUIDs: adminsUIDs,

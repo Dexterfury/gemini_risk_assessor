@@ -20,6 +20,7 @@ class AssessmentModel {
   String createdBy;
   String organizationID;
   String pdfUrl;
+  bool isShared;
   DateTime createdAt;
 
   AssessmentModel({
@@ -39,6 +40,7 @@ class AssessmentModel {
     required this.createdBy,
     required this.organizationID,
     required this.pdfUrl,
+    required this.isShared,
     required this.createdAt,
   });
 
@@ -72,7 +74,8 @@ class AssessmentModel {
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
         organizationID: organizationID,
-        pdfUrl: Constants.pdfUrl,
+        pdfUrl: json[Constants.pdfFiles] ?? '',
+        isShared: json[Constants.isShared] ?? false,
         createdAt: createdAt,
       );
     }
@@ -113,6 +116,7 @@ class AssessmentModel {
         createdBy: creatorID,
         organizationID: organizationID,
         pdfUrl: json[Constants.pdfUrl] ?? '',
+        isShared: json[Constants.isShared] ?? false,
         createdAt: createdAt,
       );
     }
@@ -138,6 +142,7 @@ class AssessmentModel {
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
       pdfUrl: json[Constants.pdfUrl] ?? '',
+      isShared: json[Constants.isShared] ?? false,
       createdAt:
           DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt] ?? 0),
     );
@@ -161,6 +166,7 @@ class AssessmentModel {
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
       Constants.pdfUrl: pdfUrl,
+      Constants.isShared: isShared,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

@@ -24,6 +24,8 @@ exports.onCreateOrganization = functions.firestore
       const orgName = orgData.name;
       const orgID = context.params.orgId;
       const createdAt = orgData.createdAt;
+      const aboutOrg = orgData.aboutOrganization;
+      const orgTerms = orgData.organizationTerms;
       const awaitingApprovalUIDs = orgData.awaitingApprovalUIDs || [];
       let orgImage = orgData.imageUrl;
 
@@ -47,8 +49,9 @@ exports.onCreateOrganization = functions.firestore
           title: "New Organization Invitation",
           description: `You've been invited to join ${orgName}`,
           imageUrl: orgImage,
-          aboutOrganization: orgData.aboutOrganization || "",
+          aboutOrganization: aboutOrg,
           notificationType: "ORGANIZATION_INVITATION",
+          oorganizationTerms: orgTerms,
           wasClicked: false,
           createdAt: createdAt,
           notificationDate: admin.firestore.FieldValue.serverTimestamp(),
@@ -143,8 +146,9 @@ exports.onCreateOrganization = functions.firestore
             title: "New Organization Invitation",
             description: `You've been invited to join ${orgName}`,
             imageUrl: orgImage,
-            aboutOrganization: newData.aboutOrganization || "",
+            aboutOrganization: newData.aboutOrganization,
             notificationType: "ORGANIZATION_INVITATION",
+            oorganizationTerms: newData.organizationTerms,
             wasClicked: false,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             notificationDate: admin.firestore.FieldValue.serverTimestamp(),

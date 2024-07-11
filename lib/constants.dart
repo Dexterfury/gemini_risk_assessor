@@ -100,6 +100,7 @@ class Constants {
   static const String createdBy = 'createdBy';
   static const String organizationID = 'organizationID';
   static const String pdfUrl = 'pdfUrl';
+  static const String isShared = 'isShared';
 
   static const String orgArg = 'orgArg';
 
@@ -109,6 +110,7 @@ class Constants {
   static const String address = 'address';
   static const String emailAddress = 'emailAddress';
   static const String websiteURL = 'websiteURL';
+  static const String organizationTerms = 'organizationTerms';
   static const String awaitingApprovalUIDs = 'awaitingApprovalUIDs';
   static const String membersUIDs = 'membersUIDs';
   static const String adminsUIDs = 'adminsUIDs';
@@ -236,6 +238,7 @@ class Constants {
     'Other',
   ];
 
+  // helper items
   static final List<HelpItem> helpItems = [
     HelpItem(
       title: 'Creating a DSTI',
@@ -268,4 +271,30 @@ class Constants {
       detailScreen: const NavigationHelpDetails(),
     ),
   ];
+
+  // build section for helper classes
+  static Widget buildSection(String title, List<String> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        ...items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('• ', style: TextStyle(fontSize: 16)),
+                  Expanded(
+                      child: Text(item, style: const TextStyle(fontSize: 16))),
+                ],
+              ),
+            )),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
 }

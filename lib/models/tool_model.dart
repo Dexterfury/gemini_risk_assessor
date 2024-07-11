@@ -12,6 +12,7 @@ class ToolModel {
   List<String> images;
   String createdBy;
   String organizationID;
+  bool isShared;
   DateTime createdAt;
 
   // constructor
@@ -24,6 +25,7 @@ class ToolModel {
     required this.images,
     required this.createdBy,
     required this.organizationID,
+    required this.isShared,
     required this.createdAt,
   });
 
@@ -50,6 +52,7 @@ class ToolModel {
         images: images,
         createdBy: creatorID,
         organizationID: organizationID,
+        isShared: json[Constants.isShared] ?? false,
         createdAt: createdAt,
       );
     }
@@ -68,6 +71,7 @@ class ToolModel {
       images: List<String>.from(json[Constants.images] ?? []),
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
+      isShared: json[Constants.isShared] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
     );
   }
@@ -83,6 +87,7 @@ class ToolModel {
       Constants.images: images,
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
+      Constants.isShared: isShared,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

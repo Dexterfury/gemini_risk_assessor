@@ -18,13 +18,10 @@ class HelpItemCard extends StatelessWidget {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.help_outline,
-                  size: 48, color: Theme.of(context).primaryColor),
-              const SizedBox(height: 16),
               Text(
                 helpItem.title,
                 textAlign: TextAlign.center,
