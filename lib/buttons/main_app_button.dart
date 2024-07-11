@@ -6,7 +6,7 @@ class MainAppButton extends StatelessWidget {
     this.icon,
     required this.label,
     this.color = Colors.white,
-    this.borderRadius = 25.0,
+    this.borderRadius = 15.0,
     required this.onTap,
   });
 
