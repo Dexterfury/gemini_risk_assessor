@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 
 class FirebaseMethods {
   static final CollectionReference _usersCollection =
@@ -143,5 +144,18 @@ class FirebaseMethods {
   // get organizations stream
   static Stream<DocumentSnapshot> organizationStream({required String orgID}) {
     return _organizationsCollection.doc(orgID).snapshots();
+  }
+
+  // get organization data from firestore
+  static Future<OrganizationModel> getOrganizationData({
+    required String orgID,
+  }) async {
+    try {
+      DocumentSnapshot orgDoc = await _organizationsCollection.doc(orgID).get();
+      return OrganizationModel.fromJson(orgDoc.data()! as Map<String, dynamic>);
+    } catch (e) {
+      print('Error fetching organization data: $e');
+      return OrganizationModel();
+    }
   }
 }

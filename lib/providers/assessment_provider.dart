@@ -420,6 +420,7 @@ class AssessmentProvider extends ChangeNotifier {
         selectImages(
           fromCamera: value,
           onError: (String error) {
+            log('err $error ');
             if (context.mounted) {
               showSnackBar(context: context, message: error);
             }
@@ -560,7 +561,7 @@ Return the assessment as valid JSON using the following structure:
   "summary": \$summary,
 }
   
-equipments, hazards and risks should be of type List<String> with a max length of 10 or less.
+equipments, hazards and risks should be of type List<String>
 ''';
 
   Future<void> submitTestAssessment({

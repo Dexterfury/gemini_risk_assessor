@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 
 class NotificationModel {
@@ -46,9 +47,9 @@ class NotificationModel {
       notificationType: json[Constants.notificationType] ?? '',
       organizationTerms: json[Constants.organizationTerms] ?? '',
       wasClicked: json[Constants.wasClicked] ?? false,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
+      createdAt: (json[Constants.createdAt] as Timestamp).toDate(),
       notificationDate:
-          DateTime.fromMillisecondsSinceEpoch(json[Constants.notificationDate]),
+          (json[Constants.notificationDate] as Timestamp).toDate(),
     );
   }
 

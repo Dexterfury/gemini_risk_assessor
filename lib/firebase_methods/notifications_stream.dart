@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/notification_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
+import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
@@ -76,6 +79,7 @@ class NotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('type: ${notification.notificationType}');
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: SizedBox(
@@ -118,7 +122,7 @@ class NotificationItem extends StatelessWidget {
   void navigateToNotificationDetailsPage(
     BuildContext context,
     NotificationModel notification,
-  ) {
+  ) async {
     switch (notification.notificationType) {
       case Constants.dstiCollections:
         Navigator.push(
@@ -151,10 +155,16 @@ class NotificationItem extends StatelessWidget {
         );
         break;
       case Constants.organizationInvitation:
+        // get organization model and navigate to organization details page
+        final orgModel = await FirebaseMethods.getOrganizationData(
+          orgID: notification.organizationID,
+        );
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const OrganizationsScreen(),
+            builder: (context) => OrganizationDetails(
+              orgModel: orgModel,
+            ),
           ),
         );
         break;

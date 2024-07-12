@@ -9,7 +9,12 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 class BottonButtonsField extends StatelessWidget {
-  const BottonButtonsField({super.key});
+  const BottonButtonsField({
+    super.key,
+    this.completed,
+  });
+
+  final Function()? completed;
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +115,9 @@ class BottonButtonsField extends StatelessWidget {
                         .whenComplete(() async {
                       // pop the screen
                       Navigator.pop(context);
+                      if (completed != null) {
+                        completed!();
+                      }
                     });
 
                     // // navigate to home screen

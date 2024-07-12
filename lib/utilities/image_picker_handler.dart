@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -26,6 +27,7 @@ class ImagePickerHandler {
           completer.complete(result);
         } catch (e) {
           completer.completeError(e);
+          log('message: $e');
         }
       },
     );

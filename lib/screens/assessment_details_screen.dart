@@ -25,10 +25,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
     super.key,
     required this.appBarTitle,
     this.currentModel,
+    this.completed,
   });
 
   final String appBarTitle;
   final AssessmentModel? currentModel;
+  final Function()? completed;
 
   @override
   Widget build(BuildContext context) {
@@ -199,21 +201,30 @@ class AssessmentDetailsScreen extends StatelessWidget {
                       Text('Date: $formattedTime'),
                     ],
                   ),
-                  // pdf icon
-                  GestureDetector(
-                    onTap: () {
-                      // open pdf
-                    },
-                    child: const IconContainer(
-                      icon: Icons.picture_as_pdf_rounded,
-                      containerColor: Colors.blue,
-                    ),
-                  ),
+                  currentModel == null
+                      ? const SizedBox()
+                      :
+                      // pdf icon
+                      GestureDetector(
+                          onTap: () {
+                            // open pdf
+                          },
+                          child: const IconContainer(
+                            icon: Icons.picture_as_pdf_rounded,
+                            containerColor: Colors.blue,
+                          ),
+                        ),
                 ],
               ),
               const SizedBox(height: 10),
               currentModel == null
-                  ? const BottonButtonsField()
+                  ? BottonButtonsField(
+                      completed: () {
+                        if (completed != null) {
+                          completed!();
+                        }
+                      },
+                    )
                   : const SizedBox(
                       height: 20,
                     ),
