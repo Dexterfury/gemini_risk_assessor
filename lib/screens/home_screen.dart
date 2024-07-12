@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen>
     // make sure widget is initialized before initializing cloud messaging
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       // 1. generate a new token
-      //await context.read<AuthProvider>().generateNewToken();
+      await context.read<AuthProvider>().generateNewToken();
 
       // 2. initialize firebase messaging
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
