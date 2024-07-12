@@ -23,7 +23,6 @@ exports.onCreateOrganization = functions.firestore
         const creatorUID = orgData.creatorUID;
         const orgName = orgData.name;
         const orgID = context.params.orgId;
-        const createdAt = orgData.createdAt;
         const aboutOrg = orgData.aboutOrganization;
         const orgTerms = orgData.organizationTerms;
         const awaitingApprovalUIDs = orgData.awaitingApprovalUIDs || [];
@@ -53,7 +52,7 @@ exports.onCreateOrganization = functions.firestore
             notificationType: "ORGANIZATION_INVITATION",
             organizationTerms: orgTerms,
             wasClicked: false,
-            createdAt: createdAt,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
             notificationDate: admin.firestore.FieldValue.serverTimestamp(),
           };
 
