@@ -178,43 +178,99 @@ class PdfApi {
     }
   }
 
+//   static void addSignatureImage(
+//     AssessmentModel assessmentModel,
+//     PdfPage page,
+//     Uint8List signatureImage,
+//     String creatorName,
+//   ) {
+//     // get page size
+//     final pageSize = page.getClientSize();
+//     // add a signature image to the page
+//     final image = PdfBitmap(signatureImage);
+//     // draw the image on the page and locate it at the bottom right corner
+
+//     //final creatorName = assessmentModel.createdBy;
+//     String dateTime = DateFormat.yMMMEd().format(assessmentModel.createdAt);
+
+//     final signatureText = '''Creator: $creatorName
+// Date: $dateTime''';
+
+//     page.graphics.drawString(
+//       signatureText,
+//       PdfStandardFont(PdfFontFamily.helvetica, 12),
+//       format: PdfStringFormat(alignment: PdfTextAlignment.left),
+//       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
+//       bounds: Rect.fromLTWH(
+//         pageSize.width - 250,
+//         pageSize.height - 40,
+//         0,
+//         0,
+//       ),
+//     );
+//     page.graphics.drawImage(
+//       image,
+//       Rect.fromLTWH(
+//         pageSize.width - 100,
+//         pageSize.height - 50,
+//         100,
+//         40,
+//       ),
+//     );
+//   }
+
   static void addSignatureImage(
     AssessmentModel assessmentModel,
     PdfPage page,
     Uint8List signatureImage,
     String creatorName,
   ) {
-    // get page size
+    // Get page size
     final pageSize = page.getClientSize();
-    // add a signature image to the page
-    final image = PdfBitmap(signatureImage);
-    // draw the image on the page and locate it at the bottom right corner
 
-    //final creatorName = assessmentModel.createdBy;
+    // Create the signature image
+    final image = PdfBitmap(signatureImage);
+
+    // Define signature and text dimensions
+    const double signatureWidth = 100;
+    const double signatureHeight = 40;
+    const double textHeight = 30;
+    const double padding = 10;
+
+    // Calculate positions
+    final double signatureX = pageSize.width - signatureWidth - padding;
+    final double signatureY = pageSize.height - signatureHeight - padding;
+    final double textY = signatureY - textHeight;
+
+    // Format the date
     String dateTime = DateFormat.yMMMEd().format(assessmentModel.createdAt);
 
+    // Create the signature text
     final signatureText = '''Creator: $creatorName
 Date: $dateTime''';
 
+    // Draw the text
     page.graphics.drawString(
       signatureText,
-      PdfStandardFont(PdfFontFamily.helvetica, 12),
-      format: PdfStringFormat(alignment: PdfTextAlignment.left),
+      PdfStandardFont(PdfFontFamily.helvetica, 10),
+      format: PdfStringFormat(alignment: PdfTextAlignment.right),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(
-        pageSize.width - 250,
-        pageSize.height - 40,
-        0,
-        0,
+        signatureX,
+        textY,
+        signatureWidth,
+        textHeight,
       ),
     );
+
+    // Draw the signature image
     page.graphics.drawImage(
       image,
       Rect.fromLTWH(
-        pageSize.width - 100,
-        pageSize.height - 50,
-        100,
-        40,
+        signatureX,
+        signatureY,
+        signatureWidth,
+        signatureHeight,
       ),
     );
   }
