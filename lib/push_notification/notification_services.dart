@@ -99,7 +99,7 @@ class NotificationServices {
         iOS: DarwinNotificationDetails(
           sound: apple?.sound?.name,
           presentSound: true,
-          presentBadge: true,
+          //presentBadge: true,
           presentAlert: true,
         ),
       ),

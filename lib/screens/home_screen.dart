@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen>
       await messaging.requestPermission(
         alert: true,
         announcement: true,
-        badge: true,
+        //badge: true,
         carPlay: true,
         criticalAlert: true,
         provisional: true,
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen>
         await messaging.requestPermission(
       alert: true,
       announcement: true,
-      badge: true,
+      //badge: true,
       carPlay: true,
       criticalAlert: true,
       provisional: true,

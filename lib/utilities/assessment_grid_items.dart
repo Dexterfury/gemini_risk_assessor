@@ -149,8 +149,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                                     context
                                         .read<AssessmentProvider>()
                                         .removeDataItem(
-                                            label:
-                                                _selectedCategory!, // get selected index
+                                            label: _selectedCategory!,
                                             data: item)
                                         .whenComplete(
                                           () => Navigator.of(context).pop(),
