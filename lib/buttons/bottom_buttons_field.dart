@@ -115,9 +115,8 @@ class BottonButtonsField extends StatelessWidget {
                         .whenComplete(() async {
                       // pop the screen
                       Navigator.pop(context);
-                      if (completed != null) {
-                        completed!();
-                      }
+                      showSnackBar(
+                          context: context, message: 'Successfully Generated');
                     });
 
                     // // navigate to home screen

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -73,14 +75,16 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
 
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                final results = snapshot.data!.docs.where(
-                  (element) => element[Constants.title]
-                      .toString()
-                      .toLowerCase()
-                      .contains(
-                        _searchQuery.toLowerCase(),
-                      ),
-                );
+                final results = snapshot.data!.docs
+                    .where(
+                      (element) => element[Constants.title]
+                          .toString()
+                          .toLowerCase()
+                          .contains(
+                            _searchQuery.toLowerCase(),
+                          ),
+                    )
+                    .toList();
 
                 return widget.orgID.isNotEmpty
                     ? CustomScrollView(
@@ -136,35 +140,18 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                           ),
                         ],
                       )
-                    : Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: MySearchBar(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() {
-                                  _searchQuery = value;
-                                });
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: results.length,
-                              itemBuilder: (context, index) {
-                                final doc = results.elementAt(index);
-                                final data = doc.data() as Map<String, dynamic>;
-                                final assessment =
-                                    AssessmentModel.fromJson(data);
-                                return ListItem(
-                                  docTitle: Constants.riskAssessment,
-                                  data: assessment,
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                    : ListView.builder(
+                        itemCount: results.length,
+                        itemBuilder: (context, index) {
+                          final doc = results.elementAt(index);
+                          final data = doc.data() as Map<String, dynamic>;
+                          final assessment = AssessmentModel.fromJson(data);
+                          log('title: ${assessment.title}');
+                          return ListItem(
+                            docTitle: Constants.riskAssessment,
+                            data: assessment,
+                          );
+                        },
                       );
               },
             );

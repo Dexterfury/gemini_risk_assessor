@@ -137,36 +137,17 @@ class _DSTIScreenState extends State<DSTIScreen> {
                           ),
                         ],
                       )
-                    : Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: MySearchBar(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() {
-                                  _searchQuery = value;
-                                });
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: results.length,
-                              itemBuilder: (context, index) {
-                                final doc = results.elementAt(index);
-                                final data = doc.data() as Map<String, dynamic>;
-                                final assessment =
-                                    AssessmentModel.fromJson(data);
-                                return ListItem(
-                                  docTitle:
-                                      Constants.dailySafetyTaskInstructions,
-                                  data: assessment,
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                    : ListView.builder(
+                        itemCount: results.length,
+                        itemBuilder: (context, index) {
+                          final doc = results.elementAt(index);
+                          final data = doc.data() as Map<String, dynamic>;
+                          final assessment = AssessmentModel.fromJson(data);
+                          return ListItem(
+                            docTitle: Constants.dailySafetyTaskInstructions,
+                            data: assessment,
+                          );
+                        },
                       );
               },
             );

@@ -25,12 +25,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
     super.key,
     required this.appBarTitle,
     this.currentModel,
-    this.completed,
   });
 
   final String appBarTitle;
   final AssessmentModel? currentModel;
-  final Function()? completed;
 
   @override
   Widget build(BuildContext context) {
@@ -218,13 +216,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               currentModel == null
-                  ? BottonButtonsField(
-                      completed: () {
-                        if (completed != null) {
-                          completed!();
-                        }
-                      },
-                    )
+                  ? const BottonButtonsField()
                   : const SizedBox(
                       height: 20,
                     ),

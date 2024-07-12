@@ -159,13 +159,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     // navigate to screen depending on the clicked icon
                     return AssessmentDetailsScreen(
                       appBarTitle: docTitle,
-                      completed: () {
-                        showSnackBar(
-                            context: context,
-                            message: 'Successfully generated');
-
-                        // reset data
-                      },
                     );
                   },
                   transitionType: ContainerTransitionType.fadeThrough,
