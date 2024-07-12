@@ -10,14 +10,16 @@ class AnonymousLoginButton extends StatelessWidget {
   const AnonymousLoginButton({
     super.key,
     required this.authProvider,
+    required this.phoneNumberController,
   });
 
   final AuthProvider authProvider;
+  final TextEditingController phoneNumberController;
 
   @override
   Widget build(BuildContext context) {
     bool isAnonymous = authProvider.isUserAnonymous();
-    return authProvider.isLoading
+    return phoneNumberController.text.isNotEmpty
         ? const SizedBox()
         : MainAppButton(
             icon: Icons.person,

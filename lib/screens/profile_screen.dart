@@ -162,10 +162,153 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 10),
                   !isMyProfile
                       ? const SizedBox()
-                      : SettingsColumn(
-                          isDarkMode: isDarkMode,
-                          isAnonymous: isAnonymous,
-                        )
+                      : Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                'Settings',
+                                style: textStyle18w500,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Card(
+                              child: Column(
+                                children: [
+                                  SettingsListTile(
+                                    title: 'Notifications',
+                                    icon: Icons.notifications,
+                                    iconContainerColor: Colors.red,
+                                    onTap: () {
+                                      // navigate to account settings
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NotificationsScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  SettingsListTile(
+                                    title: 'Help',
+                                    icon: Icons.help,
+                                    iconContainerColor: Colors.yellow,
+                                    onTap: () {
+                                      // navigate to help center
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HelpScreen()));
+                                    },
+                                  ),
+                                  SettingsListTile(
+                                    title: 'About',
+                                    icon: Icons.info,
+                                    iconContainerColor: Colors.blue,
+                                    onTap: () {
+                                      // navigate to account settings
+                                    },
+                                  ),
+                                  ListTile(
+                                    contentPadding: const EdgeInsets.only(
+                                      // added padding for the list tile
+                                      left: 8.0,
+                                      right: 8.0,
+                                    ),
+                                    leading: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.deepPurple,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(
+                                          isDarkMode
+                                              ? Icons.nightlight_round
+                                              : Icons.wb_sunny_rounded,
+                                          color: isDarkMode
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    title: const Text('Change theme'),
+                                    trailing: Switch(
+                                        value: isDarkMode,
+                                        onChanged: (value) {
+                                          // set the isDarkMode to the value
+                                        }),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Card(
+                              child: Column(
+                                children: [
+                                  SettingsListTile(
+                                    title: isAnonymous
+                                        ? 'Create Account'
+                                        : 'Logout',
+                                    icon: Icons.logout_outlined,
+                                    iconContainerColor: Colors.red,
+                                    onTap: () {
+                                      if (isAnonymous) {
+                                        navigationController(
+                                          context: context,
+                                          route: Constants.logingRoute,
+                                        );
+                                        return;
+                                      }
+                                      MyDialogs.showMyAnimatedDialog(
+                                          context: context,
+                                          title: 'Logout',
+                                          content:
+                                              'Are you sure you want to logout?',
+                                          actions: [
+                                            ActionButton(
+                                              label: const Text(
+                                                'Cancel',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            ActionButton(
+                                              label: const Text(
+                                                'Log Out',
+                                              ),
+                                              onPressed: () {
+                                                // logout
+                                                context
+                                                    .read<AuthProvider>()
+                                                    .signOut()
+                                                    .whenComplete(() {
+                                                  // remove all routes and navigateo to loging screen
+                                                  Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const LoginScreen(),
+                                                    ),
+                                                    (route) => false,
+                                                  );
+                                                });
+                                              },
+                                            ),
+                                          ]);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                 ],
               ),
             ),
@@ -332,160 +475,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           popDialog();
         }
       },
-    );
-  }
-}
-
-class SettingsColumn extends StatelessWidget {
-  const SettingsColumn({
-    super.key,
-    required this.isDarkMode,
-    required this.isAnonymous,
-  });
-
-  final bool isDarkMode;
-  final bool isAnonymous;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 8.0),
-          child: Text(
-            'Settings',
-            style: textStyle18w500,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Card(
-          child: Column(
-            children: [
-              SettingsListTile(
-                title: 'Notifications',
-                icon: Icons.notifications,
-                iconContainerColor: Colors.red,
-                onTap: () {
-                  // navigate to account settings
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NotificationsScreen(),
-                    ),
-                  );
-                },
-              ),
-              SettingsListTile(
-                title: 'Help',
-                icon: Icons.help,
-                iconContainerColor: Colors.yellow,
-                onTap: () {
-                  // navigate to help center
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HelpScreen()));
-                },
-              ),
-              SettingsListTile(
-                title: 'About',
-                icon: Icons.info,
-                iconContainerColor: Colors.blue,
-                onTap: () {
-                  // navigate to account settings
-                },
-              ),
-              ListTile(
-                contentPadding: const EdgeInsets.only(
-                  // added padding for the list tile
-                  left: 8.0,
-                  right: 8.0,
-                ),
-                leading: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      isDarkMode
-                          ? Icons.nightlight_round
-                          : Icons.wb_sunny_rounded,
-                      color: isDarkMode ? Colors.black : Colors.white,
-                    ),
-                  ),
-                ),
-                title: const Text('Change theme'),
-                trailing: Switch(
-                    value: isDarkMode,
-                    onChanged: (value) {
-                      // set the isDarkMode to the value
-                    }),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        Card(
-          child: Column(
-            children: [
-              SettingsListTile(
-                title: isAnonymous ? 'Create Account' : 'Logout',
-                icon: Icons.logout_outlined,
-                iconContainerColor: Colors.red,
-                onTap: () {
-                  if (isAnonymous) {
-                    navigationController(
-                      context: context,
-                      route: Constants.logingRoute,
-                    );
-                    return;
-                  }
-                  MyDialogs.showMyAnimatedDialog(
-                      context: context,
-                      title: 'Logout',
-                      content: 'Are you sure you want to logout?',
-                      actions: [
-                        ActionButton(
-                          label: const Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ActionButton(
-                          label: const Text(
-                            'Log Out',
-                          ),
-                          onPressed: () {
-                            // logout
-                            context
-                                .read<AuthProvider>()
-                                .signOut()
-                                .whenComplete(() {
-                              // remove all routes and navigateo to loging screen
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            });
-                          },
-                        ),
-                      ]);
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

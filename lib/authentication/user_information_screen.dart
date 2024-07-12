@@ -13,7 +13,12 @@ import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class UserInformationScreen extends StatefulWidget {
-  const UserInformationScreen({super.key});
+  const UserInformationScreen({
+    super.key,
+    this.uid = '',
+  });
+
+  final String uid;
 
   @override
   State<UserInformationScreen> createState() => _UserInformationScreenState();
@@ -99,9 +104,10 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
   // save user data to firestore
   void saveUserDataToFireStore() async {
     final authProvider = context.read<AuthProvider>();
+    final uid = widget.uid.isNotEmpty ? widget.uid : authProvider.uid!;
 
     UserModel userModel = UserModel(
-      uid: authProvider.uid!,
+      uid: uid,
       name: _nameController.text.trim(),
       phone: authProvider.phoneNumber!,
       imageUrl: '',

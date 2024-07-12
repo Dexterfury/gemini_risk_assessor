@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -74,7 +76,10 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 30),
             phoneField(authProvider, context),
             const SizedBox(height: 30),
-            AnonymousLoginButton(authProvider: authProvider),
+            AnonymousLoginButton(
+              authProvider: authProvider,
+              phoneNumberController: _phoneNumberController,
+            ),
           ],
         ),
       ),
@@ -96,23 +101,26 @@ class _LoginScreenState extends State<LoginScreen> {
         });
         if (_phoneNumberController.text.length > 9) {
           final phoneNumber = '+${selectedCountry.phoneCode}$value';
-          // show loading Dialog
-          // show my alert dialog for loading
-          MyDialogs.showMyAnimatedDialog(
-            context: context,
-            title: 'Authenticating...',
-            loadingIndicator: const SizedBox(
-                height: 100, width: 100, child: LoadingPPEIcons()),
-          );
-
-          // sign in with phone number
-          authProvider.signInWithPhoneNumber(
-              phoneNumber: phoneNumber,
+          log('saving: $phoneNumber');
+          Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+            // show loading Dialog
+            // show my alert dialog for loading
+            MyDialogs.showMyAnimatedDialog(
               context: context,
-              onSuccess: () {
-                // pop the loading dialog
-                Navigator.pop(context);
-              });
+              title: 'Authenticating...',
+              loadingIndicator: const SizedBox(
+                  height: 100, width: 100, child: LoadingPPEIcons()),
+            );
+
+            // sign in with phone number
+            authProvider.signInWithPhoneNumber(
+                phoneNumber: phoneNumber,
+                context: context,
+                onSuccess: () {
+                  // pop the loading dialog
+                  Navigator.pop(context);
+                });
+          });
         }
       },
       decoration: InputDecoration(

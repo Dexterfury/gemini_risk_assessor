@@ -8,10 +8,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utilities/file_upload_handler.dart';
@@ -108,7 +110,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // save user data to firestore
-  void saveUserDataToFireStore({
+  Future<void> saveUserDataToFireStore({
     required UserModel userModel,
     required File? fileImage,
     required Function onSuccess,
@@ -236,65 +238,189 @@ class AuthProvider extends ChangeNotifier {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        User? currentUser = _auth.currentUser;
-
-        if (currentUser != null && currentUser.isAnonymous) {
-          log('linking');
-          // Link the anonymous user with the phone credential
-          await currentUser.linkWithCredential(credential).then((value) async {
-            _uid = value.user!.uid;
-            _phoneNumber = value.user!.phoneNumber;
-            _isSuccessful = true;
-            _isLoading = false;
-            notifyListeners();
-          }).catchError((e) {
-            _isSuccessful = false;
-            _isLoading = false;
-            notifyListeners();
-            showSnackBar(context: context, message: e.toString());
-            log('Error: ${e.toString()}');
-          });
-        } else {
-          // Sign in with the phone credential if no user is signed in anonymously
-          await _auth.signInWithCredential(credential).then((value) async {
-            _uid = value.user!.uid;
-            _phoneNumber = value.user!.phoneNumber;
-            _isSuccessful = true;
-            _isLoading = false;
-            notifyListeners();
-          });
+        final (User? user, bool wasAnonymous) =
+            await _handlePhoneAuthCredential(
+          credential,
+          context,
+        );
+        if (user != null) {
+          _uid = user.uid;
+          _phoneNumber = user.phoneNumber;
+          _isSuccessful = true;
+          _isLoading = false;
+          notifyListeners();
         }
       },
       verificationFailed: (FirebaseAuthException e) {
-        _isSuccessful = false;
-        _isLoading = false;
-        notifyListeners();
-        showSnackBar(context: context, message: e.toString());
-        log('Error: ${e.toString()}');
+        _handleVerificationFailed(e, context);
       },
       codeSent: (String verificationId, int? resendToken) async {
-        _isLoading = false;
-        _resendToken = resendToken;
-        _secondsRemaining = 60;
-        _startTimer();
-        notifyListeners();
-        onSuccess();
-
-        Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-          // navigate to otp screen
-          Navigator.of(context).pushNamed(
-            Constants.optRoute,
-            arguments: {
-              Constants.verificationId: verificationId,
-              Constants.phoneNumber: phoneNumber,
-            },
-          );
-        });
+        _handleCodeSent(
+            verificationId, resendToken, phoneNumber, context, onSuccess);
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: const Duration(seconds: 60),
       forceResendingToken: resendToken,
     );
+  }
+
+  Future<(User?, bool)> _handlePhoneAuthCredential(
+    PhoneAuthCredential credential,
+    BuildContext context,
+  ) async {
+    try {
+      User? currentUser = _auth.currentUser;
+      UserCredential userCredential;
+      bool wasAnonymouse = false;
+
+      if (currentUser != null && currentUser.isAnonymous) {
+        // If current user is anonymous, try to link the credential
+        log('is anonymouse');
+        try {
+          userCredential = await currentUser.linkWithCredential(credential);
+          wasAnonymouse = true;
+        } on FirebaseAuthException catch (e) {
+          log('sign out: ${e.code}');
+          if (e.code == 'credential-already-in-use') {
+            // If the credential is already associated with an account,
+            // sign out the anonymous user and sign in with the credential
+            await _auth.signOut();
+            userCredential = await _auth.signInWithCredential(credential);
+            wasAnonymouse = true;
+          } else {
+            log('ERROR: $e');
+            throw e;
+          }
+        }
+      } else {
+        log('HERE GOOD');
+        // If there's no current user or it's not anonymous, just sign in
+        userCredential = await _auth.signInWithCredential(credential);
+        wasAnonymouse = false;
+      }
+
+      //await _postSignInActions(context, userCredential.user!);
+      return (userCredential.user, wasAnonymouse);
+    } catch (e) {
+      return (null, false);
+      //_handleAuthError(e, context);
+    }
+  }
+
+  // Future<void> _postSignInActions(BuildContext context, User user) async {
+  //   _uid = user.uid;
+  //   _phoneNumber = user.phoneNumber;
+  //   _isSuccessful = true;
+  //   _isLoading = false;
+  //   notifyListeners();
+
+  //   bool userExists = await checkUserExistsInFirestore(user.uid);
+  //   if (userExists) {
+  //     await getUserDataFromFireStore(user.uid);
+  //     await saveUserDataToSharedPreferences();
+  //     navigationController(
+  //         context: context, route: Constants.screensControllerRoute);
+  //   } else {
+  //     // If the user doesn't exist in Firestore, we need to save their data
+  //     UserModel userModel = UserModel(
+  //       uid: user.uid,
+  //       name: user.displayName ??
+  //           "User${(1000 + (DateTime.now().millisecondsSinceEpoch % 9000))}",
+  //       phone: user.phoneNumber ?? '',
+  //       imageUrl: user.photoURL ?? '',
+  //       token: '',
+  //       aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+  //       createdAt: DateTime.now().toIso8601String(),
+  //     );
+  //     await saveUserDataToFireStore(userModel: userModel);
+  //     await saveUserDataToSharedPreferences();
+  //     navigationController(
+  //         context: context, route: Constants.screensControllerRoute);
+  //   }
+  // }
+
+  Future<void> verifyOTPCode({
+    required String verificationId,
+    required String otpCode,
+    required BuildContext context,
+    required Function() onSuccess,
+  }) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: otpCode,
+      );
+      final (User? user, bool wasAnonymous) =
+          await _handlePhoneAuthCredential(credential, context);
+
+      if (user != null) {
+        _uid = user.uid;
+        _phoneNumber = user.phoneNumber;
+        _isSuccessful = true;
+        _isLoading = false;
+        notifyListeners();
+      }
+      if (wasAnonymous) {
+        // if user was anonymouse, navigate to user information screen
+        await Future.delayed(const Duration(milliseconds: 200))
+            .whenComplete(() {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserInformationScreen(
+                uid: user!.uid,
+              ),
+            ),
+          );
+        });
+        return;
+      }
+      onSuccess();
+    } catch (e) {
+      _handleAuthError(e, context);
+    }
+  }
+
+  void _handleVerificationFailed(
+      FirebaseAuthException e, BuildContext context) {
+    _isSuccessful = false;
+    _isLoading = false;
+    notifyListeners();
+    showSnackBar(context: context, message: e.toString());
+    log('Error: ${e.toString()}');
+  }
+
+  void _handleCodeSent(
+    String verificationId,
+    int? resendToken,
+    String phoneNumber,
+    BuildContext context,
+    Function() onSuccess,
+  ) {
+    _isLoading = false;
+    _resendToken = resendToken;
+    _secondsRemaining = 60;
+    _startTimer();
+    notifyListeners();
+    onSuccess();
+
+    Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+      Navigator.of(context).pushNamed(
+        Constants.optRoute,
+        arguments: {
+          Constants.verificationId: verificationId,
+          Constants.phoneNumber: phoneNumber,
+        },
+      );
+    });
+  }
+
+  void _handleAuthError(dynamic error, BuildContext context) {
+    _isSuccessful = false;
+    _isLoading = false;
+    notifyListeners();
+    showSnackBar(context: context, message: error.toString());
+    log('Error: ${error.toString()}');
   }
 
   void _startTimer() {
@@ -366,34 +492,34 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // verify otp code
-  Future<void> verifyOTPCode({
-    required String verificationId,
-    required String otpCode,
-    required BuildContext context,
-    required Function onSuccess,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
+  // Future<void> verifyOTPCode({
+  //   required String verificationId,
+  //   required String otpCode,
+  //   required BuildContext context,
+  //   required Function onSuccess,
+  // }) async {
+  //   _isLoading = true;
+  //   notifyListeners();
 
-    final credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: otpCode,
-    );
+  //   final credential = PhoneAuthProvider.credential(
+  //     verificationId: verificationId,
+  //     smsCode: otpCode,
+  //   );
 
-    await _auth.signInWithCredential(credential).then((value) async {
-      _uid = value.user!.uid;
-      _phoneNumber = value.user!.phoneNumber;
-      _isSuccessful = true;
-      _isLoading = false;
-      onSuccess();
-      notifyListeners();
-    }).catchError((e) {
-      _isSuccessful = false;
-      _isLoading = false;
-      notifyListeners();
-      showSnackBar(context: context, message: e.toString());
-    });
-  }
+  //   await _auth.signInWithCredential(credential).then((value) async {
+  //     _uid = value.user!.uid;
+  //     _phoneNumber = value.user!.phoneNumber;
+  //     _isSuccessful = true;
+  //     _isLoading = false;
+  //     onSuccess();
+  //     notifyListeners();
+  //   }).catchError((e) {
+  //     _isSuccessful = false;
+  //     _isLoading = false;
+  //     notifyListeners();
+  //     showSnackBar(context: context, message: e.toString());
+  //   });
+  // }
 
   // update name
   Future<String> updateName({
