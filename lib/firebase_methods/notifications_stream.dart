@@ -106,6 +106,7 @@ class NotificationItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
+
       //trailing: // show indicator if not clicked
       onTap: () {
         // navigate to notification details page

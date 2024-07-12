@@ -1,5 +1,6 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/widgets/anonymous_login_button.dart';
@@ -17,15 +18,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneNumberController = TextEditingController();
 
   Country selectedCountry = Country(
-    phoneCode: '26',
-    countryCode: 'ZM',
+    phoneCode: '1',
+    countryCode: 'USA',
     e164Sc: 0,
     geographic: true,
     level: 1,
-    name: 'Zambia',
-    example: 'Zambia',
-    displayName: 'Zambia',
-    displayNameNoCountryCode: 'ZM',
+    name: 'USA',
+    example: 'USA',
+    displayName: 'USA',
+    displayNameNoCountryCode: 'US',
     e164Key: '',
   );
 
@@ -45,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
         vertical: 40.0,
       ),
       child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -86,7 +88,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextFormField(
       controller: _phoneNumberController,
       maxLength: 10,
-      enabled: authProvider.isLoading ? false : true,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
       onChanged: (value) {
@@ -95,13 +96,23 @@ class _LoginScreenState extends State<LoginScreen> {
         });
         if (_phoneNumberController.text.length > 9) {
           final phoneNumber = '+${selectedCountry.phoneCode}$value';
+          // show loading Dialog
+          // show my alert dialog for loading
+          MyDialogs.showMyAnimatedDialog(
+            context: context,
+            title: 'Authenticating...',
+            loadingIndicator: const SizedBox(
+                height: 100, width: 100, child: LoadingPPEIcons()),
+          );
+
           // sign in with phone number
           authProvider.signInWithPhoneNumber(
-            phoneNumber: phoneNumber,
-            context: context,
-          );
-        } else {
-          authProvider.setLoading(false);
+              phoneNumber: phoneNumber,
+              context: context,
+              onSuccess: () {
+                // pop the loading dialog
+                Navigator.pop(context);
+              });
         }
       },
       decoration: InputDecoration(
@@ -141,13 +152,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-        suffixIcon: authProvider.isLoading
-            ? const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
-              )
-            : null,
+        // suffixIcon: authProvider.isLoading
+        //     ? const Padding(
+        //         padding: EdgeInsets.all(8.0),
+        //         child: CircularProgressIndicator(),
+        //       )
         //     : null,
+        // //     : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),

@@ -53,18 +53,33 @@ class PdfApi {
     }
 
     // Add first page
-    final firstPage = document.pages.add();
-    addHeaderAndSignature(firstPage);
+    PdfPage currentPage = document.pages.add();
+    addHeaderAndSignature(currentPage);
 
     // Draw table on the first page
-    drawGrid(
+    List<PdfGrid> remainingGrids = await drawGrid(
       heading,
       assessmentModel,
-      firstPage,
+      currentPage,
       logo,
       ppeImages,
       selectedPPEImages,
     );
+
+// If there are remaining grids, create new pages
+    while (remainingGrids.isNotEmpty) {
+      currentPage = document.pages.add();
+      addHeaderAndSignature(currentPage);
+      remainingGrids = await drawGrid(
+        heading,
+        assessmentModel,
+        currentPage,
+        logo,
+        ppeImages,
+        selectedPPEImages,
+        initialGrids: remainingGrids,
+      );
+    }
 
     if (images.isNotEmpty) {
       // Add a new page for images
@@ -77,6 +92,9 @@ class PdfApi {
     final namesPage = document.pages.add();
     addHeaderAndSignature(namesPage);
     addNamesPage(namesPage);
+
+    // Add page numbers
+    addPageNumbers(document);
 
     return saveFile(
       document,
@@ -201,125 +219,126 @@ Date: $dateTime''';
     );
   }
 
-  static Future<void> drawGrid(
-    String heading,
-    AssessmentModel assessmentModel,
-    PdfPage page,
-    PdfBitmap logo,
-    List<(PdfBitmap, String)> ppeImages,
-    List<(PdfBitmap, String)> selectedPPEImages,
-  ) async {
+  static Future<List<PdfGrid>> drawGrid(
+      String heading,
+      AssessmentModel assessmentModel,
+      PdfPage page,
+      PdfBitmap logo,
+      List<(PdfBitmap, String)> ppeImages,
+      List<(PdfBitmap, String)> selectedPPEImages,
+      {List<PdfGrid>? initialGrids}) async {
     // Create a list of grids to add together for a custom grid
-    final List<PdfGrid> grids = [];
+    List<PdfGrid> grids = initialGrids ?? [];
 
-    // First grid with one column
-    final grid1 = PdfGrid();
-    // Second grid with two columns
-    final grid2 = PdfGrid();
-    // Third grid with one columns
-    final grid3 = PdfGrid();
-    // Fourth grid with three columns
-    final grid4 = PdfGrid();
-    // Fifth grid with one column
-    final grid5 = PdfGrid();
-    // Grid for PPE images with dynamic columns
-    final ppeGrid = PdfGrid();
-
-    // Add a column to grid1
-    grid1.columns.add(count: 1);
-    // Add two columns to grid2
-    grid2.columns.add(count: 2);
-    // Add a column to grid3
-    grid3.columns.add(count: 1);
-    // Add three columns to grid4
-    grid4.columns.add(count: 3);
-    // Add a column to grid5
-    grid5.columns.add(count: 1);
-    // Add dynamic columns to ppeGrid based on number of images
-    ppeGrid.columns.add(count: ppeImages.length);
-
-    // Make this a header and put the title of the assessment here
-    final headerRow1 = grid1.headers.add(1)[0];
-    // Make one header row for grid2 with "Task:" and "Date and Time:"
-    final headerRow2 = grid2.headers.add(1)[0];
-    // Make a header for grid3 for "Equipment and tools"
-    final headerRow3 = grid3.headers.add(1)[0];
-    // Make a header for grid4 for "Hazards", "Risk", and "Control"
-    final headerRow4 = grid4.headers.add(1)[0];
-    // Make this a header and put the summary
-    final headerRow5 = grid5.headers.add(1)[0];
-    // Remove the header row for PPE images
-    // final headerRowPPE = ppeGrid.headers.add(1)[0];
-
-    // Create a list of header rows
-    final headerRowList = [
-      headerRow1,
-      headerRow2,
-      headerRow3,
-      headerRow4,
-      headerRow5,
-      // headerRowPPE,
-    ];
-
-    // Get the header style for the grid
-    for (var headerRow in headerRowList) {
-      getHeaderStyle(headerRow);
-      getBackGroundColor(headerRow);
-      cellPadding(headerRow, 0, true);
+    if (grids.isEmpty) {
+      // Create new grids only if initialGrids is null or empty
+      grids.addAll([
+        createGrid1(assessmentModel),
+        createGrid2(assessmentModel),
+        createGrid3(assessmentModel),
+        createGrid4(assessmentModel),
+        createPPEGrid(ppeImages, selectedPPEImages),
+        createGrid5(assessmentModel),
+      ]);
     }
 
-    // Add the data in the first grid (grid1)
-    headerRow1.cells[0].value = assessmentModel.title.toUpperCase();
-    headerRow1.cells[0].style.stringFormat = await centerHeaderTitle();
-    grids.add(grid1);
+    // Initial vertical offset
+    double currentOffsetY = 80;
+    List<PdfGrid> remainingGrids = [];
 
-    // Add the data in the second grid (grid2)
-    headerRow2.cells[0].value = 'TASK:';
-    headerRow2.cells[1].value = 'DATE & TIME:';
-    // Cell padding Date and Time
-    cellPadding(headerRow2, 1, true);
+    // Draw all the grids one after the other
+    for (final grid in grids) {
+      final result = grid.draw(
+        page: page,
+        bounds: Rect.fromLTWH(
+          0,
+          currentOffsetY,
+          page.getClientSize().width,
+          0, // Height set to 0 for auto-height adjustment
+        ),
+        format: PdfLayoutFormat(
+          layoutType: PdfLayoutType.paginate,
+          breakType: PdfLayoutBreakType.fitPage,
+        ),
+      );
 
-    // Create a new row for the task and date/time data
-    final dataRow1 = grid2.rows.add();
-    dataRow1.cells[0].value = assessmentModel.taskToAchieve;
-    dataRow1.cells[1].value =
+      if (result != null) {
+        if (result.bounds.bottom > page.getClientSize().height - 50) {
+          // If the grid doesn't fit on the current page, add it to remainingGrids
+          remainingGrids.add(grid);
+          break;
+        } else {
+          // Update the current vertical offset for the next grid
+          currentOffsetY = result.bounds.bottom + 10; // Space between grids
+        }
+      }
+    }
+
+    return remainingGrids;
+  }
+
+  // Helper methods to create individual grids
+  static PdfGrid createGrid1(AssessmentModel assessmentModel) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 1);
+    final headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = assessmentModel.title.toUpperCase();
+    getHeaderStyle(headerRow);
+    getBackGroundColor(headerRow);
+    cellPadding(headerRow, 0, true);
+    return grid;
+  }
+
+  static PdfGrid createGrid2(AssessmentModel assessmentModel) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 2);
+    final headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = 'TASK:';
+    headerRow.cells[1].value = 'DATE & TIME:';
+    cellPadding(headerRow, 1, true);
+    final dataRow = grid.rows.add();
+    dataRow.cells[0].value = assessmentModel.taskToAchieve;
+    dataRow.cells[1].value =
         DateFormat.yMMMEd().format(assessmentModel.createdAt);
-    applyCellPaddingToRow(dataRow1, false);
-    grids.add(grid2);
+    applyCellPaddingToRow(dataRow, false);
+    return grid;
+  }
 
-    // Add the data in the third grid (grid3)
-    headerRow3.cells[0].value = "EQUIPMENT AND TOOLS TO BE USED";
-    headerRow3.cells[0].style.stringFormat = await centerHeaderTitle();
-
-    // Add the equipments list from the assessment model to grid3
+  static PdfGrid createGrid3(AssessmentModel assessmentModel) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 1);
+    final headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = "EQUIPMENT AND TOOLS TO BE USED";
+    centerHeaderTitle()
+        .then((format) => headerRow.cells[0].style.stringFormat = format);
     int index = 1;
     for (final equipment in assessmentModel.equipments) {
-      final dataRow = grid3.rows.add();
+      final dataRow = grid.rows.add();
       dataRow.cells[0].value = '${index++}. $equipment';
       applyCellPaddingToRow(dataRow, false);
     }
-    grids.add(grid3);
+    return grid;
+  }
 
-    // Add the data in the fourth grid (grid4)
-    headerRow4.cells[0].value = "HAZARDS";
-    headerRow4.cells[1].value = "RISKS";
-    headerRow4.cells[2].value = "CONTROL MEASURES";
-    // Center the text in the header
-    for (int i = 0; i < headerRow4.cells.count; i++) {
-      headerRow4.cells[i].style.stringFormat = await centerHeaderTitle();
-      cellPadding(headerRow4, i, true);
+  static PdfGrid createGrid4(AssessmentModel assessmentModel) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 3);
+    final headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = "HAZARDS";
+    headerRow.cells[1].value = "RISKS";
+    headerRow.cells[2].value = "CONTROL MEASURES";
+    for (int i = 0; i < headerRow.cells.count; i++) {
+      centerHeaderTitle()
+          .then((format) => headerRow.cells[i].style.stringFormat = format);
+      cellPadding(headerRow, i, true);
     }
-
-    // Add the data in the fourth grid (grid4)
     final maxLength = [
       assessmentModel.hazards.length,
       assessmentModel.risks.length,
       assessmentModel.control.length,
     ].reduce((a, b) => a > b ? a : b);
-
-    // Add the data in the fourth grid (grid4)
     for (int i = 0; i < maxLength; i++) {
-      final dataRow = grid4.rows.add();
+      final dataRow = grid.rows.add();
       dataRow.cells[0].value = i < assessmentModel.hazards.length
           ? '${i + 1}. ${assessmentModel.hazards[i]}'
           : '';
@@ -331,16 +350,15 @@ Date: $dateTime''';
           : '';
       applyCellPaddingToRow(dataRow, false);
     }
-    grids.add(grid4);
+    return grid;
+  }
 
-    // Add PPE images to ppeGrid without a header
-    // headerRowPPE.cells[0].value = "PERSONAL PROTECTIVE EQUIPMENT (PPE)";
-    // headerRowPPE.cells[0].style.stringFormat = await centerHeaderTitle();
-
-    // Add images to the ppeGrid
-    final ppeRow = ppeGrid.rows.add();
-    ppeRow.height = 50; // Set a fixed height for the row to accommodate images
-
+  static PdfGrid createPPEGrid(List<(PdfBitmap, String)> ppeImages,
+      List<(PdfBitmap, String)> selectedPPEImages) {
+    final grid = PdfGrid();
+    grid.columns.add(count: ppeImages.length);
+    final ppeRow = grid.rows.add();
+    ppeRow.height = 50;
     for (int i = 0; i < ppeImages.length; i++) {
       final (image, identifier) = ppeImages[i];
       ppeRow.cells[i].value = '';
@@ -349,48 +367,42 @@ Date: $dateTime''';
         alignment: PdfTextAlignment.center,
         lineAlignment: PdfVerticalAlignment.middle,
       );
-      // Add padding to the cells
       ppeRow.cells[i].style.cellPadding =
           PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
-
-      // Check if this PPE image is selected
       if (selectedPPEImages.any((selected) => selected.$2 == identifier)) {
-        // Set a background color for selected PPE images
         ppeRow.cells[i].style.backgroundBrush =
-            PdfSolidBrush(PdfColor(255, 255, 0)); // Yellow background
+            PdfSolidBrush(PdfColor(255, 255, 0));
       }
-
       applyCellPaddingToRow(ppeRow, false);
     }
-    grids.add(ppeGrid);
+    return grid;
+  }
 
-    // Add the summary to grid5
-    headerRow5.cells[0].value = "SUMMARY";
-    // Create a new row for the summary data
-    final dataRow5 = grid5.rows.add();
-    dataRow5.cells[0].value = assessmentModel.summary;
-    applyCellPaddingToRow(dataRow5, false);
-    grids.add(grid5);
+  static PdfGrid createGrid5(AssessmentModel assessmentModel) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 1);
+    final headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = "SUMMARY";
+    final dataRow = grid.rows.add();
+    dataRow.cells[0].value = assessmentModel.summary;
+    applyCellPaddingToRow(dataRow, false);
+    return grid;
+  }
 
-    // Initial vertical offset
-    double currentOffsetY = 80;
+  static void addPageNumbers(PdfDocument document) {
+    for (int i = 0; i < document.pages.count; i++) {
+      final page = document.pages[i];
+      final pageSize = page.getClientSize();
+      final font = PdfStandardFont(PdfFontFamily.helvetica, 10);
+      final format = PdfStringFormat(alignment: PdfTextAlignment.center);
 
-    // Draw all the grids one after the other
-    for (final grid in grids) {
-      final result = grid.draw(
-        page: page,
-        bounds: Rect.fromLTWH(
-          0,
-          currentOffsetY,
-          0,
-          0, // Height set to 0 for auto-height adjustment
-        ),
+      page.graphics.drawString(
+        'Page ${i + 1} of ${document.pages.count}',
+        font,
+        brush: PdfBrushes.black,
+        bounds: Rect.fromLTWH(0, pageSize.height - 25, pageSize.width, 20),
+        format: format,
       );
-
-      // Update the current vertical offset for the next grid
-      if (result != null) {
-        currentOffsetY += result.bounds.height + 10; // Space between grids
-      }
     }
   }
 

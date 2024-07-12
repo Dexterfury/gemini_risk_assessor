@@ -228,6 +228,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> signInWithPhoneNumber({
     required String phoneNumber,
     required BuildContext context,
+    required Function() onSuccess,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -238,6 +239,7 @@ class AuthProvider extends ChangeNotifier {
         User? currentUser = _auth.currentUser;
 
         if (currentUser != null && currentUser.isAnonymous) {
+          log('linking');
           // Link the anonymous user with the phone credential
           await currentUser.linkWithCredential(credential).then((value) async {
             _uid = value.user!.uid;
@@ -276,14 +278,18 @@ class AuthProvider extends ChangeNotifier {
         _secondsRemaining = 60;
         _startTimer();
         notifyListeners();
-        // navigate to otp screen
-        Navigator.of(context).pushNamed(
-          Constants.optRoute,
-          arguments: {
-            Constants.verificationId: verificationId,
-            Constants.phoneNumber: phoneNumber,
-          },
-        );
+        onSuccess();
+
+        Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+          // navigate to otp screen
+          Navigator.of(context).pushNamed(
+            Constants.optRoute,
+            arguments: {
+              Constants.verificationId: verificationId,
+              Constants.phoneNumber: phoneNumber,
+            },
+          );
+        });
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: const Duration(seconds: 60),
@@ -491,14 +497,16 @@ class AuthProvider extends ChangeNotifier {
 
   // generate a new token
   Future<void> generateNewToken() async {
-    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-    String? token = await firebaseMessaging.getToken();
+    if (_auth.currentUser != null) {
+      final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+      String? token = await firebaseMessaging.getToken();
 
-    log('Token: $token');
+      log('Token: $token');
 
-    // save token to firestore
-    _usersCollection.doc(_userModel!.uid).update({
-      Constants.token: token,
-    });
+      // save token to firestore
+      _usersCollection.doc(_userModel!.uid).update({
+        Constants.token: token,
+      });
+    }
   }
 }
