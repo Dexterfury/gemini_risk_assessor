@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 
@@ -69,6 +66,14 @@ class FirebaseMethods {
           .collection(Constants.assessmentCollection)
           .snapshots();
     }
+  }
+
+  // discussion stream from firestore
+  static Stream<QuerySnapshot> discussionStream({required String orgID}) {
+    return _organizationsCollection
+        .doc(orgID)
+        .collection(Constants.discussionsCollection)
+        .snapshots();
   }
 
   // stream organizations from firestore

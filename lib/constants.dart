@@ -114,6 +114,7 @@ class Constants {
   static const String awaitingApprovalUIDs = 'awaitingApprovalUIDs';
   static const String membersUIDs = 'membersUIDs';
   static const String adminsUIDs = 'adminsUIDs';
+  static const String requestToAcceptTerms = 'requestToAcceptTerms';
 
   static const String enterYourName = 'Enter your name';
   static const String organizationName = 'Enter name';
@@ -138,6 +139,7 @@ class Constants {
   static const String dstisChatsCollection = 'dstisChats';
   static const String chatDataCollection = 'chatData';
   static const String notificationsCollection = 'notifications';
+  static const String discussionsCollection = 'discussions';
 
   static const String organizationImage = 'organizationImage';
 

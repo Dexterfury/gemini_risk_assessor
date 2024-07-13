@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
+import 'package:gemini_risk_assessor/buttons/buttons_row.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -173,15 +175,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
               const SizedBox(height: 10),
 
               //  add members button if the user is an admin
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: buildButtonsRow(
-                  membersCount,
-                  context,
-                  orgID,
-                  isAdmin,
-                ),
-              ),
+              ButtonsRow(orgID: orgID),
 
               const SizedBox(height: 10),
 
@@ -286,53 +280,50 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     );
   }
 
-  Row buildButtonsRow(
-    String membersCount,
-    BuildContext context,
-    String orgID,
-    bool isAdmin,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildIconButton(Icons.assignment_add, orgID),
-        _buildIconButton(Icons.assignment_late_outlined, orgID),
-        _buildIconButton(Icons.handyman, orgID),
-      ],
-    );
-  }
+  // Row buildButtonsRow(
+  //   String orgID,
+  // ) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       _buildIconButton(Icons.assignment_add, orgID),
+  //       _buildIconButton(Icons.assignment_late_outlined, orgID),
+  //       _buildIconButton(Icons.handyman, orgID),
+  //     ],
+  //   );
+  // }
 
-  Widget _buildIconButton(
-    IconData icon,
-    String orgID,
-  ) {
-    return OpenContainer(
-      closedColor: Theme.of(context).colorScheme.primary,
-      closedBuilder: (context, action) {
-        return IconButton(
-          onPressed: () async {
-            // set search data depending on the clicked icon
-            await _setSearchData(context, icon);
-            action();
-          },
-          icon: Icon(
-            icon,
-            color: Colors.white,
-          ),
-        );
-      },
-      openBuilder: (context, action) {
-        // navigate to screen depending on the clicked icon
-        return _navigateToScreen(icon, orgID);
-      },
-      transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 500),
-      closedShape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      closedElevation: 4,
-      openElevation: 4,
-    );
-  }
+  // Widget _buildIconButton(
+  //   IconData icon,
+  //   String orgID,
+  // ) {
+  //   return OpenContainer(
+  //     closedColor: Theme.of(context).colorScheme.primary,
+  //     closedBuilder: (context, action) {
+  //       return IconButton(
+  //         onPressed: () async {
+  //           // set search data depending on the clicked icon
+  //           await _setSearchData(context, icon);
+  //           action();
+  //         },
+  //         icon: Icon(
+  //           icon,
+  //           color: Colors.white,
+  //         ),
+  //       );
+  //     },
+  //     openBuilder: (context, action) {
+  //       // navigate to screen depending on the clicked icon
+  //       return _navigateToScreen(icon, orgID);
+  //     },
+  //     transitionType: ContainerTransitionType.fadeThrough,
+  //     transitionDuration: const Duration(milliseconds: 500),
+  //     closedShape:
+  //         RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  //     closedElevation: 4,
+  //     openElevation: 4,
+  //   );
+  // }
 
   // Widget _buildMembersSection(String membersCount, BuildContext context) {
   //   return GestureDetector(
@@ -626,35 +617,5 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     } else {
       return '${(count / 1000000).floor()}M+';
     }
-  }
-}
-
-Widget _navigateToScreen(IconData icon, String orgID) {
-  switch (icon) {
-    case Icons.assignment_add:
-      return DSTIScreen(
-        orgID: orgID,
-      );
-    case Icons.assignment_late_outlined:
-      return RiskAssessmentsScreen(orgID: orgID);
-    case Icons.handyman:
-      return ToolsScreen(
-        orgID: orgID,
-      );
-    default:
-      return const SizedBox();
-  }
-}
-
-_setSearchData(
-  BuildContext context,
-  IconData icon,
-) async {
-  if (icon == Icons.assignment_add) {
-    await context.read<TabProvider>().dataSearch(0);
-  } else if (icon == Icons.assignment_late_outlined) {
-    await context.read<TabProvider>().dataSearch(1);
-  } else {
-    await context.read<TabProvider>().dataSearch(2);
   }
 }
