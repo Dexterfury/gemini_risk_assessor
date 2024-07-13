@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +58,7 @@ class NotificationsStream extends StatelessWidget {
             final data = doc.data() as Map<String, dynamic>;
             final notification = NotificationModel.fromJson(data);
             return NotificationItem(
+              uid: uid,
               notification: notification,
             );
           },
@@ -72,14 +71,15 @@ class NotificationsStream extends StatelessWidget {
 class NotificationItem extends StatelessWidget {
   const NotificationItem({
     super.key,
+    required this.uid,
     required this.notification,
   });
 
+  final String uid;
   final NotificationModel notification;
 
   @override
   Widget build(BuildContext context) {
-    log('type: ${notification.notificationType}');
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: SizedBox(
@@ -112,10 +112,25 @@ class NotificationItem extends StatelessWidget {
       ),
 
       //trailing: // show indicator if not clicked
-      onTap: () {
-        // navigate to notification details page
-        navigateToNotificationDetailsPage(context, notification);
+      onTap: () async {
+        // set was clicked to true
+        await FirebaseMethods.setNotificationClicked(
+          uid: uid,
+          notificationID: notification.notificationID,
+        ).whenComplete(() {
+          // navigate to notification details page
+          navigateToNotificationDetailsPage(
+            context,
+            notification,
+          );
+        });
       },
+      trailing: notification.wasClicked
+          ? null
+          : const CircleAvatar(
+              radius: 10,
+              backgroundColor: Colors.blue,
+            ),
     );
   }
 
@@ -156,17 +171,19 @@ class NotificationItem extends StatelessWidget {
         break;
       case Constants.organizationInvitation:
         // get organization model and navigate to organization details page
-        final orgModel = await FirebaseMethods.getOrganizationData(
+        FirebaseMethods.getOrganizationData(
           orgID: notification.organizationID,
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrganizationDetails(
-              orgModel: orgModel,
+        ).then((orgModel) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrganizationDetails(
+                orgModel: orgModel,
+              ),
             ),
-          ),
-        );
+          );
+        });
+
         break;
       default:
         Navigator.push(

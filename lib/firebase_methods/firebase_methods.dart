@@ -203,4 +203,18 @@ class FirebaseMethods {
         .doc(toolModel.id)
         .set(toolModel.toJson());
   }
+
+  // set notification was clicked to true
+  static Future<void> setNotificationClicked({
+    required String uid,
+    required String notificationID,
+  }) async {
+    await _usersCollection
+        .doc(uid)
+        .collection(Constants.notificationsCollection)
+        .doc(notificationID)
+        .update({
+      Constants.wasClicked: true,
+    });
+  }
 }
