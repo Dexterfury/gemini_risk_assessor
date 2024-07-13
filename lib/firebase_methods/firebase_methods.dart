@@ -9,10 +9,6 @@ class FirebaseMethods {
       FirebaseFirestore.instance.collection(Constants.usersCollection);
   static final CollectionReference _organizationsCollection =
       FirebaseFirestore.instance.collection(Constants.organizationCollection);
-  static final CollectionReference _dstiCollection =
-      FirebaseFirestore.instance.collection(Constants.dstiCollections);
-  static final CollectionReference _assessementsCollection =
-      FirebaseFirestore.instance.collection(Constants.assessmentCollection);
   static final CollectionReference _toolsCollection =
       FirebaseFirestore.instance.collection(Constants.toolsCollection);
 

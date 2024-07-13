@@ -67,7 +67,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                     : null,
                 body: const Center(
                   child: Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(20.0),
                     child: Text('No Risk Assessments Yet!',
                         textAlign: TextAlign.center, style: textStyle18w500),
                   ),

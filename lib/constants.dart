@@ -105,6 +105,9 @@ class Constants {
 
   static const String orgArg = 'orgArg';
 
+  static const String sharedWith = 'Shared With';
+  static const String discussions = 'Discussions';
+
   // organization model constants
   static const String creatorUID = 'creatorUID';
   static const String aboutOrganization = 'aboutOrganization';

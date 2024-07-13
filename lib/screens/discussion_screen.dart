@@ -57,7 +57,7 @@ class _DiscussionScreenState extends State<DiscussionScreen> {
                 appBar: widget.orgID.isNotEmpty
                     ? const MyAppBar(
                         leading: BackButton(),
-                        title: 'Discussions',
+                        title: Constants.discussions,
                       )
                     : null,
                 body: Center(
@@ -103,7 +103,7 @@ class _DiscussionScreenState extends State<DiscussionScreen> {
                       leading: const BackButton(),
                       title: const FittedBox(
                         child: Text(
-                          Constants.riskAssessments,
+                          Constants.discussions,
                         ),
                       ),
                       actions: [
