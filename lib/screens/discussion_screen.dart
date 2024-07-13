@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/discussion_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
 
 class DiscussionScreen extends StatefulWidget {
@@ -56,11 +60,27 @@ class _DiscussionScreenState extends State<DiscussionScreen> {
                         title: 'Discussions',
                       )
                     : null,
-                body: const Center(
+                body: Center(
                   child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text('No Discussions Yet!',
-                        textAlign: TextAlign.center, style: textStyle18w500),
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'No Discussions Yet!',
+                          textAlign: TextAlign.center,
+                          style: textStyle18w500,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        MainAppButton(
+                          label: ' Start a Discussion ',
+                          borderRadius: 15.0,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -116,10 +136,10 @@ class _DiscussionScreenState extends State<DiscussionScreen> {
                                   final doc = results.elementAt(index);
                                   final data =
                                       doc.data() as Map<String, dynamic>;
-                                  final item = AssessmentModel.fromJson(data);
-                                  return ListItem(
-                                    docTitle: Constants.riskAssessments,
-                                    data: item,
+                                  final item = DiscussionModel.fromJson(data);
+                                  return ListTile(
+                                    title: Text(item.title),
+                                    subtitle: Text(item.description),
                                   );
                                 },
                                 childCount: results.length,

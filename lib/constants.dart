@@ -76,6 +76,7 @@ class Constants {
   static const String pdfFiles = 'pdfFiles';
   static const String toolPdf = 'toolPdf';
   static const String description = 'description';
+  static const String discussingAbout = 'discussingAbout';
 
   // constants for promptDataModel
   static const String images = 'images';

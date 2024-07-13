@@ -128,16 +128,16 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     return Scaffold(
       appBar: MyAppBar(
         title: 'Organisation Details',
-        leading: BackButton(),
+        leading: const BackButton(),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: AnimatedChatButton(
-              onPressed: () async {},
-              size: ChatButtonSize.small,
-              iconColor: Colors.white,
-            ),
-          ),
+          isAdmin
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(FontAwesomeIcons.gear, size: 20)),
+                )
+              : const SizedBox(),
         ],
       ),
       body: Padding(
