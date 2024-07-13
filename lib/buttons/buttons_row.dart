@@ -13,9 +13,11 @@ class ButtonsRow extends StatelessWidget {
   const ButtonsRow({
     super.key,
     required this.orgID,
+    required this.isAdmin,
   });
 
   final String orgID;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +28,16 @@ class ButtonsRow extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              buildButton(Icons.assignment_add, orgID, 'DSTI'),
+              buildButton(Icons.assignment_add, orgID, 'DSTI', isAdmin),
               const SizedBox(
                 width: 5,
               ),
-              buildButton(Icons.assignment_late_outlined, orgID, 'Assessments'),
+              buildButton(
+                Icons.assignment_late_outlined,
+                orgID,
+                'Assessments',
+                isAdmin,
+              ),
               const SizedBox(
                 width: 5,
               ),
@@ -38,6 +45,7 @@ class ButtonsRow extends StatelessWidget {
                 Icons.handyman,
                 orgID,
                 Constants.tools,
+                isAdmin,
               ),
               const SizedBox(
                 width: 5,
@@ -46,6 +54,7 @@ class ButtonsRow extends StatelessWidget {
                 FontAwesomeIcons.peopleGroup,
                 orgID,
                 'Discussions',
+                isAdmin,
               ),
             ],
           ),
@@ -55,7 +64,12 @@ class ButtonsRow extends StatelessWidget {
   }
 }
 
-Widget buildButton(IconData icon, String orgID, String label) {
+Widget buildButton(
+  IconData icon,
+  String orgID,
+  String label,
+  bool isAdmin,
+) {
   return OpenContainer(
     //closedColor: Colors.transparent,
     closedBuilder: (context, action) {
@@ -66,11 +80,7 @@ Widget buildButton(IconData icon, String orgID, String label) {
             vertical: 4,
           ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onPressed: () async {
-            // set search data depending on the clicked icon
-            await _setSearchData(context, icon);
-            action();
-          },
+          onPressed: action,
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: FittedBox(
@@ -96,7 +106,11 @@ Widget buildButton(IconData icon, String orgID, String label) {
     },
     openBuilder: (context, action) {
       // navigate to screen depending on the clicked icon
-      return _navigateToScreen(icon, orgID);
+      return _navigateToScreen(
+        icon,
+        orgID,
+        isAdmin,
+      );
     },
     transitionType: ContainerTransitionType.fadeThrough,
     transitionDuration: const Duration(milliseconds: 500),
@@ -107,7 +121,11 @@ Widget buildButton(IconData icon, String orgID, String label) {
   );
 }
 
-Widget _navigateToScreen(IconData icon, String orgID) {
+Widget _navigateToScreen(
+  IconData icon,
+  String orgID,
+  bool isAdmin,
+) {
   switch (icon) {
     case Icons.assignment_add:
       return DSTIScreen(
@@ -122,19 +140,7 @@ Widget _navigateToScreen(IconData icon, String orgID) {
     default:
       return DiscussionScreen(
         orgID: orgID,
+        isAdmin: isAdmin,
       );
-  }
-}
-
-_setSearchData(
-  BuildContext context,
-  IconData icon,
-) async {
-  if (icon == Icons.assignment_add) {
-    await context.read<TabProvider>().dataSearch(0);
-  } else if (icon == Icons.assignment_late_outlined) {
-    await context.read<TabProvider>().dataSearch(1);
-  } else {
-    await context.read<TabProvider>().dataSearch(2);
   }
 }

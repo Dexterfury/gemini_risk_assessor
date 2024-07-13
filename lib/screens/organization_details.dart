@@ -175,7 +175,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
               const SizedBox(height: 10),
 
               //  add members button if the user is an admin
-              ButtonsRow(orgID: orgID),
+              ButtonsRow(
+                orgID: orgID,
+                isAdmin: isAdmin,
+              ),
 
               const SizedBox(height: 10),
 
