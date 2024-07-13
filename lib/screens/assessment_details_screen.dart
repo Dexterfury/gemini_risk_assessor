@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -61,6 +65,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
     final control = assessmentModel.control;
     // summary
     final summary = assessmentModel.summary;
+    // pdf
+    final pdfUrl = assessmentModel.pdfUrl;
+    // id
+    final id = assessmentModel.id;
 
     // get generationType
     final generationType = getGenerationType(appBarTitle);
@@ -189,29 +197,69 @@ class AssessmentDetailsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.50,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        getCreatedBy(
+                          context,
+                          currentModel,
+                        ),
+                        Text(formattedTime),
+                      ],
+                    ),
+                  ),
+                  Row(
                     children: [
-                      getCreatedBy(
-                        context,
-                        currentModel,
+                      currentModel == null
+                          ? const SizedBox()
+                          :
+                          // pdf icon
+                          IconButton(
+                              onPressed: () async {
+                                // show my alert dialog for loading
+                                MyDialogs.showMyAnimatedDialog(
+                                  context: context,
+                                  title: 'Processing',
+                                  loadingIndicator: const SizedBox(
+                                      height: 100,
+                                      width: 100,
+                                      child: LoadingPPEIcons()),
+                                );
+                                // open pdf
+                                await context
+                                    .read<AssessmentProvider>()
+                                    .openPdf(
+                                      pdfUrl: pdfUrl,
+                                      fileName: '$id.pdf',
+                                      onSuccess: () {
+                                        //pop loading dialog
+                                        Navigator.of(context).pop();
+                                      },
+                                      onError: (error) {
+                                        //pop loading dialog
+                                        Navigator.of(context).pop();
+                                        showSnackBar(
+                                          context: context,
+                                          message: 'Error loading PDF file',
+                                        );
+                                      },
+                                    );
+                              },
+                              icon: const Icon(
+                                FontAwesomeIcons.filePdf,
+                              ),
+                            ),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          FontAwesomeIcons.share,
+                        ),
                       ),
-                      Text('Date: $formattedTime'),
                     ],
                   ),
-                  currentModel == null
-                      ? const SizedBox()
-                      :
-                      // pdf icon
-                      GestureDetector(
-                          onTap: () {
-                            // open pdf
-                          },
-                          child: const IconContainer(
-                            icon: Icons.picture_as_pdf_rounded,
-                            containerColor: Colors.blue,
-                          ),
-                        ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -254,12 +302,20 @@ class AssessmentDetailsScreen extends StatelessWidget {
             );
           } else {
             String creatorName = snapshot.data ?? '';
-            return Text(
-              'Creator: $creatorName',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+            return Row(
+              children: [
+                const Icon(
+                  FontAwesomeIcons.user,
+                  size: 16.0,
+                ),
+                Text(
+                  ' $creatorName',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             );
           }
         },

@@ -192,18 +192,20 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // open pdf assessment file
-  Future<void> openPdf(String url, String filename) async {
-    _isLoading = true;
-    notifyListeners();
-
+  Future<void> openPdf({
+    required String pdfUrl,
+    required String fileName,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
     try {
-      await PDFHandler.openPDF(url, filename);
+      await PDFHandler.openPDF(pdfUrl, fileName);
     } catch (e) {
       print("Error opening PDF: $e");
+      onError(e.toString());
       // Handle error (e.g., show an error message to the user)
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      onSuccess();
     }
   }
 
