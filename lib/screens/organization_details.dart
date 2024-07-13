@@ -116,110 +116,121 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthProvider>().userModel!.uid;
-    bool isAdmin = widget.orgModel.adminsUIDs.contains(uid);
-    String orgID = widget.orgModel.organizationID;
-    String membersCount = getMembersCount(widget.orgModel);
-    bool showAcceptBtn = widget.orgModel.awaitingApprovalUIDs.contains(uid);
-    return Scaffold(
-      appBar: MyAppBar(
-        title: 'Organisation Details',
-        leading: const BackButton(),
-        actions: [
-          isAdmin
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: IconButton(
-                      onPressed: () async {
-                        context
-                            .read<OrgSettingsProvider>()
-                            .setOrganizationModel(widget.orgModel)
-                            .whenComplete(() {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const OrganizationSettingsScreen(),
-                            ),
-                          );
-                        });
-                      },
-                      icon: const Icon(FontAwesomeIcons.gear, size: 20)),
-                )
-              : const SizedBox(),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      //  organisation name and image
-                      buildImageAndName(
-                        isAdmin,
-                        context,
-                        showAcceptBtn,
-                        widget.orgModel,
-                        uid,
-                      ),
 
-                      const SizedBox(height: 10),
+    return Consumer<OrganizationProvider>(
+        builder: (context, orgProvider, child) {
+      bool isAdmin = orgProvider.organizationModel.adminsUIDs.contains(uid);
+      String orgID = orgProvider.organizationModel.organizationID;
+      String membersCount = getMembersCount(orgProvider.organizationModel);
+      bool showAcceptBtn =
+          orgProvider.organizationModel.awaitingApprovalUIDs.contains(uid);
+      return Scaffold(
+        appBar: MyAppBar(
+          title: 'Organisation Details',
+          leading: const BackButton(),
+          actions: [
+            isAdmin
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: IconButton(
+                        onPressed: () async {
+                          context
+                              .read<OrgSettingsProvider>()
+                              .setOrganizationModel(
+                                  orgProvider.organizationModel)
+                              .whenComplete(() {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const OrganizationSettingsScreen(),
+                              ),
+                            );
+                          });
+                        },
+                        icon: const Icon(FontAwesomeIcons.gear, size: 20)),
+                  )
+                : const SizedBox(),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        //  organisation name and image
+                        buildImageAndName(
+                          isAdmin,
+                          context,
+                          showAcceptBtn,
+                          orgProvider,
+                          uid,
+                        ),
 
-                      // divider
-                      const Divider(
-                        thickness: 1,
-                        color: Colors.black26,
-                      ),
+                        const SizedBox(height: 10),
 
-                      //  organisation description
-                      buildDescription(isAdmin),
-                    ],
+                        // divider
+                        const Divider(
+                          thickness: 1,
+                          color: Colors.black26,
+                        ),
+
+                        //  organisation description
+                        buildDescription(
+                          isAdmin,
+                          orgProvider,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              //  add members button if the user is an admin
-              ButtonsRow(
-                orgID: orgID,
-                isAdmin: isAdmin,
-              ),
+                //  add members button if the user is an admin
+                ButtonsRow(
+                  orgID: orgID,
+                  isAdmin: isAdmin,
+                ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // members list if the user is an admin
-              buildMembersList(
-                isAdmin,
-                uid,
-                orgID,
-              )
-            ],
+                // members list if the user is an admin
+                buildMembersList(
+                  isAdmin,
+                  uid,
+                  orgID,
+                  orgProvider,
+                )
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton: MyFabButton(
-        animationController: _animationController,
-        animation: _animation,
-        organisationID: widget.orgModel.organizationID,
-      ),
-    );
+        floatingActionButton: MyFabButton(
+          animationController: _animationController,
+          animation: _animation,
+          organisationID: orgProvider.organizationModel.organizationID,
+        ),
+      );
+    });
   }
 
   Column buildMembersList(
     bool isAdmin,
     String uid,
     String orgID,
+    OrganizationProvider orgProvider,
   ) {
     return Column(
       children: [
         // members list
         MembersCard(
-          orgModel: widget.orgModel,
+          orgModel: orgProvider.organizationModel,
           isAdmin: isAdmin,
         ),
         const SizedBox(height: 10),
@@ -383,7 +394,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
         ]);
   }
 
-  Column buildDescription(bool isAdmin) {
+  Column buildDescription(
+    bool isAdmin,
+    OrganizationProvider orgProvider,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -405,16 +419,19 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                           context: context,
                           title: 'Edit Description',
                           content: Constants.changeDescription,
-                          hintText: widget.orgModel.aboutOrganization,
+                          hintText:
+                              orgProvider.organizationModel.aboutOrganization,
                           textAction: "Change",
                           onActionTap: (value, updatedText) async {
                             if (value) {
                               final authProvider = context.read<AuthProvider>();
                               final desc = await authProvider.updateDescription(
                                 isUser: false,
-                                id: widget.orgModel.organizationID,
+                                id: orgProvider
+                                    .organizationModel.organizationID,
                                 newDesc: updatedText,
-                                oldDesc: widget.orgModel.aboutOrganization,
+                                oldDesc: orgProvider
+                                    .organizationModel.aboutOrganization,
                               );
                               if (desc == 'Invalid description.') return;
                               await setNewDescriptionInProvider(desc);
@@ -440,7 +457,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
           height: 5,
         ),
         Text(
-          widget.orgModel.aboutOrganization,
+          orgProvider.organizationModel.aboutOrganization,
           style: textStyle16w600,
         ),
       ],
@@ -451,7 +468,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     bool isAdmin,
     BuildContext context,
     bool showAcceptBtn,
-    OrganizationModel orgModel,
+    OrganizationProvider orgProvider,
     String uid,
   ) {
     return SizedBox(
@@ -462,7 +479,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
           DisplayOrgImage(
             isViewOnly: true,
             fileImage: _finalFileImage,
-            imageUrl: widget.orgModel.imageUrl!,
+            imageUrl: orgProvider.organizationModel.imageUrl ?? '',
             onPressed: !isAdmin
                 ? null
                 : () async {
@@ -481,9 +498,9 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                       final imageUrl = await FileUploadHandler.updateImage(
                         file: file,
                         isUser: false,
-                        id: widget.orgModel.organizationID,
+                        id: orgProvider.organizationModel.organizationID,
                         reference:
-                            '${Constants.organizationImage}/${widget.orgModel.organizationID}.jpg',
+                            '${Constants.organizationImage}/${orgProvider.organizationModel.organizationID}.jpg',
                       );
 
                       // set newimage in provider
@@ -506,7 +523,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                   children: [
                     Flexible(
                       child: Text(
-                        widget.orgModel.name,
+                        orgProvider.organizationModel.name,
                         style: textStyle18Bold,
                         softWrap: true,
                         overflow: TextOverflow.visible,
@@ -520,7 +537,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                             context: context,
                             title: 'Edit Name',
                             content: Constants.changeName,
-                            hintText: widget.orgModel.name,
+                            hintText: orgProvider.organizationModel.name,
                             textAction: "Change",
                             onActionTap: (value, updatedText) async {
                               if (value) {
@@ -528,9 +545,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                                     context.read<AuthProvider>();
                                 final name = await authProvider.updateName(
                                   isUser: false,
-                                  id: widget.orgModel.organizationID,
+                                  id: orgProvider
+                                      .organizationModel.organizationID,
                                   newName: updatedText,
-                                  oldName: widget.orgModel.name,
+                                  oldName: orgProvider.organizationModel.name,
                                 );
                                 if (name == 'Invalid name.') return;
                                 // set new name
@@ -600,16 +618,20 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                         icon: Icons.person_add,
                         label: 'Accept Invite',
                         contanerColor: Colors.orangeAccent,
-                        onTap: () {
+                        onTap: () async {
                           // accept invite
                           // first check if admin set to read terms and conditions
-                          if (orgModel.requestToReadTerms) {
+                          if (orgProvider
+                              .organizationModel.requestToReadTerms) {
                             if (!_hasReadTerms) {
                               MyDialogs.animatedTermsDialog(
                                   context: context,
                                   title: "Terms and Conditions",
-                                  content: orgModel.organizationTerms,
-                                  isMember: orgModel.membersUIDs.contains(uid),
+                                  content: orgProvider
+                                      .organizationModel.organizationTerms,
+                                  isMember: orgProvider
+                                      .organizationModel.membersUIDs
+                                      .contains(uid),
                                   onAccept: () {
                                     // Handle acceptance here
                                     // join org and update data in firestore
@@ -618,29 +640,56 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                                     setState(() {
                                       _hasReadTerms = true;
                                     });
-                                    // update user data in firestore to add to members list and update role to member
                                   },
                                   onDecline: () {
                                     // Handle decline here
                                     Navigator.of(context)
                                         .pop(); // Close the dialog
                                   });
+                            } else {
+                              // join org and update data in firestore
+                              await orgProvider
+                                  .addMemberToOrganization(
+                                uid: uid,
+                              )
+                                  .whenComplete(() {
+                                showSnackBar(
+                                  context: context,
+                                  message:
+                                      'You are a member of this Organization',
+                                );
+                              });
                             }
                           } else {
                             // join org and update data in firestore
+                            // join org and update data in firestore
+                            await orgProvider
+                                .addMemberToOrganization(
+                              uid: uid,
+                            )
+                                .whenComplete(() {
+                              showSnackBar(
+                                context: context,
+                                message:
+                                    'You are a member of this Organization',
+                              );
+                            });
                           }
                         },
                       )
                     : Container(),
-                orgModel.organizationTerms.isNotEmpty
+                orgProvider.organizationModel.organizationTerms.isNotEmpty
                     ? TextButton(
                         onPressed: () {
                           // show terms and conditions dialog
                           MyDialogs.animatedTermsDialog(
                               context: context,
                               title: "Terms and Conditions",
-                              content: orgModel.organizationTerms,
-                              isMember: orgModel.membersUIDs.contains(uid),
+                              content: orgProvider
+                                  .organizationModel.organizationTerms,
+                              isMember: orgProvider
+                                  .organizationModel.membersUIDs
+                                  .contains(uid),
                               onAccept: () {
                                 // Handle acceptance here
                                 Navigator.of(context).pop(); // Close the dialog

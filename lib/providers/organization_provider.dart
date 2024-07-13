@@ -141,6 +141,56 @@ class OrganizationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // add member to organization
+  Future<void> addMemberToOrganization({
+    required String uid,
+  }) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final DocumentReference orgRef =
+        _organizationCollection.doc(organizationModel.organizationID);
+
+    return firestore.runTransaction((transaction) async {
+      final DocumentSnapshot orgSnapshot = await transaction.get(orgRef);
+
+      if (!orgSnapshot.exists) {
+        throw Exception('Organization does not exist');
+      }
+
+      final OrganizationModel org = OrganizationModel.fromJson(
+          orgSnapshot.data() as Map<String, dynamic>);
+
+      if (!org.awaitingApprovalUIDs.contains(uid)) {
+        throw Exception('User is not in the awaiting approval list');
+      }
+
+      if (org.membersUIDs.contains(uid)) {
+        throw Exception('User is already a member');
+      }
+
+      // Remove UID from awaiting approval list
+      final List<String> updatedAwaitingApproval =
+          List.from(org.awaitingApprovalUIDs)..remove(uid);
+
+      // remove uid from awaiting approval local list
+      _organizationModel.awaitingApprovalUIDs
+          .removeWhere((element) => element == uid);
+
+      // Add UID to members list
+      final List<String> updatedMembers = List.from(org.membersUIDs)..add(uid);
+
+      // update local temp list
+      _organizationModel.membersUIDs.add(uid);
+
+      notifyListeners();
+
+      // Update the document
+      transaction.update(orgRef, {
+        Constants.awaitingApprovalUIDs: updatedAwaitingApproval,
+        Constants.membersUIDs: updatedMembers,
+      });
+    });
+  }
+
   // add member to temp list for saving changes later
   void addMemberToTempOrg({
     required String memberUID,
