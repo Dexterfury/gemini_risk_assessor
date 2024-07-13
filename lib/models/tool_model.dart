@@ -5,7 +5,7 @@ import '../utilities/global.dart';
 
 class ToolModel {
   String id;
-  String name;
+  String title;
   String description;
   String summary;
   String toolPdf;
@@ -19,7 +19,7 @@ class ToolModel {
   // constructor
   ToolModel({
     required this.id,
-    required this.name,
+    required this.title,
     required this.description,
     required this.summary,
     required this.toolPdf,
@@ -47,7 +47,7 @@ class ToolModel {
     if (json is Map<String, dynamic>) {
       return ToolModel(
         id: toolId,
-        name: json[Constants.name] ?? '',
+        title: json[Constants.title] ?? '',
         description: json[Constants.description] ?? '',
         summary: json[Constants.summary] ?? '',
         toolPdf: json[Constants.toolPdf] ?? '',
@@ -67,7 +67,7 @@ class ToolModel {
   factory ToolModel.fromJson(Map<String, dynamic> json) {
     return ToolModel(
       id: json[Constants.id] ?? '',
-      name: json[Constants.name] ?? '',
+      title: json[Constants.title] ?? '',
       description: json[Constants.description] ?? '',
       summary: json[Constants.summary] ?? '',
       toolPdf: json[Constants.toolPdf] ?? '',
@@ -84,7 +84,7 @@ class ToolModel {
   Map<String, dynamic> toJson() {
     return {
       Constants.id: id,
-      Constants.name: name,
+      Constants.name: title,
       Constants.description: description,
       Constants.summary: summary,
       Constants.toolPdf: toolPdf,

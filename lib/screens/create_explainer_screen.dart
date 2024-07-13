@@ -213,7 +213,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tool.name,
+            tool.title,
             style: textStyle18w500,
           ),
           const SizedBox(height: 10),

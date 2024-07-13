@@ -624,15 +624,19 @@ class AuthProvider extends ChangeNotifier {
   // generate a new token
   Future<void> generateNewToken() async {
     if (_auth.currentUser != null) {
-      final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-      String? token = await firebaseMessaging.getToken();
+      try {
+        final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+        String? token = await firebaseMessaging.getToken();
 
-      log('Token: $token');
+        log('Token: $token');
 
-      // save token to firestore
-      _usersCollection.doc(_userModel!.uid).update({
-        Constants.token: token,
-      });
+        // save token to firestore
+        _usersCollection.doc(_userModel!.uid).update({
+          Constants.token: token,
+        });
+      } catch (e) {
+        log('FCM TOKEN ERROR: ${e.toString()}');
+      }
     }
   }
 }

@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/search/my_data_stream.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -142,37 +144,8 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                     )),
                         ],
                       )
-                    : Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: MySearchBar(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() {
-                                  _searchQuery = value;
-                                });
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: GridView.builder(
-                              itemCount: results.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 1,
-                              ),
-                              itemBuilder: (context, index) {
-                                final doc = results[index];
-                                final data = doc.data() as Map<String, dynamic>;
-
-                                final tool = ToolModel.fromJson(data);
-                                return GridItem(toolModel: tool);
-                              },
-                            ),
-                          ),
-                        ],
+                    : const MyDataStream(
+                        generationType: GenerationType.tool,
                       );
               },
             );

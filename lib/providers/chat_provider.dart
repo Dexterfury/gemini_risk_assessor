@@ -577,7 +577,7 @@ Only answer questions related to this specific $docType. If asked about somethin
       final contextPrompt = '''
 You are a tools expert discussing a specific tool. Here are the details:
 
-Name: ${tool.name}
+Name: ${tool.title}
 Description: ${tool.description}
 Summary: ${tool.summary}
 

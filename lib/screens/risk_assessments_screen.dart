@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/search/my_data_stream.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -75,16 +77,14 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
 
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                final results = snapshot.data!.docs
-                    .where(
-                      (element) => element[Constants.title]
-                          .toString()
-                          .toLowerCase()
-                          .contains(
-                            _searchQuery.toLowerCase(),
-                          ),
-                    )
-                    .toList();
+                final results = snapshot.data!.docs.where(
+                  (element) => element[Constants.title]
+                      .toString()
+                      .toLowerCase()
+                      .contains(
+                        _searchQuery.toLowerCase(),
+                      ),
+                );
 
                 return widget.orgID.isNotEmpty
                     ? CustomScrollView(
@@ -140,18 +140,8 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                           ),
                         ],
                       )
-                    : ListView.builder(
-                        itemCount: results.length,
-                        itemBuilder: (context, index) {
-                          final doc = results.elementAt(index);
-                          final data = doc.data() as Map<String, dynamic>;
-                          final assessment = AssessmentModel.fromJson(data);
-                          log('title: ${assessment.title}');
-                          return ListItem(
-                            docTitle: Constants.riskAssessment,
-                            data: assessment,
-                          );
-                        },
+                    : const MyDataStream(
+                        generationType: GenerationType.riskAssessment,
                       );
               },
             );

@@ -105,7 +105,7 @@ class GridItem extends StatelessWidget {
     OrganizationModel? orgModel,
   ) {
     if (toolModel != null) {
-      return toolModel.name;
+      return toolModel.title;
     } else if (orgModel != null) {
       return orgModel.name;
     } else {

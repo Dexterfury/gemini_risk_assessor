@@ -87,6 +87,11 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
                 child: _isExpanded
                     ? Consumer<TabProvider>(
                         builder: (context, tabProvider, child) {
+                          bool clearText = tabProvider.textFocus;
+                          if (clearText) {
+                            //_focusNode.unfocus();
+                            _textController.clear();
+                          }
                           return Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: TextField(
