@@ -36,8 +36,8 @@ class OrgSearchStream extends StatelessWidget {
           if (snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('You are not part of any organizations yet!',
+                padding: EdgeInsets.all(20.0),
+                child: Text('You are not part of \n any organizations yet!',
                     textAlign: TextAlign.center, style: textStyle18w500),
               ),
             );

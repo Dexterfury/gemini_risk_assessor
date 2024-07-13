@@ -50,6 +50,9 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
       appBar: MyAppBar(
         leading: const BackButton(),
         title: title,
+        actions: [
+          resetIcon(assessmentProvider),
+        ],
       ),
       body: SafeArea(
           child: Padding(
@@ -176,5 +179,52 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
         ),
       )),
     );
+  }
+
+  resetIcon(
+    AssessmentProvider assessmentProvider,
+  ) {
+    // of images or ppe or weather is not sunny or number of people is not 1
+    // or description is not empty
+    // show the reset iscon button else dont show it
+    bool isResetIconVisible = assessmentProvider.shouldShowResetIcon();
+    if (isResetIconVisible || _descriptionController.text.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: CircleAvatar(
+          backgroundColor: Colors.blue,
+          child: IconButton(
+            onPressed: () {
+              MyDialogs.showMyAnimatedDialog(
+                  context: context,
+                  title: 'Clear data',
+                  content: 'Are you sure to clear?',
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('No'),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          // reset data
+                          assessmentProvider.resetCreationData();
+                          // reset description
+                          _descriptionController.clear();
+                        },
+                        child: const Text('Yes'))
+                  ]);
+            },
+            icon: const Icon(
+              Icons.refresh,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox();
+    }
   }
 }

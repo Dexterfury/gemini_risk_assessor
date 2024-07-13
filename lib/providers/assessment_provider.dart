@@ -348,6 +348,37 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // check if we should show reset icon
+  bool shouldShowResetIcon() {
+    return _ppeModelList.isNotEmpty ||
+        _imagesFileList!.isNotEmpty ||
+        _numberOfPeople > 1 ||
+        weather != Weather.sunny;
+  }
+
+  // reset creation data
+  void resetCreationData() {
+    removeAllImages();
+    removeAllPpeModelItems();
+    _weather = Weather.sunny;
+    _numberOfPeople = 1;
+    notifyListeners();
+  }
+
+  // remove all ppes from ppeModelList
+  void removeAllPpeModelItems() {
+    _ppeModelList.clear();
+    _assessmentModel.ppe = [];
+    notifyListeners();
+  }
+
+  // remove all images from imagesFileList
+  void removeAllImages() {
+    _imagesFileList!.clear();
+    _maxImages = 10;
+    notifyListeners();
+  }
+
   // remove file
   void removeFile({required XFile image}) {
     _imagesFileList!.removeWhere((file) => file == image);

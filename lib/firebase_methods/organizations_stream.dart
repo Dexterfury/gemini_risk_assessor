@@ -34,25 +34,28 @@ class OrganizationsStream extends StatelessWidget {
         if (snapshot.data!.docs.isEmpty) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('You are not part of any organizations yet!',
+              padding: EdgeInsets.all(20.0),
+              child: Text('You are not part of \n any organizations yet!',
                   textAlign: TextAlign.center, style: textStyle18w500),
             ),
           );
         }
 
-        return GridView.builder(
-            itemCount: snapshot.data!.docs.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-            ),
-            itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final orgData = doc.data() as Map<String, dynamic>;
-              final org = OrganizationModel.fromJson(orgData);
-              return GridItem(orgModel: org);
-            });
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GridView.builder(
+              itemCount: snapshot.data!.docs.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1,
+              ),
+              itemBuilder: (context, index) {
+                final doc = snapshot.data!.docs[index];
+                final orgData = doc.data() as Map<String, dynamic>;
+                final org = OrganizationModel.fromJson(orgData);
+                return GridItem(orgModel: org);
+              }),
+        );
       },
     );
   }
