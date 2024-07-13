@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
@@ -42,6 +43,156 @@ class MyDialogs {
                 actions: actions,
               ),
             ));
+      },
+    );
+  }
+
+  // termsdialog
+  static void animatedTermsDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    required bool isMember,
+    required VoidCallback onAccept,
+    required VoidCallback onDecline,
+  }) {
+    bool isScrolledToBottom = false;
+    late ScrollController scrollController;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, animation1, animation2, child) {
+        scrollController = ScrollController();
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (scrollController.position.maxScrollExtent == 0) {
+            isScrolledToBottom = true;
+          }
+        });
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            scrollController.addListener(() {
+              if (scrollController.offset >=
+                      scrollController.position.maxScrollExtent &&
+                  !scrollController.position.outOfRange) {
+                setState(() {
+                  isScrolledToBottom = true;
+                });
+              }
+            });
+            List<Widget> actions = isMember
+                ? [
+                    TextButton(
+                      onPressed: onDecline,
+                      child: const Text('Close'),
+                    )
+                  ]
+                : [
+                    TextButton(
+                      onPressed: onDecline,
+                      child: const Text(
+                        'Decline',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: isScrolledToBottom ? onAccept : null,
+                      child: const Text('Accept'),
+                    ),
+                  ];
+
+            return ScaleTransition(
+              scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+              child: FadeTransition(
+                opacity:
+                    Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+                child: AlertDialog(
+                  title: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                  ),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: Scrollbar(
+                      controller: scrollController,
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        child: MarkdownBody(
+                          selectable: true,
+                          data: content,
+                        ),
+                      ),
+                    ),
+                  ),
+                  actions: actions,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  static void animatedEditTermsDialog({
+    required BuildContext context,
+    required String initialTerms,
+    required Function(String) onSave,
+  }) {
+    final textController = TextEditingController(text: initialTerms);
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, animation1, animation2, child) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: AlertDialog(
+              title: const Text(
+                'Edit Terms and Conditions',
+                textAlign: TextAlign.center,
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: TextField(
+                  controller: textController,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter terms and conditions here...',
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    onSave(textController.text);
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

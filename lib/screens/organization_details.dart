@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/buttons/buttons_row.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -11,21 +9,17 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/org_settings_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
-import 'package:gemini_risk_assessor/providers/tab_provider.dart';
-import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
-import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
-import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
+import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
-import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
-import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class OrganizationDetails extends StatefulWidget {
@@ -43,6 +37,7 @@ class OrganizationDetails extends StatefulWidget {
 class _OrganizationDetailsState extends State<OrganizationDetails>
     with SingleTickerProviderStateMixin {
   File? _finalFileImage;
+  bool _hasReadTerms = false;
 
   late Animation<double> _animation;
   late AnimationController _animationController;
@@ -134,7 +129,20 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
               ? Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        context
+                            .read<OrgSettingsProvider>()
+                            .setOrganizationModel(widget.orgModel)
+                            .whenComplete(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const OrganizationSettingsScreen(),
+                            ),
+                          );
+                        });
+                      },
                       icon: const Icon(FontAwesomeIcons.gear, size: 20)),
                 )
               : const SizedBox(),
@@ -155,6 +163,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                         isAdmin,
                         context,
                         showAcceptBtn,
+                        widget.orgModel,
+                        uid,
                       ),
 
                       const SizedBox(height: 10),
@@ -441,6 +451,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     bool isAdmin,
     BuildContext context,
     bool showAcceptBtn,
+    OrganizationModel orgModel,
+    String uid,
   ) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
@@ -588,13 +600,62 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                         icon: Icons.person_add,
                         label: 'Accept Invite',
                         contanerColor: Colors.orangeAccent,
-                        onTap: () {},
+                        onTap: () {
+                          // accept invite
+                          // first check if admin set to read terms and conditions
+                          if (orgModel.requestToReadTerms) {
+                            if (!_hasReadTerms) {
+                              MyDialogs.animatedTermsDialog(
+                                  context: context,
+                                  title: "Terms and Conditions",
+                                  content: orgModel.organizationTerms,
+                                  isMember: orgModel.membersUIDs.contains(uid),
+                                  onAccept: () {
+                                    // Handle acceptance here
+                                    // join org and update data in firestore
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                    setState(() {
+                                      _hasReadTerms = true;
+                                    });
+                                    // update user data in firestore to add to members list and update role to member
+                                  },
+                                  onDecline: () {
+                                    // Handle decline here
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  });
+                            }
+                          } else {
+                            // join org and update data in firestore
+                          }
+                        },
                       )
                     : Container(),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('Terms'),
-                ),
+                orgModel.organizationTerms.isNotEmpty
+                    ? TextButton(
+                        onPressed: () {
+                          // show terms and conditions dialog
+                          MyDialogs.animatedTermsDialog(
+                              context: context,
+                              title: "Terms and Conditions",
+                              content: orgModel.organizationTerms,
+                              isMember: orgModel.membersUIDs.contains(uid),
+                              onAccept: () {
+                                // Handle acceptance here
+                                Navigator.of(context).pop(); // Close the dialog
+                                setState(() {
+                                  _hasReadTerms = true;
+                                });
+                              },
+                              onDecline: () {
+                                // Handle decline here
+                                Navigator.of(context).pop(); // Close the dialog
+                              });
+                        },
+                        child: const Text('Terms'),
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
           )

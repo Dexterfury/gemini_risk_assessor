@@ -105,7 +105,8 @@ class Constants {
 
   static const String orgArg = 'orgArg';
 
-  static const String sharedWith = 'Shared With';
+  static const String shareWithTitle = 'Shared With';
+  static const String sharedWith = 'sharedWith';
   static const String discussions = 'Discussions';
 
   // organization model constants
@@ -118,7 +119,8 @@ class Constants {
   static const String awaitingApprovalUIDs = 'awaitingApprovalUIDs';
   static const String membersUIDs = 'membersUIDs';
   static const String adminsUIDs = 'adminsUIDs';
-  static const String requestToAcceptTerms = 'requestToAcceptTerms';
+  static const String requestToReadTerms = 'requestToReadTerms';
+  static const String allowSharing = 'allowSharing';
 
   static const String enterYourName = 'Enter your name';
   static const String organizationName = 'Enter name';

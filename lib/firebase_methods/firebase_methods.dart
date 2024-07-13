@@ -165,13 +165,13 @@ class FirebaseMethods {
   }
 
   // share assessment to organization
-  Future<void> shareWithOrganization({
+  static Future<void> shareWithOrganization({
     required AssessmentModel itemModel,
     required String orgID,
     required bool isDSTI,
   }) async {
-    // set is shared to true
-    itemModel.isShared = true;
+    // add to shareed with list in Assessment Model
+    itemModel.sharedWith.add(orgID);
     if (isDSTI) {
       // share dsti assessment to organization
       await _organizationsCollection
@@ -190,12 +190,12 @@ class FirebaseMethods {
   }
 
   // shares tool to organization
-  Future<void> shareToolWithOrganization({
+  static Future<void> shareToolWithOrganization({
     required ToolModel toolModel,
     required String orgID,
   }) async {
-    // set isshared to true
-    toolModel.isShared = true;
+    // add to shareed with list in Tool Model
+    toolModel.sharedWith.add(orgID);
     // share tool to organization
     await _organizationsCollection
         .doc(orgID)

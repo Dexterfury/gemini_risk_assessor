@@ -64,8 +64,6 @@ class AssessmentProvider extends ChangeNotifier {
       FirebaseFirestore.instance.collection(Constants.usersCollection);
   final CollectionReference _organizationCollection =
       FirebaseFirestore.instance.collection(Constants.organizationCollection);
-  final CollectionReference _dstiCollection =
-      FirebaseFirestore.instance.collection(Constants.dstiCollections);
 
   Future<void> setDocData(
     String desc,

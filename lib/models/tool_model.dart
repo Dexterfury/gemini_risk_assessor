@@ -11,9 +11,9 @@ class ToolModel {
   String toolPdf;
   List<String> images;
   List<String> reactions;
+  List<String> sharedWith;
   String createdBy;
   String organizationID;
-  bool isShared;
   DateTime createdAt;
 
   // constructor
@@ -25,9 +25,9 @@ class ToolModel {
     required this.toolPdf,
     required this.images,
     required this.reactions,
+    required this.sharedWith,
     required this.createdBy,
     required this.organizationID,
-    required this.isShared,
     required this.createdAt,
   });
 
@@ -53,9 +53,9 @@ class ToolModel {
         toolPdf: json[Constants.toolPdf] ?? '',
         images: images,
         reactions: List<String>.from(json[Constants.reactions] ?? []),
+        sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
         createdBy: creatorID,
         organizationID: organizationID,
-        isShared: json[Constants.isShared] ?? false,
         createdAt: createdAt,
       );
     }
@@ -73,9 +73,9 @@ class ToolModel {
       toolPdf: json[Constants.toolPdf] ?? '',
       images: List<String>.from(json[Constants.images] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
+      sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
-      isShared: json[Constants.isShared] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
     );
   }
@@ -90,9 +90,9 @@ class ToolModel {
       Constants.toolPdf: toolPdf,
       Constants.images: images,
       Constants.reactions: reactions,
+      Constants.sharedWith: sharedWith,
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
-      Constants.isShared: isShared,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

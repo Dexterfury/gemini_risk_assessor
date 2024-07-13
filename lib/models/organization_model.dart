@@ -14,7 +14,8 @@ class OrganizationModel {
   List<String> awaitingApprovalUIDs;
   List<String> membersUIDs;
   List<String> adminsUIDs;
-  bool requestToAcceptTerms;
+  bool requestToReadTerms;
+  bool allowSharing;
   DateTime createdAt;
 
   // Constructor with default values
@@ -32,7 +33,8 @@ class OrganizationModel {
     List<String>? awaitingApprovalUIDs,
     List<String>? membersUIDs,
     List<String>? adminsUIDs,
-    this.requestToAcceptTerms = false,
+    this.requestToReadTerms = false,
+    this.allowSharing = false,
     DateTime? createdAt,
   })  : awaitingApprovalUIDs = awaitingApprovalUIDs ?? [],
         membersUIDs = membersUIDs ?? [],
@@ -56,7 +58,8 @@ class OrganizationModel {
           List<String>.from(json[Constants.awaitingApprovalUIDs] ?? []),
       membersUIDs: List<String>.from(json[Constants.membersUIDs] ?? []),
       adminsUIDs: List<String>.from(json[Constants.adminsUIDs] ?? []),
-      requestToAcceptTerms: json[Constants.requestToAcceptTerms] ?? false,
+      requestToReadTerms: json[Constants.requestToReadTerms] ?? false,
+      allowSharing: json[Constants.allowSharing] ?? false,
       createdAt: json[Constants.createdAt] != null
           ? DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt])
           : null,
@@ -79,7 +82,8 @@ class OrganizationModel {
       Constants.awaitingApprovalUIDs: awaitingApprovalUIDs,
       Constants.membersUIDs: membersUIDs,
       Constants.adminsUIDs: adminsUIDs,
-      Constants.requestToAcceptTerms: requestToAcceptTerms,
+      Constants.requestToReadTerms: requestToReadTerms,
+      Constants.allowSharing: allowSharing,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

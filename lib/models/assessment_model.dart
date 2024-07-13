@@ -16,12 +16,13 @@ class AssessmentModel {
   List<String> ppe;
   List<String> control;
   List<String> reactions;
+  List<String> sharedWith;
   String weather;
   String summary;
   String createdBy;
   String organizationID;
   String pdfUrl;
-  bool isShared;
+
   DateTime createdAt;
 
   AssessmentModel({
@@ -37,12 +38,12 @@ class AssessmentModel {
     required this.ppe,
     required this.control,
     required this.reactions,
+    required this.sharedWith,
     required this.weather,
     required this.summary,
     required this.createdBy,
     required this.organizationID,
     required this.pdfUrl,
-    required this.isShared,
     required this.createdAt,
   });
 
@@ -73,12 +74,12 @@ class AssessmentModel {
         ppe: testppe,
         control: List<String>.from(json[Constants.control] ?? []),
         reactions: List<String>.from(json[Constants.reactions] ?? []),
+        sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
         organizationID: organizationID,
         pdfUrl: json[Constants.pdfFiles] ?? '',
-        isShared: json[Constants.isShared] ?? false,
         createdAt: createdAt,
       );
     }
@@ -115,12 +116,12 @@ class AssessmentModel {
         ppe: ppe,
         control: List<String>.from(json[Constants.control] ?? []),
         reactions: List<String>.from(json[Constants.reactions] ?? []),
+        sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
         organizationID: organizationID,
         pdfUrl: json[Constants.pdfUrl] ?? '',
-        isShared: json[Constants.isShared] ?? false,
         createdAt: createdAt,
       );
     }
@@ -142,12 +143,12 @@ class AssessmentModel {
       ppe: List<String>.from(json[Constants.ppe] ?? []),
       control: List<String>.from(json[Constants.control] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
+      sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
       pdfUrl: json[Constants.pdfUrl] ?? '',
-      isShared: json[Constants.isShared] ?? false,
       createdAt:
           DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt] ?? 0),
     );
@@ -167,12 +168,12 @@ class AssessmentModel {
       Constants.ppe: ppe,
       Constants.control: control,
       Constants.reactions: reactions,
+      Constants.sharedWith: sharedWith,
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
       Constants.pdfUrl: pdfUrl,
-      Constants.isShared: isShared,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

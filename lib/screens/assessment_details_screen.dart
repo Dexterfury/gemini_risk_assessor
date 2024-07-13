@@ -17,7 +17,6 @@ import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/buttons/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -265,7 +264,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
                         },
                         openBuilder: (context, action) {
                           // navigate to screen depending on the clicked icon
-                          return const ShareScreen();
+                          return ShareScreen(
+                            itemModel: assessmentModel,
+                            generationType: generationType,
+                          );
                         },
                         transitionType: ContainerTransitionType.fadeThrough,
                         transitionDuration: const Duration(milliseconds: 500),

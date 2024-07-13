@@ -4,16 +4,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:provider/provider.dart';
 
 class ShareScreen extends StatefulWidget {
-  const ShareScreen({super.key});
+  const ShareScreen({
+    super.key,
+    this.itemModel,
+    this.toolModel,
+    required this.generationType,
+  });
+
+  final AssessmentModel? itemModel;
+  final ToolModel? toolModel;
+  final GenerationType generationType;
 
   @override
   State<ShareScreen> createState() => _ShareScreenState();
@@ -27,6 +41,71 @@ class _ShareScreenState extends State<ShareScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _handleSharing(OrganizationModel org) {
+    if (!org.allowSharing) {
+      showSnackBar(
+        context: context,
+        message: 'Sharing not allowed for this organization',
+      );
+      return;
+    }
+
+    final isAlreadyShared = widget.generationType == GenerationType.tool
+        ? widget.toolModel!.sharedWith.contains(org.organizationID)
+        : widget.itemModel!.sharedWith.contains(org.organizationID);
+
+    if (isAlreadyShared) {
+      showSnackBar(
+        context: context,
+        message: 'You are already sharing this item with this organization',
+      );
+
+      return;
+    }
+
+    _showSharingDialog(org);
+  }
+
+  void _showSharingDialog(OrganizationModel org) {
+    MyDialogs.showMyAnimatedDialog(
+      context: context,
+      title: 'Share',
+      content: 'Share with ${org.name}',
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await _performSharing(org);
+          },
+          child: const Text('Yes'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _performSharing(OrganizationModel org) async {
+    if (widget.generationType == GenerationType.tool) {
+      await FirebaseMethods.shareToolWithOrganization(
+        toolModel: widget.toolModel!,
+        orgID: org.organizationID,
+      );
+    } else {
+      await FirebaseMethods.shareWithOrganization(
+        itemModel: widget.itemModel!,
+        orgID: org.organizationID,
+        isDSTI: widget.generationType == GenerationType.dsti,
+      ).whenComplete(() {
+        showSnackBar(
+          context: context,
+          message: 'Shared Successfully',
+        );
+      });
+    }
   }
 
   @override
@@ -127,8 +206,123 @@ class _ShareScreenState extends State<ShareScreen> {
                                         OrganizationModel.fromJson(data);
                                     return GestureDetector(
                                         onTap: () {
-                                          // share with this org
-                                          log('share with id: ${org.organizationID}');
+                                          _handleSharing(org);
+
+                                          // if (widget.generationType ==
+                                          //     GenerationType.tool) {
+                                          //   // handle too sharing
+                                          //   if (!org.allowSharing) {
+                                          //     showSnackBar(
+                                          //       context: context,
+                                          //       message:
+                                          //           'Sharing not allowed for this organization',
+                                          //     );
+                                          //     return;
+                                          //   }
+
+                                          //   if (widget.toolModel!.sharedWith
+                                          //       .contains(org.organizationID)) {
+                                          //     // already shared with this org
+                                          //     showSnackBar(
+                                          //       context: context,
+                                          //       message:
+                                          //           'You are already sharing this item with this organization',
+                                          //     );
+                                          //     return;
+                                          //   }
+
+                                          //   // show dialog to share with this org
+                                          //   MyDialogs.showMyAnimatedDialog(
+                                          //       context: context,
+                                          //       title: 'Share',
+                                          //       content:
+                                          //           'Share with ${org.name}',
+                                          //       actions: [
+                                          //         TextButton(
+                                          //           onPressed: () {
+                                          //             // pop dialog
+                                          //             Navigator.pop(context);
+                                          //           },
+                                          //           child: const Text('Cancel'),
+                                          //         ),
+                                          //         TextButton(
+                                          //           onPressed: () async {
+                                          //             await FirebaseMethods
+                                          //                 .shareToolWithOrganization(
+                                          //               toolModel:
+                                          //                   widget.toolModel!,
+                                          //               orgID:
+                                          //                   org.organizationID,
+                                          //             ).whenComplete(() {
+                                          //               showSnackBar(
+                                          //                 context: context,
+                                          //                 message:
+                                          //                     'Shared Successfull',
+                                          //               );
+                                          //             });
+                                          //           },
+                                          //           child: const Text('Yes'),
+                                          //         ),
+                                          //       ]);
+                                          // } else {
+                                          //   if (!org.allowSharing) {
+                                          //     showSnackBar(
+                                          //       context: context,
+                                          //       message:
+                                          //           'Sharing not allowed for this organization',
+                                          //     );
+                                          //     return;
+                                          //   }
+
+                                          //   if (widget.itemModel!.sharedWith
+                                          //       .contains(org.organizationID)) {
+                                          //     // already shared with this org
+                                          //     showSnackBar(
+                                          //       context: context,
+                                          //       message:
+                                          //           'You are already sharing this item with this organization',
+                                          //     );
+                                          //     return;
+                                          //   }
+                                          //   // share with this org
+                                          //   log('share with id: ${org.organizationID}');
+                                          //   // show dialog to share with this org
+                                          //   MyDialogs.showMyAnimatedDialog(
+                                          //       context: context,
+                                          //       title: 'Share',
+                                          //       content:
+                                          //           'Share with ${org.name}',
+                                          //       actions: [
+                                          //         TextButton(
+                                          //           onPressed: () {
+                                          //             // pop dialog
+                                          //             Navigator.pop(context);
+                                          //           },
+                                          //           child: const Text('Cancel'),
+                                          //         ),
+                                          //         TextButton(
+                                          //           onPressed: () async {
+                                          //             await FirebaseMethods
+                                          //                 .shareWithOrganization(
+                                          //               itemModel:
+                                          //                   widget.itemModel!,
+                                          //               orgID:
+                                          //                   org.organizationID,
+                                          //               isDSTI: widget
+                                          //                       .generationType ==
+                                          //                   GenerationType.dsti,
+                                          //             ).whenComplete(() {
+                                          //               showSnackBar(
+                                          //                 context: context,
+                                          //                 message:
+                                          //                     'Shared Successfull',
+                                          //               );
+                                          //             });
+                                          //           },
+                                          //           child: const Text('Yes'),
+                                          //         ),
+                                          //       ]);
+                                          // }
                                         },
                                         child: GridItem(orgModel: org));
                                   },
