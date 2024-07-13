@@ -2,12 +2,10 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/screens/discussion_screen.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
-import 'package:provider/provider.dart';
 
 class ButtonsRow extends StatelessWidget {
   const ButtonsRow({

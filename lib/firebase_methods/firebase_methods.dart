@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/models/tool_model.dart';
 
 class FirebaseMethods {
   static final CollectionReference _usersCollection =
@@ -25,7 +27,7 @@ class FirebaseMethods {
           .collection(Constants.toolsCollection)
           .snapshots();
     } else {
-      return _toolsCollection
+      return _usersCollection
           .doc(userId)
           .collection(Constants.toolsCollection)
           .snapshots();
@@ -43,7 +45,7 @@ class FirebaseMethods {
           .collection(Constants.dstiCollections)
           .snapshots();
     } else {
-      return _dstiCollection
+      return _usersCollection
           .doc(userId)
           .collection(Constants.dstiCollections)
           .snapshots();
@@ -61,7 +63,7 @@ class FirebaseMethods {
           .collection(Constants.assessmentCollection)
           .snapshots();
     } else {
-      return _assessementsCollection
+      return _usersCollection
           .doc(userId)
           .collection(Constants.assessmentCollection)
           .snapshots();
@@ -164,5 +166,45 @@ class FirebaseMethods {
       print('Error fetching organization data: $e');
       return OrganizationModel();
     }
+  }
+
+  // share assessment to organization
+  Future<void> shareWithOrganization({
+    required AssessmentModel itemModel,
+    required String orgID,
+    required bool isDSTI,
+  }) async {
+    // set is shared to true
+    itemModel.isShared = true;
+    if (isDSTI) {
+      // share dsti assessment to organization
+      await _organizationsCollection
+          .doc(orgID)
+          .collection(Constants.dstiCollections)
+          .doc(itemModel.id)
+          .set(itemModel.toJson());
+    } else {
+      // share assessment to organization
+      await _organizationsCollection
+          .doc(orgID)
+          .collection(Constants.assessmentCollection)
+          .doc(itemModel.id)
+          .set(itemModel.toJson());
+    }
+  }
+
+  // shares tool to organization
+  Future<void> shareToolWithOrganization({
+    required ToolModel toolModel,
+    required String orgID,
+  }) async {
+    // set isshared to true
+    toolModel.isShared = true;
+    // share tool to organization
+    await _organizationsCollection
+        .doc(orgID)
+        .collection(Constants.tools)
+        .doc(toolModel.id)
+        .set(toolModel.toJson());
   }
 }

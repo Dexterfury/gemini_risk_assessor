@@ -60,8 +60,8 @@ class AssessmentProvider extends ChangeNotifier {
   GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final CollectionReference _assessmentCollection =
-      FirebaseFirestore.instance.collection(Constants.assessmentCollection);
+  final CollectionReference _usersCollection =
+      FirebaseFirestore.instance.collection(Constants.usersCollection);
   final CollectionReference _organizationCollection =
       FirebaseFirestore.instance.collection(Constants.organizationCollection);
   final CollectionReference _dstiCollection =
@@ -103,7 +103,7 @@ class AssessmentProvider extends ChangeNotifier {
 
     if (file.existsSync()) {
       await OpenFile.open((file.path));
-      await saveFileToFirestore(file.absolute, _pdfHeading);
+      await saveDataToFirestore(file.absolute, _pdfHeading);
     } else {
       throw FileSystemException("PDF file does not exist", file.path);
     }
@@ -118,7 +118,7 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // save assement to firetore
-  Future<void> saveFileToFirestore(
+  Future<void> saveDataToFirestore(
     File file,
     String pdfHeading,
   ) async {
@@ -152,7 +152,7 @@ class AssessmentProvider extends ChangeNotifier {
     if (_organizationID.isEmpty) {
       if (_pdfHeading == Constants.riskAssessment) {
         // save to user's database
-        await _assessmentCollection
+        await _usersCollection
             .doc(id)
             .collection(Constants.assessmentCollection)
             .doc(assessmentModel.id)
@@ -160,7 +160,7 @@ class AssessmentProvider extends ChangeNotifier {
         // save to user's database end.
       } else {
         // save to user's database
-        await _dstiCollection
+        await _usersCollection
             .doc(id)
             .collection(Constants.dstiCollections)
             .doc(assessmentModel.id)
