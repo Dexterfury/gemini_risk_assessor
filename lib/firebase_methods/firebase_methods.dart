@@ -1,12 +1,16 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 
 class FirebaseMethods {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
   static final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
   static final CollectionReference _organizationsCollection =
@@ -196,61 +200,105 @@ class FirebaseMethods {
     ]);
   }
 
-  // // share assessment to organization
-  // static Future<void> shareWithOrganization({
-  //   required String uid,
-  //   required AssessmentModel itemModel,
-  //   required String orgID,
-  //   required bool isDSTI,
-  // }) async {
-  //   // add to shareed with list in Assessment Model
-  //   itemModel.sharedWith.add(orgID);
-  //   if (isDSTI) {
-  //     // share dsti assessment to organization
-  //     await _organizationsCollection
-  //         .doc(orgID)
-  //         .collection(Constants.dstiCollections)
-  //         .doc(itemModel.id)
-  //         .set(itemModel.toJson());
-  //     await _usersCollection
-  //         .doc(uid)
-  //         .collection(Constants.dstiCollections)
-  //         .doc(itemModel.id)
-  //         .update({
-  //       Constants.sharedWith: FieldValue.arrayUnion([orgID])
-  //     });
-  //   } else {
-  //     // share assessment to organization
-  //     await _organizationsCollection
-  //         .doc(orgID)
-  //         .collection(Constants.assessmentCollection)
-  //         .doc(itemModel.id)
-  //         .set(itemModel.toJson());
-  //     await _usersCollection
-  //         .doc(uid)
-  //         .collection(Constants.assessmentCollection)
-  //         .doc(itemModel.id)
-  //         .update({
-  //       Constants.sharedWith: FieldValue.arrayUnion([orgID])
-  //     });
-  //   }
-  // }
-
   // shares tool to organization
   static Future<void> shareToolWithOrganization({
     required String uid,
     required ToolModel toolModel,
     required String orgID,
   }) async {
-    // add to shareed with list in Tool Model
-    toolModel.sharedWith.add(orgID);
-    // share tool to organization
-    await _organizationsCollection
+    // we get the database referrence for the organization and the user
+    final orgRef = _organizationsCollection
         .doc(orgID)
         .collection(Constants.tools)
-        .doc(toolModel.id)
-        .set(toolModel.toJson());
+        .doc(toolModel.id);
+    final userRef =
+        _usersCollection.doc(uid).collection(Constants.tools).doc(toolModel.id);
+
+    // we create a new assessment object with updated sharedWith list
+    final updatedTool = toolModel.copyWith(
+      sharedWith: [...toolModel.sharedWith, orgID],
+    );
+
+    // we perform both operations in parallel
+    await Future.wait([
+      orgRef.set(updatedTool.toJson()),
+      userRef.update({
+        Constants.sharedWith: FieldValue.arrayUnion([orgID])
+      }),
+    ]);
   }
+
+  // Future<void> deleteAssessment({
+  //   required String docId,
+  //   required bool isDsti,
+  //   required String ownerId,
+  //   required bool isOrganization,
+  //   required AssessmentModel assessment,
+  // }) async {
+  //   final String collectionName = isDsti ? Constants.dstiCollections : Constants.assessmentCollection;
+  //   final String rootCollection = isOrganization ? Constants.organizationCollection : Constants.usersCollection;
+
+  //   try {
+  //     final docRef = _firestore.collection(rootCollection).doc(ownerId).collection(collectionName).doc(docId);
+
+  //     // Start a batch write
+  //     final WriteBatch batch = _firestore.batch();
+
+  //     if (isOrganization) {
+  //       // If it's an organization deleting a shared document, remove org from user's sharedWith
+  //       if (assessment.createdBy != ownerId) {
+  //         final userRef = _firestore.collection('users').doc(assessment.createdBy).collection(collectionName).doc(docId);
+  //         batch.update(userRef, {
+  //           Constants.sharedWith: FieldValue.arrayRemove([ownerId])
+  //         });
+  //       }
+  //     } else {
+  //       // If it's a user deleting their own document
+  //       if (assessment.sharedWith.isEmpty) {
+  //         // If not shared, delete images from storage
+  //         await Future.wait(assessment.images.map((url) => _deleteImage(url)));
+  //       }
+  //       // Note: We're not removing the document from shared organizations as per the new requirements
+  //     }
+
+  //     // Delete the document
+  //     batch.delete(docRef);
+
+  //     // Commit the batch
+  //     await batch.commit();
+
+  //     print('Assessment successfully deleted and related documents updated');
+  //   } catch (e) {
+  //     print('Error deleting assessment: $e');
+  //     rethrow;
+  //   }
+  // }
+
+  // // delete assessment from o rganization and user
+  // static Future<void> deleteAssessment({
+  //   required String uid,
+  //   required String orgID,
+  //   required String assessmentID,
+  //   required bool isDSTI,
+  // }) async {
+  //   // we get the database referrence for the organization and the user
+  //   final String collectionName =
+  //       isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
+  //   final orgRef = _organizationsCollection
+  //       .doc(orgID)
+  //       .collection(collectionName)
+  //       .doc(assessmentID);
+  //   final userRef = _usersCollection
+  //       .doc(uid)
+  //       .collection(collectionName)
+  //       .doc(assessmentID);
+
+  //   // delete the assessment from both the organization and user collections
+  //   await Future.wait([
+  //     orgRef.delete(),
+  //     // remove this assessment from sharedWith list
+  //   ]);
+  // }
 
   // set notification was clicked to true
   static Future<void> setNotificationClicked({

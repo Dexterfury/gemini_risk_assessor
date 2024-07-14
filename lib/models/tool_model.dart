@@ -96,4 +96,33 @@ class ToolModel {
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }
+
+  // create a copy with method
+  ToolModel copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? summary,
+    String? toolPdf,
+    List<String>? images,
+    List<String>? reactions,
+    List<String>? sharedWith,
+    String? createdBy,
+    String? organizationID,
+    DateTime? createdAt,
+  }) {
+    return ToolModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      summary: summary ?? this.summary,
+      toolPdf: toolPdf ?? this.toolPdf,
+      images: images ?? this.images,
+      reactions: reactions ?? this.reactions,
+      sharedWith: sharedWith ?? this.sharedWith,
+      createdBy: createdBy ?? this.createdBy,
+      organizationID: organizationID ?? this.organizationID,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
