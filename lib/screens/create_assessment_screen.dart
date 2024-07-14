@@ -45,7 +45,6 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
 
     final String docTitle = Constants.getDoctTitle(title);
 
-    log('$title: $orgID');
     return Scaffold(
       appBar: MyAppBar(
         leading: const BackButton(),
@@ -162,6 +161,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     // navigate to screen depending on the clicked icon
                     return AssessmentDetailsScreen(
                       appBarTitle: docTitle,
+                      orgID: orgID,
                     );
                   },
                   transitionType: ContainerTransitionType.fadeThrough,

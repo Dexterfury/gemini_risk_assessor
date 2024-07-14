@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
@@ -119,9 +120,53 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     child: IconButton(
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(Icons.refresh),
                       onPressed: () async {
                         // show my animated dialog to start new chat
+                        MyDialogs.showMyAnimatedDialog(
+                            context: context,
+                            title: 'Clear Chat',
+                            content: 'Are you sure to clear this Chat?',
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  // pop dialog
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  // pop dialog
+                                  Navigator.pop(context);
+                                  // Future.delayed(const Duration(seconds: 1))
+                                  //     .whenComplete(() {
+                                  //   // show loading dialog
+                                  //   MyDialogs.showMyAnimatedDialog(
+                                  //     context: context,
+                                  //     title: 'Deleting',
+                                  //     loadingIndicator: const SizedBox(
+                                  //       height: 100,
+                                  //       width: 100,
+                                  //       child: LoadingPPEIcons(),
+                                  //     ),
+                                  //   );
+                                  // });
+
+                                  final uid = context
+                                      .read<AuthProvider>()
+                                      .userModel!
+                                      .uid;
+                                  await chatProvider.clearChat(
+                                    uid: uid,
+                                    generationType: widget.generationType,
+                                    assessmentModel: widget.assesmentModel,
+                                    toolModel: widget.toolModel,
+                                  );
+                                },
+                                child: const Text('Yes'),
+                              ),
+                            ]);
                       },
                     ),
                   ),

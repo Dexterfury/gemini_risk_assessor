@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -30,6 +32,8 @@ class MyDataStream extends StatelessWidget {
       orgID,
       generationType,
     );
+
+    final title = getAppBarTitle(generationType);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -88,7 +92,8 @@ class MyDataStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
                             final assessment = AssessmentModel.fromJson(data);
                             return ListItem(
-                              docTitle: Constants.dailySafetyTaskInstructions,
+                              docTitle: title,
+                              orgID: '',
                               data: assessment,
                             );
                           },
@@ -100,7 +105,8 @@ class MyDataStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
                             final item = AssessmentModel.fromJson(data);
                             return ListItem(
-                              docTitle: Constants.dailySafetyTaskInstructions,
+                              docTitle: title,
+                              orgID: '',
                               data: item,
                             );
                           },
@@ -191,5 +197,17 @@ class MyDataStream extends StatelessWidget {
               return GridItem(toolModel: tool);
             },
           );
+  }
+
+  getAppBarTitle(GenerationType generationType) {
+    if (generationType == GenerationType.dsti) {
+      return Constants.dailySafetyTaskInstructions;
+    }
+    if (generationType == GenerationType.riskAssessment) {
+      return Constants.riskAssessment;
+    }
+    if (generationType == GenerationType.tool) {
+      return Constants.tools;
+    }
   }
 }

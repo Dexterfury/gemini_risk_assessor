@@ -9,9 +9,11 @@ class ListItem extends StatelessWidget {
   const ListItem({
     super.key,
     required this.docTitle,
+    required this.orgID,
     required this.data,
   });
   final String docTitle;
+  final String orgID;
   final AssessmentModel data;
 
   @override
@@ -54,6 +56,7 @@ class ListItem extends StatelessWidget {
       openBuilder: (context, action) {
         return AssessmentDetailsScreen(
           appBarTitle: docTitle,
+          orgID: orgID,
           currentModel: data,
         );
       },

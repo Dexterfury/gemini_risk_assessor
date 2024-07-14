@@ -130,7 +130,8 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                                         final item =
                                             AssessmentModel.fromJson(data);
                                         return ListItem(
-                                          docTitle: Constants.riskAssessments,
+                                          docTitle: Constants.riskAssessment,
+                                          orgID: widget.orgID,
                                           data: item,
                                         );
                                       },

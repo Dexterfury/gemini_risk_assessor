@@ -256,6 +256,7 @@ class ChatProvider extends ChangeNotifier {
           .collection(collection)
           .doc(chatID)
           .collection(Constants.chatDataCollection)
+          .orderBy(Constants.timeSent)
           .get()
           .then((value) {
         for (var doc in value.docs) {
@@ -445,6 +446,50 @@ class ChatProvider extends ChangeNotifier {
           .toList();
 
       return Content.multi([prompt, ...imageParts]);
+    }
+  }
+
+  // clear chat
+  Future<void> clearChat({
+    required String uid,
+    required GenerationType generationType,
+    AssessmentModel? assessmentModel,
+    ToolModel? toolModel,
+  }) async {
+    try {
+      _isLoading = true;
+      final chatID = toolModel != null ? toolModel.id : assessmentModel!.id;
+      final collectionRef = getCollectionRef(generationType);
+
+      // Reference to the chat document
+      final chatDocRef =
+          _chatsCollection.doc(uid).collection(collectionRef).doc(chatID);
+
+      // Delete all documents in the chatData subcollection
+      final querySnapshot =
+          await chatDocRef.collection(Constants.chatDataCollection).get();
+      final batch = FirebaseFirestore.instance.batch();
+      for (var doc in querySnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+
+      // Now delete the chat document itself
+      await chatDocRef.delete();
+
+      _messages.clear();
+      _historyMessages.clear;
+      _isLoading = false;
+      notifyListeners();
+
+      await setChatContext(
+        assessment: assessmentModel,
+        tool: toolModel,
+        generationType: generationType,
+      );
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

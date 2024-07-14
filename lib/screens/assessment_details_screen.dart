@@ -1,16 +1,24 @@
+import 'dart:developer';
+
+import 'package:animations/animations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
+import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
@@ -25,10 +33,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
   const AssessmentDetailsScreen({
     super.key,
     required this.appBarTitle,
+    required this.orgID,
     this.currentModel,
   });
 
   final String appBarTitle;
+  final String orgID;
   final AssessmentModel? currentModel;
 
   @override
@@ -207,56 +217,15 @@ class AssessmentDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      currentModel == null
-                          ? const SizedBox()
-                          :
-                          // pdf icon
-                          IconButton(
-                              onPressed: () async {
-                                // show my alert dialog for loading
-                                MyDialogs.showMyAnimatedDialog(
-                                  context: context,
-                                  title: 'Processing',
-                                  loadingIndicator: const SizedBox(
-                                      height: 100,
-                                      width: 100,
-                                      child: LoadingPPEIcons()),
-                                );
-                                // open pdf
-                                await context
-                                    .read<AssessmentProvider>()
-                                    .openPdf(
-                                      pdfUrl: pdfUrl,
-                                      fileName: '$id.pdf',
-                                      onSuccess: () {
-                                        //pop loading dialog
-                                        Navigator.of(context).pop();
-                                      },
-                                      onError: (error) {
-                                        //pop loading dialog
-                                        Navigator.of(context).pop();
-                                        showSnackBar(
-                                          context: context,
-                                          message: 'Error loading PDF file',
-                                        );
-                                      },
-                                    );
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.filePdf,
-                              ),
-                            ),
-                      const SizedBox(width: 10),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          FontAwesomeIcons.share,
+                  currentModel == null
+                      ? const SizedBox()
+                      : buildPDFAndShare(
+                          context,
+                          pdfUrl,
+                          id,
+                          assessmentModel,
+                          generationType,
                         ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -265,10 +234,81 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   : const SizedBox(
                       height: 20,
                     ),
+              DeleteButton(
+                orgID: orgID,
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Row buildPDFAndShare(BuildContext context, String pdfUrl, String id,
+      AssessmentModel assessmentModel, generationType) {
+    return Row(
+      children: [
+        // pdf icon
+        Card(
+          elevation: 4,
+          color: Colors.white,
+          child: IconButton(
+            onPressed: () async {
+              // show my alert dialog for loading
+              MyDialogs.showMyAnimatedDialog(
+                context: context,
+                title: 'Processing',
+                loadingIndicator: const SizedBox(
+                    height: 100, width: 100, child: LoadingPPEIcons()),
+              );
+              // open pdf
+              await context.read<AssessmentProvider>().openPdf(
+                    pdfUrl: pdfUrl,
+                    fileName: '$id.pdf',
+                    onSuccess: () {
+                      //pop loading dialog
+                      Navigator.of(context).pop();
+                    },
+                    onError: (error) {
+                      //pop loading dialog
+                      Navigator.of(context).pop();
+                      showSnackBar(
+                        context: context,
+                        message: 'Error loading PDF file',
+                      );
+                    },
+                  );
+            },
+            icon: const Icon(
+              FontAwesomeIcons.filePdf,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        OpenContainer(
+          closedBuilder: (context, action) {
+            return IconButton(
+              onPressed: action,
+              icon: const Icon(
+                FontAwesomeIcons.share,
+              ),
+            );
+          },
+          openBuilder: (context, action) {
+            // navigate to screen depending on the clicked icon
+            return ShareScreen(
+              itemModel: assessmentModel,
+              generationType: generationType,
+            );
+          },
+          transitionType: ContainerTransitionType.fadeThrough,
+          transitionDuration: const Duration(milliseconds: 500),
+          closedShape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          closedElevation: 4,
+          openElevation: 4,
+        ),
+      ],
     );
   }
 
@@ -379,5 +419,66 @@ class AssessmentDetailsScreen extends StatelessWidget {
     } else {
       return GenerationType.riskAssessment;
     }
+  }
+}
+
+class DeleteButton extends StatelessWidget {
+  const DeleteButton({
+    super.key,
+    required this.orgID,
+  });
+
+  final String orgID;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget buttonWidget() {
+      if (orgID.isEmpty) {
+        return MainAppButton(
+          icon: FontAwesomeIcons.deleteLeft,
+          label: ' Delete ',
+          contanerColor: Colors.red,
+          borderRadius: 15.0,
+          onTap: () {},
+        );
+      } else {
+        final uid = context.read<AuthProvider>().userModel!.uid;
+        return FutureBuilder<DocumentSnapshot>(
+          future: FirebaseMethods.getOrgData(orgID: orgID),
+          builder:
+              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const SizedBox.shrink();
+            }
+
+            if (snapshot.hasData && !snapshot.data!.exists) {
+              return const SizedBox.shrink();
+            }
+
+            if (snapshot.connectionState == ConnectionState.done) {
+              // Map<String, dynamic> data =
+              //     snapshot.data!.data() as Map<String, dynamic>;
+              final orgModel = OrganizationModel.fromJson(
+                  snapshot.data!.data() as Map<String, dynamic>);
+
+              final isAdmin = orgModel.adminsUIDs.contains(uid);
+              return isAdmin
+                  ? MainAppButton(
+                      icon: FontAwesomeIcons.deleteLeft,
+                      label: ' Delete ',
+                      contanerColor: Colors.red,
+                      borderRadius: 15.0,
+                      onTap: () {},
+                    )
+                  : const SizedBox.shrink();
+            }
+
+            return const SizedBox.shrink();
+          },
+        );
+      }
+    }
+
+    return buttonWidget();
   }
 }

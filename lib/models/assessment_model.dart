@@ -177,4 +177,49 @@ class AssessmentModel {
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }
+
+  // copy with method
+  AssessmentModel copyWith({
+    String? id,
+    String? title,
+    String? taskToAchieve,
+    List<String>? images,
+    List<String>? equipments,
+    List<String>? hazards,
+    List<String>? risks,
+    List<String>? signatures,
+    List<String>? approvers,
+    List<String>? ppe,
+    List<String>? control,
+    List<String>? reactions,
+    List<String>? sharedWith,
+    String? weather,
+    String? summary,
+    String? createdBy,
+    String? organizationID,
+    String? pdfUrl,
+    DateTime? createdAt,
+  }) {
+    return AssessmentModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      taskToAchieve: taskToAchieve ?? this.taskToAchieve,
+      images: images ?? this.images,
+      equipments: equipments ?? this.equipments,
+      hazards: hazards ?? this.hazards,
+      risks: risks ?? this.risks,
+      signatures: signatures ?? this.signatures,
+      approvers: approvers ?? this.approvers,
+      ppe: ppe ?? this.ppe,
+      control: control ?? this.control,
+      reactions: reactions ?? this.reactions,
+      sharedWith: sharedWith ?? this.sharedWith,
+      weather: weather ?? this.weather,
+      summary: summary ?? this.summary,
+      createdBy: createdBy ?? this.createdBy,
+      organizationID: organizationID ?? this.organizationID,
+      pdfUrl: pdfUrl ?? this.pdfUrl,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

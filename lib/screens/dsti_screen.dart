@@ -130,6 +130,7 @@ class _DSTIScreenState extends State<DSTIScreen> {
                                         return ListItem(
                                           docTitle: Constants
                                               .dailySafetyTaskInstructions,
+                                          orgID: widget.orgID,
                                           data: item,
                                         );
                                       },

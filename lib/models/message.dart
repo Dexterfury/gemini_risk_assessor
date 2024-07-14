@@ -38,7 +38,7 @@ class Message {
       Constants.reactions: reactions,
       Constants.sentencesUrls: sentencesUrls,
       Constants.finalWords: finalWords,
-      Constants.timeSent: timeSent,
+      Constants.timeSent: timeSent.millisecondsSinceEpoch,
     };
   }
 
@@ -54,7 +54,7 @@ class Message {
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       sentencesUrls: List<String>.from(json[Constants.sentencesUrls] ?? []),
       finalWords: json[Constants.finalWords] ?? true,
-      timeSent: DateTime.parse(json[Constants.timeSent] ?? DateTime.now()),
+      timeSent: DateTime.fromMillisecondsSinceEpoch(json[Constants.timeSent]),
     );
   }
 

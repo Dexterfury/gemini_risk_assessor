@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -164,33 +166,79 @@ class FirebaseMethods {
     }
   }
 
-  // share assessment to organization
   static Future<void> shareWithOrganization({
+    required String uid,
     required AssessmentModel itemModel,
     required String orgID,
     required bool isDSTI,
   }) async {
-    // add to shareed with list in Assessment Model
-    itemModel.sharedWith.add(orgID);
-    if (isDSTI) {
-      // share dsti assessment to organization
-      await _organizationsCollection
-          .doc(orgID)
-          .collection(Constants.dstiCollections)
-          .doc(itemModel.id)
-          .set(itemModel.toJson());
-    } else {
-      // share assessment to organization
-      await _organizationsCollection
-          .doc(orgID)
-          .collection(Constants.assessmentCollection)
-          .doc(itemModel.id)
-          .set(itemModel.toJson());
-    }
+    // we get the database referrence for the organization and the user
+    final String collectionName =
+        isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
+    final orgRef = _organizationsCollection
+        .doc(orgID)
+        .collection(collectionName)
+        .doc(itemModel.id);
+    final userRef =
+        _usersCollection.doc(uid).collection(collectionName).doc(itemModel.id);
+
+    // we create a new assessment object with updated sharedWith list
+    final updatedAssessment = itemModel.copyWith(
+      sharedWith: [...itemModel.sharedWith, orgID],
+    );
+
+    // we perform both operations in parallel
+    await Future.wait([
+      orgRef.set(updatedAssessment.toJson()),
+      userRef.update({
+        Constants.sharedWith: FieldValue.arrayUnion([orgID])
+      }),
+    ]);
   }
+
+  // // share assessment to organization
+  // static Future<void> shareWithOrganization({
+  //   required String uid,
+  //   required AssessmentModel itemModel,
+  //   required String orgID,
+  //   required bool isDSTI,
+  // }) async {
+  //   // add to shareed with list in Assessment Model
+  //   itemModel.sharedWith.add(orgID);
+  //   if (isDSTI) {
+  //     // share dsti assessment to organization
+  //     await _organizationsCollection
+  //         .doc(orgID)
+  //         .collection(Constants.dstiCollections)
+  //         .doc(itemModel.id)
+  //         .set(itemModel.toJson());
+  //     await _usersCollection
+  //         .doc(uid)
+  //         .collection(Constants.dstiCollections)
+  //         .doc(itemModel.id)
+  //         .update({
+  //       Constants.sharedWith: FieldValue.arrayUnion([orgID])
+  //     });
+  //   } else {
+  //     // share assessment to organization
+  //     await _organizationsCollection
+  //         .doc(orgID)
+  //         .collection(Constants.assessmentCollection)
+  //         .doc(itemModel.id)
+  //         .set(itemModel.toJson());
+  //     await _usersCollection
+  //         .doc(uid)
+  //         .collection(Constants.assessmentCollection)
+  //         .doc(itemModel.id)
+  //         .update({
+  //       Constants.sharedWith: FieldValue.arrayUnion([orgID])
+  //     });
+  //   }
+  // }
 
   // shares tool to organization
   static Future<void> shareToolWithOrganization({
+    required String uid,
     required ToolModel toolModel,
     required String orgID,
   }) async {
@@ -216,5 +264,12 @@ class FirebaseMethods {
         .update({
       Constants.wasClicked: true,
     });
+  }
+
+  // get is admin
+  static Future<DocumentSnapshot> getOrgData({
+    required String orgID,
+  }) {
+    return _organizationsCollection.doc(orgID).get();
   }
 }
