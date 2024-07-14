@@ -72,6 +72,7 @@ Widget buildButton(
     //closedColor: Colors.transparent,
     closedBuilder: (context, action) {
       return SizedBox(
+        height: 60,
         width: MediaQuery.of(context).size.width / 4,
         child: MaterialButton(
           padding: const EdgeInsets.symmetric(

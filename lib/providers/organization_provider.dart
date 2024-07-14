@@ -150,9 +150,13 @@ class OrganizationProvider extends ChangeNotifier {
         _organizationCollection.doc(organizationModel.organizationID);
 
     return firestore.runTransaction((transaction) async {
+      _isLoading = true;
+      notifyListeners();
       final DocumentSnapshot orgSnapshot = await transaction.get(orgRef);
 
       if (!orgSnapshot.exists) {
+        _isLoading = false;
+        notifyListeners();
         throw Exception('Organization does not exist');
       }
 
@@ -160,10 +164,14 @@ class OrganizationProvider extends ChangeNotifier {
           orgSnapshot.data() as Map<String, dynamic>);
 
       if (!org.awaitingApprovalUIDs.contains(uid)) {
+        _isLoading = false;
+        notifyListeners();
         throw Exception('User is not in the awaiting approval list');
       }
 
       if (org.membersUIDs.contains(uid)) {
+        _isLoading = false;
+        notifyListeners();
         throw Exception('User is already a member');
       }
 
@@ -188,6 +196,8 @@ class OrganizationProvider extends ChangeNotifier {
         Constants.awaitingApprovalUIDs: updatedAwaitingApproval,
         Constants.membersUIDs: updatedMembers,
       });
+      _isLoading = false;
+      notifyListeners();
     });
   }
 

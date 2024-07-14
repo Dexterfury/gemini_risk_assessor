@@ -614,69 +614,71 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                       )
                     : const SizedBox.shrink(),
                 showAcceptBtn
-                    ? MainAppButton(
-                        icon: Icons.person_add,
-                        label: 'Accept Invite',
-                        contanerColor: Colors.orangeAccent,
-                        onTap: () async {
-                          // accept invite
-                          // first check if admin set to read terms and conditions
-                          if (orgProvider
-                              .organizationModel.requestToReadTerms) {
-                            if (!_hasReadTerms) {
-                              MyDialogs.animatedTermsDialog(
-                                  context: context,
-                                  title: "Terms and Conditions",
-                                  content: orgProvider
-                                      .organizationModel.organizationTerms,
-                                  isMember: orgProvider
-                                      .organizationModel.membersUIDs
-                                      .contains(uid),
-                                  onAccept: () {
-                                    // Handle acceptance here
-                                    // join org and update data in firestore
-                                    Navigator.of(context)
-                                        .pop(); // Close the dialog
-                                    setState(() {
-                                      _hasReadTerms = true;
-                                    });
-                                  },
-                                  onDecline: () {
-                                    // Handle decline here
-                                    Navigator.of(context)
-                                        .pop(); // Close the dialog
+                    ? orgProvider.isLoading
+                        ? const CircularProgressIndicator()
+                        : MainAppButton(
+                            icon: Icons.person_add,
+                            label: 'Accept Invite',
+                            contanerColor: Colors.orangeAccent,
+                            onTap: () async {
+                              // accept invite
+                              // first check if admin set to read terms and conditions
+                              if (orgProvider
+                                  .organizationModel.requestToReadTerms) {
+                                if (!_hasReadTerms) {
+                                  MyDialogs.animatedTermsDialog(
+                                      context: context,
+                                      title: "Terms and Conditions",
+                                      content: orgProvider
+                                          .organizationModel.organizationTerms,
+                                      isMember: orgProvider
+                                          .organizationModel.membersUIDs
+                                          .contains(uid),
+                                      onAccept: () {
+                                        // Handle acceptance here
+                                        // join org and update data in firestore
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                        setState(() {
+                                          _hasReadTerms = true;
+                                        });
+                                      },
+                                      onDecline: () {
+                                        // Handle decline here
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                      });
+                                } else {
+                                  // join org and update data in firestore
+                                  await orgProvider
+                                      .addMemberToOrganization(
+                                    uid: uid,
+                                  )
+                                      .whenComplete(() {
+                                    showSnackBar(
+                                      context: context,
+                                      message:
+                                          'You are a member of this Organization',
+                                    );
                                   });
-                            } else {
-                              // join org and update data in firestore
-                              await orgProvider
-                                  .addMemberToOrganization(
-                                uid: uid,
-                              )
-                                  .whenComplete(() {
-                                showSnackBar(
-                                  context: context,
-                                  message:
-                                      'You are a member of this Organization',
-                                );
-                              });
-                            }
-                          } else {
-                            // join org and update data in firestore
-                            // join org and update data in firestore
-                            await orgProvider
-                                .addMemberToOrganization(
-                              uid: uid,
-                            )
-                                .whenComplete(() {
-                              showSnackBar(
-                                context: context,
-                                message:
-                                    'You are a member of this Organization',
-                              );
-                            });
-                          }
-                        },
-                      )
+                                }
+                              } else {
+                                // join org and update data in firestore
+                                // join org and update data in firestore
+                                await orgProvider
+                                    .addMemberToOrganization(
+                                  uid: uid,
+                                )
+                                    .whenComplete(() {
+                                  showSnackBar(
+                                    context: context,
+                                    message:
+                                        'You are a member of this Organization',
+                                  );
+                                });
+                              }
+                            },
+                          )
                     : Container(),
                 orgProvider.organizationModel.organizationTerms.isNotEmpty
                     ? TextButton(

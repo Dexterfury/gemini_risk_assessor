@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
@@ -14,7 +11,6 @@ import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
-import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
@@ -253,28 +249,11 @@ class AssessmentDetailsScreen extends StatelessWidget {
                               ),
                             ),
                       const SizedBox(width: 10),
-                      OpenContainer(
-                        closedBuilder: (context, action) {
-                          return IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              FontAwesomeIcons.share,
-                            ),
-                          );
-                        },
-                        openBuilder: (context, action) {
-                          // navigate to screen depending on the clicked icon
-                          return ShareScreen(
-                            itemModel: assessmentModel,
-                            generationType: generationType,
-                          );
-                        },
-                        transitionType: ContainerTransitionType.fadeThrough,
-                        transitionDuration: const Duration(milliseconds: 500),
-                        closedShape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        closedElevation: 4,
-                        openElevation: 4,
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          FontAwesomeIcons.share,
+                        ),
                       ),
                     ],
                   ),

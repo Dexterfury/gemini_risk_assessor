@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:provider/provider.dart';
 
 navigationControler({
@@ -13,7 +15,21 @@ navigationControler({
 
   switch (message.data[Constants.notificationType]) {
     case Constants.organizationInvitation:
+      log('getting data for: ${message.data[Constants.organizationID]}');
       // navigate to organizations tab
+      // get organization model and navigate to organization details page
+      FirebaseMethods.getOrganizationData(
+        orgID: message.data[Constants.organizationID],
+      ).then((orgModel) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrganizationDetails(
+              orgModel: orgModel,
+            ),
+          ),
+        );
+      });
       break;
     case Constants.dstiNotification:
       // navigate to organizations dsti tab

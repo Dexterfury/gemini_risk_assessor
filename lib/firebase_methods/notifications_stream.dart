@@ -80,57 +80,60 @@ class NotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: SizedBox(
-        width: 80,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: CachedNetworkImage(
-            imageUrl: notification.imageUrl,
-            fit: BoxFit.cover,
-            placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => const Center(
-                child: Icon(
-              Icons.error,
-              color: Colors.red,
-            )),
-            cacheManager: MyImageCacheManager.itemsCacheManager,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: SizedBox(
+          width: 80,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(
+              imageUrl: notification.imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => const Center(
+                  child: Icon(
+                Icons.error,
+                color: Colors.red,
+              )),
+              cacheManager: MyImageCacheManager.itemsCacheManager,
+            ),
           ),
         ),
-      ),
-      title: Text(
-        notification.title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text(
-        notification.description,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
+        title: Text(
+          notification.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          notification.description,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
 
-      //trailing: // show indicator if not clicked
-      onTap: () async {
-        // set was clicked to true
-        await FirebaseMethods.setNotificationClicked(
-          uid: uid,
-          notificationID: notification.notificationID,
-        ).whenComplete(() {
-          // navigate to notification details page
-          navigateToNotificationDetailsPage(
-            context,
-            notification,
-          );
-        });
-      },
-      trailing: notification.wasClicked
-          ? null
-          : const CircleAvatar(
-              radius: 10,
-              backgroundColor: Colors.blue,
-            ),
+        //trailing: // show indicator if not clicked
+        onTap: () async {
+          // set was clicked to true
+          await FirebaseMethods.setNotificationClicked(
+            uid: uid,
+            notificationID: notification.notificationID,
+          ).whenComplete(() {
+            // navigate to notification details page
+            navigateToNotificationDetailsPage(
+              context,
+              notification,
+            );
+          });
+        },
+        trailing: notification.wasClicked
+            ? null
+            : const CircleAvatar(
+                radius: 5,
+                backgroundColor: Colors.blue,
+              ),
+      ),
     );
   }
 
