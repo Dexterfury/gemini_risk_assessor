@@ -232,16 +232,21 @@ class FirebaseMethods {
     required String docID,
     required bool isDSTI,
     required String ownerID,
-    required bool isOrganization,
+    required String orgID,
     required AssessmentModel assessment,
     required Function() onSuccess,
     required Function(String) onError,
   }) async {
     final String collectionName =
         isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
-    final String rootCollection = isOrganization
+    final String rootCollection = orgID.isNotEmpty
         ? Constants.organizationCollection
         : Constants.usersCollection;
+
+    log('collectionName: $collectionName');
+    log('rootCollection: $rootCollection');
+    log('ownerID: $ownerID');
+    log('docID: $docID');
 
     try {
       final docRef = _firestore
@@ -253,15 +258,15 @@ class FirebaseMethods {
       // Start a batch write
       final WriteBatch batch = _firestore.batch();
 
-      if (isOrganization) {
+      if (orgID.isNotEmpty) {
         // If it's an organization deleting a shared document, remove org from user's sharedWith
         if (assessment.sharedWith.contains(ownerID)) {
           final userRef = _usersCollection
               .doc(assessment.createdBy)
               .collection(collectionName)
-              .doc(docID);
+              .doc(orgID);
           batch.update(userRef, {
-            Constants.sharedWith: FieldValue.arrayRemove([ownerID])
+            Constants.sharedWith: FieldValue.arrayRemove([orgID])
           });
         }
       } else {

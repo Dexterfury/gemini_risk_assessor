@@ -22,7 +22,6 @@ import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
-import 'package:gemini_risk_assessor/buttons/bottom_buttons_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_items_widget.dart';
 import 'package:gemini_risk_assessor/widgets/weather_button.dart';
@@ -186,6 +185,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 hazards: hazards,
                 risks: risks,
                 controlMeasures: control,
+                currentModel: currentModel,
               ),
               const SizedBox(height: 10),
               ppeList.isNotEmpty
@@ -217,20 +217,46 @@ class AssessmentDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  currentModel == null
-                      ? const SizedBox()
-                      : buildPDFAndShare(
-                          context,
-                          pdfUrl,
-                          id,
-                          assessmentModel,
-                          generationType,
-                        ),
+                  pdfAndShareButtons(context, assessmentModel, generationType),
                 ],
               ),
               const SizedBox(height: 10),
               currentModel == null
-                  ? const BottonButtonsField()
+                  ? Align(
+                      alignment: Alignment.centerRight,
+                      child: MainAppButton(
+                          icon: FontAwesomeIcons.floppyDisk,
+                          label: "Save Document",
+                          borderRadius: 15.0,
+                          onTap: () async {
+                            MyDialogs.showMyAnimatedDialog(
+                              context: context,
+                              title: 'Saving Document',
+                              loadingIndicator: const SizedBox(
+                                height: 100,
+                                width: 100,
+                                child: LoadingPPEIcons(),
+                              ),
+                            );
+                            await context
+                                .read<AssessmentProvider>()
+                                .saveDataToFirestore()
+                                .whenComplete(() {
+                              // pop the dialog
+                              Navigator.pop(context);
+
+                              Future.delayed(const Duration(seconds: 1))
+                                  .whenComplete(() {
+                                showSnackBar(
+                                  context: context,
+                                  message: 'Successfully saved document',
+                                );
+                                // pop the screen
+                                Navigator.pop(context);
+                              });
+                            });
+                          }),
+                    )
                   : const SizedBox(
                       height: 20,
                     ),
@@ -249,8 +275,11 @@ class AssessmentDetailsScreen extends StatelessWidget {
     );
   }
 
-  Row buildPDFAndShare(BuildContext context, String pdfUrl, String id,
-      AssessmentModel assessmentModel, generationType) {
+  pdfAndShareButtons(
+    BuildContext context,
+    AssessmentModel assessmentModel,
+    generationType,
+  ) {
     return Row(
       children: [
         // pdf icon
@@ -259,30 +288,33 @@ class AssessmentDetailsScreen extends StatelessWidget {
           color: Colors.white,
           child: IconButton(
             onPressed: () async {
-              // show my alert dialog for loading
+              // // show my alert dialog for loading
               MyDialogs.showMyAnimatedDialog(
                 context: context,
-                title: 'Processing',
+                title: 'Generating PDF file',
                 loadingIndicator: const SizedBox(
-                    height: 100, width: 100, child: LoadingPPEIcons()),
+                  height: 100,
+                  width: 100,
+                  child: LoadingPPEIcons(),
+                ),
               );
-              // open pdf
-              await context.read<AssessmentProvider>().openPdf(
-                    pdfUrl: pdfUrl,
-                    fileName: '$id.pdf',
-                    onSuccess: () {
-                      //pop loading dialog
-                      Navigator.of(context).pop();
-                    },
-                    onError: (error) {
-                      //pop loading dialog
-                      Navigator.of(context).pop();
-                      showSnackBar(
-                        context: context,
-                        message: 'Error loading PDF file',
-                      );
-                    },
+
+              // create the pdf file and save to local storage
+              await context.read<AssessmentProvider>().createPdfAndSave(
+                appBarTitle,
+                currentModel,
+                (error) {
+                  showSnackBar(
+                    context: context,
+                    message: 'Error loading PDF file',
                   );
+                  // close the loading dialog
+                  Navigator.pop(context);
+                },
+              ).whenComplete(() async {
+                // close the loading dialog
+                Navigator.pop(context);
+              });
             },
             icon: const Icon(
               FontAwesomeIcons.filePdf,
@@ -290,29 +322,31 @@ class AssessmentDetailsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        OpenContainer(
-          closedBuilder: (context, action) {
-            return IconButton(
-              onPressed: action,
-              icon: const Icon(
-                FontAwesomeIcons.share,
+        currentModel == null
+            ? const SizedBox()
+            : OpenContainer(
+                closedBuilder: (context, action) {
+                  return IconButton(
+                    onPressed: action,
+                    icon: const Icon(
+                      FontAwesomeIcons.share,
+                    ),
+                  );
+                },
+                openBuilder: (context, action) {
+                  // navigate to screen depending on the clicked icon
+                  return ShareScreen(
+                    itemModel: assessmentModel,
+                    generationType: generationType,
+                  );
+                },
+                transitionType: ContainerTransitionType.fadeThrough,
+                transitionDuration: const Duration(milliseconds: 500),
+                closedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                closedElevation: 4,
+                openElevation: 4,
               ),
-            );
-          },
-          openBuilder: (context, action) {
-            // navigate to screen depending on the clicked icon
-            return ShareScreen(
-              itemModel: assessmentModel,
-              generationType: generationType,
-            );
-          },
-          transitionType: ContainerTransitionType.fadeThrough,
-          transitionDuration: const Duration(milliseconds: 500),
-          closedShape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          closedElevation: 4,
-          openElevation: 4,
-        ),
       ],
     );
   }
@@ -444,6 +478,7 @@ class DeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDSTI = generationType == GenerationType.dsti;
+    final uid = context.read<AuthProvider>().userModel!.uid;
     Widget buttonWidget() {
       if (orgID.isEmpty) {
         return MainAppButton(
@@ -452,19 +487,34 @@ class DeleteButton extends StatelessWidget {
           contanerColor: Colors.red,
           borderRadius: 15.0,
           onTap: () async {
+            // show my alert dialog for loading
+            MyDialogs.showMyAnimatedDialog(
+              context: context,
+              title: 'Deleting...',
+              loadingIndicator: const SizedBox(
+                height: 100,
+                width: 100,
+                child: LoadingPPEIcons(),
+              ),
+            );
+
             await FirebaseMethods.deleteAssessment(
-              docID: orgID,
+              docID: assessment.id,
               isDSTI: isDSTI,
-              ownerID: orgID,
-              isOrganization: false,
+              ownerID: uid,
+              orgID: orgID,
               assessment: assessment,
               onSuccess: () {
-                // pop the screen
+                // pop the loading dialog
                 Navigator.pop(context);
-                showSnackBar(
-                  context: context,
-                  message: 'Successful Deleted',
-                );
+                Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+                  showSnackBar(
+                    context: context,
+                    message: 'Successful Deleted',
+                  );
+                  // pop the screen
+                  Navigator.pop(context);
+                });
               },
               onError: (error) {
                 showSnackBar(
@@ -503,19 +553,35 @@ class DeleteButton extends StatelessWidget {
                       contanerColor: Colors.red,
                       borderRadius: 15.0,
                       onTap: () async {
+                        // show my alert dialog for loading
+                        MyDialogs.showMyAnimatedDialog(
+                          context: context,
+                          title: 'Deleting...',
+                          loadingIndicator: const SizedBox(
+                            height: 100,
+                            width: 100,
+                            child: LoadingPPEIcons(),
+                          ),
+                        );
+
                         await FirebaseMethods.deleteAssessment(
-                          docID: orgID,
+                          docID: assessment.id,
                           isDSTI: isDSTI,
                           ownerID: assessment.createdBy,
-                          isOrganization: true,
+                          orgID: orgID,
                           assessment: assessment,
                           onSuccess: () {
-                            // pop the screen
+                            // pop the loading dialog
                             Navigator.pop(context);
-                            showSnackBar(
-                              context: context,
-                              message: 'Successful Deleted',
-                            );
+                            Future.delayed(const Duration(seconds: 1))
+                                .whenComplete(() {
+                              showSnackBar(
+                                context: context,
+                                message: 'Successful Deleted',
+                              );
+                              // pop the screen
+                              Navigator.pop(context);
+                            });
                           },
                           onError: (error) {
                             showSnackBar(

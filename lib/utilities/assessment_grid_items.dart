@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
@@ -10,6 +12,7 @@ class AssessmentGridItems extends StatefulWidget {
   final List<String> hazards;
   final List<String> risks;
   final List<String> controlMeasures;
+  final AssessmentModel? currentModel;
 
   const AssessmentGridItems({
     super.key,
@@ -17,6 +20,7 @@ class AssessmentGridItems extends StatefulWidget {
     required this.hazards,
     required this.risks,
     required this.controlMeasures,
+    this.currentModel,
   });
 
   @override
@@ -106,12 +110,38 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _selectedCategory ?? '',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _selectedCategory ?? '',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        widget.currentModel != null
+                            ? const SizedBox()
+                            : IconButton(
+                                onPressed: () {
+                                  // show dialog to add new item depending on the selected category
+                                  MyDialogs.showAddDialog(
+                                    context,
+                                    _selectedCategory,
+                                    widget.equipments,
+                                    widget.hazards,
+                                    widget.risks,
+                                    widget.controlMeasures,
+                                  );
+                                },
+                                icon: const Icon(
+                                  FontAwesomeIcons.plus,
+                                ),
+                              ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     ..._getSelectedList().map((item) {
@@ -122,42 +152,45 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                               word[0].toUpperCase() + word.substring(1))
                           .join(' ');
                       return InkWell(
-                        onTap: () {
-                          // show animated dialog and to remove item
-                          MyDialogs.showMyAnimatedDialog(
-                              context: context,
-                              title: 'Remove item',
-                              content:
-                                  'Are you sure to remove\n $capitalizedItem',
-                              actions: [
-                                ActionButton(
-                                  label: const Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                ActionButton(
-                                  label: const Text(
-                                    'Yes',
-                                  ),
-                                  onPressed: () {
-                                    context
-                                        .read<AssessmentProvider>()
-                                        .removeDataItem(
-                                            label: _selectedCategory!,
-                                            data: item)
-                                        .whenComplete(
-                                          () => Navigator.of(context).pop(),
-                                        );
-                                  },
-                                ),
-                              ]);
-                        },
+                        onTap: widget.currentModel != null
+                            ? null
+                            : () {
+                                // show animated dialog and to remove item
+                                MyDialogs.showMyAnimatedDialog(
+                                    context: context,
+                                    title: 'Remove item',
+                                    content:
+                                        'Are you sure to remove\n $capitalizedItem',
+                                    actions: [
+                                      ActionButton(
+                                        label: const Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      ActionButton(
+                                        label: const Text(
+                                          'Yes',
+                                        ),
+                                        onPressed: () {
+                                          context
+                                              .read<AssessmentProvider>()
+                                              .removeDataItem(
+                                                  label: _selectedCategory!,
+                                                  data: item)
+                                              .whenComplete(
+                                                () =>
+                                                    Navigator.of(context).pop(),
+                                              );
+                                        },
+                                      ),
+                                    ]);
+                              },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Text(

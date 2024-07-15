@@ -95,7 +95,9 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
               const SizedBox(
                 height: 10,
               ),
-              WeatherButtons(assessmentProvider: assessmentProvider),
+              WeatherButtons(
+                assessmentProvider: assessmentProvider,
+              ),
               const SizedBox(
                 height: 20,
               ),

@@ -37,34 +37,47 @@ class PDFHandler {
           await setDownloadStatus(path.basename(filePath), true);
           return file;
         } else {
-          print("Downloaded file is empty");
+          log("Downloaded file is empty");
           await setDownloadStatus(path.basename(filePath), false);
           return null;
         }
       } else {
-        print("Failed to download file: ${response.statusCode}");
+        log("Failed to download file: ${response.statusCode}");
         await setDownloadStatus(path.basename(filePath), false);
         return null;
       }
     } catch (e) {
-      print("Error downloading file: $e");
+      log("Error downloading file: $e");
       await setDownloadStatus(path.basename(filePath), false);
       return null;
     }
   }
 
-  static Future<void> openPDF(String url, String filename) async {
-    final filePath = await getLocalFilePath(filename);
+  static Future<void> openPDF(String filePath, String filename) async {
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      // Handle remote URL
+      final localFilePath = await getLocalFilePath(filename);
 
-    if (await isFileDownloaded(filePath) && await getDownloadStatus(filename)) {
-      await OpenFile.open(filePath);
-    } else {
-      final downloadedFile = await downloadFile(url, filePath);
-      if (downloadedFile != null) {
-        await OpenFile.open(downloadedFile.path);
+      if (await isFileDownloaded(localFilePath) &&
+          await getDownloadStatus(filename)) {
+        await OpenFile.open(localFilePath);
       } else {
-        print("Failed to download the file");
-        // Handle download failure (e.g., show an error message to the user)
+        final downloadedFile = await downloadFile(filePath, localFilePath);
+        if (downloadedFile != null) {
+          await OpenFile.open(downloadedFile.path);
+        } else {
+          log("Failed to download the file");
+          log('url: $filePath');
+          // Handle download failure (e.g., show an error message to the user)
+        }
+      }
+    } else {
+      // Handle local file path
+      if (await File(filePath).exists()) {
+        await OpenFile.open(filePath);
+      } else {
+        log("Local file not found: $filePath");
+        // Handle file not found error
       }
     }
   }

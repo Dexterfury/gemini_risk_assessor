@@ -38,7 +38,7 @@ class Constants {
   static const String toolExplainer = 'Tool Explainer';
 
   static getFolderName(String heading) {
-    return heading == Constants.riskAssessment ? 'RiskAssessments' : 'Dstis';
+    return heading == riskAssessment ? 'RiskAssessments' : 'Dstis';
   }
 
   // image cache manager keys

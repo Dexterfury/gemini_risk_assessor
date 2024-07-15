@@ -8,130 +8,130 @@ import 'package:gemini_risk_assessor/widgets/display_signature.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
-class BottonButtonsField extends StatelessWidget {
-  const BottonButtonsField({
-    super.key,
-    this.completed,
-  });
+// class BottonButtonsField extends StatelessWidget {
+//   const BottonButtonsField({
+//     super.key,
+//     this.completed,
+//   });
 
-  final Function()? completed;
+//   final Function()? completed;
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AssessmentProvider>(
-      builder: (context, assessmentProvider, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            assessmentProvider.signatureImage == null
-                ? MainAppButton(
-                    icon: Icons.fingerprint,
-                    label: "Add Signature",
-                    onTap: () {
-                      // show signature dialog
-                      MyDialogs.showMyAnimatedDialog(
-                          context: context,
-                          title: 'Signature',
-                          signatureInput: Container(
-                            height: 200,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                            ),
-                            child: SfSignaturePad(
-                              key: assessmentProvider.signatureGlobalKey,
-                              backgroundColor: Colors.white,
-                              strokeColor: Colors.black,
-                              minimumStrokeWidth: 1.0,
-                              maximumStrokeWidth: 4.0,
-                              onDrawEnd: () =>
-                                  assessmentProvider.setHasSigned(true),
-                            ),
-                          ),
-                          actions: [
-                            ActionButton(
-                              label: const Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            ActionButton(
-                              label: const Text(
-                                'Save',
-                              ),
-                              onPressed: () {
-                                if (!assessmentProvider.hasSigned) {
-                                  showSnackBar(
-                                      context: context,
-                                      message:
-                                          'Please sign the document first.');
-                                  return;
-                                }
-                                assessmentProvider
-                                    .saveSignature()
-                                    .whenComplete(() {
-                                  Navigator.of(context).pop();
-                                });
-                              },
-                            ),
-                          ]);
-                    })
-                : DisplaySignature(assessmentProvider: assessmentProvider),
-            const SizedBox(
-              width: 10,
-            ),
-            MainAppButton(
-                icon: Icons.save,
-                label: "Save Assessment",
-                onTap: () async {
-                  if (assessmentProvider.signatureImage == null) {
-                    showSnackBar(
-                      context: context,
-                      message: 'Please sign the document first.',
-                    );
-                    return;
-                  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Consumer<AssessmentProvider>(
+//       builder: (context, assessmentProvider, child) {
+//         return Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           children: [
+//             assessmentProvider.signatureImage == null
+//                 ? MainAppButton(
+//                     icon: Icons.fingerprint,
+//                     label: "Add Signature",
+//                     onTap: () {
+//                       // show signature dialog
+//                       MyDialogs.showMyAnimatedDialog(
+//                           context: context,
+//                           title: 'Signature',
+//                           signatureInput: Container(
+//                             height: 200,
+//                             decoration: BoxDecoration(
+//                               border: Border.all(color: Colors.grey),
+//                             ),
+//                             child: SfSignaturePad(
+//                               key: assessmentProvider.signatureGlobalKey,
+//                               backgroundColor: Colors.white,
+//                               strokeColor: Colors.black,
+//                               minimumStrokeWidth: 1.0,
+//                               maximumStrokeWidth: 4.0,
+//                               onDrawEnd: () =>
+//                                   assessmentProvider.setHasSigned(true),
+//                             ),
+//                           ),
+//                           actions: [
+//                             ActionButton(
+//                               label: const Text(
+//                                 'Cancel',
+//                                 style: TextStyle(
+//                                   color: Colors.red,
+//                                 ),
+//                               ),
+//                               onPressed: () {
+//                                 Navigator.of(context).pop();
+//                               },
+//                             ),
+//                             ActionButton(
+//                               label: const Text(
+//                                 'Save',
+//                               ),
+//                               onPressed: () {
+//                                 if (!assessmentProvider.hasSigned) {
+//                                   showSnackBar(
+//                                       context: context,
+//                                       message:
+//                                           'Please sign the document first.');
+//                                   return;
+//                                 }
+//                                 assessmentProvider
+//                                     .saveSignature()
+//                                     .whenComplete(() {
+//                                   Navigator.of(context).pop();
+//                                 });
+//                               },
+//                             ),
+//                           ]);
+//                     })
+//                 : DisplaySignature(assessmentProvider: assessmentProvider),
+//             const SizedBox(
+//               width: 10,
+//             ),
+//             MainAppButton(
+//                 icon: Icons.save,
+//                 label: "Save Assessment",
+//                 onTap: () async {
+//                   if (assessmentProvider.signatureImage == null) {
+//                     showSnackBar(
+//                       context: context,
+//                       message: 'Please sign the document first.',
+//                     );
+//                     return;
+//                   }
 
-                  // show my alert dialog for loading
-                  MyDialogs.showMyAnimatedDialog(
-                    context: context,
-                    title: 'Saving the document',
-                    loadingIndicator: const SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: LoadingPPEIcons(),
-                    ),
-                  );
-                  // create the pdf file and save to local storage
-                  assessmentProvider.createPdfAndSave().whenComplete(() async {
-                    // close the loading dialog
-                    Navigator.pop(context);
+//                   // show my alert dialog for loading
+//                   MyDialogs.showMyAnimatedDialog(
+//                     context: context,
+//                     title: 'Saving the document',
+//                     loadingIndicator: const SizedBox(
+//                       height: 100,
+//                       width: 100,
+//                       child: LoadingPPEIcons(),
+//                     ),
+//                   );
+//                   // create the pdf file and save to local storage
+//                   assessmentProvider.createPdfAndSave().whenComplete(() async {
+//                     // close the loading dialog
+//                     Navigator.pop(context);
 
-                    Future.delayed(const Duration(seconds: 1))
-                        .whenComplete(() async {
-                      // pop the screen
-                      Navigator.pop(context);
-                      showSnackBar(
-                          context: context, message: 'Successfully Generated');
-                    });
+//                     Future.delayed(const Duration(seconds: 1))
+//                         .whenComplete(() async {
+//                       // pop the screen
+//                       Navigator.pop(context);
+//                       showSnackBar(
+//                           context: context, message: 'Successfully Generated');
+//                     });
 
-                    // // navigate to home screen
-                    // navigationController(
-                    //   context: context,
-                    //   route: Constants.screensControllerRoute,
-                    // );
+//                     // // navigate to home screen
+//                     // navigationController(
+//                     //   context: context,
+//                     //   route: Constants.screensControllerRoute,
+//                     // );
 
-                    // await OpenFile.open(
-                    //     (assessmentProvider.pdfAssessmentFile!.path));
-                  });
-                }),
-          ],
-        );
-      },
-    );
-  }
-}
+//                     // await OpenFile.open(
+//                     //     (assessmentProvider.pdfAssessmentFile!.path));
+//                   });
+//                 }),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }

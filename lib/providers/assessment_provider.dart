@@ -19,6 +19,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as path;
@@ -35,7 +36,7 @@ class AssessmentProvider extends ChangeNotifier {
   AssessmentModel _assessmentModel =
       AssessmentModel.fromJson(<String, dynamic>{});
   Weather _weather = Weather.sunny;
-  File? _pdfAssessmentFile;
+  //File? _pdfAssessmentFile;
   bool _hasSigned = false;
   Uint8List? _signatureImage;
   String _organizationID = '';
@@ -48,11 +49,10 @@ class AssessmentProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   int get maxImages => _maxImages;
   int get numberOfPeople => _numberOfPeople;
-  String get pdfHeading => _pdfHeading;
   String get description => _description;
   AssessmentModel get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
-  File? get pdfAssessmentFile => _pdfAssessmentFile;
+  //File? get pdfAssessmentFile => _pdfAssessmentFile;
   bool get hasSigned => _hasSigned;
   Uint8List? get signatureImage => _signatureImage;
   String get organizationID => _organizationID;
@@ -84,28 +84,75 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // create pdf assessment file
-  Future<void> createPdfAndSave() async {
+  Future<void> createPdfAndSave(
+    String pdfHeading,
+    AssessmentModel? assessmentData,
+    Function(String) onError,
+  ) async {
     // set loading
     _isLoading = true;
     notifyListeners();
-    final creatorName = await getCreatorName(_assessmentModel.createdBy);
-    final file = await PdfApi.generatePdf(
-      assessmentModel: _assessmentModel,
-      signatureImage: _signatureImage!,
-      heading: _pdfHeading,
-      creatorName: creatorName,
-    );
 
-    _pdfAssessmentFile = file;
+    final assessment = assessmentData ?? _assessmentModel;
 
-    if (file.existsSync()) {
-      await OpenFile.open((file.path));
-      await saveDataToFirestore(file.absolute, _pdfHeading);
-    } else {
-      throw FileSystemException("PDF file does not exist", file.path);
+    try {
+      final creatorName = await getCreatorName(assessment.createdBy);
+
+      // Check if the PDF already exists
+      final folderName = Constants.getFolderName(pdfHeading);
+      final directory = await getApplicationDocumentsDirectory();
+      final dirPath = path.join(directory.path, folderName);
+      final fileName = '${assessment.id}.pdf';
+      final filePath = path.join(dirPath, fileName);
+      final file = File(filePath);
+
+      if (await file.exists()) {
+        // If the file exists, open it
+        await PDFHandler.openPDF(file.path, fileName);
+      } else {
+        // Generate PDF
+        final pdfFile = await PdfApi.generatePdf(
+          assessmentModel: assessment,
+          heading: pdfHeading,
+          creatorName: creatorName,
+        );
+
+        // Open the generated PDF
+        await PDFHandler.openPDF(pdfFile.path, fileName);
+      }
+    } catch (e) {
+      // Reset loading state
+      _isLoading = false;
+      notifyListeners();
+      // Handle any errors
+      onError(e.toString());
+    } finally {
+      // Reset loading state
+      _isLoading = false;
+      notifyListeners();
     }
   }
+
+  // // create pdf assessment file
+  // Future<void> createPdfAndSave() async {
+  //   // set loading
+  //   _isLoading = true;
+  //   notifyListeners();
+  //   final creatorName = await getCreatorName(_assessmentModel.createdBy);
+  //   final file = await PdfApi.generatePdf(
+  //     assessmentModel: _assessmentModel,
+  //     heading: _pdfHeading,
+  //     creatorName: creatorName,
+  //   );
+
+  //   _pdfAssessmentFile = file;
+
+  //   if (file.existsSync()) {
+  //     await OpenFile.open((file.path));
+  //   } else {
+  //     throw FileSystemException("PDF file does not exist", file.path);
+  //   }
+  // }
 
   Future<String> getCreatorName(String creatorId) async {
     final userDoc = await _firestore
@@ -116,19 +163,10 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   // save assement to firetore
-  Future<void> saveDataToFirestore(
-    File file,
-    String pdfHeading,
-  ) async {
+  Future<void> saveDataToFirestore() async {
     final id = _organizationID.isNotEmpty ? _organizationID : _uid;
     // get folder directory
-    final folderName = Constants.getFolderName(pdfHeading);
-
-    String fileUrl = await FileUploadHandler.uploadFileAndGetUrl(
-      file: file,
-      reference:
-          '${Constants.pdfFiles}/$folderName/$id/${assessmentModel.id}.pdf',
-    );
+    final folderName = Constants.getFolderName(_pdfHeading);
 
     if (_assessmentModel.images.isNotEmpty) {
       List<String> imagesUrls = [];
@@ -143,9 +181,6 @@ class AssessmentProvider extends ChangeNotifier {
 
       _assessmentModel.images = imagesUrls;
     }
-
-    // set pdf and images
-    _assessmentModel.pdfUrl = fileUrl;
 
     if (_organizationID.isEmpty) {
       if (_pdfHeading == Constants.riskAssessment) {
