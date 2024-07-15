@@ -122,6 +122,17 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       icon: FontAwesomeIcons.wandMagicSparkles,
                       label: 'Generate Assessment',
                       onTap: () async {
+                        final desc = _descriptionController.text;
+                        // if both images and description is empty return
+                        if (desc.isEmpty || desc.length < 10) {
+                          showSnackBar(
+                            context: context,
+                            message:
+                                'Please add a description of at least 10 characters',
+                          );
+                          return;
+                        }
+
                         final authProvider = context.read<AuthProvider>();
                         final creatorID = authProvider.userModel!.uid;
 
