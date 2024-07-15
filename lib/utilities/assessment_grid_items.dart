@@ -231,6 +231,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
     return GestureDetector(
       onTap: () => _toggleCategory(title),
       child: Card(
+        elevation: cardElevation,
         color: isSelected
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).cardColor,
