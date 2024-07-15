@@ -128,14 +128,14 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                             : IconButton(
                                 onPressed: () {
                                   // show dialog to add new item depending on the selected category
-                                  MyDialogs.showAddDialog(
-                                    context,
-                                    _selectedCategory,
-                                    widget.equipments,
-                                    widget.hazards,
-                                    widget.risks,
-                                    widget.controlMeasures,
-                                  );
+                                  // MyDialogs.showAddDialog(
+                                  //   context,
+                                  //   _selectedCategory,
+                                  //   widget.equipments,
+                                  //   widget.hazards,
+                                  //   widget.risks,
+                                  //   widget.controlMeasures,
+                                  // );
                                 },
                                 icon: const Icon(
                                   FontAwesomeIcons.plus,
