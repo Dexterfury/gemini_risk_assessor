@@ -236,6 +236,9 @@ class AssessmentDetailsScreen extends StatelessWidget {
                     ),
               DeleteButton(
                 orgID: orgID,
+                docID: id,
+                generationType: generationType,
+                assessment: assessmentModel,
               ),
             ],
           ),
@@ -426,12 +429,19 @@ class DeleteButton extends StatelessWidget {
   const DeleteButton({
     super.key,
     required this.orgID,
+    required this.docID,
+    required this.generationType,
+    required this.assessment,
   });
 
   final String orgID;
+  final String docID;
+  final GenerationType generationType;
+  final AssessmentModel assessment;
 
   @override
   Widget build(BuildContext context) {
+    final isDSTI = generationType == GenerationType.dsti;
     Widget buttonWidget() {
       if (orgID.isEmpty) {
         return MainAppButton(
@@ -439,7 +449,29 @@ class DeleteButton extends StatelessWidget {
           label: ' Delete ',
           contanerColor: Colors.red,
           borderRadius: 15.0,
-          onTap: () {},
+          onTap: () async {
+            await FirebaseMethods.deleteAssessment(
+              docID: orgID,
+              isDSTI: isDSTI,
+              ownerID: orgID,
+              isOrganization: false,
+              assessment: assessment,
+              onSuccess: () {
+                // pop the screen
+                Navigator.pop(context);
+                showSnackBar(
+                  context: context,
+                  message: 'Successful Deleted',
+                );
+              },
+              onError: (error) {
+                showSnackBar(
+                  context: context,
+                  message: error.toString(),
+                );
+              },
+            );
+          },
         );
       } else {
         final uid = context.read<AuthProvider>().userModel!.uid;
@@ -468,7 +500,29 @@ class DeleteButton extends StatelessWidget {
                       label: ' Delete ',
                       contanerColor: Colors.red,
                       borderRadius: 15.0,
-                      onTap: () {},
+                      onTap: () async {
+                        await FirebaseMethods.deleteAssessment(
+                          docID: orgID,
+                          isDSTI: isDSTI,
+                          ownerID: assessment.createdBy,
+                          isOrganization: true,
+                          assessment: assessment,
+                          onSuccess: () {
+                            // pop the screen
+                            Navigator.pop(context);
+                            showSnackBar(
+                              context: context,
+                              message: 'Successful Deleted',
+                            );
+                          },
+                          onError: (error) {
+                            showSnackBar(
+                              context: context,
+                              message: error.toString(),
+                            );
+                          },
+                        );
+                      },
                     )
                   : const SizedBox.shrink();
             }

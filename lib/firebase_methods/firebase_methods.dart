@@ -8,8 +8,8 @@ import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 
 class FirebaseMethods {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseStorage _storage = FirebaseStorage.instance;
 
   static final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
@@ -228,51 +228,88 @@ class FirebaseMethods {
     ]);
   }
 
-  // Future<void> deleteAssessment({
-  //   required String docId,
-  //   required bool isDsti,
-  //   required String ownerId,
-  //   required bool isOrganization,
-  //   required AssessmentModel assessment,
-  // }) async {
-  //   final String collectionName = isDsti ? Constants.dstiCollections : Constants.assessmentCollection;
-  //   final String rootCollection = isOrganization ? Constants.organizationCollection : Constants.usersCollection;
+  static Future<void> deleteAssessment({
+    required String docID,
+    required bool isDSTI,
+    required String ownerID,
+    required bool isOrganization,
+    required AssessmentModel assessment,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
+    final String collectionName =
+        isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
+    final String rootCollection = isOrganization
+        ? Constants.organizationCollection
+        : Constants.usersCollection;
 
-  //   try {
-  //     final docRef = _firestore.collection(rootCollection).doc(ownerId).collection(collectionName).doc(docId);
+    try {
+      final docRef = _firestore
+          .collection(rootCollection)
+          .doc(ownerID)
+          .collection(collectionName)
+          .doc(docID);
 
-  //     // Start a batch write
-  //     final WriteBatch batch = _firestore.batch();
+      // Start a batch write
+      final WriteBatch batch = _firestore.batch();
 
-  //     if (isOrganization) {
-  //       // If it's an organization deleting a shared document, remove org from user's sharedWith
-  //       if (assessment.createdBy != ownerId) {
-  //         final userRef = _firestore.collection('users').doc(assessment.createdBy).collection(collectionName).doc(docId);
-  //         batch.update(userRef, {
-  //           Constants.sharedWith: FieldValue.arrayRemove([ownerId])
-  //         });
-  //       }
-  //     } else {
-  //       // If it's a user deleting their own document
-  //       if (assessment.sharedWith.isEmpty) {
-  //         // If not shared, delete images from storage
-  //         await Future.wait(assessment.images.map((url) => _deleteImage(url)));
-  //       }
-  //       // Note: We're not removing the document from shared organizations as per the new requirements
-  //     }
+      if (isOrganization) {
+        // If it's an organization deleting a shared document, remove org from user's sharedWith
+        if (assessment.sharedWith.contains(ownerID)) {
+          final userRef = _usersCollection
+              .doc(assessment.createdBy)
+              .collection(collectionName)
+              .doc(docID);
+          batch.update(userRef, {
+            Constants.sharedWith: FieldValue.arrayRemove([ownerID])
+          });
+        }
+      } else {
+        // If it's a user deleting their own document
+        if (assessment.sharedWith.isEmpty) {
+          // If not shared, delete images from storage
+          await Future.wait(
+            assessment.images.map(
+              (url) => _deleteImage(
+                imageUrl: url,
+                onError: onError,
+              ),
+            ),
+          );
+        }
+        // Note: We're not removing the document from shared organizations so they can still see it
+      }
 
-  //     // Delete the document
-  //     batch.delete(docRef);
+      // Delete the document
+      batch.delete(docRef);
 
-  //     // Commit the batch
-  //     await batch.commit();
+      // Commit the batch
+      await batch.commit();
 
-  //     print('Assessment successfully deleted and related documents updated');
-  //   } catch (e) {
-  //     print('Error deleting assessment: $e');
-  //     rethrow;
-  //   }
-  // }
+      print('Assessment successfully deleted and related documents updated');
+      onSuccess();
+    } catch (e) {
+      print('Error deleting assessment: $e');
+      onError(e.toString());
+    }
+  }
+
+  static Future<void> _deleteImage({
+    required String imageUrl,
+    required Function(String) onError,
+  }) async {
+    try {
+      final ref = _storage.refFromURL(imageUrl);
+      await ref.delete();
+      print('Deleted image: $imageUrl');
+    } catch (e) {
+      print('Error deleting image: $e');
+      // You might want to handle this error according to your app's requirements
+      onError(
+        e.toString(),
+      );
+    }
+  }
 
   // // delete assessment from o rganization and user
   // static Future<void> deleteAssessment({
