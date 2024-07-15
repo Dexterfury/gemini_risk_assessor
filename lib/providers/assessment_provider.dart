@@ -559,7 +559,7 @@ class AssessmentProvider extends ChangeNotifier {
     return '''
 You are a Safety officer who ensures safe work practices.
 
-Generate a risk assessment based on the data information provided below.
+Generate a $_pdfHeading based on the data information provided below.
 The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
 If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
 
@@ -578,7 +578,7 @@ ${_description.isNotEmpty ? _description : ''}
   }
 
   static String noRiskFound =
-      "No risks identified based on information and images provided";
+      "No risks identified based on information provided";
 
   final String format = '''
 Return the assessment as valid JSON using the following structure:

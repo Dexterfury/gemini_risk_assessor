@@ -234,12 +234,14 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   : const SizedBox(
                       height: 20,
                     ),
-              DeleteButton(
-                orgID: orgID,
-                docID: id,
-                generationType: generationType,
-                assessment: assessmentModel,
-              ),
+              currentModel == null
+                  ? const SizedBox()
+                  : DeleteButton(
+                      orgID: orgID,
+                      docID: id,
+                      generationType: generationType,
+                      assessment: assessmentModel,
+                    ),
             ],
           ),
         ),

@@ -212,6 +212,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           assessmentProvider.resetCreationData();
                           // reset description
                           _descriptionController.clear();
+
+                          Navigator.pop(context);
                         },
                         child: const Text('Yes'))
                   ]);
