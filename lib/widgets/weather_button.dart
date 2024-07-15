@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 
 class WeatherButton extends StatelessWidget {
   const WeatherButton({
@@ -19,31 +20,33 @@ class WeatherButton extends StatelessWidget {
     final capitalizedTitle = title.isNotEmpty
         ? title[0].toUpperCase() + title.substring(1)
         : 'Unknown';
-    return GestureDetector(
-      onTap: onChanged,
-      child: Container(
-        decoration: BoxDecoration(
-          color: value
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Colors.grey[300],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: FittedBox(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Icon(iconData),
-                const SizedBox(width: 4),
-                Text(capitalizedTitle),
-                const SizedBox(width: 4),
-                if (value)
-                  const Icon(
-                    Icons.check,
-                    size: 15,
-                  ),
-              ],
+    return SizedBox(
+      height: 56.0,
+      width: MediaQuery.of(context).size.width / 4,
+      child: Card(
+        color: value
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).cardColor,
+        elevation: cardElevation,
+        child: GestureDetector(
+          onTap: onChanged,
+          child: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: FittedBox(
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Icon(iconData),
+                  const SizedBox(width: 4),
+                  Text(capitalizedTitle),
+                  const SizedBox(width: 4),
+                  if (value)
+                    const Icon(
+                      Icons.check,
+                      size: 15,
+                    ),
+                ],
+              ),
             ),
           ),
         ),

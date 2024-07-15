@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -100,12 +101,13 @@ class ImagesDisplay extends StatelessWidget {
   }
 
   getImagesToShow(dynamic provider) {
-    if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
-      return const Text('No images added');
-    } else if (isViewOnly && currentAssessmentModel != null) {
+    if (isViewOnly && currentAssessmentModel != null) {
       return _assessmentViewImages();
     } else if (isViewOnly && currentToolModel != null) {
       return _toolViewImages();
+    }
+    if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
+      return const Text('No images added');
     } else {
       return ProviderViewImages(
         isViewOnly: isViewOnly,

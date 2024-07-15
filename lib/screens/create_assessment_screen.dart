@@ -148,25 +148,24 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                               child: LoadingPPEIcons()),
                         );
 
-                        await assessmentProvider
-                            .submitPrompt(
+                        await assessmentProvider.submitPrompt(
                           creatorID: creatorID,
                           orgID: orgID,
                           description: _descriptionController.text,
                           docTitle: docTitle,
-                        )
-                            .then((value) async {
-                          // pop the the dialog
-                          Navigator.pop(context);
-                          if (value) {
-                            action();
-                          } else {
+                          onSuccess: () {
+                            // pop the loading dialog
+                            Navigator.pop(context);
+                            Future.delayed(const Duration(milliseconds: 500))
+                                .whenComplete(action);
+                          },
+                          onError: (error) {
                             showSnackBar(
                               context: context,
-                              message: AssessmentProvider.noRiskFound,
+                              message: error,
                             );
-                          }
-                        });
+                          },
+                        );
                       },
                     );
                   },

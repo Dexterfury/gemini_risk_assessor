@@ -103,7 +103,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
         SizeTransition(
           sizeFactor: _animation,
           child: Card(
-            //color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).cardColor,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: SizedBox(
@@ -231,8 +231,9 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
     return GestureDetector(
       onTap: () => _toggleCategory(title),
       child: Card(
-        color:
-            isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+        color: isSelected
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).cardColor,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: FittedBox(

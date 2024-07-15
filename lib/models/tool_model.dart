@@ -84,7 +84,7 @@ class ToolModel {
   Map<String, dynamic> toJson() {
     return {
       Constants.id: id,
-      Constants.name: title,
+      Constants.title: title,
       Constants.description: description,
       Constants.summary: summary,
       Constants.toolPdf: toolPdf,

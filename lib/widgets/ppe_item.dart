@@ -20,7 +20,9 @@ class PpeItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Card(
-        color: isAdded ? Theme.of(context).colorScheme.primaryContainer : null,
+        color: isAdded
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).cardColor,
         child: Padding(
           padding: const EdgeInsets.only(
             left: 4.0,

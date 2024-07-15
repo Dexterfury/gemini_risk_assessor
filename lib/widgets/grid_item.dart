@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
@@ -33,6 +35,7 @@ class GridItem extends StatelessWidget {
       toolModel,
       orgModel,
     );
+
     return Card(
       color: Theme.of(context).cardColor,
       elevation: cardElevation,

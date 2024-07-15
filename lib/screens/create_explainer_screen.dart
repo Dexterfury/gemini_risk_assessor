@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -152,25 +154,23 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                     final authProvider = context.read<AuthProvider>();
                     final description = _descriptionController.text;
 
-                    await toolProvider
-                        .submitPrompt(
+                    await toolProvider.submitPrompt(
                       creatorID: authProvider.userModel!.uid,
                       organizationID: orgID,
                       description: description,
-                    )
-                        .then((value) async {
-                      // hide my alert dialog
-                      Navigator.pop(context);
-
-                      if (value) {
-                        action();
-                      } else {
+                      onSuccess: () {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        Future.delayed(const Duration(milliseconds: 500))
+                            .whenComplete(action);
+                      },
+                      onError: (error) {
                         showSnackBar(
                           context: context,
-                          message: ToolsProvider.noToolFound,
+                          message: error,
                         );
-                      }
-                    });
+                      },
+                    );
                   },
                 );
               },
@@ -183,9 +183,6 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                       toolProvider.clearImages();
                       _descriptionController.clear();
 
-                      // setState(() {
-
-                      // });
                       showSnackBar(
                           context: context, message: 'Tool Successfully saved');
                     } else {

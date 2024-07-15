@@ -546,11 +546,13 @@ class AssessmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> submitPrompt({
+  Future<void> submitPrompt({
     required String creatorID,
     required String orgID,
     required String description,
     required String docTitle,
+    required Function() onSuccess,
+    required Function(String) onError,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -580,7 +582,7 @@ class AssessmentProvider extends ChangeNotifier {
       if (content.text != null && content.text!.contains(noRiskFound)) {
         // show error message
         _isLoading = false;
-        return false;
+        onError(noRiskFound);
       } else {
         final List<String> images = [];
         if (_imagesFileList != null) {
@@ -601,7 +603,7 @@ class AssessmentProvider extends ChangeNotifier {
         );
         _isLoading = false;
         notifyListeners();
-        return true;
+        onSuccess();
       }
     } catch (error) {
       // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
@@ -610,11 +612,9 @@ class AssessmentProvider extends ChangeNotifier {
         print(error);
       }
       _isLoading = false;
+      notifyListeners();
+      onError(error.toString());
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return false;
   }
 
   String get mainPrompt {

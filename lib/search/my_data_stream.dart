@@ -79,11 +79,37 @@ class MyDataStream extends StatelessWidget {
               }
 
               return generationType == GenerationType.tool
-                  ? _toolsWidget(
-                      searchQuery,
-                      results,
-                      snapshot,
-                    )
+                  ? searchQuery.isNotEmpty
+                      ? GridView.builder(
+                          itemCount: results.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1,
+                          ),
+                          itemBuilder: (context, index) {
+                            final doc = results[index];
+                            final data = doc.data() as Map<String, dynamic>;
+
+                            final tool = ToolModel.fromJson(data);
+                            return GridItem(toolModel: tool);
+                          },
+                        )
+                      : GridView.builder(
+                          itemCount: snapshot.data!.docs.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1,
+                          ),
+                          itemBuilder: (context, index) {
+                            final doc = snapshot.data!.docs[index];
+                            final data = doc.data() as Map<String, dynamic>;
+
+                            final tool = ToolModel.fromJson(data);
+                            return GridItem(toolModel: tool);
+                          },
+                        )
                   : searchQuery.isNotEmpty
                       ? ListView.builder(
                           itemCount: results.length,
@@ -161,42 +187,6 @@ class MyDataStream extends StatelessWidget {
       default:
         return tabProvider.dstiSearchQuery;
     }
-  }
-
-  _toolsWidget(
-    searchQuery,
-    List<QueryDocumentSnapshot<Object?>> results,
-    AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
-  ) {
-    searchQuery.isNotEmpty
-        ? GridView.builder(
-            itemCount: results.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-            ),
-            itemBuilder: (context, index) {
-              final doc = results[index];
-              final data = doc.data() as Map<String, dynamic>;
-
-              final tool = ToolModel.fromJson(data);
-              return GridItem(toolModel: tool);
-            },
-          )
-        : GridView.builder(
-            itemCount: snapshot.data!.docs.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-            ),
-            itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final data = doc.data() as Map<String, dynamic>;
-
-              final tool = ToolModel.fromJson(data);
-              return GridItem(toolModel: tool);
-            },
-          );
   }
 
   getAppBarTitle(GenerationType generationType) {

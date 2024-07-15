@@ -14,32 +14,22 @@ class WeatherButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        itemCount: Weather.values.length,
-        itemBuilder: (context, index) {
-          final weather = Weather.values[index];
-          final value = assessmentProvider.weather == weather;
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: SizedBox(
-              width: 100,
+    return FittedBox(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (final weather in Weather.values)
+            IntrinsicHeight(
               child: WeatherButton(
-                  title: weather.name,
-                  value: value,
-                  iconData: getWeatherIcon(weather),
-                  onChanged: () {
-                    assessmentProvider.setWeather(
-                      newWeather: weather,
-                    );
-                  }),
+                title: weather.name,
+                value: assessmentProvider.weather == weather,
+                iconData: getWeatherIcon(weather),
+                onChanged: () {
+                  assessmentProvider.setWeather(newWeather: weather);
+                },
+              ),
             ),
-          );
-        },
+        ],
       ),
     );
   }

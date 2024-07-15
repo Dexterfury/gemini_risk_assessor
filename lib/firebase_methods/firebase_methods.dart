@@ -15,8 +15,6 @@ class FirebaseMethods {
       FirebaseFirestore.instance.collection(Constants.usersCollection);
   static final CollectionReference _organizationsCollection =
       FirebaseFirestore.instance.collection(Constants.organizationCollection);
-  static final CollectionReference _toolsCollection =
-      FirebaseFirestore.instance.collection(Constants.toolsCollection);
 
   // stream my tools from firestore
   static Stream<QuerySnapshot> toolsStream({
@@ -24,7 +22,7 @@ class FirebaseMethods {
     required String orgID,
   }) {
     if (orgID.isNotEmpty) {
-      return _toolsCollection
+      return _organizationsCollection
           .doc(orgID)
           .collection(Constants.toolsCollection)
           .snapshots();
@@ -242,11 +240,6 @@ class FirebaseMethods {
     final String rootCollection = orgID.isNotEmpty
         ? Constants.organizationCollection
         : Constants.usersCollection;
-
-    log('collectionName: $collectionName');
-    log('rootCollection: $rootCollection');
-    log('ownerID: $ownerID');
-    log('docID: $docID');
 
     try {
       final docRef = _firestore

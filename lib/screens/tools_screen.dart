@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -81,7 +83,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
               builder: (BuildContext context, StateSetter setState) {
                 final results = snapshot.data!.docs
                     .where(
-                      (element) => element[Constants.name]
+                      (element) => element[Constants.title]
                           .toString()
                           .toLowerCase()
                           .contains(

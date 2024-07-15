@@ -32,6 +32,8 @@ class GeminiModelManager {
   final List<SafetySetting> _safetySettings = [
     SafetySetting(HarmCategory.harassment, HarmBlockThreshold.high),
     SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+    SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.medium),
+    SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
   ];
 
   // Retrieve API key from environment variables

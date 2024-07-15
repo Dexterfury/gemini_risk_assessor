@@ -26,7 +26,12 @@ class ButtonsRow extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              buildButton(Icons.assignment_add, orgID, 'DSTI', isAdmin),
+              buildButton(
+                Icons.assignment_add,
+                orgID,
+                'DSTI',
+                isAdmin,
+              ),
               const SizedBox(
                 width: 5,
               ),

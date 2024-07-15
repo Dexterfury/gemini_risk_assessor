@@ -38,8 +38,8 @@ class ToolsProvider extends ChangeNotifier {
   ToolModel? get toolModel => _toolModel;
   List<ToolModel> get toolsList => _toolsList;
 
-  final CollectionReference toolsCollection =
-      FirebaseFirestore.instance.collection(Constants.toolsCollection);
+  final CollectionReference _usersCollection =
+      FirebaseFirestore.instance.collection(Constants.usersCollection);
 
   Future<bool> saveToolToFirestore() async {
     if (_toolModel != null) {
@@ -60,7 +60,7 @@ class ToolsProvider extends ChangeNotifier {
           _toolModel!.images = imagesUrls;
         }
 
-        await toolsCollection
+        await _usersCollection
             .doc(id)
             .collection(Constants.toolsCollection)
             .doc(_toolModel!.id)
@@ -293,10 +293,12 @@ class ToolsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> submitPrompt({
+  Future<void> submitPrompt({
     required String creatorID,
     required String organizationID,
     required String description,
+    required Function() onSuccess,
+    required Function(String) onError,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -325,7 +327,7 @@ class ToolsProvider extends ChangeNotifier {
       if (content.text != null && content.text!.contains(noToolFound)) {
         // show error message
         _isLoading = false;
-        return false;
+        onError(noToolFound);
       } else {
         final List<String> images = [];
         if (_imagesFileList != null) {
@@ -345,7 +347,7 @@ class ToolsProvider extends ChangeNotifier {
         );
         _isLoading = false;
         notifyListeners();
-        return false;
+        onSuccess();
       }
     } catch (error) {
       if (kDebugMode) {
@@ -353,7 +355,7 @@ class ToolsProvider extends ChangeNotifier {
       }
       _isLoading = false;
       notifyListeners();
-      return false;
+      onError(error.toString());
     }
   }
 
@@ -379,7 +381,7 @@ ${_description.isNotEmpty ? _description : ''}
   final String format = '''
 Return the response as valid JSON using the following structure:
 {
-  "name": \$name,
+  "title": \$title,
   "description": \$description,
   "summary": \$summary,
 }
