@@ -3,6 +3,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,8 @@ class MembersCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      color: Theme.of(context).cardColor,
+      elevation: cardElevation,
       child: Column(
         children: [
           FutureBuilder<List<UserModel>>(
@@ -55,11 +57,17 @@ class MembersCard extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final member = snapshot.data![index];
                     final isAdmin = orgModel.adminsUIDs.contains(member.uid);
-                    return UserWidget(
-                      userData: member,
-                      isAdminView: isAdmin,
-                      showCheckMark: false,
-                      viewType: UserViewType.user,
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8.0,
+                        right: 8.0,
+                      ),
+                      child: UserWidget(
+                        userData: member,
+                        isAdminView: isAdmin,
+                        showCheckMark: false,
+                        viewType: UserViewType.user,
+                      ),
                     );
                   });
             },

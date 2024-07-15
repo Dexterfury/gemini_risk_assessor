@@ -34,6 +34,8 @@ class GridItem extends StatelessWidget {
       orgModel,
     );
     return Card(
+      color: Theme.of(context).cardColor,
+      elevation: cardElevation,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final imageHeight = constraints.maxHeight * 0.8;

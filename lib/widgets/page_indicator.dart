@@ -23,7 +23,8 @@ class PageIndicator extends StatelessWidget {
             child: SmoothPageIndicator(
               controller: _pageController,
               count: images.length,
-              effect: const WormEffect(
+              effect: WormEffect(
+                activeDotColor: Theme.of(context).primaryColor,
                 dotHeight: 16,
                 dotWidth: 16,
                 type: WormType.normal,

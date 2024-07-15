@@ -79,14 +79,14 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 4,
               ),
               PageIndicator(
                 pageController: _pageController,
                 images: images,
               ),
               const SizedBox(
-                height: 10,
+                height: 4,
               ),
               isViewOnly
                   ? buildToolDescriptionText(widget.tool!)

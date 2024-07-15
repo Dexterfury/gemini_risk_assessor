@@ -201,7 +201,7 @@ class MyDialogs {
   static void showMyEditAnimatedDialog({
     required BuildContext context,
     required String title,
-    required String content,
+    int maxLength = 20,
     String hintText = '',
     required String textAction,
     required Function(bool, String) onActionTap,
@@ -227,7 +227,9 @@ class MyDialogs {
                 ),
                 content: TextField(
                   controller: controller,
-                  maxLength: content == Constants.changeName ? 20 : 500,
+                  maxLength: maxLength,
+                  minLines: 1,
+                  maxLines: 5,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     hintText: hintText,

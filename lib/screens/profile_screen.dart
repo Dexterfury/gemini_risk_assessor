@@ -100,6 +100,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Card(
+                    color: Theme.of(context).cardColor,
+                    elevation: cardElevation,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Column(
@@ -173,6 +175,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             const SizedBox(height: 10),
                             Card(
+                              color: Theme.of(context).cardColor,
+                              elevation: cardElevation,
                               child: Column(
                                 children: [
                                   SettingsListTile(
@@ -246,6 +250,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             const SizedBox(height: 10),
                             Card(
+                              color: Theme.of(context).cardColor,
+                              elevation: cardElevation,
                               child: Column(
                                 children: [
                                   SettingsListTile(
@@ -335,7 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             MyDialogs.showMyEditAnimatedDialog(
               context: context,
               title: Constants.aboutMe,
-              content: Constants.aboutMe,
+              maxLength: 500,
               hintText: userModel.aboutMe,
               textAction: "Change",
               onActionTap: (value, updatedText) async {
@@ -383,7 +389,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             MyDialogs.showMyEditAnimatedDialog(
               context: context,
               title: Constants.changeName,
-              content: Constants.changeName,
               hintText: userModel.name,
               textAction: "Change",
               onActionTap: (value, updatedText) async {

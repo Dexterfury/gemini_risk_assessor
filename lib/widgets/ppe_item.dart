@@ -15,10 +15,12 @@ class PpeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ? Theme.of(context).colorScheme.primaryContainer
+    //           : Colors.grey[300],
     return InkWell(
       onTap: onTap,
       child: Card(
-        color: isAdded ? Theme.of(context).highlightColor : null,
+        color: isAdded ? Theme.of(context).colorScheme.primaryContainer : null,
         child: Padding(
           padding: const EdgeInsets.only(
             left: 4.0,

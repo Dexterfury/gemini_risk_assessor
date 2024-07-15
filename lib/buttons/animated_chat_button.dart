@@ -12,7 +12,7 @@ class AnimatedChatButton extends StatefulWidget {
     super.key,
     required this.onPressed,
     this.size = ChatButtonSize.large,
-    this.color = Colors.blue,
+    this.color = Colors.green,
     this.iconColor = Colors.black,
     this.icon = Icons.chat,
   });

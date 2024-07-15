@@ -11,13 +11,12 @@ ThemeData lightTheme = ThemeData(
         displayColor: Colors.black,
       ),
   dialogBackgroundColor: Colors.grey[200],
-  highlightColor: Colors.blue[100],
   colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.deepPurple,
+    seedColor: Colors.green,
     brightness: Brightness.light,
   ),
   useMaterial3: true,
-  cardColor: Colors.grey[800],
+  cardColor: Colors.white,
 ).copyWith(
   pageTransitionsTheme: const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -37,7 +36,7 @@ ThemeData darkTheme = ThemeData(
   dialogBackgroundColor: Colors.grey[800],
   highlightColor: Colors.grey[600],
   colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.deepPurple,
+    seedColor: Colors.green,
     brightness: Brightness.dark,
   ),
   useMaterial3: true,
@@ -49,6 +48,8 @@ ThemeData darkTheme = ThemeData(
     },
   ),
 );
+
+const cardElevation = 4.0;
 
 // text styles
 const textStyle28w500 = TextStyle(

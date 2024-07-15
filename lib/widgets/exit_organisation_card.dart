@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 
 class ExitCard extends StatelessWidget {
@@ -12,7 +13,8 @@ class ExitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      color: Theme.of(context).cardColor,
+      elevation: cardElevation,
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: SettingsListTile(

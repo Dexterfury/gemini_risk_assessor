@@ -38,7 +38,7 @@ class PromptDataModel {
     return PromptDataModel(
       images: images ?? this.images,
       textInput: textInput ?? this.textInput,
-      numberOfPeople: numberOfPlayers ?? this.numberOfPeople,
+      numberOfPeople: numberOfPlayers ?? numberOfPeople,
       selectedPpe: selectedPpe ?? this.selectedPpe,
       additionalTextInputs: additionalTextInputs ?? this.additionalTextInputs,
     );

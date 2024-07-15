@@ -159,6 +159,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
             child: Column(
               children: [
                 Card(
+                  color: Theme.of(context).cardColor,
+                  elevation: cardElevation,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -418,7 +420,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                         MyDialogs.showMyEditAnimatedDialog(
                           context: context,
                           title: 'Edit Description',
-                          content: Constants.changeDescription,
+                          maxLength: 500,
                           hintText:
                               orgProvider.organizationModel.aboutOrganization,
                           textAction: "Change",
@@ -536,7 +538,6 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                           MyDialogs.showMyEditAnimatedDialog(
                             context: context,
                             title: 'Edit Name',
-                            content: Constants.changeName,
                             hintText: orgProvider.organizationModel.name,
                             textAction: "Change",
                             onActionTap: (value, updatedText) async {

@@ -365,6 +365,33 @@ class AssessmentProvider extends ChangeNotifier {
     }
   }
 
+  // add item to list
+  Future<void> addDataItem({
+    required String label,
+    required String data,
+  }) async {
+    switch (label) {
+      case 'Equipments':
+        _assessmentModel.equipments.add(data);
+        notifyListeners();
+        break;
+      case 'Hazards':
+        _assessmentModel.hazards.add(data);
+        notifyListeners();
+        break;
+      case 'Risks':
+        _assessmentModel.risks.add(data);
+        notifyListeners();
+        break;
+      case 'Control Measures':
+        _assessmentModel.control.add(data);
+        notifyListeners();
+        break;
+      default:
+        break;
+    }
+  }
+
   // add ppe model item
   void addOrRemovePpeModelItem({required PpeModel ppeItem}) {
     // check ppeModelList contains ppeItem

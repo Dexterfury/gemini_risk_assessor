@@ -349,7 +349,7 @@ class ToolsProvider extends ChangeNotifier {
       }
     } catch (error) {
       if (kDebugMode) {
-        print(error);
+        print('error### : $error');
       }
       _isLoading = false;
       notifyListeners();

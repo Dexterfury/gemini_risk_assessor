@@ -78,6 +78,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
 
   @override
   Widget build(BuildContext context) {
+    final assessmentProvider = context.read<AssessmentProvider>();
     return Column(
       children: [
         Text(
@@ -128,14 +129,22 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                             : IconButton(
                                 onPressed: () {
                                   // show dialog to add new item depending on the selected category
-                                  // MyDialogs.showAddDialog(
-                                  //   context,
-                                  //   _selectedCategory,
-                                  //   widget.equipments,
-                                  //   widget.hazards,
-                                  //   widget.risks,
-                                  //   widget.controlMeasures,
-                                  // );
+                                  MyDialogs.showMyEditAnimatedDialog(
+                                    context: context,
+                                    title: _selectedCategory ?? '',
+                                    maxLength: 500,
+                                    hintText:
+                                        'Add new ${_selectedCategory ?? ''}',
+                                    textAction: "Save",
+                                    onActionTap: (value, updatedText) async {
+                                      if (value) {
+                                        assessmentProvider.addDataItem(
+                                          label: _selectedCategory!,
+                                          data: updatedText,
+                                        );
+                                      }
+                                    },
+                                  );
                                 },
                                 icon: const Icon(
                                   FontAwesomeIcons.plus,
@@ -178,11 +187,11 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                                           'Yes',
                                         ),
                                         onPressed: () {
-                                          context
-                                              .read<AssessmentProvider>()
+                                          assessmentProvider
                                               .removeDataItem(
-                                                  label: _selectedCategory!,
-                                                  data: item)
+                                                label: _selectedCategory!,
+                                                data: item,
+                                              )
                                               .whenComplete(
                                                 () =>
                                                     Navigator.of(context).pop(),

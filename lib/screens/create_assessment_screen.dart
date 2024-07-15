@@ -205,7 +205,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
       return Padding(
         padding: const EdgeInsets.all(4.0),
         child: CircleAvatar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: IconButton(
             onPressed: () {
               MyDialogs.showMyAnimatedDialog(
