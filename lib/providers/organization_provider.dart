@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
@@ -86,6 +87,22 @@ class OrganizationProvider extends ChangeNotifier {
     // set temp members
     _tempOrgMemberUIDs = List<String>.from(orgModel.membersUIDs);
     _awaitApprovalList = List<String>.from(orgModel.awaitingApprovalUIDs);
+    notifyListeners();
+  }
+
+  Future<void> updateOrganizationSettings(DataSettings settings) async {
+    // updates settings in firestore
+    await _organizationCollection
+        .doc(_organizationModel.organizationID)
+        .update({
+      Constants.organizationTerms: settings.organizationTerms,
+      Constants.allowSharing: settings.allowSharing,
+      Constants.requestToReadTerms: settings.requestToReadTerms,
+    });
+    // update in provider
+    _organizationModel.organizationTerms = settings.organizationTerms;
+    _organizationModel.allowSharing = settings.allowSharing;
+    _organizationModel.requestToReadTerms = settings.requestToReadTerms;
     notifyListeners();
   }
 

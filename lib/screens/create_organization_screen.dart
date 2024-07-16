@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
@@ -26,15 +29,14 @@ class CreateOrganizationScreen extends StatefulWidget {
 class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _termsController = TextEditingController();
 
   File? _finalFileImage;
+  DataSettings _dataSettings = DataSettings();
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _termsController.dispose();
     super.dispose();
   }
 
@@ -59,45 +61,88 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DisplayOrgImage(
-                    fileImage: _finalFileImage,
-                    onPressed: () async {
-                      final file =
-                          await ImagePickerHandler.showImagePickerDialog(
-                        context: context,
-                      );
-                      if (file != null) {
-                        setState(() {
-                          _finalFileImage = file;
-                        });
-                      }
-                    },
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).primaryColor,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: DisplayOrgImage(
+                      fileImage: _finalFileImage,
+                      onPressed: () async {
+                        final file =
+                            await ImagePickerHandler.showImagePickerDialog(
+                          context: context,
+                        );
+                        if (file != null) {
+                          setState(() {
+                            _finalFileImage = file;
+                          });
+                        }
+                      },
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  MainAppButton(
-                    icon: Icons.person_add,
-                    contanerColor: Colors.blue,
-                    label: 'People',
-                    onTap: () {
-                      if (organizationProvider.isLoading) {
-                        return;
-                      }
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          if (organizationProvider.isLoading) {
+                            return;
+                          }
 
-                      MyDialogs.showAnimatedPeopleDialog(
-                        context: context,
-                        userViewType: UserViewType.creator,
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text(
-                                'Close',
-                                style: textStyle18Bold,
-                              ))
-                        ],
-                      );
-                    },
+                          MyDialogs.showAnimatedPeopleDialog(
+                            context: context,
+                            userViewType: UserViewType.creator,
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text(
+                                    'Close',
+                                    style: textStyle18Bold,
+                                  ))
+                            ],
+                          );
+                        },
+                        icon: const Icon(
+                          FontAwesomeIcons.userPlus,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrganizationSettingsScreen(
+                                isNew: true,
+                                initialSettings: DataSettings(
+                                  requestToReadTerms:
+                                      _dataSettings.requestToReadTerms,
+                                  allowSharing: _dataSettings.allowSharing,
+                                  organizationTerms:
+                                      _dataSettings.organizationTerms,
+                                ),
+                                onSave: (DataSettings settings) {
+                                  setState(() {
+                                    _dataSettings = settings;
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(
+                          FontAwesomeIcons.gear,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -120,20 +165,12 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                 organizationProvider: organizationProvider,
               ),
 
-              const SizedBox(height: 20),
-              // organization description input field
-              InputField(
-                labelText: Constants.enterTerms,
-                hintText: Constants.termsOptional,
-                controller: _termsController,
-                organizationProvider: organizationProvider,
-              ),
-
               const SizedBox(height: 40),
 
               MainAppButton(
                 icon: Icons.save,
-                label: 'Save and Continue',
+                label: ' Save and Continue ',
+                borderRadius: 15,
                 onTap: () {
                   if (organizationProvider.isLoading) {
                     return;
@@ -143,21 +180,10 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                   final shortName = _nameController.text.length < 3;
 
                   // check description
-                  final emptyDescription = _descriptionController.text.isEmpty;
-                  final shortDescription =
-                      _descriptionController.text.length < 10;
-
-                  // if terms controller is not null, check terms length, it shpuld not be less than 10
-                  final invalidTerms = _termsController.text.isNotEmpty &&
-                      _termsController.text.length < 10;
-                  if (invalidTerms) {
-                    showSnackBar(
-                      context: context,
-                      message:
-                          'Terms field must be empty or atleast atleast 10 Characters',
-                    );
-                    return;
-                  }
+                  // final emptyDescription = _descriptionController.text.isEmpty;
+                  // final shortDescription =
+                  //     _descriptionController.text.length < 10;
+                  // final desc = emptyDescription ? Constants.defaultDescription : _descriptionController.text;
 
                   // check name
                   if (emptyName || shortName) {
@@ -170,22 +196,24 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                     return;
                   }
                   // check description
-                  if (emptyDescription || shortDescription) {
-                    showSnackBar(
-                      context: context,
-                      message: emptyDescription
-                          ? 'Please enter organization description'
-                          : 'organization description must be at least 10 characters',
-                    );
-                    return;
-                  }
+                  // if (emptyDescription || shortDescription) {
+                  //   showSnackBar(
+                  //     context: context,
+                  //     message: emptyDescription
+                  //         ? 'Please enter organization description'
+                  //         : 'organization description must be at least 10 characters',
+                  //   );
+                  //   return;
+                  // }
 
                   final orgModel = OrganizationModel(
                     creatorUID: context.read<AuthProvider>().userModel!.uid,
                     name: _nameController.text,
                     aboutOrganization: _descriptionController.text,
-                    organizationTerms: _termsController.text,
                     imageUrl: '',
+                    organizationTerms: _dataSettings.organizationTerms,
+                    requestToReadTerms: _dataSettings.requestToReadTerms,
+                    allowSharing: _dataSettings.allowSharing,
                   );
 
                   // show loading dialog

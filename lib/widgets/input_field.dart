@@ -30,7 +30,7 @@ class InputField extends StatelessWidget {
       keyboardType: isNameInput ? TextInputType.text : TextInputType.multiline,
       textInputAction:
           isNameInput ? TextInputAction.next : TextInputAction.done,
-      maxLength: isNameInput ? 20 : 500,
+      maxLength: isNameInput ? 25 : 500,
       minLines: 1,
       maxLines: 3,
       enabled: getEnabled(),

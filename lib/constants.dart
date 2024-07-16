@@ -190,6 +190,9 @@ class Constants {
   static const String loading = 'loading';
   static const String signature = 'signature';
 
+  // default description
+  static const String defaultDescription = 'Organization Description';
+
   static String getDoctTitle(String docTitle) {
     if (docTitle == createAssessment) {
       return riskAssessment;

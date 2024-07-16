@@ -144,7 +144,7 @@ class MyDialogs {
   static void animatedEditTermsDialog({
     required BuildContext context,
     required String initialTerms,
-    required Function(String) onSave,
+    required Function(String) action,
   }) {
     final textController = TextEditingController(text: initialTerms);
 
@@ -163,28 +163,36 @@ class MyDialogs {
             opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
             child: AlertDialog(
               title: const Text(
-                'Edit Terms and Conditions',
+                'Terms and Conditions',
                 textAlign: TextAlign.center,
               ),
               content: SizedBox(
                 width: double.maxFinite,
                 child: TextField(
                   controller: textController,
-                  maxLines: null,
+                  minLines: 1,
+                  maxLines: 10,
                   keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter terms and conditions here...',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: 'Terms and conditions',
+                    hintText: 'Enter terms and conditions',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    onSave(textController.text);
+                    action(textController.text);
                     Navigator.of(context).pop();
                   },
                   child: const Text('Save'),

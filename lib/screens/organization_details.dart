@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
+import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/org_settings_provider.dart';
@@ -121,7 +122,12 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
         builder: (context, orgProvider, child) {
       bool isAdmin = orgProvider.organizationModel.adminsUIDs.contains(uid);
       String orgID = orgProvider.organizationModel.organizationID;
-      String membersCount = getMembersCount(orgProvider.organizationModel);
+      String orgTerms = orgProvider.organizationModel.organizationTerms;
+      bool requestToReadTerms =
+          orgProvider.organizationModel.requestToReadTerms;
+      bool allowSharing = orgProvider.organizationModel.allowSharing;
+
+      //String membersCount = getMembersCount(orgProvider.organizationModel);
       bool showAcceptBtn =
           orgProvider.organizationModel.awaitingApprovalUIDs.contains(uid);
       return Scaffold(
@@ -134,19 +140,23 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                     padding: const EdgeInsets.only(right: 8.0),
                     child: IconButton(
                         onPressed: () async {
-                          context
-                              .read<OrgSettingsProvider>()
-                              .setOrganizationModel(
-                                  orgProvider.organizationModel)
-                              .whenComplete(() {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const OrganizationSettingsScreen(),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrganizationSettingsScreen(
+                                isNew: false,
+                                initialSettings: DataSettings(
+                                  requestToReadTerms: requestToReadTerms,
+                                  allowSharing: allowSharing,
+                                  organizationTerms: orgTerms,
+                                ),
+                                onSave: (DataSettings settings) {
+                                  orgProvider
+                                      .updateOrganizationSettings(settings);
+                                },
                               ),
-                            );
-                          });
+                            ),
+                          );
                         },
                         icon: const Icon(FontAwesomeIcons.gear, size: 20)),
                   )
@@ -400,6 +410,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     bool isAdmin,
     OrganizationProvider orgProvider,
   ) {
+    final desc = orgProvider.organizationModel.aboutOrganization;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -458,10 +469,12 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
         const SizedBox(
           height: 5,
         ),
-        Text(
-          orgProvider.organizationModel.aboutOrganization,
-          style: textStyle16w600,
-        ),
+        desc.isEmpty
+            ? const SizedBox.shrink()
+            : Text(
+                orgProvider.organizationModel.aboutOrganization,
+                style: textStyle16w600,
+              ),
       ],
     );
   }
