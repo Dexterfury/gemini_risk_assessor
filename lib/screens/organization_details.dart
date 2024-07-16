@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -21,6 +22,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
 import 'package:gemini_risk_assessor/widgets/exit_organisation_card.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class OrganizationDetails extends StatefulWidget {
@@ -245,72 +247,79 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
           orgModel: orgProvider.organizationModel,
           isAdmin: isAdmin,
         ),
-        const SizedBox(height: 10),
-        ExitCard(
-          onTap: () {
-            // exit group
-            MyDialogs.showMyAnimatedDialog(
-              context: context,
-              title: 'Exit Group',
-              content: 'Are you sure you want to exit the group?',
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    // pop the dialog
-                    Navigator.pop(context);
+        const SizedBox(height: 20),
 
-                    // show loading dialog
-                    showLoadingDialog(
-                      title: 'Exiting',
-                    );
-                    final orgProvider = context.read<OrganizationProvider>();
+        Card(
+          color: Theme.of(context).cardColor,
+          elevation: cardElevation,
+          child: SettingsListTile(
+            title: 'Exit Organization',
+            icon: FontAwesomeIcons.arrowRightFromBracket,
+            iconContainerColor: Colors.red,
+            onTap: () {
+              // exit group
+              MyDialogs.showMyAnimatedDialog(
+                context: context,
+                title: 'Exit Organization',
+                content: 'Are you sure you want to leave this Organisation?',
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      // pop the dialog
+                      Navigator.pop(context);
 
-                    String result = await orgProvider.exitOrganization(
-                      isAdmin: isAdmin,
-                      uid: uid,
-                      orgID: orgID,
-                    );
+                      // show loading dialog
+                      showLoadingDialog(
+                        title: 'Exiting',
+                      );
 
-                    if (result == Constants.exitSuccessful ||
-                        result == Constants.deletedSuccessfully) {
-                      Future.delayed(const Duration(milliseconds: 200))
-                          .whenComplete(() {
-                        if (context.mounted) {
-                          // pop loading dialog
-                          Navigator.pop(context);
-                          // show snackbar
-                          showSnackBar(
-                            context: context,
-                            message: result,
-                          );
-                          // pop the Organization details Screen
-                          Navigator.pop(context);
-                        }
-                      });
-                    } else {
-                      Future.delayed(const Duration(milliseconds: 200))
-                          .whenComplete(() {
-                        if (context.mounted) {
-                          // pop loading dialog
-                          Navigator.pop(context);
-                          // show snackbar
-                          showSnackBar(
-                            context: context,
-                            message: result,
-                          );
-                        }
-                      });
-                    }
-                  },
-                  child: const Text('Yes'),
-                ),
-              ],
-            );
-          },
+                      String result = await orgProvider.exitOrganization(
+                        isAdmin: isAdmin,
+                        uid: uid,
+                        orgID: orgID,
+                      );
+
+                      if (result == Constants.exitSuccessful ||
+                          result == Constants.deletedSuccessfully) {
+                        Future.delayed(const Duration(milliseconds: 200))
+                            .whenComplete(() {
+                          if (context.mounted) {
+                            // pop loading dialog
+                            Navigator.pop(context);
+                            // show snackbar
+                            showSnackBar(
+                              context: context,
+                              message: result,
+                            );
+                            // pop the Organization details Screen
+                            Navigator.pop(context);
+                          }
+                        });
+                      } else {
+                        Future.delayed(const Duration(milliseconds: 200))
+                            .whenComplete(() {
+                          if (context.mounted) {
+                            // pop loading dialog
+                            Navigator.pop(context);
+                            // show snackbar
+                            showSnackBar(
+                              context: context,
+                              message: result,
+                            );
+                          }
+                        });
+                      }
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ],
+              );
+            },
+          ),
         )
       ],
     );
@@ -491,40 +500,50 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DisplayOrgImage(
-            isViewOnly: true,
-            fileImage: _finalFileImage,
-            imageUrl: orgProvider.organizationModel.imageUrl ?? '',
-            onPressed: !isAdmin
-                ? null
-                : () async {
-                    final file = await ImagePickerHandler.showImagePickerDialog(
-                      context: context,
-                    );
-                    if (file != null) {
-                      setState(() async {
-                        _finalFileImage = file;
-                      });
-                      // show loading dialog
-                      showLoadingDialog(
-                        title: 'Saving,',
-                      );
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: DisplayOrgImage(
+                isViewOnly: true,
+                fileImage: _finalFileImage,
+                imageUrl: orgProvider.organizationModel.imageUrl ?? '',
+                onPressed: !isAdmin
+                    ? null
+                    : () async {
+                        final file =
+                            await ImagePickerHandler.showImagePickerDialog(
+                          context: context,
+                        );
+                        if (file != null) {
+                          setState(() async {
+                            _finalFileImage = file;
+                          });
+                          // show loading dialog
+                          showLoadingDialog(
+                            title: 'Saving,',
+                          );
 
-                      final imageUrl = await FileUploadHandler.updateImage(
-                        file: file,
-                        isUser: false,
-                        id: orgProvider.organizationModel.organizationID,
-                        reference:
-                            '${Constants.organizationImage}/${orgProvider.organizationModel.organizationID}.jpg',
-                      );
+                          final imageUrl = await FileUploadHandler.updateImage(
+                            file: file,
+                            isUser: false,
+                            id: orgProvider.organizationModel.organizationID,
+                            reference:
+                                '${Constants.organizationImage}/${orgProvider.organizationModel.organizationID}.jpg',
+                          );
 
-                      // set newimage in provider
-                      await setNewImageInProvider(imageUrl);
+                          // set newimage in provider
+                          await setNewImageInProvider(imageUrl);
 
-                      // pop loading dialog
-                      popDialog();
-                    }
-                  },
+                          // pop loading dialog
+                          popDialog();
+                        }
+                      },
+              ),
+            ),
           ),
           const SizedBox(
             width: 10,
@@ -588,43 +607,48 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                   height: 10,
                 ),
                 isAdmin
-                    ? MainAppButton(
-                        icon: Icons.person_add,
-                        label: 'People',
-                        contanerColor: Colors.blue,
-                        onTap: () {
-                          // show people dialog
-                          _showPeopleDialog(
-                              context: context,
-                              onActionTap: (value) async {
-                                if (value) {
-                                  bool isSaved = await context
-                                      .read<OrganizationProvider>()
-                                      .updateOrganizationDataInFireStore();
+                    ? Card(
+                        color: Theme.of(context).cardColor,
+                        elevation: cardElevation,
+                        shape: const CircleBorder(),
+                        child: IconButton(
+                          onPressed: () {
+                            // show people dialog
+                            _showPeopleDialog(
+                                context: context,
+                                onActionTap: (value) async {
+                                  if (value) {
+                                    bool isSaved = await context
+                                        .read<OrganizationProvider>()
+                                        .updateOrganizationDataInFireStore();
 
-                                  if (isSaved) {
-                                    Future.delayed(
-                                            const Duration(milliseconds: 100))
-                                        .whenComplete(() {
-                                      showSnackBar(
-                                        context: context,
-                                        message:
-                                            'Requests sent to added members',
-                                      );
-                                    });
+                                    if (isSaved) {
+                                      Future.delayed(
+                                              const Duration(milliseconds: 100))
+                                          .whenComplete(() {
+                                        showSnackBar(
+                                          context: context,
+                                          message:
+                                              'Requests sent to added members',
+                                        );
+                                      });
+                                    }
                                   }
-                                }
 
-                                Future.delayed(
-                                        const Duration(milliseconds: 100))
-                                    .whenComplete(() async {
-                                  // clear search query
-                                  context
-                                      .read<OrganizationProvider>()
-                                      .setSearchQuery('');
+                                  Future.delayed(
+                                          const Duration(milliseconds: 100))
+                                      .whenComplete(() async {
+                                    // clear search query
+                                    context
+                                        .read<OrganizationProvider>()
+                                        .setSearchQuery('');
+                                  });
                                 });
-                              });
-                        },
+                          },
+                          icon: const Icon(
+                            FontAwesomeIcons.userPlus,
+                          ),
+                        ),
                       )
                     : const SizedBox.shrink(),
                 showAcceptBtn

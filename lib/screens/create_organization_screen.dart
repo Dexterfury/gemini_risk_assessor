@@ -57,94 +57,114 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).primaryColor,
-                          width: 1,
-                        ),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: DisplayOrgImage(
-                      fileImage: _finalFileImage,
-                      onPressed: () async {
-                        final file =
-                            await ImagePickerHandler.showImagePickerDialog(
-                          context: context,
-                        );
-                        if (file != null) {
-                          setState(() {
-                            _finalFileImage = file;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+              Card(
+                color: Theme.of(context).cardColor,
+                elevation: cardElevation,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          if (organizationProvider.isLoading) {
-                            return;
-                          }
-
-                          MyDialogs.showAnimatedPeopleDialog(
-                            context: context,
-                            userViewType: UserViewType.creator,
-                            actions: [
-                              TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text(
-                                    'Close',
-                                    style: textStyle18Bold,
-                                  ))
-                            ],
-                          );
-                        },
-                        icon: const Icon(
-                          FontAwesomeIcons.userPlus,
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: DisplayOrgImage(
+                            fileImage: _finalFileImage,
+                            onPressed: () async {
+                              final file = await ImagePickerHandler
+                                  .showImagePickerDialog(
+                                context: context,
+                              );
+                              if (file != null) {
+                                setState(() {
+                                  _finalFileImage = file;
+                                });
+                              }
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(
-                        width: 20,
+                        width: 10,
                       ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OrganizationSettingsScreen(
-                                isNew: true,
-                                initialSettings: DataSettings(
-                                  requestToReadTerms:
-                                      _dataSettings.requestToReadTerms,
-                                  allowSharing: _dataSettings.allowSharing,
-                                  organizationTerms:
-                                      _dataSettings.organizationTerms,
-                                ),
-                                onSave: (DataSettings settings) {
-                                  setState(() {
-                                    _dataSettings = settings;
-                                  });
-                                },
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Card(
+                            color: Theme.of(context).cardColor,
+                            elevation: cardElevation,
+                            shape: const CircleBorder(),
+                            child: IconButton(
+                              onPressed: () {
+                                if (organizationProvider.isLoading) {
+                                  return;
+                                }
+
+                                MyDialogs.showAnimatedPeopleDialog(
+                                  context: context,
+                                  userViewType: UserViewType.creator,
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text(
+                                          'Close',
+                                          style: textStyle18Bold,
+                                        ))
+                                  ],
+                                );
+                              },
+                              icon: const Icon(
+                                FontAwesomeIcons.userPlus,
                               ),
                             ),
-                          );
-                        },
-                        icon: const Icon(
-                          FontAwesomeIcons.gear,
-                        ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Card(
+                            color: Theme.of(context).cardColor,
+                            elevation: cardElevation,
+                            shape: const CircleBorder(),
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        OrganizationSettingsScreen(
+                                      isNew: true,
+                                      initialSettings: DataSettings(
+                                        requestToReadTerms:
+                                            _dataSettings.requestToReadTerms,
+                                        allowSharing:
+                                            _dataSettings.allowSharing,
+                                        organizationTerms:
+                                            _dataSettings.organizationTerms,
+                                      ),
+                                      onSave: (DataSettings settings) {
+                                        setState(() {
+                                          _dataSettings = settings;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(
+                                FontAwesomeIcons.gear,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
               const SizedBox(height: 30),
 

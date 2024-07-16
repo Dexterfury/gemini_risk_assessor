@@ -49,7 +49,7 @@ ThemeData darkTheme = ThemeData(
   ),
 );
 
-const cardElevation = 4.0;
+const cardElevation = 2.0;
 
 // text styles
 const textStyle28w500 = TextStyle(

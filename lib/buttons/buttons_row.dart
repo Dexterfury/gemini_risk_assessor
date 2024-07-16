@@ -6,6 +6,7 @@ import 'package:gemini_risk_assessor/screens/discussion_screen.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 
 class ButtonsRow extends StatelessWidget {
   const ButtonsRow({
@@ -120,7 +121,7 @@ Widget buildButton(
     transitionDuration: const Duration(milliseconds: 500),
     closedShape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    closedElevation: 4,
+    closedElevation: cardElevation,
     openElevation: 4,
   );
 }

@@ -10,6 +10,7 @@ import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/screens/about_screen.dart';
 import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
@@ -212,7 +213,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     icon: Icons.info,
                                     iconContainerColor: Colors.blue,
                                     onTap: () {
-                                      // navigate to account settings
+                                      // navigate to about screen
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AboutScreen(),
+                                        ),
+                                      );
                                     },
                                   ),
                                   ListTile(
