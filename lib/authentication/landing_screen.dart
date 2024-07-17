@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class LandingScreen extends StatefulWidget {

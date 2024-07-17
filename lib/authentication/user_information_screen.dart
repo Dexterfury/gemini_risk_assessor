@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
@@ -117,21 +119,32 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       createdAt: '',
     );
 
-    authProvider.saveUserDataToFireStore(
-      userModel: userModel,
-      fileImage: _finalFileImage,
-      onSuccess: () async {
-        // save user data to shared preferences
-        await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
-          navigationController(
-            context: context,
-            route: Constants.screensControllerRoute,
-          );
-        });
-      },
-      onFail: () async {
-        showSnackBar(context: context, message: 'Failed to save user data');
-      },
-    );
+    try {
+      authProvider.setLoading(true);
+      authProvider.saveUserDataToFireStore(
+        userModel: userModel,
+        fileImage: _finalFileImage,
+        onSuccess: () async {
+          // save user data to shared preferences
+          await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
+            navigationController(
+              context: context,
+              route: Constants.screensControllerRoute,
+            );
+          });
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+        FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+      });
+    } catch (e) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        showSnackBar(
+            context: context, message: 'An unexpected error occurred: $e');
+      });
+    } finally {
+      authProvider.setLoading(false);
+    }
   }
 }

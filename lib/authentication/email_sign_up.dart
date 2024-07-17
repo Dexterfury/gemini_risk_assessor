@@ -1,9 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
@@ -83,9 +81,6 @@ class _EmailSignUpState extends State<EmailSignUp> {
               await authProvider.signOut().whenComplete(() {
                 Navigator.pop(context);
               });
-            },
-            onFail: (error) {
-              showSnackBar(context: context, message: error.toString());
             },
           );
         }

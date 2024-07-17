@@ -118,41 +118,30 @@ class AuthenticationProvider extends ChangeNotifier {
     required UserModel userModel,
     required File? fileImage,
     required Function onSuccess,
-    required Function onFail,
   }) async {
-    _isLoading = true;
-    notifyListeners();
+    if (fileImage != null) {
+      // upload image to storage
+      String imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
+          file: fileImage,
+          reference: '${Constants.userImages}/${userModel.uid}.jpg');
 
-    try {
-      if (fileImage != null) {
-        // upload image to storage
-        String imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
-            file: fileImage,
-            reference: '${Constants.userImages}/${userModel.uid}.jpg');
-
-        userModel.imageUrl = imageUrl;
-        // update the display image in firebase auth
-        await _auth.currentUser!.updatePhotoURL(imageUrl);
-      }
-      userModel.createdAt = DateTime.now().microsecondsSinceEpoch.toString();
-
-      _userModel = userModel;
-      _uid = userModel.uid;
-
-      // save user data to firestore
-      await _firestore
-          .collection(Constants.usersCollection)
-          .doc(userModel.uid)
-          .set(userModel.toJson());
-
-      _isLoading = false;
-      onSuccess();
-      notifyListeners();
-    } on FirebaseException catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      onFail(e.toString());
+      userModel.imageUrl = imageUrl;
+      // update the display image in firebase auth
+      await _auth.currentUser!.updatePhotoURL(imageUrl);
     }
+    userModel.createdAt = DateTime.now().microsecondsSinceEpoch.toString();
+
+    _userModel = userModel;
+    _uid = userModel.uid;
+
+    // save user data to firestore
+    await _firestore
+        .collection(Constants.usersCollection)
+        .doc(userModel.uid)
+        .set(userModel.toJson());
+
+    onSuccess();
+    notifyListeners();
   }
 
   // check if user exists in firestore
@@ -186,42 +175,23 @@ class AuthenticationProvider extends ChangeNotifier {
   // sign in anonymous
   Future<void> signInAnonymously({
     required Function() onSuccess,
-    required Function(String) onFail,
   }) async {
     _isLoading = true;
-    _isSuccessful = false;
     notifyListeners();
-    try {
-      // check if user is already signed in and sign them out first
-      if (_auth.currentUser != null) {
-        _uid = _auth.currentUser!.uid;
-        notifyListeners();
-        onSuccess();
-        return;
-      }
-
-      await FirebaseAuth.instance.signInAnonymously().then((value) async {
-        _uid = value.user!.uid;
-        _phoneNumber = value.user!.phoneNumber;
-        onSuccess();
-        notifyListeners();
-      });
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case "operation-not-allowed":
-          _isLoading = false;
-          notifyListeners();
-          onFail(e.code);
-          break;
-        default:
-          _isLoading = false;
-          notifyListeners();
-          onFail(e.code);
-      }
-    } finally {
-      _isSuccessful = true;
+    // check if user is already signed in and sign them out first
+    if (_auth.currentUser != null) {
+      _uid = _auth.currentUser!.uid;
       notifyListeners();
+      onSuccess();
+      return;
     }
+
+    await FirebaseAuth.instance.signInAnonymously().then((value) async {
+      _uid = value.user!.uid;
+      _phoneNumber = value.user!.phoneNumber;
+      onSuccess();
+      notifyListeners();
+    });
   }
 
   // check if signed in user is anonymous or not
@@ -626,10 +596,11 @@ class AuthenticationProvider extends ChangeNotifier {
     required SignInType signInType,
   }) async {
     try {
+      _isLoading = true;
+      notifyListeners();
       switch (signInType) {
         case SignInType.google:
           // google sign in
-          print('Attempting Google sign in...');
           UserCredential? userCredential = await _signInWithGoogle();
           if (userCredential != null) {
             Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
@@ -713,9 +684,6 @@ class AuthenticationProvider extends ChangeNotifier {
                 route: Constants.screensControllerRoute,
               );
             });
-          },
-          onFail: (error) {
-            log('error saving user data: $error');
           },
         );
       }

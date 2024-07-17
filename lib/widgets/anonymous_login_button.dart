@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/auth_button.dart';
-import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
@@ -39,67 +40,74 @@ class AnonymousLoginButton extends StatelessWidget {
                   return;
                 }
 
-                authProvider.signInAnonymously(
-                  onSuccess: () async {
-                    bool userExists =
-                        await authProvider.checkUserExistsInFirestore();
-                    if (userExists) {
-                      // 2. if user exists,
+                try {
+                  authProvider.signInAnonymously(
+                    onSuccess: () async {
+                      bool userExists =
+                          await authProvider.checkUserExistsInFirestore();
+                      if (userExists) {
+                        // 2. if user exists,
 
-                      // * get user information from firestore
-                      await authProvider.getUserDataFromFireStore();
+                        // * get user information from firestore
+                        await authProvider.getUserDataFromFireStore();
 
-                      // * save user information to provider / shared preferences
-                      await authProvider
-                          .saveUserDataToSharedPreferences()
-                          .whenComplete(() {
-                        // * navigate to home screen
-                        navigationController(
-                          context: context,
-                          route: Constants.screensControllerRoute,
+                        // * save user information to provider / shared preferences
+                        await authProvider
+                            .saveUserDataToSharedPreferences()
+                            .whenComplete(() {
+                          // * navigate to home screen
+                          navigationController(
+                            context: context,
+                            route: Constants.screensControllerRoute,
+                          );
+                        });
+                      } else {
+                        // we generate a random name here
+                        final name =
+                            "User${(1000 + (DateTime.now().millisecondsSinceEpoch % 9000))}";
+                        UserModel userModel = UserModel(
+                          uid: authProvider.uid!,
+                          name: name,
+                          phone: '',
+                          email: '',
+                          imageUrl: '',
+                          token: '',
+                          aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+                          createdAt: '',
                         );
-                      });
-                    } else {
-                      // we generate a random name here
-                      final name =
-                          "User${(1000 + (DateTime.now().millisecondsSinceEpoch % 9000))}";
-                      UserModel userModel = UserModel(
-                        uid: authProvider.uid!,
-                        name: name,
-                        phone: '',
-                        email: '',
-                        imageUrl: '',
-                        token: '',
-                        aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
-                        createdAt: '',
-                      );
-                      authProvider.saveUserDataToFireStore(
-                        fileImage: null,
-                        userModel: userModel,
-                        onSuccess: () async {
-                          // save user data to shared preferences
-                          await authProvider
-                              .saveUserDataToSharedPreferences()
-                              .whenComplete(() {
-                            // navigate to home screen
-                            navigationController(
-                              context: context,
-                              route: Constants.screensControllerRoute,
-                            );
-                          });
-                        },
-                        onFail: () async {
-                          showSnackBar(
-                              context: context,
-                              message: 'Failed to save user data');
-                        },
-                      );
-                    }
-                  },
-                  onFail: (error) {
-                    showSnackBar(context: context, message: error);
-                  },
-                );
+                        authProvider.saveUserDataToFireStore(
+                          fileImage: null,
+                          userModel: userModel,
+                          onSuccess: () async {
+                            // save user data to shared preferences
+                            await authProvider
+                                .saveUserDataToSharedPreferences()
+                                .whenComplete(() {
+                              // navigate to home screen
+                              navigationController(
+                                context: context,
+                                route: Constants.screensControllerRoute,
+                              );
+                            });
+                          },
+                        );
+                      }
+                    },
+                  );
+                } on FirebaseAuthException catch (e) {
+                  Future.delayed(const Duration(milliseconds: 200))
+                      .whenComplete(() {
+                    FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+                  });
+                } catch (e) {
+                  Future.delayed(const Duration(milliseconds: 200), () {
+                    showSnackBar(
+                        context: context,
+                        message: 'An unexpected error occurred: $e');
+                  });
+                } finally {
+                  authProvider.setLoading(false);
+                }
               }
             },
           );

@@ -10,7 +10,6 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/widgets/anonymous_login_button.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -45,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthenticationProvider>();
+    final isLoading = authProvider.isLoading;
     return Scaffold(
         body: Padding(
       padding: const EdgeInsets.symmetric(
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          //mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
             SizedBox(
@@ -91,44 +91,58 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
-            AuthButton(
-              icon: FontAwesomeIcons.solidEnvelope,
-              label: 'Sign in with Email',
-              containerColor: Colors.grey,
-              onTap: () {
-                // navigate to email sign in
-                Navigator.pushNamed(context, Constants.emailSignInRoute);
-              },
-            ),
-            const SizedBox(height: 10),
-            AuthButton(
-              icon: FontAwesomeIcons.google,
-              label: 'Sign in with Google',
-              containerColor: Colors.blue,
-              onTap: () async {
-                await authProvider.socialLogin(
-                  context: context,
-                  signInType: SignInType.google,
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            AuthButton(
-              icon: FontAwesomeIcons.apple,
-              label: 'Sign in with Apple',
-              containerColor: Colors.black,
-              onTap: () {},
-            ),
-            const SizedBox(height: 10),
-            AnonymousLoginButton(
-              authProvider: authProvider,
-              phoneNumberController: _phoneNumberController,
-            ),
+            SizedBox(height: isLoading ? 100 : 10),
+            isLoading
+                ? const CircularProgressIndicator()
+                : socialLoginButtons(
+                    context,
+                    authProvider,
+                  )
           ],
         ),
       ),
     ));
+  }
+
+  socialLoginButtons(
+      BuildContext context, AuthenticationProvider authProvider) {
+    return Column(
+      children: [
+        AuthButton(
+          icon: FontAwesomeIcons.solidEnvelope,
+          label: 'Sign in with Email',
+          containerColor: Colors.grey,
+          onTap: () {
+            // navigate to email sign in
+            Navigator.pushNamed(context, Constants.emailSignInRoute);
+          },
+        ),
+        const SizedBox(height: 10),
+        AuthButton(
+          icon: FontAwesomeIcons.google,
+          label: 'Sign in with Google',
+          containerColor: Colors.blue,
+          onTap: () async {
+            await authProvider.socialLogin(
+              context: context,
+              signInType: SignInType.google,
+            );
+          },
+        ),
+        const SizedBox(height: 10),
+        AuthButton(
+          icon: FontAwesomeIcons.apple,
+          label: 'Sign in with Apple',
+          containerColor: Colors.black,
+          onTap: () {},
+        ),
+        const SizedBox(height: 10),
+        AnonymousLoginButton(
+          authProvider: authProvider,
+          phoneNumberController: _phoneNumberController,
+        ),
+      ],
+    );
   }
 
   TextFormField phoneField(
