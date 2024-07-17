@@ -655,6 +655,8 @@ class AuthenticationProvider extends ChangeNotifier {
 
         // 2. save user data to shared preferenced - local storage then navigate to screens controller route
         await saveUserDataToSharedPreferences().whenComplete(() {
+          _isLoading = false;
+          notifyListeners();
           navigationController(
             context: context,
             route: Constants.screensControllerRoute,
@@ -679,6 +681,8 @@ class AuthenticationProvider extends ChangeNotifier {
           onSuccess: () async {
             // save user data to shared preferences
             await saveUserDataToSharedPreferences().whenComplete(() {
+              _isLoading = false;
+              notifyListeners();
               navigationController(
                 context: context,
                 route: Constants.screensControllerRoute,

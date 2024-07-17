@@ -70,6 +70,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
             fileImage: _finalFileImage,
             onSuccess: () async {
               formKey.currentState!.reset();
+              authProvider.setLoading(false);
               // sign out the user and navigate to the login screen
               // so that he may now sign In
               showSnackBar(
