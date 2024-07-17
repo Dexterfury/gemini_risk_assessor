@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
@@ -131,7 +132,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     // display phone number
                                     isMyProfile
-                                        ? Text(userModel.phone,
+                                        ? Text(
+                                            userModel.phone.isNotEmpty
+                                                ? userModel.phone
+                                                : userModel.email,
                                             style: textStyle16w600)
                                         : const SizedBox.shrink(),
 
@@ -152,12 +156,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             uid,
                             isAnonymous,
                           ),
-                          Text(
+                          AnimatedReadMoreText(
                             userModel.aboutMe,
-                            style: const TextStyle(
+                            maxLines: 3,
+                            // Set a custom text style for the main block of text
+                            textStyle: const TextStyle(
                               fontSize: 16,
                             ),
+                            // Set a custom text style for the expand/collapse button
+                            buttonTextStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          // Text(
+                          //   userModel.aboutMe,
+                          //   style: const TextStyle(
+                          //     fontSize: 16,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -263,9 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: Column(
                                 children: [
                                   SettingsListTile(
-                                    title: isAnonymous
-                                        ? 'Create Account'
-                                        : 'Logout',
+                                    title: isAnonymous ? 'Sign In' : 'Log Out',
                                     icon: Icons.logout_outlined,
                                     iconContainerColor: Colors.red,
                                     onTap: () {
@@ -278,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       }
                                       MyDialogs.showMyAnimatedDialog(
                                           context: context,
-                                          title: 'Logout',
+                                          title: 'Log Out',
                                           content:
                                               'Are you sure you want to logout?',
                                           actions: [

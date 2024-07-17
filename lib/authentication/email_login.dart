@@ -270,7 +270,7 @@ class _LoginScreenState extends State<EmailLogin> {
                 authProvider.isLoading
                     ? const CircularProgressIndicator()
                     : SizedBox(
-                        height: 40,
+                        height: 50,
                         width: MediaQuery.of(context).size.width,
                         child: MainAppButton(
                           label: ' SIGN IN ',

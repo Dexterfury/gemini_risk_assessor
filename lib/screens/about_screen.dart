@@ -37,12 +37,14 @@ class _AboutScreenState extends State<AboutScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(
-                AssetsManager.appLogo,
-              ), // Replace with your app icon
-            ),
+            SizedBox(
+                height: 150,
+                width: 150,
+                child: Image.asset(
+                  AssetsManager.appLogo,
+                )
+                //Lottie.asset(AssetsManager.clipboardAnimation),
+                ),
             const SizedBox(height: 20),
             Text(
               'AI Risk Assessment App',

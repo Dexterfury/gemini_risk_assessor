@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/buttons_row.dart';
@@ -478,9 +479,18 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
         ),
         desc.isEmpty
             ? const SizedBox.shrink()
-            : Text(
-                orgProvider.organizationModel.aboutOrganization,
-                style: textStyle16w600,
+            : AnimatedReadMoreText(
+                desc,
+                maxLines: 3,
+                // Set a custom text style for the main block of text
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                ),
+                // Set a custom text style for the expand/collapse button
+                buttonTextStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
       ],
     );

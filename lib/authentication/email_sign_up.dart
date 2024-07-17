@@ -129,7 +129,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                   height: 20,
                 ),
                 DisplayUserImage(
-                  radius: 50,
+                  radius: 60,
                   isViewOnly: false,
                   fileImage: _finalFileImage,
                   onPressed: () async {
@@ -233,7 +233,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                 authProvider.isLoading
                     ? const CircularProgressIndicator()
                     : SizedBox(
-                        height: 40,
+                        height: 50,
                         width: MediaQuery.of(context).size.width,
                         child: MainAppButton(
                           label: ' SIGN UP ',

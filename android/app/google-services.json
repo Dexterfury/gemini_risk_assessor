@@ -12,7 +12,20 @@
           "package_name": "com.raphaeldaka.geminiriskassessor"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "257849877914-ebbmasft72n9pkv320rmu7o442fi29ff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.raphaeldaka.geminiriskassessor",
+            "certificate_hash": "e3abd431a8e84b39328682a5f126cbae982dcbcf"
+          }
+        },
+        {
+          "client_id": "257849877914-ts64jv9f5lhiurfh0bfm08b7nvm0p7hg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDXxCnVjEp4crK0AWscaf2nDjGJ5xHkAmA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "257849877914-ts64jv9f5lhiurfh0bfm08b7nvm0p7hg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "257849877914-id226dje01e1fn7btf80khtis8bbc8m9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.raphaeldaka.geminiriskassessor"
+              }
+            }
+          ]
         }
       }
     }
