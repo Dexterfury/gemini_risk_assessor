@@ -8,12 +8,16 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
+import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utilities/file_upload_handler.dart';
@@ -127,19 +131,13 @@ class AuthenticationProvider extends ChangeNotifier {
             reference: '${Constants.userImages}/${userModel.uid}.jpg');
 
         userModel.imageUrl = imageUrl;
+        // update the display image in firebase auth
+        await _auth.currentUser!.updatePhotoURL(imageUrl);
       }
       userModel.createdAt = DateTime.now().microsecondsSinceEpoch.toString();
 
       _userModel = userModel;
       _uid = userModel.uid;
-
-      // update data in firebase auth
-      // update the display name in firebase auth
-      await _auth.currentUser!.updateDisplayName(userModel.name);
-      // update the display image in firebase auth
-      if (userModel.imageUrl.isNotEmpty) {
-        await _auth.currentUser!.updatePhotoURL(userModel.imageUrl);
-      }
 
       // save user data to firestore
       await _firestore
@@ -559,6 +557,50 @@ class AuthenticationProvider extends ChangeNotifier {
     return userCredential;
   }
 
+  // sign in with google
+  // Future<UserCredential?> _signInWithGoogle() async {
+  //   _isLoading = true;
+  //   notifyListeners();
+  //   final GoogleSignInAccount? googleSignInAccount =
+  //       await GoogleSignIn().signIn();
+
+  //   if (googleSignInAccount == null) {
+  //     return null;
+  //   }
+
+  //   final GoogleSignInAuthentication googleSignInAuthentication =
+  //       await googleSignInAccount.authentication;
+  //   final AuthCredential credential = GoogleAuthProvider.credential(
+  //     accessToken: googleSignInAuthentication.accessToken,
+  //     idToken: googleSignInAuthentication.idToken,
+  //   );
+
+  //   final UserCredential userCredential =
+  //       await _auth.signInWithCredential(credential);
+  //   _uid = userCredential.user!.uid;
+  //   notifyListeners();
+  //   return userCredential;
+  // }
+
+  Future<UserCredential?> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return null;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      print('Error in _signInWithGoogle: $e');
+      return null;
+    }
+  }
+
   // send verification email
   Future<void> sendEmailVerification() async {
     await _auth.currentUser!.sendEmailVerification();
@@ -577,6 +619,107 @@ class AuthenticationProvider extends ChangeNotifier {
   // get user email
   Future<String> getUserEmail() async {
     return _auth.currentUser!.email!;
+  }
+
+  Future<void> socialLogin({
+    required BuildContext context,
+    required SignInType signInType,
+  }) async {
+    try {
+      switch (signInType) {
+        case SignInType.google:
+          // google sign in
+          print('Attempting Google sign in...');
+          UserCredential? userCredential = await _signInWithGoogle();
+          if (userCredential != null) {
+            Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+              handleUserCredential(
+                context: context,
+                userCredential: userCredential,
+              );
+            });
+          } else {
+            log('Google sign in failed or was cancelled by the user');
+          }
+          break;
+        case SignInType.facebook:
+          // facebook sign in
+          break;
+        case SignInType.apple:
+          // apple sign in
+          break;
+        case SignInType.anonymous:
+          // anonymous sign in
+          break;
+        default:
+      }
+    } on FirebaseAuthException catch (e) {
+      log('FirebaseAuthException: ${e.code} - ${e.message}');
+      Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+        FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+      });
+    } catch (e) {
+      log('error signUP: ${e.toString()}');
+      Future.delayed(const Duration(milliseconds: 200), () {
+        showSnackBar(
+            context: context, message: 'An unexpected error occurred: $e');
+      });
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> handleUserCredential({
+    required BuildContext context,
+    required UserCredential userCredential,
+  }) async {
+    // get user from credential
+    User? user = userCredential.user;
+    // check if user is not null and exist in firestore
+    if (user != null) {
+      if (await checkUserExistsInFirestore()) {
+        // 1. get user data from firestore
+        await getUserDataFromFireStore();
+
+        // 2. save user data to shared preferenced - local storage then navigate to screens controller route
+        await saveUserDataToSharedPreferences().whenComplete(() {
+          navigationController(
+            context: context,
+            route: Constants.screensControllerRoute,
+          );
+        });
+      } else {
+        // 1. create userdata in firestore
+        _userModel = UserModel(
+          uid: user.uid,
+          name: user.displayName ?? '',
+          phone: user.phoneNumber ?? '',
+          email: user.email ?? '',
+          imageUrl: user.photoURL ?? '',
+          token: '',
+          aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+          createdAt: '',
+        );
+
+        saveUserDataToFireStore(
+          userModel: _userModel!,
+          fileImage: null,
+          onSuccess: () async {
+            // save user data to shared preferences
+            await saveUserDataToSharedPreferences().whenComplete(() {
+              navigationController(
+                context: context,
+                route: Constants.screensControllerRoute,
+              );
+            });
+          },
+          onFail: (error) {
+            log('error saving user data: $error');
+          },
+        );
+      }
+    }
   }
 
   // update name

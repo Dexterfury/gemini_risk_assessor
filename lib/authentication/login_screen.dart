@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/auth_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/widgets/anonymous_login_button.dart';
@@ -105,7 +106,12 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: FontAwesomeIcons.google,
               label: 'Sign in with Google',
               containerColor: Colors.blue,
-              onTap: () {},
+              onTap: () async {
+                await authProvider.socialLogin(
+                  context: context,
+                  signInType: SignInType.google,
+                );
+              },
             ),
             const SizedBox(height: 10),
             AuthButton(

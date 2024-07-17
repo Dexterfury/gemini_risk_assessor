@@ -63,6 +63,10 @@ class _EmailSignUpState extends State<EmailSignUp> {
             createdAt: '',
           );
 
+          // update data in firebase auth
+          // update the display name in firebase auth
+          await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
+
           authProvider.saveUserDataToFireStore(
             userModel: userModel,
             fileImage: _finalFileImage,
