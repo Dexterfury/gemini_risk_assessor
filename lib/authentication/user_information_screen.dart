@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
@@ -37,7 +37,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       appBar: const MyAppBar(
         title: 'User Information',
@@ -103,7 +103,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
   // save user data to firestore
   void saveUserDataToFireStore() async {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     final uid = widget.uid.isNotEmpty ? widget.uid : authProvider.uid!;
 
     UserModel userModel = UserModel(

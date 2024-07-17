@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -69,7 +69,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   label: 'Send reset password link',
                   onTap: () {
                     if (formKey.currentState!.validate()) {
-                      AuthProvider.sendPasswordResetEmail(
+                      AuthenticationProvider.sendPasswordResetEmail(
                           context: context,
                           email: _emailController.text,
                           onSuccess: () {

@@ -15,7 +15,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
@@ -99,7 +99,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   child: AnimatedChatButton(
                     onPressed: () async {
                       // Open chat or navigate to chat screen
-                      final uid = context.read<AuthProvider>().userModel!.uid;
+                      final uid =
+                          context.read<AuthenticationProvider>().userModel!.uid;
                       final chatProvider = context.read<ChatProvider>();
                       await chatProvider
                           .getChatHistoryFromFirebase(
@@ -397,7 +398,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
         },
       );
     } else {
-      String creatorName = context.read<AuthProvider>().userModel!.name;
+      String creatorName =
+          context.read<AuthenticationProvider>().userModel!.name;
       return Text(
         creatorName,
         style: const TextStyle(
@@ -478,7 +480,7 @@ class DeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDSTI = generationType == GenerationType.dsti;
-    final uid = context.read<AuthProvider>().userModel!.uid;
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
     Widget buttonWidget() {
       if (orgID.isEmpty) {
         return MainAppButton(
@@ -526,7 +528,7 @@ class DeleteButton extends StatelessWidget {
           },
         );
       } else {
-        final uid = context.read<AuthProvider>().userModel!.uid;
+        final uid = context.read<AuthenticationProvider>().userModel!.uid;
         return FutureBuilder<DocumentSnapshot>(
           future: FirebaseMethods.getOrgData(orgID: orgID),
           builder:

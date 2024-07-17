@@ -1,10 +1,12 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
@@ -28,59 +30,75 @@ class _LoginScreenState extends State<EmailLogin> {
 
   // signIn user
   void signInUser() async {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     if (formKey.currentState!.validate()) {
       // save the form
       formKey.currentState!.save();
 
-      final userCredential = await authProvider.signInUserWithEmailAndPassword(
-        email: _email,
-        password: _password,
-      );
+      try {
+        final userCredential =
+            await authProvider.signInUserWithEmailAndPassword(
+          email: _email,
+          password: _password,
+        );
 
-      if (userCredential != null) {
-        // 1. reload firebase user
-        await authProvider.reloadUser();
+        if (userCredential != null) {
+          // 1. reload firebase user
+          await authProvider.reloadUser();
 
-        // 2. check email verification status
-        final isVerified = await authProvider.isEmailVerified();
+          // 2. check email verification status
+          final isVerified = await authProvider.isEmailVerified();
 
-        if (isVerified) {
-          // 1. check if this user exist in firestore
-          bool userExist = await authProvider.checkUserExistsInFirestore();
+          if (isVerified) {
+            // 1. check if this user exist in firestore
+            bool userExist = await authProvider.checkUserExistsInFirestore();
 
-          if (userExist) {
-            // 2. get user data from firestore
-            await authProvider.getUserDataFromFireStore();
+            if (userExist) {
+              // 2. get user data from firestore
+              await authProvider.getUserDataFromFireStore();
 
-            // 3. save user data to shared preferenced - local storage
-            await authProvider.saveUserDataToSharedPreferences();
+              // 3. save user data to shared preferenced - local storage
+              await authProvider.saveUserDataToSharedPreferences();
 
-            // 4. reset the form
-            formKey.currentState!.reset();
+              // 4. reset the form
+              formKey.currentState!.reset();
 
-            // 5. remove loading
-            authProvider.setLoading(false);
+              // 5. remove loading
+              authProvider.setLoading(false);
 
-            // 5. navigate to home screen
-            navigate(isSignedIn: true);
+              // 5. navigate to home screen
+              navigate(isSignedIn: true);
+            } else {
+              // navigate to user information
+              navigate(isSignedIn: false);
+            }
           } else {
-            // navigate to user information
-            navigate(isSignedIn: false);
+            Future.delayed(const Duration(milliseconds: 200), () {
+              showSnackBar(
+                  context: context,
+                  message: 'Please verify your email address');
+            });
+            setState(() {
+              _sendEmailVerification = true;
+            });
           }
-        } else {
-          authProvider.setLoading(false);
-          Future.delayed(const Duration(milliseconds: 200), () {
-            showSnackBar(
-                context: context, message: 'Please verify your email address');
-          });
-          setState(() {
-            _sendEmailVerification = true;
-          });
         }
+      } on FirebaseAuthException catch (e) {
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+          FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+        });
+      } catch (e) {
+        log('signIn error: $e');
+
+        Future.delayed(const Duration(milliseconds: 200), () {
+          showSnackBar(
+              context: context, message: 'An unexpected error occurred: $e');
+        });
+      } finally {
+        authProvider.setLoading(false);
       }
     } else {
-      showSnackBar(context: context, message: 'Please fill all fields');
+      showSnackBar(context: context, message: 'Please fill in all fields');
     }
   }
 
@@ -101,7 +119,7 @@ class _LoginScreenState extends State<EmailLogin> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       appBar: const MyAppBar(leading: BackButton(), title: 'Sign In'),
       body: Center(

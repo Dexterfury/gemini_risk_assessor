@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/widgets/preview_images.dart';
 import 'package:image_picker/image_picker.dart';
@@ -46,7 +46,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
     required ChatProvider chatProvider,
     required bool isTextOnly,
   }) async {
-    final uid = context.read<AuthProvider>().userModel!.uid;
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
     try {
       await chatProvider.sendMessage(
         uid: uid,

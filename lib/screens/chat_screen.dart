@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_chat_field.dart';
 import 'package:gemini_risk_assessor/widgets/message_bubble.dart';
@@ -59,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // speech to text method for later
   Future<void> _start({required bool isClicked}) async {
     final chatProvider = context.read<ChatProvider>();
-    final uid = context.read<AuthProvider>().userModel!.uid;
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
     bool isAvailable = await _speechToText.initialize();
 
     String docID = widget.assesmentModel != null
@@ -154,7 +154,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   // });
 
                                   final uid = context
-                                      .read<AuthProvider>()
+                                      .read<AuthenticationProvider>()
                                       .userModel!
                                       .uid;
                                   await chatProvider.clearChat(

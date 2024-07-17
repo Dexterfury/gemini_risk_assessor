@@ -11,7 +11,7 @@ import 'package:gemini_risk_assessor/authentication/user_information_screen.dart
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/providers/search_provider.dart';
@@ -46,7 +46,7 @@ void main() async {
 
   runApp(
     MultiProvider(providers: [
-      ChangeNotifierProvider(create: (context) => AuthProvider()),
+      ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
       ChangeNotifierProvider(create: (context) => ToolsProvider()),
       ChangeNotifierProvider(create: (context) => OrganizationProvider()),

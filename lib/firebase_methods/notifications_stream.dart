@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/notification_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
@@ -24,7 +24,7 @@ class NotificationsStream extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.read<AuthProvider>().userModel!.uid;
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseMethods.notificationsStream(
         userId: uid,

@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -227,7 +227,8 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                   // }
 
                   final orgModel = OrganizationModel(
-                    creatorUID: context.read<AuthProvider>().userModel!.uid,
+                    creatorUID:
+                        context.read<AuthenticationProvider>().userModel!.uid,
                     name: _nameController.text,
                     aboutOrganization: _descriptionController.text,
                     imageUrl: '',

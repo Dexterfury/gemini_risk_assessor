@@ -1,12 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
@@ -31,7 +33,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
 
   // signUp user
   void signUpUser() async {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     if (formKey.currentState!.validate()) {
       // save the form
       formKey.currentState!.save();
@@ -48,13 +50,13 @@ class _EmailSignUpState extends State<EmailSignUp> {
           await authProvider.sendEmailVerification();
 
           // user has been created - now we save the user to firestore
-          print('user created: ${userCredential.user!.uid}');
+          log('user created: ${userCredential.user!.uid}');
 
           UserModel userModel = UserModel(
             uid: userCredential.user!.uid,
             name: name,
-            phone: authProvider.phoneNumber!,
-            email: '',
+            phone: '',
+            email: email,
             imageUrl: '',
             token: '',
             aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
@@ -83,8 +85,18 @@ class _EmailSignUpState extends State<EmailSignUp> {
             },
           );
         }
+      } on FirebaseAuthException catch (e) {
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+          FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+        });
       } catch (e) {
         log('error signUP: ${e.toString()}');
+        Future.delayed(const Duration(milliseconds: 200), () {
+          showSnackBar(
+              context: context, message: 'An unexpected error occurred: $e');
+        });
+      } finally {
+        authProvider.setLoading(false);
       }
     } else {
       showSnackBar(context: context, message: 'Please fill all fields');
@@ -93,7 +105,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       appBar: const MyAppBar(
         leading: BackButton(),

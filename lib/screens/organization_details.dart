@@ -9,7 +9,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
 import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
@@ -115,7 +115,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.read<AuthProvider>().userModel!.uid;
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
 
     return Consumer<OrganizationProvider>(
         builder: (context, orgProvider, child) {
@@ -443,7 +443,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                           textAction: "Change",
                           onActionTap: (value, updatedText) async {
                             if (value) {
-                              final authProvider = context.read<AuthProvider>();
+                              final authProvider =
+                                  context.read<AuthenticationProvider>();
                               final desc = await authProvider.updateDescription(
                                 isUser: false,
                                 id: orgProvider
@@ -572,7 +573,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                             onActionTap: (value, updatedText) async {
                               if (value) {
                                 final authProvider =
-                                    context.read<AuthProvider>();
+                                    context.read<AuthenticationProvider>();
                                 final name = await authProvider.updateName(
                                   isUser: false,
                                   id: orgProvider

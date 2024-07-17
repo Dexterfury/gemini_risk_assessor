@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _handleSearch(String query) {
-    bool isAnonymous = context.read<AuthProvider>().isUserAnonymous();
+    bool isAnonymous = context.read<AuthenticationProvider>().isUserAnonymous();
     if (!isAnonymous) {
       final tabProvider = context.read<TabProvider>();
       // Implement your search logic here
@@ -68,13 +68,14 @@ class _HomeScreenState extends State<HomeScreen>
         navigationController(
           context: context,
           route: Constants.profileRoute,
-          titleArg: context.read<AuthProvider>().userModel!.uid,
+          titleArg: context.read<AuthenticationProvider>().userModel!.uid,
         );
       },
       child: DisplayUserImage(
         radius: 20,
         isViewOnly: true,
-        imageUrl: context.watch<AuthProvider>().userModel?.imageUrl ?? '',
+        imageUrl:
+            context.watch<AuthenticationProvider>().userModel?.imageUrl ?? '',
         onPressed: () {},
       ),
     );
@@ -139,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen>
     // make sure widget is initialized before initializing cloud messaging
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       // 1. generate a new token
-      await context.read<AuthProvider>().generateNewToken();
+      await context.read<AuthenticationProvider>().generateNewToken();
 
       // 2. initialize firebase messaging
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {

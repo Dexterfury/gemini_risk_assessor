@@ -4,7 +4,7 @@ import 'package:gemini_risk_assessor/buttons/auth_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 
@@ -15,7 +15,7 @@ class AnonymousLoginButton extends StatelessWidget {
     required this.phoneNumberController,
   });
 
-  final AuthProvider authProvider;
+  final AuthenticationProvider authProvider;
   final TextEditingController phoneNumberController;
 
   @override

@@ -18,7 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utilities/file_upload_handler.dart';
 
-class AuthProvider extends ChangeNotifier {
+class AuthenticationProvider extends ChangeNotifier {
   bool _isSignedIn = false;
   UserModel? _userModel;
   bool _isLoading = false;

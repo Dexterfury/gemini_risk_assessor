@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/auth_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/widgets/anonymous_login_button.dart';
 import 'package:lottie/lottie.dart';
@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
         body: Padding(
       padding: const EdgeInsets.symmetric(
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   TextFormField phoneField(
-    AuthProvider authProvider,
+    AuthenticationProvider authProvider,
     BuildContext context,
   ) {
     return TextFormField(

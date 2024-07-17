@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
@@ -135,7 +135,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                           return;
                         }
 
-                        final authProvider = context.read<AuthProvider>();
+                        final authProvider =
+                            context.read<AuthenticationProvider>();
                         final creatorID = authProvider.userModel!.uid;
 
                         // show my alert dialog for loading

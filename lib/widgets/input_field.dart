@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 
 class InputField extends StatelessWidget {
@@ -16,7 +16,7 @@ class InputField extends StatelessWidget {
   final String labelText;
   final String hintText;
   final TextEditingController controller;
-  final AuthProvider? authProvider;
+  final AuthenticationProvider? authProvider;
   final OrganizationProvider? organizationProvider;
 
   @override

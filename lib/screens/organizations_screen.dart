@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/search/org_serach_stream.dart';
 import 'package:gemini_risk_assessor/firebase_methods/organizations_stream.dart';
@@ -15,7 +15,7 @@ class OrganizationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isAnonymous = context.read<AuthProvider>().isUserAnonymous();
+    bool isAnonymous = context.read<AuthenticationProvider>().isUserAnonymous();
     return Consumer<OrganizationProvider>(
         builder: (context, organizationProvider, child) {
       handleSearch(String query) {
@@ -51,13 +51,14 @@ class OrganizationsScreen extends StatelessWidget {
         navigationController(
           context: context,
           route: Constants.profileRoute,
-          titleArg: context.read<AuthProvider>().userModel!.uid,
+          titleArg: context.read<AuthenticationProvider>().userModel!.uid,
         );
       },
       child: DisplayUserImage(
         radius: 20,
         isViewOnly: true,
-        imageUrl: context.watch<AuthProvider>().userModel?.imageUrl ?? '',
+        imageUrl:
+            context.watch<AuthenticationProvider>().userModel?.imageUrl ?? '',
         onPressed: () {},
       ),
     );

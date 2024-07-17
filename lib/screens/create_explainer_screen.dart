@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -151,7 +151,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                       ),
                     );
 
-                    final authProvider = context.read<AuthProvider>();
+                    final authProvider = context.read<AuthenticationProvider>();
                     final description = _descriptionController.text;
 
                     await toolProvider.submitPrompt(

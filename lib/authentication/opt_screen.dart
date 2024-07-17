@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -33,7 +33,7 @@ class _OTPScreenState extends State<OTPScreen> {
     final verificationId = args[Constants.verificationId] as String;
     final phoneNumber = args[Constants.phoneNumber] as String;
 
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
 
     return Scaffold(
       appBar: const MyAppBar(
@@ -82,7 +82,8 @@ class _OTPScreenState extends State<OTPScreen> {
     );
   }
 
-  Widget resendCodeField(AuthProvider authProvider, String phoneNumber) {
+  Widget resendCodeField(
+      AuthenticationProvider authProvider, String phoneNumber) {
     if (authProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     } else if (authProvider.isSuccessful) {
@@ -171,7 +172,7 @@ class _OTPScreenState extends State<OTPScreen> {
     required String verificationId,
     required String otpCode,
   }) async {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     authProvider.verifyOTPCode(
       verificationId: verificationId,
       otpCode: otpCode,

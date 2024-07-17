@@ -9,7 +9,7 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/auth_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/screens/about_screen.dart';
 import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -37,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // set new image from file and update provider
   Future<void> setNewImageInProvider(String imageUrl) async {
     // set newimage in provider
-    await context.read<AuthProvider>().setImageUrl(imageUrl);
+    await context.read<AuthenticationProvider>().setImageUrl(imageUrl);
   }
 
   void popDialog() {
@@ -69,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // get profile data from arguments
     final uid = ModalRoute.of(context)!.settings.arguments as String;
 
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     bool isAnonymous = authProvider.isUserAnonymous();
     bool isMyProfile = uid == authProvider.uid;
     return Scaffold(
@@ -300,7 +300,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               onPressed: () {
                                                 // logout
                                                 context
-                                                    .read<AuthProvider>()
+                                                    .read<
+                                                        AuthenticationProvider>()
                                                     .signOut()
                                                     .whenComplete(() {
                                                   // remove all routes and navigateo to loging screen
@@ -353,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               hintText: userModel.aboutMe,
               textAction: "Change",
               onActionTap: (value, updatedText) async {
-                final authProvider = context.read<AuthProvider>();
+                final authProvider = context.read<AuthenticationProvider>();
                 if (value) {
                   await authProvider.updateDescription(
                     isUser: true,
@@ -400,7 +401,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               hintText: userModel.name,
               textAction: "Change",
               onActionTap: (value, updatedText) async {
-                final authProvider = context.read<AuthProvider>();
+                final authProvider = context.read<AuthenticationProvider>();
                 if (value) {
                   await authProvider.updateName(
                     isUser: true,
