@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -8,6 +9,7 @@ import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 
 class FirebaseMethods {
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -118,6 +120,7 @@ class FirebaseMethods {
 
   // update userName
   static Future<void> updateUserName(String id, String newName) async {
+    await _auth.currentUser!.updateDisplayName(newName);
     await _usersCollection.doc(id).update({
       Constants.name: newName,
     });

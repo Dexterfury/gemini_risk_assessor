@@ -110,6 +110,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       uid: uid,
       name: _nameController.text.trim(),
       phone: authProvider.phoneNumber!,
+      email: '',
       imageUrl: '',
       token: '',
       aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',

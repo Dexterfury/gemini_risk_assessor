@@ -133,6 +133,14 @@ class AuthProvider extends ChangeNotifier {
       _userModel = userModel;
       _uid = userModel.uid;
 
+      // update data in firebase auth
+      // update the display name in firebase auth
+      await _auth.currentUser!.updateDisplayName(userModel.name);
+      // update the display image in firebase auth
+      if (userModel.imageUrl.isNotEmpty) {
+        await _auth.currentUser!.updatePhotoURL(userModel.imageUrl);
+      }
+
       // save user data to firestore
       await _firestore
           .collection(Constants.usersCollection)
@@ -521,6 +529,56 @@ class AuthProvider extends ChangeNotifier {
   //   });
   // }
 
+  // sign in user with email and password
+  Future<UserCredential?> signInUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email, password: password);
+    _uid = userCredential.user!.uid;
+    notifyListeners();
+
+    return userCredential;
+  }
+
+  // create user with email and password
+  Future<UserCredential?> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    _uid = userCredential.user!.uid;
+    notifyListeners();
+
+    return userCredential;
+  }
+
+  // send verification email
+  Future<void> sendEmailVerification() async {
+    await _auth.currentUser!.sendEmailVerification();
+  }
+
+  // reload firebase user
+  Future<void> reloadUser() async {
+    await _auth.currentUser!.reload();
+  }
+
+  // check email is verified
+  Future<bool> isEmailVerified() async {
+    return _auth.currentUser!.emailVerified;
+  }
+
+  // get user email
+  Future<String> getUserEmail() async {
+    return _auth.currentUser!.email!;
+  }
+
   // update name
   Future<String> updateName({
     required bool isUser,
@@ -593,6 +651,52 @@ class AuthProvider extends ChangeNotifier {
   Future<void> setDescription(String description) async {
     _userModel!.aboutMe = description;
     notifyListeners();
+  }
+
+  static Future<void> sendPasswordResetEmail({
+    required BuildContext context,
+    required String email,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+      onSuccess();
+    } catch (e) {
+      onError(e.toString());
+    }
+  }
+
+  static Future<bool> checkOldPassword({
+    required String email,
+    required String password,
+  }) async {
+    AuthCredential authCredential =
+        EmailAuthProvider.credential(email: email, password: password);
+
+    try {
+      var credentialResult = await FirebaseAuth.instance.currentUser!
+          .reauthenticateWithCredential(authCredential);
+
+      return credentialResult.user != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> updateUserPassword({
+    required BuildContext context,
+    required String newPassword,
+  }) async {
+    User user = FirebaseAuth.instance.currentUser!;
+
+    try {
+      await user.updatePassword(newPassword);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   // sign out

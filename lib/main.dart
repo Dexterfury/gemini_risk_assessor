@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/authentication/email_login.dart';
+import 'package:gemini_risk_assessor/authentication/email_sign_up.dart';
+import 'package:gemini_risk_assessor/authentication/forgot_password.dart';
 import 'package:gemini_risk_assessor/authentication/landing_screen.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
 import 'package:gemini_risk_assessor/authentication/opt_screen.dart';
@@ -10,7 +13,6 @@ import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
-import 'package:gemini_risk_assessor/providers/org_settings_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
@@ -51,7 +53,6 @@ void main() async {
       ChangeNotifierProvider(create: (context) => TabProvider()),
       ChangeNotifierProvider(create: (context) => ChatProvider()),
       ChangeNotifierProvider(create: (context) => SearchProvider()),
-      ChangeNotifierProvider(create: (context) => OrgSettingsProvider()),
     ], child: const MyApp()),
   );
 }
@@ -83,6 +84,9 @@ class MyApp extends StatelessWidget {
           Constants.profileRoute: (context) => const ProfileScreen(),
           Constants.createOrganizationRoute: (context) =>
               const CreateOrganizationScreen(),
+          Constants.emailSignInRoute: (context) => const EmailLogin(),
+          Constants.emailSignUpRoute: (context) => const EmailSignUp(),
+          Constants.forgotPasswordRoute: (context) => const ForgotPassword(),
         });
   }
 }

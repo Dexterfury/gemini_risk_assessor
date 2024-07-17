@@ -46,16 +46,15 @@ class MainAppButton extends StatelessWidget {
                     ),
                     Text(
                       label,
-                      style: TextStyle(
-                        color: color,
-                      ),
+                      style:
+                          TextStyle(color: color, fontWeight: FontWeight.bold),
                     ),
                   ],
                 )
-              : Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
+              : Center(
+                  child: Text(
+                    label,
+                    style: TextStyle(color: color, fontWeight: FontWeight.bold),
                   ),
                 ),
         ));

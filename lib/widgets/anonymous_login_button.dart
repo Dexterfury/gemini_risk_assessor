@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/buttons/auth_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
@@ -21,10 +23,10 @@ class AnonymousLoginButton extends StatelessWidget {
     bool isAnonymous = authProvider.isUserAnonymous();
     return phoneNumberController.text.isNotEmpty
         ? const SizedBox()
-        : MainAppButton(
-            icon: Icons.person,
-            label: 'Continue as Guest',
-            onTap: () async {
+        : AuthButton(
+            icon: FontAwesomeIcons.solidCircleUser,
+            label: 'Sign in Anonymous',
+            onTap: () {
               if (!authProvider.isLoading) {
                 if (isAnonymous) {
                   // set loading back to false
@@ -65,6 +67,7 @@ class AnonymousLoginButton extends StatelessWidget {
                         uid: authProvider.uid!,
                         name: name,
                         phone: '',
+                        email: '',
                         imageUrl: '',
                         token: '',
                         aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',

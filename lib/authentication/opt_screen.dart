@@ -187,9 +187,6 @@ class _OTPScreenState extends State<OTPScreen> {
           await authProvider.getUserDataFromFireStore();
 
           // * save user information to provider / shared preferences
-          await authProvider.saveUserDataToSharedPreferences();
-
-          // * save user information to provider / shared preferences
           await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
             // * navigate to home screen
             navigationController(

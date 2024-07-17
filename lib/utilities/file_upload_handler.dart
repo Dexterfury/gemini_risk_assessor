@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -77,6 +78,7 @@ class FileUploadHandler {
       reference: reference,
     );
     if (isUser) {
+      await FirebaseAuth.instance.currentUser!.updatePhotoURL(imageURL);
       await FirebaseFirestore.instance
           .collection(Constants.usersCollection)
           .doc(id)

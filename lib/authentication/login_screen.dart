@@ -2,6 +2,9 @@ import 'dart:developer';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/buttons/auth_button.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/auth_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
@@ -54,10 +57,13 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             const SizedBox(height: 50),
             SizedBox(
-              height: 200,
-              width: 200,
-              child: Lottie.asset(AssetsManager.clipboardAnimation),
-            ),
+                height: 150,
+                width: 150,
+                child: Image.asset(
+                  AssetsManager.appLogo,
+                )
+                //Lottie.asset(AssetsManager.clipboardAnimation),
+                ),
             const Text(
               'Gemini Risk Assessor',
               style: TextStyle(
@@ -75,7 +81,40 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 30),
             phoneField(authProvider, context),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
+            const Text(
+              '- OR -',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            AuthButton(
+              icon: FontAwesomeIcons.solidEnvelope,
+              label: 'Sign in with Email',
+              containerColor: Colors.grey,
+              onTap: () {
+                // navigate to email sign in
+                Navigator.pushNamed(context, Constants.emailSignInRoute);
+              },
+            ),
+            const SizedBox(height: 10),
+            AuthButton(
+              icon: FontAwesomeIcons.google,
+              label: 'Sign in with Google',
+              containerColor: Colors.blue,
+              onTap: () {},
+            ),
+            const SizedBox(height: 10),
+            AuthButton(
+              icon: FontAwesomeIcons.apple,
+              label: 'Sign in with Apple',
+              containerColor: Colors.black,
+              onTap: () {},
+            ),
+            const SizedBox(height: 10),
             AnonymousLoginButton(
               authProvider: authProvider,
               phoneNumberController: _phoneNumberController,

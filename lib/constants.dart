@@ -58,6 +58,9 @@ class Constants {
   static const String createToolRoute = '/createTool';
   static const String createOrganizationRoute = '/createOrganization';
   static const String chatRoute = '/chat';
+  static const String emailSignUpRoute = '/emailSignUp';
+  static const String emailSignInRoute = '/emailSignIn';
+  static const String forgotPasswordRoute = '/forgotPassword';
 
   static const String verificationId = 'verificationId';
   static const String phoneNumber = 'phoneNumber';
@@ -66,6 +69,7 @@ class Constants {
   static const String uid = 'uid';
   static const String name = 'name';
   static const String phone = 'phone';
+  static const String email = 'email';
   static const String imageUrl = 'imageUrl';
   static const String token = 'token';
   static const String aboutMe = 'aboutMe';

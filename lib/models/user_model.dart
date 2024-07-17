@@ -4,6 +4,7 @@ class UserModel {
   String uid;
   String name;
   String phone;
+  String email;
   String imageUrl;
   String token;
   String aboutMe;
@@ -14,6 +15,7 @@ class UserModel {
     required this.uid,
     required this.name,
     required this.phone,
+    required this.email,
     required this.imageUrl,
     required this.token,
     required this.aboutMe,
@@ -26,6 +28,7 @@ class UserModel {
       uid: json[Constants.uid] ?? '',
       name: json[Constants.name] ?? '',
       phone: json[Constants.phone] ?? '',
+      email: json[Constants.email] ?? '',
       imageUrl: json[Constants.imageUrl] ?? '',
       token: json[Constants.token] ?? '',
       aboutMe: json[Constants.aboutMe] ?? '',
@@ -39,6 +42,7 @@ class UserModel {
       Constants.uid: uid,
       Constants.name: name,
       Constants.phone: phone,
+      Constants.email: email,
       Constants.imageUrl: imageUrl,
       Constants.token: token,
       Constants.aboutMe: aboutMe,
