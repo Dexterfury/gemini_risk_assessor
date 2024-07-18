@@ -54,10 +54,8 @@ enum ChatButtonSize {
 
 // sign in type enum
 enum SignInType {
-  google,
-  facebook,
-  apple,
   email,
-  phoneNumber,
+  google,
+  apple,
   anonymous,
 }

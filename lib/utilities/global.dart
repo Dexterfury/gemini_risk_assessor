@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:image_picker/image_picker.dart';
@@ -142,6 +143,16 @@ IconData getWeatherIcon(Weather weather) {
           : weather == Weather.windy
               ? Icons.wind_power
               : Icons.snowing;
+}
+
+IconData getAuthIcon(SignInType signInType) {
+  return signInType == SignInType.email
+      ? FontAwesomeIcons.solidEnvelope
+      : signInType == SignInType.google
+          ? FontAwesomeIcons.google
+          : signInType == SignInType.apple
+              ? FontAwesomeIcons.apple
+              : FontAwesomeIcons.solidCircleUser;
 }
 
 // animated dialog

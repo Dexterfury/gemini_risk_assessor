@@ -14,7 +14,6 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -97,8 +96,6 @@ class AuthenticationProvider extends ChangeNotifier {
   // save user data to shared preferences
   Future<void> saveUserDataToSharedPreferences() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    _isLoading = true;
-    notifyListeners();
     await sharedPreferences.setString(
         Constants.userModel, jsonEncode(userModel!.toJson()));
   }
@@ -194,6 +191,26 @@ class AuthenticationProvider extends ChangeNotifier {
     });
   }
 
+  Future<UserCredential> linkAnonymousAccountWithEmail({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null || !currentUser.isAnonymous) {
+      throw Exception('No anonymous user to link');
+    }
+
+    final credential =
+        EmailAuthProvider.credential(email: email, password: password);
+    final userCredential = await currentUser.linkWithCredential(credential);
+
+    // Update display name
+    await userCredential.user!.updateDisplayName(name);
+
+    return userCredential;
+  }
+
   // check if signed in user is anonymous or not
   bool isUserAnonymous() {
     if (_auth.currentUser != null) {
@@ -208,9 +225,6 @@ class AuthenticationProvider extends ChangeNotifier {
     required BuildContext context,
     required Function() onSuccess,
   }) async {
-    _isLoading = true;
-    notifyListeners();
-
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
@@ -222,8 +236,6 @@ class AuthenticationProvider extends ChangeNotifier {
         if (user != null) {
           _uid = user.uid;
           _phoneNumber = user.phoneNumber;
-          _isSuccessful = true;
-          _isLoading = false;
           notifyListeners();
         }
       },
@@ -359,11 +371,11 @@ class AuthenticationProvider extends ChangeNotifier {
 
   void _handleVerificationFailed(
       FirebaseAuthException e, BuildContext context) {
-    _isSuccessful = false;
-    _isLoading = false;
-    notifyListeners();
-    showSnackBar(context: context, message: e.toString());
-    log('Error: ${e.toString()}');
+    // _isSuccessful = false;
+    // _isLoading = false;
+    // notifyListeners();
+    // showSnackBar(context: context, message: e.toString());
+    // log('Error: ${e.toString()}');
   }
 
   void _handleCodeSent(
@@ -552,11 +564,11 @@ class AuthenticationProvider extends ChangeNotifier {
   //   return userCredential;
   // }
 
-  Future<UserCredential?> _signInWithGoogle() async {
+  Future<UserCredential?> _signInWithGoogle({bool link = false}) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      log('here 1');
       if (googleUser == null) return null;
-
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -564,9 +576,16 @@ class AuthenticationProvider extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+      log('here 2');
+
+      if (link && isUserAnonymous() == true) {
+        return await _auth.currentUser?.linkWithCredential(credential);
+      } else {
+        log('here 3');
+        return await _auth.signInWithCredential(credential);
+      }
     } catch (e) {
-      print('Error in _signInWithGoogle: $e');
+      log('Error in _signInWithGoogle: $e');
       return null;
     }
   }
@@ -601,20 +620,21 @@ class AuthenticationProvider extends ChangeNotifier {
       switch (signInType) {
         case SignInType.google:
           // google sign in
-          UserCredential? userCredential = await _signInWithGoogle();
+          bool isAnonymous = isUserAnonymous();
+          UserCredential? userCredential =
+              await _signInWithGoogle(link: isAnonymous);
           if (userCredential != null) {
-            Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
-              handleUserCredential(
+            await Future.delayed(const Duration(milliseconds: 200))
+                .whenComplete(() async {
+              await handleUserCredential(
                 context: context,
                 userCredential: userCredential,
+                wasAnonymous: isAnonymous,
               );
             });
           } else {
             log('Google sign in failed or was cancelled by the user');
           }
-          break;
-        case SignInType.facebook:
-          // facebook sign in
           break;
         case SignInType.apple:
           // apple sign in
@@ -630,7 +650,7 @@ class AuthenticationProvider extends ChangeNotifier {
         FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
       });
     } catch (e) {
-      log('error signUP: ${e.toString()}');
+      log('error signing: ${e.toString()}');
       Future.delayed(const Duration(milliseconds: 200), () {
         showSnackBar(
             context: context, message: 'An unexpected error occurred: $e');
@@ -644,26 +664,19 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<void> handleUserCredential({
     required BuildContext context,
     required UserCredential userCredential,
+    bool wasAnonymous = false,
   }) async {
     // get user from credential
     User? user = userCredential.user;
     // check if user is not null and exist in firestore
     if (user != null) {
-      if (await checkUserExistsInFirestore()) {
-        // 1. get user data from firestore
-        await getUserDataFromFireStore();
+      bool userExists = await checkUserExistsInFirestore();
 
-        // 2. save user data to shared preferenced - local storage then navigate to screens controller route
-        await saveUserDataToSharedPreferences().whenComplete(() {
-          _isLoading = false;
-          notifyListeners();
-          navigationController(
-            context: context,
-            route: Constants.screensControllerRoute,
-          );
-        });
+      if (userExists && !wasAnonymous) {
+        await getUserDataFromFireStore();
+        await saveUserDataToSharedPreferences();
       } else {
-        // 1. create userdata in firestore
+        // Create or update user data
         _userModel = UserModel(
           uid: user.uid,
           name: user.displayName ?? '',
@@ -672,25 +685,70 @@ class AuthenticationProvider extends ChangeNotifier {
           imageUrl: user.photoURL ?? '',
           token: '',
           aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
-          createdAt: '',
+          isAnonymous: false,
+          createdAt: DateTime.now().toIso8601String(),
         );
-
-        saveUserDataToFireStore(
+        await saveUserDataToFireStore(
           userModel: _userModel!,
           fileImage: null,
           onSuccess: () async {
-            // save user data to shared preferences
-            await saveUserDataToSharedPreferences().whenComplete(() {
-              _isLoading = false;
-              notifyListeners();
-              navigationController(
-                context: context,
-                route: Constants.screensControllerRoute,
-              );
-            });
+            await saveUserDataToSharedPreferences();
           },
         );
       }
+
+      _isLoading = false;
+      notifyListeners();
+      Future.delayed(const Duration(milliseconds: 200), () {
+        navigationController(
+          context: context,
+          route: Constants.screensControllerRoute,
+        );
+      });
+
+      // if (await checkUserExistsInFirestore()) {
+      //   // 1. get user data from firestore
+      //   await getUserDataFromFireStore();
+
+      //   // 2. save user data to shared preferenced - local storage then navigate to screens controller route
+      //   await saveUserDataToSharedPreferences().whenComplete(() {
+      //     _isLoading = false;
+      //     notifyListeners();
+      //     navigationController(
+      //       context: context,
+      //       route: Constants.screensControllerRoute,
+      //     );
+      //   });
+      // } else {
+      //   // 1. create userdata in firestore
+      //   _userModel = UserModel(
+      //     uid: user.uid,
+      //     name: user.displayName ?? '',
+      //     phone: user.phoneNumber ?? '',
+      //     email: user.email ?? '',
+      //     imageUrl: user.photoURL ?? '',
+      //     token: '',
+      //     aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+      //     isAnonymous: false,
+      //     createdAt: '',
+      //   );
+
+      //   saveUserDataToFireStore(
+      //     userModel: _userModel!,
+      //     fileImage: null,
+      //     onSuccess: () async {
+      //       // save user data to shared preferences
+      //       await saveUserDataToSharedPreferences().whenComplete(() {
+      //         _isLoading = false;
+      //         notifyListeners();
+      //         navigationController(
+      //           context: context,
+      //           route: Constants.screensControllerRoute,
+      //         );
+      //       });
+      //     },
+      //   );
+      // }
     }
   }
 
@@ -849,10 +907,12 @@ class AuthenticationProvider extends ChangeNotifier {
 
         log('Token: $token');
 
-        // save token to firestore
-        _usersCollection.doc(_userModel!.uid).update({
-          Constants.token: token,
-        });
+        // save token to firestore for authenticated users, not anonymous users
+        if (!_userModel!.isAnonymous) {
+          _usersCollection.doc(_userModel!.uid).update({
+            Constants.token: token,
+          });
+        }
       } catch (e) {
         log('FCM TOKEN ERROR: ${e.toString()}');
       }

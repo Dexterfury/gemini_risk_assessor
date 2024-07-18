@@ -1,15 +1,14 @@
-import 'dart:developer';
-
 import 'package:country_picker/country_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gemini_risk_assessor/buttons/auth_button.dart';
-import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
+import 'package:gemini_risk_assessor/authentication/social_auth_buttons.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
-import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
-import 'package:gemini_risk_assessor/widgets/anonymous_login_button.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneNumberController = TextEditingController();
+  bool _isValid = false;
 
   Country selectedCountry = Country(
     phoneCode: '1',
@@ -82,67 +82,82 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 30),
             phoneField(authProvider, context),
-            const SizedBox(height: 10),
+            const SizedBox(height: 30),
+            SizedBox(
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              child: MainAppButton(
+                label: ' SIGN IN WITH PHONE ',
+                onTap: () {
+                  if (_isValid) {
+                    final phoneNumber =
+                        '+${selectedCountry.phoneCode}${_phoneNumberController.text}';
+                    Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+                      // show loading Dialog
+                      // show my alert dialog for loading
+                      MyDialogs.showMyAnimatedDialog(
+                        context: context,
+                        title: 'Authenticating...',
+                        loadingIndicator: const SizedBox(
+                            height: 100, width: 100, child: LoadingPPEIcons()),
+                      );
+
+                      try {
+                        // sign in with phone number
+                        authProvider.signInWithPhoneNumber(
+                            phoneNumber: phoneNumber,
+                            context: context,
+                            onSuccess: () {
+                              // pop the loading dialog
+                              Navigator.pop(context);
+                            });
+                      } on FirebaseAuthException catch (e) {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        Future.delayed(const Duration(milliseconds: 200))
+                            .whenComplete(() {
+                          FirebaseAuthErrorHandler.showErrorSnackBar(
+                              context, e);
+                        });
+                      } catch (e) {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        Future.delayed(const Duration(milliseconds: 200))
+                            .whenComplete(() {
+                          showSnackBar(
+                              context: context,
+                              message: 'An unexpected error occurred: $e');
+                        });
+                      }
+                    });
+                  } else {
+                    showSnackBar(
+                      context: context,
+                      message: 'Please enter a valid phone number',
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 40),
             const Text(
-              '- OR -',
+              'Or continue with',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: isLoading ? 100 : 10),
+            const SizedBox(height: 40),
             isLoading
                 ? const CircularProgressIndicator()
-                : socialLoginButtons(
-                    context,
-                    authProvider,
-                  )
+                : SocialAuthButtons(
+                    authProvider: authProvider,
+                  ),
           ],
         ),
       ),
     ));
-  }
-
-  socialLoginButtons(
-      BuildContext context, AuthenticationProvider authProvider) {
-    return Column(
-      children: [
-        AuthButton(
-          icon: FontAwesomeIcons.solidEnvelope,
-          label: 'Sign in with Email',
-          containerColor: Colors.grey,
-          onTap: () {
-            // navigate to email sign in
-            Navigator.pushNamed(context, Constants.emailSignInRoute);
-          },
-        ),
-        const SizedBox(height: 10),
-        AuthButton(
-          icon: FontAwesomeIcons.google,
-          label: 'Sign in with Google',
-          containerColor: Colors.blue,
-          onTap: () async {
-            await authProvider.socialLogin(
-              context: context,
-              signInType: SignInType.google,
-            );
-          },
-        ),
-        const SizedBox(height: 10),
-        AuthButton(
-          icon: FontAwesomeIcons.apple,
-          label: 'Sign in with Apple',
-          containerColor: Colors.black,
-          onTap: () {},
-        ),
-        const SizedBox(height: 10),
-        AnonymousLoginButton(
-          authProvider: authProvider,
-          phoneNumberController: _phoneNumberController,
-        ),
-      ],
-    );
   }
 
   TextFormField phoneField(
@@ -159,27 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
           _phoneNumberController.text = value;
         });
         if (_phoneNumberController.text.length > 9) {
-          final phoneNumber = '+${selectedCountry.phoneCode}$value';
-          log('saving: $phoneNumber');
-          Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-            // show loading Dialog
-            // show my alert dialog for loading
-            MyDialogs.showMyAnimatedDialog(
-              context: context,
-              title: 'Authenticating...',
-              loadingIndicator: const SizedBox(
-                  height: 100, width: 100, child: LoadingPPEIcons()),
-            );
-
-            // sign in with phone number
-            authProvider.signInWithPhoneNumber(
-                phoneNumber: phoneNumber,
-                context: context,
-                onSuccess: () {
-                  // pop the loading dialog
-                  Navigator.pop(context);
-                });
-          });
+          _isValid = true;
+        } else {
+          _isValid = false;
         }
       },
       decoration: InputDecoration(
@@ -219,13 +216,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-        // suffixIcon: authProvider.isLoading
-        //     ? const Padding(
-        //         padding: EdgeInsets.all(8.0),
-        //         child: CircularProgressIndicator(),
-        //       )
-        //     : null,
-        // //     : null,
+        suffixIcon: _isValid
+            ? const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  child: Icon(
+                    FontAwesomeIcons.check,
+                  ),
+                ),
+              )
+            : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),

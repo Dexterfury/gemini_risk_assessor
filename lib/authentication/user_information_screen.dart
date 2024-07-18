@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -80,23 +81,20 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
             const SizedBox(height: 40),
 
-            authProvider.isLoading
-                ? const CircularProgressIndicator()
-                : MainAppButton(
-                    icon: Icons.login,
-                    label: 'Continue',
-                    onTap: () {
-                      if (_nameController.text.isEmpty ||
-                          _nameController.text.length < 3) {
-                        showSnackBar(
-                            context: context,
-                            message: 'Please enter your name');
-                        return;
-                      }
-                      // save user data to firestore
-                      saveUserDataToFireStore();
-                    },
-                  ),
+            MainAppButton(
+              icon: Icons.login,
+              label: 'Continue',
+              onTap: () {
+                if (_nameController.text.isEmpty ||
+                    _nameController.text.length < 3) {
+                  showSnackBar(
+                      context: context, message: 'Please enter your name');
+                  return;
+                }
+                // save user data to firestore
+                saveUserDataToFireStore();
+              },
+            ),
           ],
         ),
       )),
@@ -108,6 +106,13 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     final authProvider = context.read<AuthenticationProvider>();
     final uid = widget.uid.isNotEmpty ? widget.uid : authProvider.uid!;
 
+    MyDialogs.showMyAnimatedDialog(
+      context: context,
+      title: 'Saving User Information',
+      loadingIndicator:
+          const SizedBox(height: 100, width: 100, child: LoadingPPEIcons()),
+    );
+
     UserModel userModel = UserModel(
       uid: uid,
       name: _nameController.text.trim(),
@@ -116,6 +121,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       imageUrl: '',
       token: '',
       aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+      isAnonymous: false,
       createdAt: '',
     );
 
@@ -125,6 +131,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         userModel: userModel,
         fileImage: _finalFileImage,
         onSuccess: () async {
+          Navigator.pop(context);
           // save user data to shared preferences
           await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
             navigationController(
@@ -143,8 +150,6 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         showSnackBar(
             context: context, message: 'An unexpected error occurred: $e');
       });
-    } finally {
-      authProvider.setLoading(false);
-    }
+    } finally {}
   }
 }

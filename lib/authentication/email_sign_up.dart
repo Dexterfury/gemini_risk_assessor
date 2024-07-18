@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -29,69 +30,143 @@ class _EmailSignUpState extends State<EmailSignUp> {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  // signUp user
+  // // signUp user
+  // void signUpUser() async {
+  //   final authProvider = context.read<AuthenticationProvider>();
+  //   if (formKey.currentState!.validate()) {
+  //     // save the form
+  //     formKey.currentState!.save();
+
+  //     try {
+  //       final userCredential =
+  //           await authProvider.createUserWithEmailAndPassword(
+  //         email: email,
+  //         password: password,
+  //       );
+
+  //       if (userCredential != null) {
+  //         // send email verification
+  //         await authProvider.sendEmailVerification();
+
+  //         // user has been created - now we save the user to firestore
+  //         log('user created: ${userCredential.user!.uid}');
+
+  //         UserModel userModel = UserModel(
+  //           uid: userCredential.user!.uid,
+  //           name: name,
+  //           phone: '',
+  //           email: email,
+  //           imageUrl: '',
+  //           token: '',
+  //           aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+  //           isAnonymous: false,
+  //           createdAt: '',
+  //         );
+
+  //         // update data in firebase auth
+  //         // update the display name in firebase auth
+  //         await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
+
+  //         authProvider.saveUserDataToFireStore(
+  //           userModel: userModel,
+  //           fileImage: _finalFileImage,
+  //           onSuccess: () async {
+  //             formKey.currentState!.reset();
+  //             authProvider.setLoading(false);
+  //             // sign out the user and navigate to the login screen
+  //             // so that he may now sign In
+  //             showSnackBar(
+  //               context: context,
+  //               message:
+  //                   'Sign Up successful, Please verify your email and sign In',
+  //             );
+
+  //             await authProvider.signOut().whenComplete(() {
+  //               Navigator.pop(context);
+  //             });
+  //           },
+  //         );
+  //       }
+  //     } on FirebaseAuthException catch (e) {
+  //       Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+  //         FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+  //       });
+  //     } catch (e) {
+  //       log('error signUP: ${e.toString()}');
+  //       Future.delayed(const Duration(milliseconds: 200), () {
+  //         showSnackBar(
+  //             context: context, message: 'An unexpected error occurred: $e');
+  //       });
+  //     } finally {
+  //       authProvider.setLoading(false);
+  //     }
+  //   } else {
+  //     showSnackBar(context: context, message: 'Please fill all fields');
+  //   }
+  // }
   void signUpUser() async {
     final authProvider = context.read<AuthenticationProvider>();
     if (formKey.currentState!.validate()) {
-      // save the form
       formKey.currentState!.save();
 
       try {
-        final userCredential =
-            await authProvider.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        late UserCredential? userCredential;
 
-        if (userCredential != null) {
-          // send email verification
-          await authProvider.sendEmailVerification();
-
-          // user has been created - now we save the user to firestore
-          log('user created: ${userCredential.user!.uid}');
-
-          UserModel userModel = UserModel(
-            uid: userCredential.user!.uid,
-            name: name,
-            phone: '',
+        if (authProvider.isUserAnonymous()) {
+          // Link the anonymous account with the new email/password
+          userCredential = await authProvider.linkAnonymousAccountWithEmail(
             email: email,
-            imageUrl: '',
-            token: '',
-            aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
-            createdAt: '',
+            password: password,
+            name: name,
           );
-
-          // update data in firebase auth
-          // update the display name in firebase auth
-          await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
-
-          authProvider.saveUserDataToFireStore(
-            userModel: userModel,
-            fileImage: _finalFileImage,
-            onSuccess: () async {
-              formKey.currentState!.reset();
-              authProvider.setLoading(false);
-              // sign out the user and navigate to the login screen
-              // so that he may now sign In
-              showSnackBar(
-                context: context,
-                message:
-                    'Sign Up successful, Please verify your email and sign In',
-              );
-
-              await authProvider.signOut().whenComplete(() {
-                Navigator.pop(context);
-              });
-            },
+        } else {
+          // Create a new account if not anonymous
+          userCredential = await authProvider.createUserWithEmailAndPassword(
+            email: email,
+            password: password,
           );
         }
+
+        // Send email verification
+        await userCredential!.user!.sendEmailVerification();
+
+        // Create or update UserModel
+        UserModel userModel = UserModel(
+          uid: userCredential.user!.uid,
+          name: name,
+          phone: userCredential.user!.phoneNumber ?? '',
+          email: email,
+          imageUrl: '',
+          token: '',
+          aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+          isAnonymous: false,
+          createdAt: DateTime.now().toIso8601String(),
+        );
+
+        // Save user data to Firestore
+        await authProvider.saveUserDataToFireStore(
+          userModel: userModel,
+          fileImage: _finalFileImage,
+          onSuccess: () async {
+            formKey.currentState!.reset();
+            authProvider.setLoading(false);
+
+            showSnackBar(
+              context: context,
+              message:
+                  'Account created successfully. Please verify your email.',
+            );
+
+            // Navigate to home or login screen as needed
+            Navigator.pushReplacementNamed(context, Constants.emailSignInRoute);
+          },
+        );
       } on FirebaseAuthException catch (e) {
         Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
           FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
         });
       } catch (e) {
-        log('error signUP: ${e.toString()}');
-        Future.delayed(const Duration(milliseconds: 200), () {
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
           showSnackBar(
               context: context, message: 'An unexpected error occurred: $e');
         });

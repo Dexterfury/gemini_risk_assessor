@@ -73,6 +73,7 @@ class Constants {
   static const String imageUrl = 'imageUrl';
   static const String token = 'token';
   static const String aboutMe = 'aboutMe';
+  static const String isAnonymous = 'isAnonymous';
   static const String createdAt = 'createdAt';
   static const String userModel = 'userModel';
   static const String userImages = 'userImages';

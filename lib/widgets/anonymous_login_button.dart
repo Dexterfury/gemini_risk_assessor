@@ -73,6 +73,7 @@ class AnonymousLoginButton extends StatelessWidget {
                           imageUrl: '',
                           token: '',
                           aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+                          isAnonymous: true,
                           createdAt: '',
                         );
                         authProvider.saveUserDataToFireStore(

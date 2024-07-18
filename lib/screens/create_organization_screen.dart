@@ -71,22 +71,19 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                           border: Border.all(),
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: DisplayOrgImage(
-                            fileImage: _finalFileImage,
-                            onPressed: () async {
-                              final file = await ImagePickerHandler
-                                  .showImagePickerDialog(
-                                context: context,
-                              );
-                              if (file != null) {
-                                setState(() {
-                                  _finalFileImage = file;
-                                });
-                              }
-                            },
-                          ),
+                        child: DisplayOrgImage(
+                          fileImage: _finalFileImage,
+                          onPressed: () async {
+                            final file =
+                                await ImagePickerHandler.showImagePickerDialog(
+                              context: context,
+                            );
+                            if (file != null) {
+                              setState(() {
+                                _finalFileImage = file;
+                              });
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(
