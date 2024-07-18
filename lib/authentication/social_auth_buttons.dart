@@ -34,9 +34,18 @@ class SocialAuthButtons extends StatelessWidget {
           break;
         case SignInType.apple:
           // handle apple sign in
+          // handle anonymous
+          await authProvider.socialLogin(
+            context: context,
+            signInType: SignInType.apple,
+          );
           break;
         case SignInType.anonymous:
           // handle anonymous
+          await authProvider.socialLogin(
+            context: context,
+            signInType: SignInType.anonymous,
+          );
           break;
         default:
           log('Invalid sign in type');

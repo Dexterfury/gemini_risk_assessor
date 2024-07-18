@@ -59,3 +59,10 @@ enum SignInType {
   apple,
   anonymous,
 }
+
+// auth status
+enum AuthStatus {
+  authenticated,
+  authenticatedButNoData,
+  unauthenticated,
+}

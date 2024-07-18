@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:provider/provider.dart';
@@ -14,22 +15,29 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   @override
   void initState() {
-    checkAthentication();
+    checkAuthentication();
     super.initState();
   }
 
-  void checkAthentication() async {
-    final authProvider = context.read<AuthenticationProvider>();
-    bool isAuthenticated = await authProvider.checkAuthenticationState();
-
-    navigate(isAuthenticated: isAuthenticated);
+  void checkAuthentication() async {
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+    AuthStatus authStatus = await authProvider.checkAuthenticationState();
+    navigate(authStatus: authStatus);
   }
 
-  navigate({required bool isAuthenticated}) {
-    if (isAuthenticated) {
-      Navigator.pushReplacementNamed(context, Constants.screensControllerRoute);
-    } else {
-      Navigator.pushReplacementNamed(context, Constants.logingRoute);
+  void navigate({required AuthStatus authStatus}) {
+    switch (authStatus) {
+      case AuthStatus.authenticated:
+        Navigator.pushReplacementNamed(
+            context, Constants.screensControllerRoute);
+        break;
+      case AuthStatus.authenticatedButNoData:
+        Navigator.pushReplacementNamed(context, Constants.userInformationRoute);
+        break;
+      case AuthStatus.unauthenticated:
+        Navigator.pushReplacementNamed(context, Constants.logingRoute);
+        break;
     }
   }
 
