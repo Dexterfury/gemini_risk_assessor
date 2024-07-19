@@ -238,20 +238,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       );
                                     },
                                   ),
-                                  //if (canChangePassword)
-                                  SettingsListTile(
-                                    title: 'Change Password',
-                                    icon: Icons.lock,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ChangePassword(),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  if (canChangePassword)
+                                    SettingsListTile(
+                                      title: 'Change Password',
+                                      icon: Icons.lock,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ChangePassword(),
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ListTile(
                                     contentPadding: const EdgeInsets.only(
                                       // added padding for the list tile

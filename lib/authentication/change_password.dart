@@ -16,6 +16,8 @@ class _ChangePasswordState extends State<ChangePassword> {
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
 
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +81,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       TextFormField(
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'Please enter a password';
+                            return 'Please re-enter your new password';
                           }
                           if (value != _newPasswordController.text) {
                             return 'Passwords do not match';
@@ -107,26 +109,38 @@ class _ChangePasswordState extends State<ChangePassword> {
                           onFail: () {}),
                       const SizedBox(height: 10),
                       const Spacer(),
-                      SizedBox(
-                        height: 50,
-                        width: double.infinity,
-                        child: MainAppButton(
-                          label: 'Save Changes',
-                          onTap: () async {
-                            if (formKey.currentState!.validate()) {
-                              await UserService.changePassword(
-                                context,
-                                _oldPasswordController.text,
-                                _newPasswordController.text,
-                              );
-                              print('Password changed successfully');
-                              // clear the form
-                              _oldPasswordController.clear();
-                              _newPasswordController.clear();
-                            }
-                          },
-                        ),
-                      ),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : SizedBox(
+                              height: 50,
+                              width: double.infinity,
+                              child: MainAppButton(
+                                label: 'Save Changes',
+                                onTap: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    await UserService.changePassword(
+                                      context,
+                                      _oldPasswordController.text,
+                                      _newPasswordController.text,
+                                    );
+                                    print('Password changed successfully');
+                                    formKey.currentState!.reset();
+                                    _newPasswordController.clear();
+                                    _oldPasswordController.clear();
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    Future.delayed(const Duration(seconds: 1))
+                                        .whenComplete(() {
+                                      Navigator.pop(context);
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
                       const SizedBox(height: 56.0),
                     ],
                   ),
