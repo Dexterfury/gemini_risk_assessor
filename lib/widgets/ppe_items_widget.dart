@@ -4,7 +4,6 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_item.dart';
 import 'package:provider/provider.dart';
 
@@ -58,27 +57,28 @@ class PpeItemsWidget extends StatelessWidget {
                                   content:
                                       'Are you sure to remove\n ${ppeItem.label} ?',
                                   actions: [
-                                    ActionButton(
-                                      label: const Text(
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text(
                                         'Cancel',
                                         style: TextStyle(
                                           color: Colors.red,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
                                     ),
-                                    ActionButton(
-                                      label: const Text(
-                                        'Yes',
-                                      ),
+                                    TextButton(
                                       onPressed: () {
                                         assessmentProvider
                                             .addOrRemovePpeModelItem(
                                           ppeItem: ppeItem,
                                         );
+                                        Navigator.of(context).pop();
                                       },
+                                      child: const Text(
+                                        'Yes',
+                                      ),
                                     ),
                                   ]);
                             }

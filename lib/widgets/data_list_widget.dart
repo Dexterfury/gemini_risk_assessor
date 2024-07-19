@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:provider/provider.dart';
 
 class DataListWidget extends StatefulWidget {
@@ -91,21 +90,18 @@ class _DataListWidgetState extends State<DataListWidget> {
                         content:
                             'Are you sure to remove\n $capitalizedFirstLetter',
                         actions: [
-                          ActionButton(
-                            label: const Text(
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
                               'Cancel',
                               style: TextStyle(
                                 color: Colors.red,
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
                           ),
-                          ActionButton(
-                            label: const Text(
-                              'Yes',
-                            ),
+                          TextButton(
                             onPressed: () {
                               context
                                   .read<AssessmentProvider>()
@@ -117,6 +113,9 @@ class _DataListWidgetState extends State<DataListWidget> {
                                     () => Navigator.of(context).pop(),
                                   );
                             },
+                            child: const Text(
+                              'Yes',
+                            ),
                           ),
                         ]);
                   },

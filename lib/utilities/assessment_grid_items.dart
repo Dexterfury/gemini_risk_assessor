@@ -4,7 +4,6 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:provider/provider.dart';
 
 class AssessmentGridItems extends StatefulWidget {
@@ -171,21 +170,18 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                                     content:
                                         'Are you sure to remove\n $capitalizedItem',
                                     actions: [
-                                      ActionButton(
-                                        label: const Text(
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
                                           'Cancel',
                                           style: TextStyle(
                                             color: Colors.red,
                                           ),
                                         ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
                                       ),
-                                      ActionButton(
-                                        label: const Text(
-                                          'Yes',
-                                        ),
+                                      TextButton(
                                         onPressed: () {
                                           assessmentProvider
                                               .removeDataItem(
@@ -197,6 +193,9 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                                                     Navigator.of(context).pop(),
                                               );
                                         },
+                                        child: const Text(
+                                          'Yes',
+                                        ),
                                       ),
                                     ]);
                               },

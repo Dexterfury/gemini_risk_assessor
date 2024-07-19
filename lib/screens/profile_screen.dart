@@ -18,7 +18,6 @@ import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
-import 'package:gemini_risk_assessor/widgets/action_button.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
@@ -309,21 +308,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           content:
                                               'Are you sure you want to logout?',
                                           actions: [
-                                            ActionButton(
-                                              label: const Text(
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text(
                                                 'Cancel',
                                                 style: TextStyle(
                                                   color: Colors.red,
                                                 ),
                                               ),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
                                             ),
-                                            ActionButton(
-                                              label: const Text(
-                                                'Log Out',
-                                              ),
+                                            TextButton(
                                               onPressed: () {
                                                 // logout
                                                 context
@@ -342,6 +338,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   );
                                                 });
                                               },
+                                              child: const Text(
+                                                'Yes',
+                                              ),
                                             ),
                                           ]);
                                     },
