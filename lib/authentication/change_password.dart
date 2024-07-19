@@ -47,6 +47,11 @@ class _ChangePasswordState extends State<ChangePassword> {
                       const SizedBox(height: 40),
                       TextFormField(
                         controller: _oldPasswordController,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter your current password';
+                          }
+                        },
                         obscureText: true,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -57,6 +62,12 @@ class _ChangePasswordState extends State<ChangePassword> {
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: _newPasswordController,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter a password';
+                          }
+                          return null;
+                        },
                         obscureText: true,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -67,6 +78,9 @@ class _ChangePasswordState extends State<ChangePassword> {
                       const SizedBox(height: 20),
                       TextFormField(
                         validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter a password';
+                          }
                           if (value != _newPasswordController.text) {
                             return 'Passwords do not match';
                           }
