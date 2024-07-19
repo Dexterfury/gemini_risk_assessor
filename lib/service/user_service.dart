@@ -6,9 +6,9 @@ import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class UserService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<void> changePassword(
+  static Future<void> changePassword(
     BuildContext context,
     String currentPassword,
     String newPassword,
@@ -54,7 +54,7 @@ class UserService {
     }
   }
 
-  bool _canChangePassword(User user) {
+  static bool _canChangePassword(User user) {
     // Check if the user signed in with a method that supports password changes
     return user.providerData
         .any((userInfo) => userInfo.providerId == 'password');

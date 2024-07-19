@@ -3,6 +3,7 @@ import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/authentication/change_password.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -237,14 +238,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       );
                                     },
                                   ),
-                                  if (canChangePassword)
-                                    SettingsListTile(
-                                      title: 'Change Password',
-                                      icon: Icons.lock,
-                                      onTap: () {
-                                        // navigate to change password
-                                      },
-                                    ),
+                                  //if (canChangePassword)
+                                  SettingsListTile(
+                                    title: 'Change Password',
+                                    icon: Icons.lock,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ChangePassword(),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                   ListTile(
                                     contentPadding: const EdgeInsets.only(
                                       // added padding for the list tile

@@ -264,7 +264,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.red),
+                    ),
                   ),
                   TextButton(
                     onPressed: () async {

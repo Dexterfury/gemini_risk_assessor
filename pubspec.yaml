@@ -74,6 +74,7 @@ dependencies:
   animated_read_more_text: ^0.0.6
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^6.1.1
+  flutter_pw_validator: ^1.6.0
 
 
 dev_dependencies:

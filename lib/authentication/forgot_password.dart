@@ -26,7 +26,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         child: Form(
           key: formKey,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 20.0,
+            ),
             child: Column(
               //mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -65,30 +68,34 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 const SizedBox(
                   height: 80,
                 ),
-                MainAppButton(
-                  label: 'Send reset password link',
-                  onTap: () {
-                    if (formKey.currentState!.validate()) {
-                      AuthenticationProvider.sendPasswordResetEmail(
-                          context: context,
-                          email: _emailController.text,
-                          onSuccess: () {
-                            showSnackBar(
-                              context: context,
-                              message:
-                                  "Reset password link has been sent to ${_emailController.text}",
-                            );
-                          },
-                          onError: (error) {
-                            showSnackBar(
-                              context: context,
-                              message: error,
-                            );
-                          });
-                    } else {
-                      showSnackBar(context: context, message: 'Form not valid');
-                    }
-                  },
+                SizedBox(
+                  height: 50,
+                  child: MainAppButton(
+                    label: 'Send reset password link',
+                    onTap: () {
+                      if (formKey.currentState!.validate()) {
+                        AuthenticationProvider.sendPasswordResetEmail(
+                            context: context,
+                            email: _emailController.text,
+                            onSuccess: () {
+                              showSnackBar(
+                                context: context,
+                                message:
+                                    "Reset password link has been sent to ${_emailController.text}",
+                              );
+                            },
+                            onError: (error) {
+                              showSnackBar(
+                                context: context,
+                                message: error,
+                              );
+                            });
+                      } else {
+                        showSnackBar(
+                            context: context, message: 'Form not valid');
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
