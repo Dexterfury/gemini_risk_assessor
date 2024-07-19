@@ -1,10 +1,9 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
-import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
@@ -19,7 +18,6 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/action_button.dart';
-import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
@@ -66,6 +64,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+    bool canChangePassword = user != null &&
+        user.providerData
+            .any((userInfo) => userInfo.providerId == Constants.password);
     bool isDarkMode = false;
     // get profile data from arguments
     final uid = ModalRoute.of(context)!.settings.arguments as String;
@@ -131,13 +133,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isAnonymous,
                                     ),
                                     // display phone number
-                                    isMyProfile
-                                        ? Text(
+                                    if (isMyProfile)
+                                      FittedBox(
+                                        child: Text(
                                             userModel.phone.isNotEmpty
                                                 ? userModel.phone
                                                 : userModel.email,
-                                            style: textStyle16w600)
-                                        : const SizedBox.shrink(),
+                                            style: textStyle16w600),
+                                      ),
 
                                     const SizedBox(height: 10),
                                   ],
@@ -169,12 +172,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          // Text(
-                          //   userModel.aboutMe,
-                          //   style: const TextStyle(
-                          //     fontSize: 16,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -240,6 +237,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       );
                                     },
                                   ),
+                                  if (canChangePassword)
+                                    SettingsListTile(
+                                      title: 'Change Password',
+                                      icon: Icons.lock,
+                                      onTap: () {
+                                        // navigate to change password
+                                      },
+                                    ),
                                   ListTile(
                                     contentPadding: const EdgeInsets.only(
                                       // added padding for the list tile
@@ -355,38 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String uid,
     bool isAnonymous,
   ) {
-    editButton() {
-      if (isAnonymous) {
-        return const SizedBox.shrink();
-      }
-      if (isMyProfile) {
-        return GestureDetector(
-          onTap: () {
-            MyDialogs.showMyEditAnimatedDialog(
-              context: context,
-              title: Constants.aboutMe,
-              maxLength: 500,
-              hintText: userModel.aboutMe,
-              textAction: "Change",
-              onActionTap: (value, updatedText) async {
-                final authProvider = context.read<AuthenticationProvider>();
-                if (value) {
-                  await authProvider.updateDescription(
-                    isUser: true,
-                    id: uid,
-                    newDesc: updatedText,
-                    oldDesc: userModel.aboutMe,
-                  );
-                }
-              },
-            );
-          },
-          child: const Icon(Icons.edit_rounded),
-        );
-      }
-      return const SizedBox.shrink();
-    }
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -395,45 +368,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
             )),
-        editButton(),
+        if (isMyProfile && !isAnonymous)
+          GestureDetector(
+            onTap: () {
+              MyDialogs.showMyEditAnimatedDialog(
+                context: context,
+                title: Constants.aboutMe,
+                maxLength: 500,
+                hintText: userModel.aboutMe,
+                textAction: "Change",
+                onActionTap: (value, updatedText) async {
+                  final authProvider = context.read<AuthenticationProvider>();
+                  if (value) {
+                    await authProvider.updateDescription(
+                      isUser: true,
+                      id: uid,
+                      newDesc: updatedText,
+                      oldDesc: userModel.aboutMe,
+                    );
+                  }
+                },
+              );
+            },
+            child: const Icon(Icons.edit_rounded),
+          )
       ],
     );
   }
 
-  _buildNameView(UserModel userModel, bool isMyProfile, BuildContext context,
-      String uid, bool isAnonymous) {
-    editIcon() {
-      if (isAnonymous) {
-        return const SizedBox.shrink();
-      }
-
-      if (isMyProfile) {
-        return GestureDetector(
-          onTap: () {
-            MyDialogs.showMyEditAnimatedDialog(
-              context: context,
-              title: Constants.changeName,
-              hintText: userModel.name,
-              textAction: "Change",
-              onActionTap: (value, updatedText) async {
-                final authProvider = context.read<AuthenticationProvider>();
-                if (value) {
-                  await authProvider.updateName(
-                    isUser: true,
-                    id: uid,
-                    newName: updatedText,
-                    oldName: userModel.name,
-                  );
-                }
-              },
-            );
-          },
-          child: const Icon(Icons.edit_rounded),
-        );
-      }
-      return const SizedBox.shrink();
-    }
-
+  _buildNameView(
+    UserModel userModel,
+    bool isMyProfile,
+    BuildContext context,
+    String uid,
+    bool isAnonymous,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -444,7 +413,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(
           width: 10,
         ),
-        editIcon()
+        if (isMyProfile && !isAnonymous)
+          GestureDetector(
+            onTap: () {
+              MyDialogs.showMyEditAnimatedDialog(
+                context: context,
+                title: Constants.changeName,
+                hintText: userModel.name,
+                textAction: "Change",
+                onActionTap: (value, updatedText) async {
+                  final authProvider = context.read<AuthenticationProvider>();
+                  if (value) {
+                    await authProvider.updateName(
+                      isUser: true,
+                      id: uid,
+                      newName: updatedText,
+                      oldName: userModel.name,
+                    );
+                  }
+                },
+              );
+            },
+            child: const Icon(Icons.edit_rounded),
+          ),
       ],
     );
   }

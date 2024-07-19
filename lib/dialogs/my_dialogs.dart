@@ -5,7 +5,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
-import 'package:gemini_risk_assessor/widgets/people.dart';
+import 'package:gemini_risk_assessor/screens/people_screen.dart';
 
 class MyDialogs {
   // general dialog
@@ -276,38 +276,38 @@ class MyDialogs {
   }
 
   // people dialog
-  static void showAnimatedPeopleDialog({
-    required BuildContext context,
-    required UserViewType userViewType,
-    List<Widget>? actions,
-  }) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierLabel: '',
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (context, animation1, animation2) {
-        return Container();
-      },
-      transitionBuilder: (context, animation1, animation2, child) {
-        return ScaleTransition(
-            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
-            child: FadeTransition(
-              opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
-              child: AlertDialog(
-                content: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  width: MediaQuery.of(context).size.width,
-                  child: People(
-                    userViewType: userViewType,
-                  ),
-                ),
-                actions: actions ?? [],
-              ),
-            ));
-      },
-    );
-  }
+  // static void showAnimatedPeopleDialog({
+  //   required BuildContext context,
+  //   required UserViewType userViewType,
+  //   List<Widget>? actions,
+  // }) {
+  //   showGeneralDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     barrierLabel: '',
+  //     transitionDuration: const Duration(milliseconds: 200),
+  //     pageBuilder: (context, animation1, animation2) {
+  //       return Container();
+  //     },
+  //     transitionBuilder: (context, animation1, animation2, child) {
+  //       return ScaleTransition(
+  //           scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+  //           child: FadeTransition(
+  //             opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+  //             child: AlertDialog(
+  //               content: SizedBox(
+  //                 height: MediaQuery.of(context).size.height * 0.6,
+  //                 width: MediaQuery.of(context).size.width,
+  //                 child: PeopleScreen(
+  //                   userViewType: userViewType,
+  //                 ),
+  //               ),
+  //               actions: actions ?? [],
+  //             ),
+  //           ));
+  //     },
+  //   );
+  // }
 
   static getContent(
     String content,

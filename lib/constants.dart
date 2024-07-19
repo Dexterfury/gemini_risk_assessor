@@ -83,6 +83,8 @@ class Constants {
   static const String description = 'description';
   static const String discussingAbout = 'discussingAbout';
 
+  static const String people = 'People';
+
   // constants for promptDataModel
   static const String images = 'images';
   static const String textInput = 'textInput';
@@ -107,6 +109,8 @@ class Constants {
   static const String organizationID = 'organizationID';
   static const String pdfUrl = 'pdfUrl';
   static const String isShared = 'isShared';
+
+  static const String password = 'password';
 
   static const String orgArg = 'orgArg';
 

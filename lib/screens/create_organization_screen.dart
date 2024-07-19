@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
@@ -10,6 +11,7 @@ import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
+import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
@@ -44,9 +46,36 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
   Widget build(BuildContext context) {
     final organizationProvider = context.watch<OrganizationProvider>();
     return Scaffold(
-      appBar: const MyAppBar(
+      appBar: MyAppBar(
         title: 'Create Organization',
-        leading: BackButton(),
+        leading: const BackButton(),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OrganizationSettingsScreen(
+                    isNew: true,
+                    initialSettings: DataSettings(
+                      requestToReadTerms: _dataSettings.requestToReadTerms,
+                      allowSharing: _dataSettings.allowSharing,
+                      organizationTerms: _dataSettings.organizationTerms,
+                    ),
+                    onSave: (DataSettings settings) {
+                      setState(() {
+                        _dataSettings = settings;
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(
+              FontAwesomeIcons.gear,
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -57,110 +86,62 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
-              Card(
-                color: Theme.of(context).cardColor,
-                elevation: cardElevation,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: DisplayOrgImage(
-                          fileImage: _finalFileImage,
-                          onPressed: () async {
-                            final file =
-                                await ImagePickerHandler.showImagePickerDialog(
-                              context: context,
-                            );
-                            if (file != null) {
-                              setState(() {
-                                _finalFileImage = file;
-                              });
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: DisplayOrgImage(
+                        fileImage: _finalFileImage,
+                        onPressed: () async {
+                          final file =
+                              await ImagePickerHandler.showImagePickerDialog(
+                            context: context,
+                          );
+                          if (file != null) {
+                            setState(() {
+                              _finalFileImage = file;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    OpenContainer(
+                      closedBuilder: (context, action) {
+                        return IconButton(
+                          onPressed: () {
+                            if (organizationProvider.isLoading) {
+                              return;
                             }
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Card(
-                            color: Theme.of(context).cardColor,
-                            elevation: cardElevation,
-                            shape: const CircleBorder(),
-                            child: IconButton(
-                              onPressed: () {
-                                if (organizationProvider.isLoading) {
-                                  return;
-                                }
 
-                                MyDialogs.showAnimatedPeopleDialog(
-                                  context: context,
-                                  userViewType: UserViewType.creator,
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text(
-                                          'Close',
-                                          style: textStyle18Bold,
-                                        ))
-                                  ],
-                                );
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.userPlus,
-                              ),
-                            ),
+                            action();
+                          },
+                          icon: const Icon(
+                            FontAwesomeIcons.userPlus,
                           ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Card(
-                            color: Theme.of(context).cardColor,
-                            elevation: cardElevation,
-                            shape: const CircleBorder(),
-                            child: IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        OrganizationSettingsScreen(
-                                      isNew: true,
-                                      initialSettings: DataSettings(
-                                        requestToReadTerms:
-                                            _dataSettings.requestToReadTerms,
-                                        allowSharing:
-                                            _dataSettings.allowSharing,
-                                        organizationTerms:
-                                            _dataSettings.organizationTerms,
-                                      ),
-                                      onSave: (DataSettings settings) {
-                                        setState(() {
-                                          _dataSettings = settings;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.gear,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        );
+                      },
+                      openBuilder: (context, action) {
+                        // navigate to people screen
+                        return const PeopleScreen(
+                          userViewType: UserViewType.creator,
+                        );
+                      },
+                      transitionType: ContainerTransitionType.fadeThrough,
+                      transitionDuration: const Duration(milliseconds: 500),
+                      closedElevation: cardElevation,
+                      openElevation: 4,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 30),
@@ -184,93 +165,97 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
 
               const SizedBox(height: 40),
 
-              MainAppButton(
-                icon: Icons.save,
-                label: ' Save and Continue ',
-                borderRadius: 15,
-                onTap: () {
-                  if (organizationProvider.isLoading) {
-                    return;
-                  }
-                  // check name
-                  final emptyName = _nameController.text.isEmpty;
-                  final shortName = _nameController.text.length < 3;
+              SizedBox(
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                child: MainAppButton(
+                  label: ' Save and Continue ',
+                  borderRadius: 15,
+                  onTap: () {
+                    if (organizationProvider.isLoading) {
+                      return;
+                    }
+                    // check name
+                    final emptyName = _nameController.text.isEmpty;
+                    final shortName = _nameController.text.length < 3;
 
-                  // check description
-                  // final emptyDescription = _descriptionController.text.isEmpty;
-                  // final shortDescription =
-                  //     _descriptionController.text.length < 10;
-                  // final desc = emptyDescription ? Constants.defaultDescription : _descriptionController.text;
+                    // check description
+                    // final emptyDescription = _descriptionController.text.isEmpty;
+                    // final shortDescription =
+                    //     _descriptionController.text.length < 10;
+                    // final desc = emptyDescription ? Constants.defaultDescription : _descriptionController.text;
 
-                  // check name
-                  if (emptyName || shortName) {
-                    showSnackBar(
-                      context: context,
-                      message: emptyName
-                          ? 'Please enter organization name'
-                          : 'organization name must be at least 3 characters',
-                    );
-                    return;
-                  }
-                  // check description
-                  // if (emptyDescription || shortDescription) {
-                  //   showSnackBar(
-                  //     context: context,
-                  //     message: emptyDescription
-                  //         ? 'Please enter organization description'
-                  //         : 'organization description must be at least 10 characters',
-                  //   );
-                  //   return;
-                  // }
-
-                  final orgModel = OrganizationModel(
-                    creatorUID:
-                        context.read<AuthenticationProvider>().userModel!.uid,
-                    name: _nameController.text,
-                    aboutOrganization: _descriptionController.text,
-                    imageUrl: '',
-                    organizationTerms: _dataSettings.organizationTerms,
-                    requestToReadTerms: _dataSettings.requestToReadTerms,
-                    allowSharing: _dataSettings.allowSharing,
-                  );
-
-                  // show loading dialog
-                  // show my alert dialog for loading
-                  MyDialogs.showMyAnimatedDialog(
-                    context: context,
-                    title: 'Creating organization',
-                    loadingIndicator: const SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: LoadingPPEIcons(),
-                    ),
-                  );
-
-                  // save organization data to firestore
-                  organizationProvider.createOrganization(
-                    fileImage: _finalFileImage,
-                    newOrganizationModel: orgModel,
-                    onSuccess: () {
-                      // pop the loading dialog
-                      Navigator.pop(context);
-                      // clear data
-                      setState(() {
-                        _nameController.text = '';
-                        _descriptionController.text = '';
-                        _finalFileImage = null;
-                      });
+                    // check name
+                    if (emptyName || shortName) {
                       showSnackBar(
-                          context: context, message: 'Organization created');
-                      // pop to previous screen
-                      Navigator.pop(context);
-                    },
-                    onError: (error) {
-                      // pop the loading dialog
-                      Navigator.pop(context);
-                      showSnackBar(context: context, message: error.toString());
-                    },
-                  );
-                },
+                        context: context,
+                        message: emptyName
+                            ? 'Please enter organization name'
+                            : 'organization name must be at least 3 characters',
+                      );
+                      return;
+                    }
+                    // check description
+                    // if (emptyDescription || shortDescription) {
+                    //   showSnackBar(
+                    //     context: context,
+                    //     message: emptyDescription
+                    //         ? 'Please enter organization description'
+                    //         : 'organization description must be at least 10 characters',
+                    //   );
+                    //   return;
+                    // }
+
+                    final orgModel = OrganizationModel(
+                      creatorUID:
+                          context.read<AuthenticationProvider>().userModel!.uid,
+                      name: _nameController.text,
+                      aboutOrganization: _descriptionController.text,
+                      imageUrl: '',
+                      organizationTerms: _dataSettings.organizationTerms,
+                      requestToReadTerms: _dataSettings.requestToReadTerms,
+                      allowSharing: _dataSettings.allowSharing,
+                    );
+
+                    // show loading dialog
+                    // show my alert dialog for loading
+                    MyDialogs.showMyAnimatedDialog(
+                      context: context,
+                      title: 'Creating organization',
+                      loadingIndicator: const SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: LoadingPPEIcons(),
+                      ),
+                    );
+
+                    // save organization data to firestore
+                    organizationProvider.createOrganization(
+                      fileImage: _finalFileImage,
+                      newOrganizationModel: orgModel,
+                      onSuccess: () {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        // clear data
+                        setState(() {
+                          _nameController.text = '';
+                          _descriptionController.text = '';
+                          _finalFileImage = null;
+                        });
+                        showSnackBar(
+                            context: context, message: 'Organization created');
+                        // pop to previous screen
+                        Navigator.pop(context);
+                      },
+                      onError: (error) {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        showSnackBar(
+                            context: context, message: error.toString());
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

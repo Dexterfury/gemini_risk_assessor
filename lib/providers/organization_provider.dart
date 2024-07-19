@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,10 @@ class OrganizationProvider extends ChangeNotifier {
   List<String> _tempRemovedAdminsUIDs = [];
 
   bool _isSaved = false;
+
+  List<String> _initialMemberUIDs = [];
+  List<String> _initialAwaitingApprovalUIDs = [];
+
   OrganizationModel _organizationModel = OrganizationModel.empty();
 
   // getters
@@ -49,6 +54,24 @@ class OrganizationProvider extends ChangeNotifier {
   final CollectionReference _organizationCollection =
       FirebaseFirestore.instance.collection(Constants.organizationCollection);
 
+  void setInitialMemberState() {
+    _initialMemberUIDs = List.from(_organizationModel.membersUIDs);
+    _initialAwaitingApprovalUIDs =
+        List.from(_organizationModel.awaitingApprovalUIDs);
+  }
+
+  bool hasChanges() {
+    final currentMembers = Set.from(_tempOrgMemberUIDs);
+    final initialMembers = Set.from(_initialMemberUIDs);
+    final currentAwaiting = Set.from(_awaitApprovalList);
+    final initialAwaiting = Set.from(_initialAwaitingApprovalUIDs);
+
+    return currentMembers.difference(initialMembers).isNotEmpty ||
+        initialMembers.difference(currentMembers).isNotEmpty ||
+        currentAwaiting.difference(initialAwaiting).isNotEmpty ||
+        initialAwaiting.difference(currentAwaiting).isNotEmpty;
+  }
+
   Future<void> setSearchQuery(String value) async {
     _searchQuery = value;
     notifyListeners();
@@ -58,11 +81,6 @@ class OrganizationProvider extends ChangeNotifier {
   void setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
-  }
-
-  // get all users stream
-  Stream<QuerySnapshot> allUsersStream() {
-    return _usersCollection.snapshots();
   }
 
   // get a list UIDs from group members list
@@ -104,6 +122,42 @@ class OrganizationProvider extends ChangeNotifier {
     _organizationModel.allowSharing = settings.allowSharing;
     _organizationModel.requestToReadTerms = settings.requestToReadTerms;
     notifyListeners();
+  }
+
+  Future<bool> updateOrganizationDataInFireStore() async {
+    if (!hasChanges()) {
+      return false;
+    }
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final removedMembers =
+          _initialMemberUIDs.where((uid) => !_tempOrgMemberUIDs.contains(uid));
+      final addedMembers =
+          _tempOrgMemberUIDs.where((uid) => !_initialMemberUIDs.contains(uid));
+
+      await _organizationCollection
+          .doc(_organizationModel.organizationID)
+          .update({
+        Constants.membersUIDs: FieldValue.arrayRemove(removedMembers.toList()),
+        Constants.awaitingApprovalUIDs:
+            FieldValue.arrayUnion(addedMembers.toList()),
+      });
+
+      _organizationModel.membersUIDs = _tempOrgMemberUIDs;
+      _organizationModel.awaitingApprovalUIDs = _awaitApprovalList;
+
+      setInitialMemberState();
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      print(e.toString());
+      return false;
+    }
   }
 
   // set the temp lists to empty
@@ -250,28 +304,28 @@ class OrganizationProvider extends ChangeNotifier {
   }
 
   // update group settings in firestore
-  Future<bool> updateOrganizationDataInFireStore() async {
-    if (_tempOrgMemberUIDs == _organizationModel.membersUIDs) {
-      return false;
-    }
+  // Future<bool> updateOrganizationDataInFireStore() async {
+  //   if (_tempOrgMemberUIDs == _organizationModel.membersUIDs) {
+  //     return false;
+  //   }
 
-    // remove all membersUIDs whi are already in the organizationModel.membersUIDs list
-    _tempOrgMemberUIDs.removeWhere(
-        (element) => _organizationModel.membersUIDs.contains(element));
+  //   // remove all membersUIDs who are already in the organizationModel.membersUIDs list
+  //   _tempOrgMemberUIDs.removeWhere(
+  //       (element) => _organizationModel.membersUIDs.contains(element));
 
-    try {
-      await _organizationCollection
-          .doc(_organizationModel.organizationID)
-          .update({
-        Constants.awaitingApprovalUIDs: _tempOrgMemberUIDs,
-      });
-      notifyListeners();
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return false;
-    }
-  }
+  //   try {
+  //     await _organizationCollection
+  //         .doc(_organizationModel.organizationID)
+  //         .update({
+  //       Constants.awaitingApprovalUIDs: _tempOrgMemberUIDs,
+  //     });
+  //     notifyListeners();
+  //     return true;
+  //   } catch (e) {
+  //     print(e.toString());
+  //     return false;
+  //   }
+  // }
 
   // get a list of goup members data from firestore
   Future<List<UserModel>> getMembersDataFromFirestore({

@@ -9,18 +9,19 @@ class SettingsListTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     required this.icon,
-    required this.iconContainerColor,
+    this.iconContainerColor,
     required this.onTap,
   });
 
   final String title;
   final String? subtitle;
   final IconData icon;
-  final Color iconContainerColor;
+  final Color? iconContainerColor;
   final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final containerColor = iconContainerColor ?? Theme.of(context).primaryColor;
     return ListTile(
       // added padding
       contentPadding: const EdgeInsets.only(
@@ -29,7 +30,7 @@ class SettingsListTile extends StatelessWidget {
       ),
       leading: IconContainer(
         icon: icon,
-        containerColor: iconContainerColor,
+        containerColor: containerColor,
       ),
       title: Text(title),
       subtitle: subtitle != null

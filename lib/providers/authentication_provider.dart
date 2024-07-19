@@ -13,7 +13,6 @@ import 'package:gemini_risk_assessor/authentication/user_information_screen.dart
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
-import 'package:gemini_risk_assessor/models/apple_name_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
@@ -241,7 +240,6 @@ class AuthenticationProvider extends ChangeNotifier {
 
       if (currentUser != null && currentUser.isAnonymous) {
         // If current user is anonymous, try to link the credential
-        log('is anonymouse');
         try {
           userCredential = await currentUser.linkWithCredential(credential);
           wasAnonymouse = true;
@@ -259,7 +257,6 @@ class AuthenticationProvider extends ChangeNotifier {
           }
         }
       } else {
-        log('HERE GOOD');
         // If there's no current user or it's not anonymous, just sign in
         userCredential = await _auth.signInWithCredential(credential);
         wasAnonymouse = false;
@@ -588,20 +585,24 @@ class AuthenticationProvider extends ChangeNotifier {
             await FirebaseAuth.instance.signInWithCredential(credential);
       }
 
-      // Check if the user provided a full name
-      final fullName = appleIdCredential.givenName != null &&
-              appleIdCredential.familyName != null
-          ? AppleNameModel(
-              givenName: appleIdCredential.givenName!,
-              familyName: appleIdCredential.familyName!,
-            )
-          : null;
+      // Determine the display name
+      String displayName;
+      if (appleIdCredential.givenName != null &&
+          appleIdCredential.familyName != null) {
+        displayName =
+            '${appleIdCredential.givenName} ${appleIdCredential.familyName}';
+      } else {
+        displayName = 'Apple User';
+      }
 
       // Update the user's display name
-      final user = FirebaseAuth.instance.currentUser;
-      await user!.updateDisplayName(
-        fullName?.toString() ?? user.displayName,
-      );
+      await userCredential.user?.updateDisplayName(displayName);
+
+      // Fetch the user again to ensure we have the updated information
+      await userCredential.user?.reload();
+      final updatedUser = FirebaseAuth.instance.currentUser;
+
+      log('displayName: ${updatedUser?.displayName}');
 
       return userCredential;
     } on SignInWithAppleAuthorizationException catch (e) {
@@ -633,103 +634,52 @@ class AuthenticationProvider extends ChangeNotifier {
     return _auth.currentUser!.email!;
   }
 
-  Future<void> socialLogin({
+  Future<UserCredential?> socialLogin({
     required BuildContext context,
     required SignInType signInType,
   }) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-      bool isAnonymous = isUserAnonymous();
-      UserCredential? userCredential;
+    _isLoading = true;
+    notifyListeners();
+    bool isAnonymous = isUserAnonymous();
+    UserCredential? userCredential;
 
-      switch (signInType) {
-        case SignInType.google:
-          userCredential = await _signInWithGoogle(link: isAnonymous);
-          break;
-        case SignInType.apple:
-          userCredential = await _signInWithApple(link: isAnonymous);
-          break;
-        case SignInType.anonymous:
-          userCredential = await _auth.signInAnonymously();
-          isAnonymous = true;
-          break;
-        default:
-          throw Exception('Invalid sign-in type');
-      }
-
-      if (userCredential != null) {
-        log('handling credentials');
-        Future.delayed(const Duration(milliseconds: 200))
-            .whenComplete(() async {
-          await handleUserCredential(
-            context: context,
-            userCredential: userCredential!,
-            wasAnonymous: isAnonymous,
-          );
-        });
-      } else {
-        log('${signInType.toString()} sign in failed or was cancelled by the user');
-      }
-    } on FirebaseAuthException catch (e) {
-      log('FirebaseAuthException: ${e.code} - ${e.message}');
-      Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
-        FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
-      });
-    } catch (e) {
-      log('error signing: ${e.toString()}');
-      Future.delayed(const Duration(milliseconds: 200), () {
-        showSnackBar(
-            context: context, message: 'An unexpected error occurred: $e');
-      });
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    switch (signInType) {
+      case SignInType.google:
+        userCredential = await _signInWithGoogle(link: isAnonymous);
+        break;
+      case SignInType.apple:
+        userCredential = await _signInWithApple(link: isAnonymous);
+        break;
+      case SignInType.anonymous:
+        userCredential = await _auth.signInAnonymously();
+        isAnonymous = true;
+        break;
+      default:
+        throw Exception('Invalid sign-in type');
     }
+
+    return userCredential;
   }
 
-  Future<void> handleUserCredential({
-    required BuildContext context,
-    required UserCredential userCredential,
-    bool wasAnonymous = false,
-  }) async {
-    User? user = userCredential.user;
-    if (user != null) {
-      bool userExists = await checkUserExistsInFirestore();
-
-      if (userExists && !wasAnonymous) {
-        await getUserDataFromFireStore();
+  Future<void> createAndSaveNewUser(User user, bool wasAnonymous) async {
+    _userModel = UserModel(
+      uid: user.uid,
+      name: user.displayName ?? '',
+      phone: user.phoneNumber ?? '',
+      email: user.email ?? '',
+      imageUrl: user.photoURL ?? '',
+      token: '',
+      aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+      isAnonymous: wasAnonymous,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await saveUserDataToFireStore(
+      userModel: _userModel!,
+      fileImage: null,
+      onSuccess: () async {
         await saveUserDataToSharedPreferences();
-      } else {
-        _userModel = UserModel(
-          uid: user.uid,
-          name: user.displayName ?? '',
-          phone: user.phoneNumber ?? '',
-          email: user.email ?? '',
-          imageUrl: user.photoURL ?? '',
-          token: '',
-          aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
-          isAnonymous: wasAnonymous,
-          createdAt: DateTime.now().toIso8601String(),
-        );
-        await saveUserDataToFireStore(
-          userModel: _userModel!,
-          fileImage: null,
-          onSuccess: () async {
-            await saveUserDataToSharedPreferences();
-          },
-        );
-      }
-
-      _isLoading = false;
-      notifyListeners();
-      Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
-        navigationController(
-          context: context,
-          route: Constants.screensControllerRoute,
-        );
-      });
-    }
+      },
+    );
   }
 
   // update name

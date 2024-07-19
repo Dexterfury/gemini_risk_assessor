@@ -54,6 +54,13 @@ class FirebaseMethods {
     }
   }
 
+  // get all users stream
+  static Stream<QuerySnapshot> allUsersStream() {
+    return _usersCollection
+        .where(Constants.isAnonymous, isEqualTo: false)
+        .snapshots();
+  }
+
   // stream risk assessments from firestore
   static Stream<QuerySnapshot> ristAssessmentsStream({
     required String userId,

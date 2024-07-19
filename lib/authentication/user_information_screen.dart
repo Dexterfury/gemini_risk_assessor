@@ -81,19 +81,22 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
             const SizedBox(height: 40),
 
-            MainAppButton(
-              icon: Icons.login,
-              label: 'Continue',
-              onTap: () {
-                if (_nameController.text.isEmpty ||
-                    _nameController.text.length < 3) {
-                  showSnackBar(
-                      context: context, message: 'Please enter your name');
-                  return;
-                }
-                // save user data to firestore
-                saveUserDataToFireStore();
-              },
+            SizedBox(
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              child: MainAppButton(
+                label: 'Continue',
+                onTap: () {
+                  if (_nameController.text.isEmpty ||
+                      _nameController.text.length < 3) {
+                    showSnackBar(
+                        context: context, message: 'Please enter your name');
+                    return;
+                  }
+                  // save user data to firestore
+                  saveUserDataToFireStore();
+                },
+              ),
             ),
           ],
         ),

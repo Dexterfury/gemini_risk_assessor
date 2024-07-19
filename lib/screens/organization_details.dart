@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/buttons_row.dart';
@@ -14,6 +15,7 @@ import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
 import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
+import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -135,32 +137,31 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
           title: 'Organisation Details',
           leading: const BackButton(),
           actions: [
-            isAdmin
-                ? Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: IconButton(
-                        onPressed: () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OrganizationSettingsScreen(
-                                isNew: false,
-                                initialSettings: DataSettings(
-                                  requestToReadTerms: requestToReadTerms,
-                                  allowSharing: allowSharing,
-                                  organizationTerms: orgTerms,
-                                ),
-                                onSave: (DataSettings settings) {
-                                  orgProvider
-                                      .updateOrganizationSettings(settings);
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                        icon: const Icon(FontAwesomeIcons.gear, size: 20)),
-                  )
-                : const SizedBox(),
+            if (isAdmin)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  onPressed: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OrganizationSettingsScreen(
+                          isNew: false,
+                          initialSettings: DataSettings(
+                            requestToReadTerms: requestToReadTerms,
+                            allowSharing: allowSharing,
+                            organizationTerms: orgTerms,
+                          ),
+                          onSave: (DataSettings settings) {
+                            orgProvider.updateOrganizationSettings(settings);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(FontAwesomeIcons.gear, size: 20),
+                ),
+              )
           ],
         ),
         body: Padding(
@@ -323,96 +324,6 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     );
   }
 
-  // Row buildButtonsRow(
-  //   String orgID,
-  // ) {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     children: [
-  //       _buildIconButton(Icons.assignment_add, orgID),
-  //       _buildIconButton(Icons.assignment_late_outlined, orgID),
-  //       _buildIconButton(Icons.handyman, orgID),
-  //     ],
-  //   );
-  // }
-
-  // Widget _buildIconButton(
-  //   IconData icon,
-  //   String orgID,
-  // ) {
-  //   return OpenContainer(
-  //     closedColor: Theme.of(context).colorScheme.primary,
-  //     closedBuilder: (context, action) {
-  //       return IconButton(
-  //         onPressed: () async {
-  //           // set search data depending on the clicked icon
-  //           await _setSearchData(context, icon);
-  //           action();
-  //         },
-  //         icon: Icon(
-  //           icon,
-  //           color: Colors.white,
-  //         ),
-  //       );
-  //     },
-  //     openBuilder: (context, action) {
-  //       // navigate to screen depending on the clicked icon
-  //       return _navigateToScreen(icon, orgID);
-  //     },
-  //     transitionType: ContainerTransitionType.fadeThrough,
-  //     transitionDuration: const Duration(milliseconds: 500),
-  //     closedShape:
-  //         RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-  //     closedElevation: 4,
-  //     openElevation: 4,
-  //   );
-  // }
-
-  // Widget _buildMembersSection(String membersCount, BuildContext context) {
-  //   return GestureDetector(
-  //     onTap: () {
-
-  //     },
-  //     child: const IconContainer(
-  //       containerColor: Colors.blue,
-  //       icon: Icons.person_add,
-  //       padding: 12,
-  //       borderRadius: 4.0,
-  //     ),
-  //   );
-  // }
-
-  void _showPeopleDialog({
-    required BuildContext context,
-    required Function(bool) onActionTap,
-  }) {
-    MyDialogs.showAnimatedPeopleDialog(
-        context: context,
-        userViewType: UserViewType.tempPlus,
-        actions: [
-          TextButton(
-            onPressed: () {
-              onActionTap(false);
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Cancel',
-              style: textStyle18Bold,
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              onActionTap(true);
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Save',
-              style: textStyle18Bold,
-            ),
-          ),
-        ]);
-  }
-
   Column buildDescription(
     bool isAdmin,
     OrganizationProvider orgProvider,
@@ -511,46 +422,43 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
           Container(
             decoration: BoxDecoration(
               border: Border.all(),
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: DisplayOrgImage(
-                isViewOnly: true,
-                fileImage: _finalFileImage,
-                imageUrl: orgProvider.organizationModel.imageUrl ?? '',
-                onPressed: !isAdmin
-                    ? null
-                    : () async {
-                        final file =
-                            await ImagePickerHandler.showImagePickerDialog(
-                          context: context,
+            child: DisplayOrgImage(
+              isViewOnly: true,
+              fileImage: _finalFileImage,
+              imageUrl: orgProvider.organizationModel.imageUrl ?? '',
+              onPressed: !isAdmin
+                  ? null
+                  : () async {
+                      final file =
+                          await ImagePickerHandler.showImagePickerDialog(
+                        context: context,
+                      );
+                      if (file != null) {
+                        setState(() async {
+                          _finalFileImage = file;
+                        });
+                        // show loading dialog
+                        showLoadingDialog(
+                          title: 'Saving,',
                         );
-                        if (file != null) {
-                          setState(() async {
-                            _finalFileImage = file;
-                          });
-                          // show loading dialog
-                          showLoadingDialog(
-                            title: 'Saving,',
-                          );
 
-                          final imageUrl = await FileUploadHandler.updateImage(
-                            file: file,
-                            isUser: false,
-                            id: orgProvider.organizationModel.organizationID,
-                            reference:
-                                '${Constants.organizationImage}/${orgProvider.organizationModel.organizationID}.jpg',
-                          );
+                        final imageUrl = await FileUploadHandler.updateImage(
+                          file: file,
+                          isUser: false,
+                          id: orgProvider.organizationModel.organizationID,
+                          reference:
+                              '${Constants.organizationImage}/${orgProvider.organizationModel.organizationID}.jpg',
+                        );
 
-                          // set newimage in provider
-                          await setNewImageInProvider(imageUrl);
+                        // set newimage in provider
+                        await setNewImageInProvider(imageUrl);
 
-                          // pop loading dialog
-                          popDialog();
-                        }
-                      },
-              ),
+                        // pop loading dialog
+                        popDialog();
+                      }
+                    },
             ),
           ),
           const SizedBox(
@@ -614,102 +522,104 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 const SizedBox(
                   height: 10,
                 ),
-                isAdmin
-                    ? Card(
-                        color: Theme.of(context).cardColor,
-                        elevation: cardElevation,
-                        shape: const CircleBorder(),
-                        child: IconButton(
-                          onPressed: () {
-                            // show people dialog
-                            _showPeopleDialog(
-                                context: context,
-                                onActionTap: (value) async {
-                                  if (value) {
-                                    bool isSaved = await context
-                                        .read<OrganizationProvider>()
-                                        .updateOrganizationDataInFireStore();
-
-                                    if (isSaved) {
-                                      Future.delayed(
-                                              const Duration(milliseconds: 100))
-                                          .whenComplete(() {
-                                        showSnackBar(
-                                          context: context,
-                                          message:
-                                              'Requests sent to added members',
-                                        );
-                                      });
-                                    }
-                                  }
-
-                                  Future.delayed(
-                                          const Duration(milliseconds: 100))
-                                      .whenComplete(() async {
-                                    // clear search query
-                                    context
-                                        .read<OrganizationProvider>()
-                                        .setSearchQuery('');
-                                  });
-                                });
-                          },
-                          icon: const Icon(
-                            FontAwesomeIcons.userPlus,
-                          ),
+                if (isAdmin)
+                  OpenContainer(
+                    closedBuilder: (context, action) {
+                      return IconButton(
+                        onPressed: action,
+                        icon: const Icon(
+                          FontAwesomeIcons.userPlus,
                         ),
-                      )
-                    : const SizedBox.shrink(),
-                showAcceptBtn
-                    ? orgProvider.isLoading
-                        ? const CircularProgressIndicator()
-                        : MainAppButton(
-                            icon: Icons.person_add,
-                            label: 'Accept Invite',
-                            contanerColor: Colors.orangeAccent,
-                            onTap: () async {
-                              // accept invite
-                              // first check if admin set to read terms and conditions
-                              if (orgProvider
-                                  .organizationModel.requestToReadTerms) {
-                                if (!_hasReadTerms) {
-                                  MyDialogs.animatedTermsDialog(
-                                      context: context,
-                                      title: "Terms and Conditions",
-                                      content: orgProvider
-                                          .organizationModel.organizationTerms,
-                                      isMember: orgProvider
-                                          .organizationModel.membersUIDs
-                                          .contains(uid),
-                                      onAccept: () {
-                                        // Handle acceptance here
-                                        // join org and update data in firestore
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
-                                        setState(() {
-                                          _hasReadTerms = true;
-                                        });
-                                      },
-                                      onDecline: () {
-                                        // Handle decline here
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
+                      );
+                    },
+                    openBuilder: (context, action) {
+                      // navigate to people screen
+                      return const PeopleScreen(
+                        userViewType: UserViewType.tempPlus,
+                      );
+                    },
+                    transitionType: ContainerTransitionType.fadeThrough,
+                    transitionDuration: const Duration(milliseconds: 500),
+                    closedElevation: cardElevation,
+                    openElevation: 4,
+                  ),
+                // Card(
+                //   color: Theme.of(context).cardColor,
+                //   elevation: cardElevation,
+                //   shape: const CircleBorder(),
+                //   child: IconButton(
+                //     onPressed: () {
+                //       // show people dialog
+                //       _showPeopleDialog(
+                //           context: context,
+                //           onActionTap: (value) async {
+                //             if (value) {
+                //               bool isSaved = await context
+                //                   .read<OrganizationProvider>()
+                //                   .updateOrganizationDataInFireStore();
+
+                //               if (isSaved) {
+                //                 Future.delayed(
+                //                         const Duration(milliseconds: 100))
+                //                     .whenComplete(() {
+                //                   showSnackBar(
+                //                     context: context,
+                //                     message: 'Requests sent to added members',
+                //                   );
+                //                 });
+                //               }
+                //             }
+
+                //             Future.delayed(const Duration(milliseconds: 100))
+                //                 .whenComplete(() async {
+                //               // clear search query
+                //               context
+                //                   .read<OrganizationProvider>()
+                //                   .setSearchQuery('');
+                //             });
+                //           });
+                //     },
+                //     icon: const Icon(
+                //       FontAwesomeIcons.userPlus,
+                //     ),
+                //   ),
+                // ),
+                if (showAcceptBtn)
+                  orgProvider.isLoading
+                      ? const CircularProgressIndicator()
+                      : MainAppButton(
+                          icon: Icons.person_add,
+                          label: 'Accept Invite',
+                          contanerColor: Colors.orangeAccent,
+                          onTap: () async {
+                            // accept invite
+                            // first check if admin set to read terms and conditions
+                            if (orgProvider
+                                .organizationModel.requestToReadTerms) {
+                              if (!_hasReadTerms) {
+                                MyDialogs.animatedTermsDialog(
+                                    context: context,
+                                    title: "Terms and Conditions",
+                                    content: orgProvider
+                                        .organizationModel.organizationTerms,
+                                    isMember: orgProvider
+                                        .organizationModel.membersUIDs
+                                        .contains(uid),
+                                    onAccept: () {
+                                      // Handle acceptance here
+                                      // join org and update data in firestore
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                      setState(() {
+                                        _hasReadTerms = true;
                                       });
-                                } else {
-                                  // join org and update data in firestore
-                                  await orgProvider
-                                      .addMemberToOrganization(
-                                    uid: uid,
-                                  )
-                                      .whenComplete(() {
-                                    showSnackBar(
-                                      context: context,
-                                      message:
-                                          'You are a member of this Organization',
-                                    );
-                                  });
-                                }
+                                    },
+                                    onDecline: () {
+                                      // Handle decline here
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    });
                               } else {
-                                // join org and update data in firestore
                                 // join org and update data in firestore
                                 await orgProvider
                                     .addMemberToOrganization(
@@ -723,36 +633,48 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                                   );
                                 });
                               }
-                            },
-                          )
-                    : Container(),
-                orgProvider.organizationModel.organizationTerms.isNotEmpty
-                    ? TextButton(
-                        onPressed: () {
-                          // show terms and conditions dialog
-                          MyDialogs.animatedTermsDialog(
-                              context: context,
-                              title: "Terms and Conditions",
-                              content: orgProvider
-                                  .organizationModel.organizationTerms,
-                              isMember: orgProvider
-                                  .organizationModel.membersUIDs
-                                  .contains(uid),
-                              onAccept: () {
-                                // Handle acceptance here
-                                Navigator.of(context).pop(); // Close the dialog
-                                setState(() {
-                                  _hasReadTerms = true;
-                                });
-                              },
-                              onDecline: () {
-                                // Handle decline here
-                                Navigator.of(context).pop(); // Close the dialog
+                            } else {
+                              // join org and update data in firestore
+                              // join org and update data in firestore
+                              await orgProvider
+                                  .addMemberToOrganization(
+                                uid: uid,
+                              )
+                                  .whenComplete(() {
+                                showSnackBar(
+                                  context: context,
+                                  message:
+                                      'You are a member of this Organization',
+                                );
                               });
-                        },
-                        child: const Text('Terms'),
-                      )
-                    : const SizedBox.shrink(),
+                            }
+                          },
+                        ),
+                if (orgProvider.organizationModel.organizationTerms.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      // show terms and conditions dialog
+                      MyDialogs.animatedTermsDialog(
+                          context: context,
+                          title: "Terms and Conditions",
+                          content:
+                              orgProvider.organizationModel.organizationTerms,
+                          isMember: orgProvider.organizationModel.membersUIDs
+                              .contains(uid),
+                          onAccept: () {
+                            // Handle acceptance here
+                            Navigator.of(context).pop(); // Close the dialog
+                            setState(() {
+                              _hasReadTerms = true;
+                            });
+                          },
+                          onDecline: () {
+                            // Handle decline here
+                            Navigator.of(context).pop(); // Close the dialog
+                          });
+                    },
+                    child: const Text('Terms'),
+                  ),
               ],
             ),
           )

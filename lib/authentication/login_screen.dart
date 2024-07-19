@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/authentication/social_auth_buttons.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -39,6 +43,110 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _phoneNumberController.dispose();
     super.dispose();
+  }
+
+  Future<void> handleClickedButton(SignInType authType) async {
+    final authProvider = context.read<AuthenticationProvider>();
+    try {
+      UserCredential? userCredential;
+      switch (authType) {
+        case SignInType.email:
+          Navigator.pushNamed(context, Constants.emailSignInRoute);
+          return;
+        case SignInType.google:
+        case SignInType.apple:
+        case SignInType.anonymous:
+          userCredential = await authProvider.socialLogin(
+            context: context,
+            signInType: authType,
+          );
+          break;
+        default:
+          throw Exception('Invalid sign in type');
+      }
+
+      if (userCredential != null) {
+        // Handle successful authentication
+        bool userExists = await authProvider.checkUserExistsInFirestore();
+        bool wasAnonymous = authProvider.isUserAnonymous();
+
+        if (userExists && !wasAnonymous) {
+          await authProvider.getUserDataFromFireStore();
+          await authProvider.saveUserDataToSharedPreferences();
+        } else {
+          // Fetch the user again to ensure we have the updated information
+          await userCredential.user?.reload();
+          final updatedUser = FirebaseAuth.instance.currentUser;
+
+          log('displayName: ${updatedUser?.displayName}');
+          await authProvider.createAndSaveNewUser(
+            updatedUser!,
+            wasAnonymous,
+          );
+        }
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+          // Navigate to the main screen
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Constants.screensControllerRoute,
+            (route) => false,
+          );
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      authProvider.setLoading(false);
+      log('FirebaseAuthException: ${e.code} - ${e.message}');
+      Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+        FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+      });
+    } catch (e) {
+      authProvider.setLoading(false);
+      log('error signing: ${e.toString()}');
+      Future.delayed(const Duration(milliseconds: 200), () {
+        showSnackBar(
+            context: context, message: 'An unexpected error occurred: $e');
+      });
+    }
+  }
+
+  void handlePhoneSignIn({
+    required String phoneNumber,
+    required AuthenticationProvider authProvider,
+  }) async {
+    Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+      // show loading Dialog
+      // show my alert dialog for loading
+      MyDialogs.showMyAnimatedDialog(
+        context: context,
+        title: 'Authenticating...',
+        loadingIndicator:
+            const SizedBox(height: 100, width: 100, child: LoadingPPEIcons()),
+      );
+
+      try {
+        // sign in with phone number
+        authProvider.signInWithPhoneNumber(
+            phoneNumber: phoneNumber,
+            context: context,
+            onSuccess: () {
+              // pop the loading dialog
+              Navigator.pop(context);
+            });
+      } on FirebaseAuthException catch (e) {
+        // pop the loading dialog
+        Navigator.pop(context);
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+          FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
+        });
+      } catch (e) {
+        // pop the loading dialog
+        Navigator.pop(context);
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+          showSnackBar(
+              context: context, message: 'An unexpected error occurred: $e');
+        });
+      }
+    });
   }
 
   @override
@@ -89,47 +197,16 @@ class _LoginScreenState extends State<LoginScreen> {
               child: MainAppButton(
                 label: ' SIGN IN WITH PHONE ',
                 onTap: () {
+                  if (authProvider.isLoading) {
+                    return;
+                  }
                   if (_isValid) {
                     final phoneNumber =
                         '+${selectedCountry.phoneCode}${_phoneNumberController.text}';
-                    Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-                      // show loading Dialog
-                      // show my alert dialog for loading
-                      MyDialogs.showMyAnimatedDialog(
-                        context: context,
-                        title: 'Authenticating...',
-                        loadingIndicator: const SizedBox(
-                            height: 100, width: 100, child: LoadingPPEIcons()),
-                      );
-
-                      try {
-                        // sign in with phone number
-                        authProvider.signInWithPhoneNumber(
-                            phoneNumber: phoneNumber,
-                            context: context,
-                            onSuccess: () {
-                              // pop the loading dialog
-                              Navigator.pop(context);
-                            });
-                      } on FirebaseAuthException catch (e) {
-                        // pop the loading dialog
-                        Navigator.pop(context);
-                        Future.delayed(const Duration(milliseconds: 200))
-                            .whenComplete(() {
-                          FirebaseAuthErrorHandler.showErrorSnackBar(
-                              context, e);
-                        });
-                      } catch (e) {
-                        // pop the loading dialog
-                        Navigator.pop(context);
-                        Future.delayed(const Duration(milliseconds: 200))
-                            .whenComplete(() {
-                          showSnackBar(
-                              context: context,
-                              message: 'An unexpected error occurred: $e');
-                        });
-                      }
-                    });
+                    handlePhoneSignIn(
+                      phoneNumber: phoneNumber,
+                      authProvider: authProvider,
+                    );
                   } else {
                     showSnackBar(
                       context: context,
@@ -152,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
             isLoading
                 ? const CircularProgressIndicator()
                 : SocialAuthButtons(
-                    authProvider: authProvider,
+                    onTap: handleClickedButton,
                   ),
           ],
         ),

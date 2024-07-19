@@ -16,6 +16,7 @@ class UserWidget extends StatelessWidget {
     required this.showCheckMark,
     required this.viewType,
     this.onTap,
+    this.onChanged,
   });
 
   final UserModel userData;
@@ -23,14 +24,13 @@ class UserWidget extends StatelessWidget {
   final bool showCheckMark;
   final UserViewType viewType;
   final VoidCallback? onTap;
+  final VoidCallback? onChanged;
+
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final name = uid == userData.uid ? 'You' : userData.name;
-    bool value = getValue(
-      context,
-      viewType,
-    );
+    bool value = getValue(context, viewType);
 
     return ListTile(
       minLeadingWidth: 0.0,
@@ -58,6 +58,9 @@ class UserWidget extends StatelessWidget {
                   value,
                   viewType,
                 );
+                if (onChanged != null) {
+                  onChanged!();
+                }
               },
             )
           : isAdminView
@@ -67,25 +70,16 @@ class UserWidget extends StatelessWidget {
     );
   }
 
-  getValue(
-    BuildContext context,
-    UserViewType viewType,
-  ) {
+  getValue(BuildContext context, UserViewType viewType) {
     final orgProvider = context.watch<OrganizationProvider>();
     switch (viewType) {
       case UserViewType.admin:
         return orgProvider.orgAdminsList.contains(userData);
       case UserViewType.creator:
-        return orgProvider.awaitApprovalsList.contains(
-          userData.uid,
-        );
+        return orgProvider.awaitApprovalsList.contains(userData.uid);
       case UserViewType.tempPlus:
-        return orgProvider.awaitApprovalsList.contains(
-              userData.uid,
-            ) ||
-            orgProvider.tempOrgMemberUIDs.contains(
-              userData.uid,
-            );
+        return orgProvider.awaitApprovalsList.contains(userData.uid) ||
+            orgProvider.tempOrgMemberUIDs.contains(userData.uid);
       default:
         return orgProvider.orgMembersList.contains(userData);
     }
@@ -103,7 +97,6 @@ void _handleCheckBox(
     case UserViewType.admin:
       break;
     case UserViewType.creator:
-      // check the check box
       if (value == true) {
         orgProvider.addToWaitingApproval(groupMember: userData);
       } else {
@@ -118,6 +111,6 @@ void _handleCheckBox(
       }
       break;
     default:
-      log('HERE 4');
+      log('Unhandled UserViewType');
   }
 }
