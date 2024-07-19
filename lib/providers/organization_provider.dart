@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -16,23 +15,12 @@ class OrganizationProvider extends ChangeNotifier {
   List<UserModel> _orgAdminsList = [];
   List<String> _awaitApprovalList = [];
 
-  List<UserModel> _tempOrgMembersList = [];
-  List<UserModel> _tempOrgAdminsList = [];
   List<UserModel> _tempWaitingApprovalMembersList = [];
 
   List<String> _tempOrgMemberUIDs = [];
-  List<String> _tempOrgAdminUIDs = [];
-
-  List<UserModel> _tempRemovedAdminsList = [];
-  List<UserModel> _tempRemovedMembersList = [];
 
   List<UserModel> _tempRemovedWaitingApprovalMembersList = [];
   List<String> _tempRemovedWaitingApprovalMemberUIDs = [];
-
-  List<String> _tempRemovedMemberUIDs = [];
-  List<String> _tempRemovedAdminsUIDs = [];
-
-  bool _isSaved = false;
 
   List<String> _initialMemberUIDs = [];
   List<String> _initialAwaitingApprovalUIDs = [];
@@ -54,6 +42,74 @@ class OrganizationProvider extends ChangeNotifier {
   final CollectionReference _organizationCollection =
       FirebaseFirestore.instance.collection(Constants.organizationCollection);
 
+  final Map<String, ValueNotifier<bool>> _adminValueNotifiers = {};
+  final Map<String, ValueNotifier<bool>> _awaitingApprovalValueNotifiers = {};
+  final Map<String, ValueNotifier<bool>> _tempMemberValueNotifiers = {};
+  final Map<String, ValueNotifier<bool>> _memberValueNotifiers = {};
+
+  ValueNotifier<bool> getAdminValueNotifier(String uid) {
+    return _adminValueNotifiers.putIfAbsent(
+      uid,
+      () => ValueNotifier(_orgAdminsList.any((admin) => admin.uid == uid)),
+    );
+  }
+
+  ValueNotifier<bool> getAwaitingApprovalValueNotifier(String uid) {
+    return _awaitingApprovalValueNotifiers.putIfAbsent(
+      uid,
+      () => ValueNotifier(_awaitApprovalList.contains(uid)),
+    );
+  }
+
+  ValueNotifier<bool> getTempMemberValueNotifier(String uid) {
+    return _tempMemberValueNotifiers.putIfAbsent(
+      uid,
+      () => ValueNotifier(
+          _tempOrgMemberUIDs.contains(uid) || _awaitApprovalList.contains(uid)),
+    );
+  }
+
+  ValueNotifier<bool> getMemberValueNotifier(String uid) {
+    return _memberValueNotifiers.putIfAbsent(
+      uid,
+      () => ValueNotifier(_orgMembersList.any((member) => member.uid == uid)),
+    );
+  }
+
+  // Update these methods to use ValueNotifiers
+  void addToWaitingApproval({required UserModel groupMember}) {
+    _awaitApprovalList.add(groupMember.uid);
+    _organizationModel.awaitingApprovalUIDs.add(groupMember.uid);
+    _tempWaitingApprovalMembersList.add(groupMember);
+    _awaitingApprovalValueNotifiers[groupMember.uid]?.value = true;
+    _tempMemberValueNotifiers[groupMember.uid]?.value = true;
+    notifyListeners();
+  }
+
+  void removeWaitingApproval({required UserModel orgMember}) {
+    _awaitApprovalList.remove(orgMember.uid);
+    _organizationModel.awaitingApprovalUIDs.remove(orgMember.uid);
+    _tempWaitingApprovalMembersList
+        .removeWhere((member) => member.uid == orgMember.uid);
+    _awaitingApprovalValueNotifiers[orgMember.uid]?.value = false;
+    _tempMemberValueNotifiers[orgMember.uid]?.value = false;
+    notifyListeners();
+  }
+
+  void addMemberToTempOrg({required String memberUID}) {
+    if (!_tempOrgMemberUIDs.contains(memberUID)) {
+      _tempOrgMemberUIDs.add(memberUID);
+      _tempMemberValueNotifiers[memberUID]?.value = true;
+      notifyListeners();
+    }
+  }
+
+  void removeMemberFromTempOrg({required String memberUID}) {
+    _tempOrgMemberUIDs.remove(memberUID);
+    _tempMemberValueNotifiers[memberUID]?.value = false;
+    notifyListeners();
+  }
+
   void setInitialMemberState() {
     _initialMemberUIDs = List.from(_organizationModel.membersUIDs);
     _initialAwaitingApprovalUIDs =
@@ -70,6 +126,12 @@ class OrganizationProvider extends ChangeNotifier {
         initialMembers.difference(currentMembers).isNotEmpty ||
         currentAwaiting.difference(initialAwaiting).isNotEmpty ||
         initialAwaiting.difference(currentAwaiting).isNotEmpty;
+  }
+
+  // clear awaiting approval list
+  void clearAwaitingApprovalList() {
+    _awaitApprovalList.clear();
+    notifyListeners();
   }
 
   Future<void> setSearchQuery(String value) async {
@@ -162,15 +224,7 @@ class OrganizationProvider extends ChangeNotifier {
 
   // set the temp lists to empty
   Future<void> setEmptyTemps() async {
-    _isSaved = false;
-    _tempOrgAdminsList = [];
-    _tempOrgMembersList = [];
     _tempOrgMemberUIDs = [];
-    _tempOrgAdminUIDs = [];
-    _tempRemovedMemberUIDs = [];
-    _tempRemovedAdminsUIDs = [];
-    _tempRemovedMembersList = [];
-    _tempRemovedAdminsList = [];
     _tempWaitingApprovalMembersList = [];
 
     notifyListeners();
@@ -178,7 +232,6 @@ class OrganizationProvider extends ChangeNotifier {
 
   // set empty lists
   Future<void> setEmptyLists() async {
-    _isSaved = false;
     _orgMembersList = [];
     _orgAdminsList = [];
     _awaitApprovalList = [];
@@ -204,13 +257,13 @@ class OrganizationProvider extends ChangeNotifier {
   }
 
   // add a organization member
-  void addToWaitingApproval({required UserModel groupMember}) {
-    _awaitApprovalList.add(groupMember.uid);
-    _organizationModel.awaitingApprovalUIDs.add(groupMember.uid);
-    // add data to temp lists
-    _tempWaitingApprovalMembersList.add(groupMember);
-    notifyListeners();
-  }
+  // void addToWaitingApproval({required UserModel groupMember}) {
+  //   _awaitApprovalList.add(groupMember.uid);
+  //   _organizationModel.awaitingApprovalUIDs.add(groupMember.uid);
+  //   // add data to temp lists
+  //   _tempWaitingApprovalMembersList.add(groupMember);
+  //   notifyListeners();
+  // }
 
   // add member to organization
   Future<void> addMemberToOrganization({
@@ -272,36 +325,36 @@ class OrganizationProvider extends ChangeNotifier {
     });
   }
 
-  // add member to temp list for saving changes later
-  void addMemberToTempOrg({
-    required String memberUID,
-  }) {
-    _tempOrgMemberUIDs.add(memberUID);
-    notifyListeners();
-  }
+  // // add member to temp list for saving changes later
+  // void addMemberToTempOrg({
+  //   required String memberUID,
+  // }) {
+  //   _tempOrgMemberUIDs.add(memberUID);
+  //   notifyListeners();
+  // }
 
   // remove member from temp list for saving changes later
-  void removeMemberFromTempOrg({
-    required String memberUID,
-  }) {
-    _tempOrgMemberUIDs.removeWhere((element) => element == memberUID);
-    notifyListeners();
-  }
+  // void removeMemberFromTempOrg({
+  //   required String memberUID,
+  // }) {
+  //   _tempOrgMemberUIDs.removeWhere((element) => element == memberUID);
+  //   notifyListeners();
+  // }
 
-  Future<void> removeWaitingApproval({required UserModel orgMember}) async {
-    _awaitApprovalList.remove(orgMember.uid);
-    // also remove this member from organization model
-    _organizationModel.awaitingApprovalUIDs.remove(orgMember.uid);
+  // Future<void> removeWaitingApproval({required UserModel orgMember}) async {
+  //   _awaitApprovalList.remove(orgMember.uid);
+  //   // also remove this member from organization model
+  //   _organizationModel.awaitingApprovalUIDs.remove(orgMember.uid);
 
-    // remove from temp lists
-    _tempWaitingApprovalMembersList.remove(orgMember);
+  //   // remove from temp lists
+  //   _tempWaitingApprovalMembersList.remove(orgMember);
 
-    // add  this member to the list of removed members
-    _tempRemovedWaitingApprovalMembersList.add(orgMember);
-    _tempRemovedWaitingApprovalMemberUIDs.add(orgMember.uid);
+  //   // add  this member to the list of removed members
+  //   _tempRemovedWaitingApprovalMembersList.add(orgMember);
+  //   _tempRemovedWaitingApprovalMemberUIDs.add(orgMember.uid);
 
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
 
   // update group settings in firestore
   // Future<bool> updateOrganizationDataInFireStore() async {

@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:provider/provider.dart';
@@ -28,9 +25,7 @@ class UserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.read<AuthenticationProvider>().userModel!.uid;
-    final name = uid == userData.uid ? 'You' : userData.name;
-    bool value = getValue(context, viewType);
+    final name = userData.name;
 
     return ListTile(
       minLeadingWidth: 0.0,
@@ -49,20 +44,7 @@ class UserWidget extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: showCheckMark
-          ? Checkbox(
-              value: value,
-              onChanged: (value) {
-                _handleCheckBox(
-                  context,
-                  userData,
-                  value,
-                  viewType,
-                );
-                if (onChanged != null) {
-                  onChanged!();
-                }
-              },
-            )
+          ? _buildCheckbox(context)
           : isAdminView
               ? const Icon(Icons.admin_panel_settings_rounded)
               : null,
@@ -70,18 +52,36 @@ class UserWidget extends StatelessWidget {
     );
   }
 
-  getValue(BuildContext context, UserViewType viewType) {
-    final orgProvider = context.watch<OrganizationProvider>();
+  Widget _buildCheckbox(BuildContext context) {
+    return Consumer<OrganizationProvider>(
+      builder: (context, orgProvider, _) {
+        bool isChecked = _getValue(orgProvider);
+        return Checkbox(
+          value: isChecked,
+          onChanged: (value) {
+            _handleCheckBox(context, userData, value, viewType);
+            if (onChanged != null) {
+              onChanged!();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  bool _getValue(OrganizationProvider orgProvider) {
     switch (viewType) {
       case UserViewType.admin:
-        return orgProvider.orgAdminsList.contains(userData);
+        return orgProvider.orgAdminsList
+            .any((admin) => admin.uid == userData.uid);
       case UserViewType.creator:
         return orgProvider.awaitApprovalsList.contains(userData.uid);
       case UserViewType.tempPlus:
         return orgProvider.awaitApprovalsList.contains(userData.uid) ||
             orgProvider.tempOrgMemberUIDs.contains(userData.uid);
       default:
-        return orgProvider.orgMembersList.contains(userData);
+        return orgProvider.orgMembersList
+            .any((member) => member.uid == userData.uid);
     }
   }
 }
@@ -111,6 +111,6 @@ void _handleCheckBox(
       }
       break;
     default:
-      log('Unhandled UserViewType');
+      print('Unhandled UserViewType');
   }
 }

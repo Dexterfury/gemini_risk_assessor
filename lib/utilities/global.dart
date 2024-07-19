@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../providers/tool_provider.dart';
@@ -153,6 +155,27 @@ IconData getAuthIcon(SignInType signInType) {
           : signInType == SignInType.apple
               ? FontAwesomeIcons.apple
               : FontAwesomeIcons.solidCircleUser;
+}
+
+//  get member count function
+String getMembersCount(
+  OrganizationProvider orgProvider,
+) {
+  int count = orgProvider.awaitApprovalsList.length;
+
+  if (count == 0) {
+    return '';
+  } else if (count == 1) {
+    return '1';
+  } else if (count < 100) {
+    return count.toString();
+  } else if (count < 1000) {
+    return '$count+';
+  } else if (count < 1000000) {
+    return '${(count / 1000).floor()}k+';
+  } else {
+    return '${(count / 1000000).floor()}M+';
+  }
 }
 
 // animated dialog

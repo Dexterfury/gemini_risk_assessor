@@ -600,9 +600,6 @@ class AuthenticationProvider extends ChangeNotifier {
 
       // Fetch the user again to ensure we have the updated information
       await userCredential.user?.reload();
-      final updatedUser = FirebaseAuth.instance.currentUser;
-
-      log('displayName: ${updatedUser?.displayName}');
 
       return userCredential;
     } on SignInWithAppleAuthorizationException catch (e) {
@@ -805,6 +802,10 @@ class AuthenticationProvider extends ChangeNotifier {
   // sign out
   Future<void> signOut() async {
     try {
+      // clear user token from firestore
+      await _usersCollection.doc(_userModel!.uid).update({
+        Constants.token: '',
+      });
       await _auth.signOut();
       // set signed in to false
       setIsSignedIn(false);

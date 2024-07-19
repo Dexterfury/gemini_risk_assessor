@@ -25,7 +25,7 @@ exports.onCreateOrganization = functions.firestore
         const orgID = context.params.orgId;
         const aboutOrg = orgData.aboutOrganization;
         const orgTerms = orgData.organizationTerms;
-        const awaitingApprovalUIDs = orgData.awaitingApprovalUIDs || [];
+        const awaitingApprovalUIDs = orgData.awaitingApprovalUIDs;
         let orgImage = orgData.imageUrl;
 
         if (!orgImage) {

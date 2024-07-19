@@ -45,6 +45,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
   @override
   Widget build(BuildContext context) {
     final organizationProvider = context.watch<OrganizationProvider>();
+    final selectedCount = getMembersCount(organizationProvider);
     return Scaffold(
       appBar: MyAppBar(
         title: 'Create Organization',
@@ -115,31 +116,43 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                     const SizedBox(
                       width: 10,
                     ),
-                    OpenContainer(
-                      closedBuilder: (context, action) {
-                        return IconButton(
-                          onPressed: () {
-                            if (organizationProvider.isLoading) {
-                              return;
-                            }
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          selectedCount,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        OpenContainer(
+                          closedBuilder: (context, action) {
+                            return IconButton(
+                              onPressed: () {
+                                if (organizationProvider.isLoading) {
+                                  return;
+                                }
 
-                            action();
+                                action();
+                              },
+                              icon: const Icon(
+                                FontAwesomeIcons.userPlus,
+                              ),
+                            );
                           },
-                          icon: const Icon(
-                            FontAwesomeIcons.userPlus,
-                          ),
-                        );
-                      },
-                      openBuilder: (context, action) {
-                        // navigate to people screen
-                        return const PeopleScreen(
-                          userViewType: UserViewType.creator,
-                        );
-                      },
-                      transitionType: ContainerTransitionType.fadeThrough,
-                      transitionDuration: const Duration(milliseconds: 500),
-                      closedElevation: cardElevation,
-                      openElevation: 4,
+                          openBuilder: (context, action) {
+                            // navigate to people screen
+                            return const PeopleScreen(
+                              userViewType: UserViewType.creator,
+                            );
+                          },
+                          transitionType: ContainerTransitionType.fadeThrough,
+                          transitionDuration: const Duration(milliseconds: 500),
+                          closedElevation: cardElevation,
+                          openElevation: 4,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -169,7 +182,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                 height: 50,
                 width: MediaQuery.of(context).size.width,
                 child: MainAppButton(
-                  label: ' Save and Continue ',
+                  label: ' Create Organization ',
                   borderRadius: 15,
                   onTap: () {
                     if (organizationProvider.isLoading) {
