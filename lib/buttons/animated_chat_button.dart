@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 
 class AnimatedChatButton extends StatefulWidget {
   final VoidCallback onPressed;
@@ -12,7 +13,7 @@ class AnimatedChatButton extends StatefulWidget {
     super.key,
     required this.onPressed,
     this.size = ChatButtonSize.large,
-    this.color = Colors.green,
+    this.color = Colors.white,
     this.iconColor = Colors.black,
     this.icon = Icons.chat,
   });
@@ -66,16 +67,24 @@ class _AnimatedChatButtonState extends State<AnimatedChatButton>
             width: buttonSize,
             height: buttonSize,
             child: FloatingActionButton(
-              onPressed: widget.onPressed,
-              backgroundColor: widget.color,
-              elevation: 4.0,
-              highlightElevation: 2.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(buttonSize / 2),
-              ),
-              child: Icon(widget.icon,
-                  color: widget.iconColor, size: buttonSize * 0.5),
-            ),
+                onPressed: widget.onPressed,
+                backgroundColor: widget.color,
+                elevation: 4.0,
+                highlightElevation: 2.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(buttonSize / 2),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: CircleAvatar(
+                    backgroundColor: widget.color,
+                    backgroundImage: AssetImage(AssetsManager.geminiLogo1),
+                  ),
+                )
+
+                // Icon(widget.icon,
+                //     color: widget.iconColor, size: buttonSize * 0.5),
+                ),
           ),
         );
       },

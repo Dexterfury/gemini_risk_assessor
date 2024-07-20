@@ -255,7 +255,7 @@ class ChatProvider extends ChangeNotifier {
           .doc(uid)
           .collection(collection)
           .doc(chatID)
-          .collection(Constants.chatsMessagesCollection)
+          .collection(Constants.chatMessagesCollection)
           .orderBy(Constants.timeSent)
           .get()
           .then((value) {
@@ -420,7 +420,7 @@ class ChatProvider extends ChangeNotifier {
         .doc(uid)
         .collection(collectionRef)
         .doc(chatID)
-        .collection(Constants.chatsMessagesCollection)
+        .collection(Constants.chatMessagesCollection)
         .doc(messageID)
         .set(messageModel.toJson());
     _isLoading = false;
@@ -467,7 +467,7 @@ class ChatProvider extends ChangeNotifier {
 
       // Delete all documents in the chatData subcollection
       final querySnapshot =
-          await chatDocRef.collection(Constants.chatsMessagesCollection).get();
+          await chatDocRef.collection(Constants.chatMessagesCollection).get();
       final batch = FirebaseFirestore.instance.batch();
       for (var doc in querySnapshot.docs) {
         batch.delete(doc.reference);

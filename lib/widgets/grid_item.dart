@@ -53,6 +53,7 @@ class GridItem extends StatelessWidget {
                 children: [
                   SizedBox(
                     height: imageHeight,
+                    width: constraints.maxWidth,
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(10.0),

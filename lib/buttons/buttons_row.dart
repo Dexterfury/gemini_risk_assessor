@@ -7,16 +7,19 @@ import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class ButtonsRow extends StatelessWidget {
   const ButtonsRow({
     super.key,
     required this.orgID,
     required this.isAdmin,
+    required this.isMember,
   });
 
   final String orgID;
   final bool isAdmin;
+  final bool isMember;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +35,7 @@ class ButtonsRow extends StatelessWidget {
                 orgID,
                 'DSTI',
                 isAdmin,
+                isMember,
               ),
               const SizedBox(
                 width: 5,
@@ -41,6 +45,7 @@ class ButtonsRow extends StatelessWidget {
                 orgID,
                 'Assessments',
                 isAdmin,
+                isMember,
               ),
               const SizedBox(
                 width: 5,
@@ -50,6 +55,7 @@ class ButtonsRow extends StatelessWidget {
                 orgID,
                 Constants.tools,
                 isAdmin,
+                isMember,
               ),
               const SizedBox(
                 width: 5,
@@ -59,6 +65,7 @@ class ButtonsRow extends StatelessWidget {
                 orgID,
                 'Discussions',
                 isAdmin,
+                isMember,
               ),
             ],
           ),
@@ -73,6 +80,7 @@ Widget buildButton(
   String orgID,
   String label,
   bool isAdmin,
+  bool isMember,
 ) {
   return OpenContainer(
     //closedColor: Colors.transparent,
@@ -85,7 +93,16 @@ Widget buildButton(
             vertical: 4,
           ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onPressed: action,
+          onPressed: () {
+            if (!isMember) {
+              showSnackBar(
+                context: context,
+                message: 'Join Organization to view this screen',
+              );
+            } else {
+              action();
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: FittedBox(

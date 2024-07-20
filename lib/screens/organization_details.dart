@@ -123,6 +123,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     return Consumer<OrganizationProvider>(
         builder: (context, orgProvider, child) {
       bool isAdmin = orgProvider.organizationModel.adminsUIDs.contains(uid);
+      bool isMember = orgProvider.organizationModel.membersUIDs.contains(uid);
       String orgID = orgProvider.organizationModel.organizationID;
       String orgTerms = orgProvider.organizationModel.organizationTerms;
       bool requestToReadTerms =
@@ -209,6 +210,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 ButtonsRow(
                   orgID: orgID,
                   isAdmin: isAdmin,
+                  isMember: isMember,
                 ),
 
                 const SizedBox(height: 10),

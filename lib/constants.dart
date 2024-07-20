@@ -148,7 +148,7 @@ class Constants {
   static const String organizationCollection = 'organizations';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
-  static const String chatsMessagesCollection = 'chatsMessages';
+  static const String chatMessagesCollection = 'chatMessages';
   static const String toolsChatsCollection = 'toolsChats';
   static const String assessmentsChatsCollection = 'assessmentsChats';
   static const String dstisChatsCollection = 'dstisChats';

@@ -23,6 +23,12 @@ class AssetsManager {
   // tools icon
   static String toolsIcon = '${_imagesPath}tools_icon.jpg';
 
+  // gemini logo 1
+  static String geminiLogo1 = '${_imagesPath}gemini_logo_1.png';
+
+  // gemini logo 2
+  static String geminiLogo2 = '${_imagesPath}gemini_logo_2.png';
+
   // ppe icons
   static String dustMask = '${_iconsPath}dust_mask.jpg';
   static String earProtection = '${_iconsPath}ear_protection.jpg';

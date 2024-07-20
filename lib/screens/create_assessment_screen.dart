@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
+import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
@@ -18,7 +18,6 @@ import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/title_widget.dart';
 import 'package:gemini_risk_assessor/widgets/weather_buttons.dart';
 import 'package:provider/provider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CreateAssessmentScreen extends StatefulWidget {
   const CreateAssessmentScreen({super.key});
@@ -122,9 +121,9 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                 alignment: Alignment.centerRight,
                 child: OpenContainer(
                   closedBuilder: (context, action) {
-                    return MainAppButton(
-                      icon: FontAwesomeIcons.wandMagicSparkles,
-                      label: 'Generate Assessment',
+                    return GeminiButton(
+                      label: 'Generate',
+                      borderRadius: 15.0,
                       onTap: () async {
                         final desc = _descriptionController.text;
 
@@ -182,7 +181,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     );
                   },
                   closedShape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(15)),
                   transitionType: ContainerTransitionType.fadeThrough,
                   transitionDuration: const Duration(milliseconds: 500),
                   closedElevation: cardElevation,
