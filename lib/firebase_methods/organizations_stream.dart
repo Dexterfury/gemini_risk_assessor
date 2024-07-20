@@ -53,7 +53,10 @@ class OrganizationsStream extends StatelessWidget {
                 final doc = snapshot.data!.docs[index];
                 final orgData = doc.data() as Map<String, dynamic>;
                 final org = OrganizationModel.fromJson(orgData);
-                return GridItem(orgModel: org);
+                return GridItem(
+                  orgModel: org,
+                  isDiscussion: false,
+                );
               }),
         );
       },

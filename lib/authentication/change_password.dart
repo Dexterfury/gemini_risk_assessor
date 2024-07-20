@@ -17,6 +17,9 @@ class _ChangePasswordState extends State<ChangePassword> {
   final TextEditingController _newPasswordController = TextEditingController();
 
   bool _isLoading = false;
+  bool _obscureTextOld = true;
+  bool _obscureTextNew = true;
+  bool _obscureTextRe = true;
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +56,25 @@ class _ChangePasswordState extends State<ChangePassword> {
                           if (value!.isEmpty) {
                             return 'Please enter your current password';
                           }
+                          return null;
                         },
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
+                        obscureText: _obscureTextOld,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
                           labelText: 'Old Password',
                           hintText: 'Enter old password',
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _obscureTextOld = !_obscureTextOld;
+                              });
+                            },
+                            icon: Icon(
+                              _obscureTextOld
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -70,11 +86,23 @@ class _ChangePasswordState extends State<ChangePassword> {
                           }
                           return null;
                         },
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
+                        obscureText: _obscureTextNew,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
                           labelText: 'New Password',
                           hintText: 'Enter your new password',
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _obscureTextNew = !_obscureTextNew;
+                              });
+                            },
+                            icon: Icon(
+                              _obscureTextNew
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -88,11 +116,23 @@ class _ChangePasswordState extends State<ChangePassword> {
                           }
                           return null;
                         },
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
+                        obscureText: _obscureTextRe,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
                           labelText: 'Repeat Password',
                           hintText: 'Re-Enter your new password',
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _obscureTextRe = !_obscureTextRe;
+                              });
+                            },
+                            icon: Icon(
+                              _obscureTextRe
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),

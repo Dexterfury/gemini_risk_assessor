@@ -16,9 +16,11 @@ class DSTIScreen extends StatefulWidget {
   const DSTIScreen({
     super.key,
     this.orgID = '',
+    this.isDiscussion = false,
   });
 
   final String orgID;
+  final bool isDiscussion;
 
   @override
   State<DSTIScreen> createState() => _DSTIScreenState();
@@ -132,6 +134,7 @@ class _DSTIScreenState extends State<DSTIScreen> {
                                               .dailySafetyTaskInstructions,
                                           orgID: widget.orgID,
                                           data: item,
+                                          isDiscussion: widget.isDiscussion,
                                         );
                                       },
                                       childCount: results.length,

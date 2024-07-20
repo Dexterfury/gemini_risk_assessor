@@ -148,7 +148,7 @@ class Constants {
   static const String organizationCollection = 'organizations';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
-  static const String chatsCollection = 'chats';
+  static const String chatsMessagesCollection = 'chatsMessages';
   static const String toolsChatsCollection = 'toolsChats';
   static const String assessmentsChatsCollection = 'assessmentsChats';
   static const String dstisChatsCollection = 'dstisChats';
@@ -179,6 +179,10 @@ class Constants {
   static const String volume = 'volume';
   static const String audioSpeed = 'audioSpeed';
   static const String shouldSpeak = 'ShouldSpeak';
+
+  static const String hasAssessments = 'hasAssessments';
+  static const String hasDSTI = 'hasDSTI';
+  static const String hasTools = 'hasTools';
 
   // notification constants
   static const String recieverUID = 'recieverUID';

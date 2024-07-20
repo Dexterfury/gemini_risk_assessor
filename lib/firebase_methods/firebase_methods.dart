@@ -99,6 +99,35 @@ class FirebaseMethods {
         .snapshots();
   }
 
+  // check if the organisation has any assessments, dsti or tools saved in firestore
+  static Future<Map<String, bool>> checkOrganizationData(
+      {required String orgID}) async {
+    final orgRef = _organizationsCollection.doc(orgID);
+
+    Map<String, bool> results = {
+      Constants.hasAssessments: false,
+      Constants.hasDSTI: false,
+      Constants.hasTools: false,
+    };
+
+    // Check for assessments
+    final assessmentsQuery =
+        await orgRef.collection(Constants.assessmentCollection).limit(1).get();
+    results[Constants.hasAssessments] = assessmentsQuery.docs.isNotEmpty;
+
+    // Check for DSTI
+    final dstiQuery =
+        await orgRef.collection(Constants.dstiCollections).limit(1).get();
+    results[Constants.hasDSTI] = dstiQuery.docs.isNotEmpty;
+
+    // Check for tools
+    final toolsQuery =
+        await orgRef.collection(Constants.toolsChatsCollection).limit(1).get();
+    results[Constants.hasTools] = toolsQuery.docs.isNotEmpty;
+
+    return results;
+  }
+
   // stream notifications from firestore
   static Stream<QuerySnapshot> notificationsStream({
     required String userId,

@@ -19,10 +19,12 @@ class MyDataStream extends StatelessWidget {
     super.key,
     required this.generationType,
     this.orgID = '',
+    this.isDiscussion = false,
   });
 
   final GenerationType generationType;
   final String orgID;
+  final bool isDiscussion;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,10 @@ class MyDataStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
 
                             final tool = ToolModel.fromJson(data);
-                            return GridItem(toolModel: tool);
+                            return GridItem(
+                              toolModel: tool,
+                              isDiscussion: isDiscussion,
+                            );
                           },
                         )
                       : GridView.builder(
@@ -107,7 +112,10 @@ class MyDataStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
 
                             final tool = ToolModel.fromJson(data);
-                            return GridItem(toolModel: tool);
+                            return GridItem(
+                              toolModel: tool,
+                              isDiscussion: isDiscussion,
+                            );
                           },
                         )
                   : searchQuery.isNotEmpty
@@ -121,6 +129,7 @@ class MyDataStream extends StatelessWidget {
                               docTitle: title,
                               orgID: '',
                               data: assessment,
+                              isDiscussion: isDiscussion,
                             );
                           },
                         )
@@ -134,6 +143,7 @@ class MyDataStream extends StatelessWidget {
                               docTitle: title,
                               orgID: '',
                               data: item,
+                              isDiscussion: isDiscussion,
                             );
                           },
                         );

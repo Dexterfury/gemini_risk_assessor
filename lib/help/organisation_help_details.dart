@@ -31,15 +31,13 @@ class OrganizationHelpDetails extends StatelessWidget {
                 'Invite initial members to join the organization'
               ]),
               Constants.buildSection('Joining an Organization', [
-                'Receive an invitation link or code from an organization admin',
-                'Navigate to the Organizations tab',
-                'Click on "Join Organization" and enter the invitation details',
-                'Review and accept the organization\'s terms if applicable',
-                'Wait for admin approval if required'
+                'Receive an invitation notification from an admin',
+                'Click on notification or navigate to notification in your profile and click on a notification',
+                'Navigate to "Organization details screen"',
+                'Review and accept the organization\'s terms if applicable to join the organization',
               ]),
               Constants.buildSection('Admin Responsibilities', [
                 'Manage member roles and permissions',
-                'Approve or deny new member requests',
                 'Create and manage organization-wide DSTIs and Risk Assessments',
                 'Monitor and moderate organization activity',
                 'Ensure compliance with safety standards and regulations'

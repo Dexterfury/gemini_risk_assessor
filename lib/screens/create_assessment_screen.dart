@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
@@ -125,6 +127,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       label: 'Generate Assessment',
                       onTap: () async {
                         final desc = _descriptionController.text;
+
+                        log('here');
                         // if both images and description is empty return
                         if (desc.isEmpty || desc.length < 10) {
                           showSnackBar(
@@ -177,6 +181,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                       orgID: orgID,
                     );
                   },
+                  closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   transitionType: ContainerTransitionType.fadeThrough,
                   transitionDuration: const Duration(milliseconds: 500),
                   closedElevation: cardElevation,

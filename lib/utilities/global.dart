@@ -111,7 +111,10 @@ showSnackBar({
   required String message,
 }) {
   final snackBar = SnackBar(
-    content: Text(message),
+    content: Text(
+      message,
+      textAlign: TextAlign.center,
+    ),
     duration: const Duration(seconds: 2),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);

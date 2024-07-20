@@ -149,7 +149,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                       child: OpenContainer(
                         closedBuilder: (context, action) {
                           return IconButton(
-                            onPressed: () {},
+                            onPressed: action,
                             icon: const Icon(
                               FontAwesomeIcons.share,
                             ),

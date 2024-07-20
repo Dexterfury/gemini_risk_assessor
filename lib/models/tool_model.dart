@@ -12,6 +12,7 @@ class ToolModel {
   List<String> images;
   List<String> reactions;
   List<String> sharedWith;
+  int discussions;
   String createdBy;
   String organizationID;
   DateTime createdAt;
@@ -26,6 +27,7 @@ class ToolModel {
     required this.images,
     required this.reactions,
     required this.sharedWith,
+    required this.discussions,
     required this.createdBy,
     required this.organizationID,
     required this.createdAt,
@@ -54,6 +56,7 @@ class ToolModel {
         images: images,
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
+        discussions: json[Constants.discussions] ?? 0,
         createdBy: creatorID,
         organizationID: organizationID,
         createdAt: createdAt,
@@ -74,6 +77,7 @@ class ToolModel {
       images: List<String>.from(json[Constants.images] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
+      discussions: json[Constants.discussions] ?? 0,
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
@@ -91,6 +95,7 @@ class ToolModel {
       Constants.images: images,
       Constants.reactions: reactions,
       Constants.sharedWith: sharedWith,
+      Constants.discussions: discussions,
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
@@ -107,6 +112,7 @@ class ToolModel {
     List<String>? images,
     List<String>? reactions,
     List<String>? sharedWith,
+    int? discussions,
     String? createdBy,
     String? organizationID,
     DateTime? createdAt,
@@ -120,6 +126,7 @@ class ToolModel {
       images: images ?? this.images,
       reactions: reactions ?? this.reactions,
       sharedWith: sharedWith ?? this.sharedWith,
+      discussions: discussions ?? this.discussions,
       createdBy: createdBy ?? this.createdBy,
       organizationID: organizationID ?? this.organizationID,
       createdAt: createdAt ?? this.createdAt,

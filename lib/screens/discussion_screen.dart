@@ -1,13 +1,21 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/discussion_model.dart';
+import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
+import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
+import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class DiscussionScreen extends StatefulWidget {
   const DiscussionScreen({
@@ -72,10 +80,108 @@ class _DiscussionScreenState extends State<DiscussionScreen> {
                         const SizedBox(
                           height: 10,
                         ),
-                        MainAppButton(
-                          label: ' Start a Discussion ',
-                          borderRadius: 15.0,
-                          onTap: () {},
+                        SizedBox(
+                          height: 50.0,
+                          child: MainAppButton(
+                            label: ' Start a Discussion ',
+                            borderRadius: 15.0,
+                            onTap: () async {
+                              Map<String, bool> results = {
+                                Constants.hasAssessments: true,
+                                Constants.hasDSTI: true,
+                                Constants.hasTools: true,
+                              };
+                              // If there's data, show a dialog
+                              MyDialogs.showMyDiscussionsDialog(
+                                context: context,
+                                title: 'Start a Discussion for a?',
+                                results: results,
+                                tapAction: (value) {
+                                  switch (value) {
+                                    case Constants.riskAssessment:
+                                      Future.delayed(const Duration(seconds: 1))
+                                          .whenComplete(() {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                RiskAssessmentsScreen(
+                                              orgID: widget.orgID,
+                                              isDiscussion: true,
+                                            ),
+                                          ),
+                                        );
+                                      });
+
+                                      break;
+                                    case Constants.dailySafetyTaskInstructions:
+                                      Future.delayed(const Duration(seconds: 1))
+                                          .whenComplete(() {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DSTIScreen(
+                                              orgID: widget.orgID,
+                                              isDiscussion: true,
+                                            ),
+                                          ),
+                                        );
+                                      });
+                                      break;
+                                    case Constants.tools:
+                                      Future.delayed(const Duration(seconds: 1))
+                                          .whenComplete(() {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ToolsScreen(
+                                              orgID: widget.orgID,
+                                              isDiscussion: true,
+                                            ),
+                                          ),
+                                        );
+                                      });
+                                      break;
+                                  }
+                                },
+                              );
+                              // MyDialogs.showMyAnimatedDialog(
+                              //   context: context,
+                              //   title: 'Please wait...',
+                              //   loadingIndicator: const SizedBox(
+                              //     height: 100,
+                              //     width: 100,
+                              //     child: LoadingPPEIcons(),
+                              //   ),
+                              // );
+                              // await FirebaseMethods.checkOrganizationData(
+                              //   orgID: widget.orgID,
+                              // ).then((results) {
+                              //   Navigator.pop(context);
+                              //   if (!results.values.any((value) => value)) {
+                              //     if (mounted) {
+                              //       // If no data is available, show a SnackBar
+                              //       showSnackBar(
+                              //         context: context,
+                              //         message:
+                              //             'No data available for this organization.',
+                              //       );
+                              //     }
+                              //   } else {
+                              //     // If there's data, show a dialog
+                              //     MyDialogs.showMyDiscussionsDialog(
+                              //       context: context,
+                              //       title: 'Start a Discussion for a?',
+                              //       results: results,
+                              //       tapAction: (value) {
+                              //         log('Clicked on $value');
+                              //       },
+                              //     );
+                              //   }
+                              //   return results;
+                              // });
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -105,12 +211,47 @@ class _DiscussionScreenState extends State<DiscussionScreen> {
                         ),
                       ),
                       actions: [
-                        widget.isAdmin
-                            ? IconButton(
-                                onPressed: () {},
-                                icon: const Icon(FontAwesomeIcons.plus),
-                              )
-                            : const SizedBox(),
+                        if (widget.isAdmin)
+                          IconButton(
+                            onPressed: () async {
+                              MyDialogs.showMyAnimatedDialog(
+                                context: context,
+                                title: 'Please wait...',
+                                loadingIndicator: const SizedBox(
+                                  height: 100,
+                                  width: 100,
+                                  child: LoadingPPEIcons(),
+                                ),
+                              );
+                              await FirebaseMethods.checkOrganizationData(
+                                orgID: widget.orgID,
+                              ).then((results) {
+                                Navigator.pop(context);
+                                if (!results.values.any((value) => value)) {
+                                  if (mounted) {
+                                    // If no data is available, show a SnackBar
+                                    showSnackBar(
+                                      context: context,
+                                      message:
+                                          'No data available for this organization.',
+                                    );
+                                  }
+                                } else {
+                                  // If there's data, show a dialog
+                                  MyDialogs.showMyDiscussionsDialog(
+                                    context: context,
+                                    title: 'Start a Discussion for a?',
+                                    results: results,
+                                    tapAction: (value) {
+                                      log('Clicked on $value');
+                                    },
+                                  );
+                                }
+                                return results;
+                              });
+                            },
+                            icon: const Icon(FontAwesomeIcons.plus),
+                          )
                       ],
                       pinned: true,
                       floating: true,

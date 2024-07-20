@@ -4,7 +4,7 @@ class DiscussionModel {
   String id;
   String title;
   String description;
-  String discussingAbout;
+  Map discussingAbout;
   String createdBy;
   String organizationID;
   String createdAt;

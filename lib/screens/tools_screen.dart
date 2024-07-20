@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -18,9 +16,11 @@ class ToolsScreen extends StatefulWidget {
   const ToolsScreen({
     super.key,
     this.orgID = '',
+    this.isDiscussion = false,
   });
 
   final String orgID;
+  final bool isDiscussion;
 
   @override
   State<ToolsScreen> createState() => _ToolsScreenState();
@@ -139,7 +139,10 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                               as Map<String, dynamic>;
 
                                           final tool = ToolModel.fromJson(data);
-                                          return GridItem(toolModel: tool);
+                                          return GridItem(
+                                            toolModel: tool,
+                                            isDiscussion: widget.isDiscussion,
+                                          );
                                         },
                                         childCount: results.length,
                                       ),

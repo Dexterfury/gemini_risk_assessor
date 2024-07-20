@@ -70,8 +70,8 @@ class ChatProvider extends ChangeNotifier {
   GenerativeModel? get model => _model;
   String get modelType => _modelType;
 
-  final CollectionReference _chatsCollection =
-      FirebaseFirestore.instance.collection(Constants.chatsCollection);
+  final CollectionReference _usersCollection =
+      FirebaseFirestore.instance.collection(Constants.usersCollection);
 
   // set loading
   void setLoading({required bool value}) {
@@ -251,11 +251,11 @@ class ChatProvider extends ChangeNotifier {
         toolModel != null ? toolModel.id : assessmentModel!.id; // get chat id
 
     try {
-      await _chatsCollection
+      await _usersCollection
           .doc(uid)
           .collection(collection)
           .doc(chatID)
-          .collection(Constants.chatDataCollection)
+          .collection(Constants.chatsMessagesCollection)
           .orderBy(Constants.timeSent)
           .get()
           .then((value) {
@@ -416,11 +416,11 @@ class ChatProvider extends ChangeNotifier {
       timeSent: DateTime.now(),
     );
 
-    await _chatsCollection
+    await _usersCollection
         .doc(uid)
         .collection(collectionRef)
         .doc(chatID)
-        .collection(Constants.chatDataCollection)
+        .collection(Constants.chatsMessagesCollection)
         .doc(messageID)
         .set(messageModel.toJson());
     _isLoading = false;
@@ -463,11 +463,11 @@ class ChatProvider extends ChangeNotifier {
 
       // Reference to the chat document
       final chatDocRef =
-          _chatsCollection.doc(uid).collection(collectionRef).doc(chatID);
+          _usersCollection.doc(uid).collection(collectionRef).doc(chatID);
 
       // Delete all documents in the chatData subcollection
       final querySnapshot =
-          await chatDocRef.collection(Constants.chatDataCollection).get();
+          await chatDocRef.collection(Constants.chatsMessagesCollection).get();
       final batch = FirebaseFirestore.instance.batch();
       for (var doc in querySnapshot.docs) {
         batch.delete(doc.reference);

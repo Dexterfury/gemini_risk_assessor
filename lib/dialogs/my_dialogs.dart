@@ -3,9 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
-import 'package:gemini_risk_assessor/screens/people_screen.dart';
 
 class MyDialogs {
   // general dialog
@@ -41,6 +39,98 @@ class MyDialogs {
                   signatureInput,
                 ),
                 actions: actions,
+              ),
+            ));
+      },
+    );
+  }
+
+  static void showMyDiscussionsDialog({
+    required BuildContext context,
+    required String title,
+    required Map<String, bool> results,
+    required Function(String) tapAction,
+  }) {
+    showGeneralDialog(
+      context: context,
+      //barrierDismissible: false,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, animation1, animation2, child) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: FadeTransition(
+              opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+              child: AlertDialog(
+                title: FittedBox(
+                  child: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    if (results[Constants.hasAssessments]!)
+                      Card(
+                        child: ListTile(
+                          contentPadding:
+                              const EdgeInsets.only(left: 8.0, right: 8.0),
+                          title: const Text(Constants.riskAssessment),
+                          leading: const Icon(Icons.assignment_late_outlined),
+                          onTap: () {
+                            Navigator.pop(context);
+                            tapAction(Constants.riskAssessment);
+                          },
+                        ),
+                      ),
+                    if (results[Constants.hasDSTI]!)
+                      Card(
+                        child: ListTile(
+                          contentPadding:
+                              const EdgeInsets.only(left: 8.0, right: 8.0),
+                          title:
+                              const Text(Constants.dailySafetyTaskInstructions),
+                          leading: const Icon(Icons.assignment_add),
+                          onTap: () {
+                            Navigator.pop(context);
+                            tapAction(Constants.dailySafetyTaskInstructions);
+                          },
+                        ),
+                      ),
+                    if (results[Constants.hasTools]!)
+                      Card(
+                        child: ListTile(
+                          contentPadding:
+                              const EdgeInsets.only(left: 8.0, right: 8.0),
+                          title: const Text(Constants.tools),
+                          leading: const Icon(Icons.handyman),
+                          onTap: () {
+                            Navigator.pop(context);
+                            tapAction(Constants.tools);
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
             ));
       },
@@ -256,7 +346,12 @@ class MyDialogs {
                         controller.text,
                       );
                     },
-                    child: const Text('Cancel'),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
                   ),
                   TextButton(
                     onPressed: () {

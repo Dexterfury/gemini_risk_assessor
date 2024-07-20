@@ -17,6 +17,7 @@ class AssessmentModel {
   List<String> control;
   List<String> reactions;
   List<String> sharedWith;
+  int discussions;
   String weather;
   String summary;
   String createdBy;
@@ -39,6 +40,7 @@ class AssessmentModel {
     required this.control,
     required this.reactions,
     required this.sharedWith,
+    required this.discussions,
     required this.weather,
     required this.summary,
     required this.createdBy,
@@ -75,6 +77,7 @@ class AssessmentModel {
         control: List<String>.from(json[Constants.control] ?? []),
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
+        discussions: json[Constants.discussions] ?? 0,
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
@@ -117,6 +120,7 @@ class AssessmentModel {
         control: List<String>.from(json[Constants.control] ?? []),
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
+        discussions: json[Constants.discussions] ?? 0,
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
@@ -144,6 +148,7 @@ class AssessmentModel {
       control: List<String>.from(json[Constants.control] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
+      discussions: json[Constants.discussions] ?? 0,
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
@@ -169,6 +174,7 @@ class AssessmentModel {
       Constants.control: control,
       Constants.reactions: reactions,
       Constants.sharedWith: sharedWith,
+      Constants.discussions: discussions,
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
@@ -193,6 +199,7 @@ class AssessmentModel {
     List<String>? control,
     List<String>? reactions,
     List<String>? sharedWith,
+    int? discussions,
     String? weather,
     String? summary,
     String? createdBy,
@@ -214,6 +221,7 @@ class AssessmentModel {
       control: control ?? this.control,
       reactions: reactions ?? this.reactions,
       sharedWith: sharedWith ?? this.sharedWith,
+      discussions: discussions ?? this.discussions,
       weather: weather ?? this.weather,
       summary: summary ?? this.summary,
       createdBy: createdBy ?? this.createdBy,

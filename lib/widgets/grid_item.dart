@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/screens/chat_discussion_screen.dart';
 import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
 import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -14,10 +13,12 @@ class GridItem extends StatelessWidget {
     super.key,
     this.toolModel,
     this.orgModel,
+    required this.isDiscussion,
   });
 
   final ToolModel? toolModel;
   final OrganizationModel? orgModel;
+  final bool isDiscussion;
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +82,22 @@ class GridItem extends StatelessWidget {
               ),
             ),
             openBuilder: (context, action) {
-              if (isTool) {
-                return ExplainerDetailsScreen(
-                  currentModel: toolModel!,
+              if (isDiscussion) {
+                // open tools chat discussusion
+                return ChatDiscussionScreen(
+                  orgID: orgModel != null ? orgModel!.organizationID : '',
+                  toolModel: toolModel,
                 );
               } else {
-                return OrganizationDetails(
-                  orgModel: orgModel!,
-                );
+                if (isTool) {
+                  return ExplainerDetailsScreen(
+                    currentModel: toolModel!,
+                  );
+                } else {
+                  return OrganizationDetails(
+                    orgModel: orgModel!,
+                  );
+                }
               }
             },
             transitionType: ContainerTransitionType.fadeThrough,
