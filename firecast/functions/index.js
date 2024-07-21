@@ -197,3 +197,81 @@ exports.onUpdateOrganization = functions.firestore
         throw e;
       }
     });
+
+/**
+ * Helper function to create and send notifications.
+ * @param {string} orgID - The organization ID.
+ * @param {string} itemID - The ID of the created item.
+ * @param {string} itemType - The type of the created item.
+ * @param {string} itemTitle - The title of the created item.
+ * @param {string} senderUID - The UID of the sender.
+ * @return {Promise<void>}
+ */
+async function createAndSendNotifications(orgID, itemID, itemType, itemTitle, senderUID) {
+  const orgDoc = await admin.firestore().doc(`organizations/${orgID}`).get();
+  const orgData = orgDoc.data();
+  const membersUIDs = orgData.membersUIDs || [];
+
+  // Batch get user data
+  const userRefs = membersUIDs.map((uid) => admin.firestore().doc(`users/${uid}`));
+  const userDocs = await admin.firestore().getAll(...userRefs);
+
+  const notificationPromises = userDocs
+      .filter((userDoc) => userDoc.exists && userDoc.id !== senderUID)
+      .map((userDoc) => {
+        const userData = userDoc.data();
+        if (userData.token) {
+          const notificationMessage = {
+            notification: {
+              title: `New ${itemType} Created`,
+              body: `A new ${itemType} "${itemTitle}" has been created.`,
+            },
+            android: {
+              notification: {
+                channel_id: "low_importance_channel",
+              },
+            },
+            data: {
+              [`${itemType.toLowerCase()}ID`]: itemID,
+              orgID: orgID,
+              notificationType: `${itemType.toUpperCase()}_NOTIFICATION`,
+            },
+            token: userData.token,
+          };
+          return admin.messaging().send(notificationMessage);
+        }
+        return null;
+      })
+      .filter(Boolean); // Remove null promises
+
+  try {
+    await Promise.all(notificationPromises);
+    console.log(`${itemType} notifications sent successfully`);
+  } catch (error) {
+    console.error(`Error sending ${itemType} notifications:`, error);
+  }
+}
+
+/**
+ * Creates a notification function for different types of items.
+ * @param {string} itemType - The type of the item.
+ * @param {string} collectionPath - The Firestore collection path.
+ * @return {functions.CloudFunction<functions.firestore.DocumentSnapshot>}
+ */
+function createNotificationFunction(itemType, collectionPath) {
+  return functions.firestore
+      .document(`organizations/{orgID}/${collectionPath}/{itemID}`)
+      .onCreate(async (snapshot, context) => {
+        const itemData = snapshot.data();
+        const orgID = context.params.orgID;
+        const itemID = context.params.itemID;
+        const senderUID = itemData.createdBy;
+
+        await createAndSendNotifications(orgID, itemID, itemType, itemData.title, senderUID);
+      });
+}
+
+// Create notification functions for different types
+exports.onCreateAssessment = createNotificationFunction("Assessment", "assessments");
+exports.onCreateDsti = createNotificationFunction("DSTI", "dsti");
+exports.onCreateTool = createNotificationFunction("Tool", "tools");

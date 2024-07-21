@@ -23,7 +23,6 @@ class AssessmentModel {
   String createdBy;
   String organizationID;
   String pdfUrl;
-
   DateTime createdAt;
 
   AssessmentModel({
