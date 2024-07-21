@@ -41,6 +41,8 @@ android {
         applicationId "com.raphaeldaka.geminiriskassessor"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        resValue "string", "apple_client_id", "com.raphaeldaka.geminiriskassessor.signin"
+        resValue "string", "apple_redirect_uri", "https://gemini-risk-assessor.firebaseapp.com/__/auth/handler"
         minSdk = 23
         targetSdk = 34
         versionCode = flutterVersionCode.toInteger()

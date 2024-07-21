@@ -556,6 +556,8 @@ class AuthenticationProvider extends ChangeNotifier {
         return await _auth.signInWithCredential(credential);
       }
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       log('Error in _signInWithGoogle: $e');
       return null;
     }
@@ -572,7 +574,7 @@ class AuthenticationProvider extends ChangeNotifier {
             ? WebAuthenticationOptions(
                 clientId: 'com.raphaeldaka.geminiriskassessor.signin',
                 redirectUri: Uri.parse(
-                  'https://gemini-risk-assessor.firebaseapp.com/callbacks/sign_in_with_apple',
+                  'https://gemini-risk-assessor.firebaseapp.com/__/auth/handler',
                 ),
               )
             : null,
