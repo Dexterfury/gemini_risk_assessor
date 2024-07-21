@@ -28,10 +28,7 @@ import 'package:provider/provider.dart';
 class OrganizationDetails extends StatefulWidget {
   const OrganizationDetails({
     super.key,
-    required this.orgModel,
   });
-
-  final OrganizationModel orgModel;
 
   @override
   State<OrganizationDetails> createState() => _OrganizationDetailsState();
@@ -84,19 +81,19 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     );
     _animation =
         CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
-    setOrgModel();
+    //setOrgModel();
 
     super.initState();
   }
 
-  void setOrgModel() async {
-    // wait for widget  to be built before setting state
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context
-          .read<OrganizationProvider>()
-          .setOrganizationModel(orgModel: widget.orgModel);
-    });
-  }
+  // void setOrgModel() async {
+  //   // wait for widget  to be built before setting state
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     context
+  //         .read<OrganizationProvider>()
+  //         .setOrganizationModel(orgModel: widget.orgModel);
+  //   });
+  // }
 
   // set new image from file and update provider
   Future<void> setNewImageInProvider(String imageUrl) async {
@@ -122,10 +119,11 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
     return Consumer<OrganizationProvider>(
         builder: (context, orgProvider, child) {
-      bool isAdmin = orgProvider.organizationModel.adminsUIDs.contains(uid);
-      bool isMember = orgProvider.organizationModel.membersUIDs.contains(uid);
-      String orgID = orgProvider.organizationModel.organizationID;
-      String orgTerms = orgProvider.organizationModel.organizationTerms;
+      final orgModel = orgProvider.organizationModel;
+      bool isAdmin = orgModel.adminsUIDs.contains(uid);
+      bool isMember = orgModel.membersUIDs.contains(uid);
+      String orgID = orgModel.organizationID;
+      String orgTerms = orgModel.organizationTerms;
       bool requestToReadTerms =
           orgProvider.organizationModel.requestToReadTerms;
       bool allowSharing = orgProvider.organizationModel.allowSharing;
@@ -215,8 +213,16 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
                 const SizedBox(height: 10),
 
+                // members list
+                MembersCard(
+                  orgModel: orgModel,
+                  isAdmin: isAdmin,
+                ),
+
+                const SizedBox(height: 20),
+
                 // members list if the user is an admin
-                buildMembersList(
+                buildExitCard(
                   isAdmin,
                   uid,
                   orgID,
@@ -235,97 +241,86 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     });
   }
 
-  Column buildMembersList(
+  buildExitCard(
     bool isAdmin,
     String uid,
     String orgID,
     OrganizationProvider orgProvider,
   ) {
-    return Column(
-      children: [
-        // members list
-        MembersCard(
-          orgModel: orgProvider.organizationModel,
-          isAdmin: isAdmin,
-        ),
-        const SizedBox(height: 20),
-
-        Card(
-          color: Theme.of(context).cardColor,
-          elevation: cardElevation,
-          child: SettingsListTile(
+    return Card(
+      color: Theme.of(context).cardColor,
+      elevation: cardElevation,
+      child: SettingsListTile(
+        title: 'Exit Organization',
+        icon: FontAwesomeIcons.arrowRightFromBracket,
+        iconContainerColor: Colors.red,
+        onTap: () {
+          // exit group
+          MyDialogs.showMyAnimatedDialog(
+            context: context,
             title: 'Exit Organization',
-            icon: FontAwesomeIcons.arrowRightFromBracket,
-            iconContainerColor: Colors.red,
-            onTap: () {
-              // exit group
-              MyDialogs.showMyAnimatedDialog(
-                context: context,
-                title: 'Exit Organization',
-                content: 'Are you sure you want to leave this Organisation?',
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      // pop the dialog
-                      Navigator.pop(context);
+            content: 'Are you sure you want to leave this Organisation?',
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  // pop the dialog
+                  Navigator.pop(context);
 
-                      // show loading dialog
-                      showLoadingDialog(
-                        title: 'Exiting',
-                      );
+                  // show loading dialog
+                  showLoadingDialog(
+                    title: 'Exiting',
+                  );
 
-                      String result = await orgProvider.exitOrganization(
-                        isAdmin: isAdmin,
-                        uid: uid,
-                        orgID: orgID,
-                      );
+                  String result = await orgProvider.exitOrganization(
+                    isAdmin: isAdmin,
+                    uid: uid,
+                    orgID: orgID,
+                  );
 
-                      if (result == Constants.exitSuccessful ||
-                          result == Constants.deletedSuccessfully) {
-                        Future.delayed(const Duration(milliseconds: 200))
-                            .whenComplete(() {
-                          if (context.mounted) {
-                            // pop loading dialog
-                            Navigator.pop(context);
-                            // show snackbar
-                            showSnackBar(
-                              context: context,
-                              message: result,
-                            );
-                            // pop the Organization details Screen
-                            Navigator.pop(context);
-                          }
-                        });
-                      } else {
-                        Future.delayed(const Duration(milliseconds: 200))
-                            .whenComplete(() {
-                          if (context.mounted) {
-                            // pop loading dialog
-                            Navigator.pop(context);
-                            // show snackbar
-                            showSnackBar(
-                              context: context,
-                              message: result,
-                            );
-                          }
-                        });
+                  if (result == Constants.exitSuccessful ||
+                      result == Constants.deletedSuccessfully) {
+                    Future.delayed(const Duration(milliseconds: 200))
+                        .whenComplete(() {
+                      if (context.mounted) {
+                        // pop loading dialog
+                        Navigator.pop(context);
+                        // show snackbar
+                        showSnackBar(
+                          context: context,
+                          message: result,
+                        );
+                        // pop the Organization details Screen
+                        Navigator.pop(context);
                       }
-                    },
-                    child: const Text('Yes'),
-                  ),
-                ],
-              );
-            },
-          ),
-        )
-      ],
+                    });
+                  } else {
+                    Future.delayed(const Duration(milliseconds: 200))
+                        .whenComplete(() {
+                      if (context.mounted) {
+                        // pop loading dialog
+                        Navigator.pop(context);
+                        // show snackbar
+                        showSnackBar(
+                          context: context,
+                          message: result,
+                        );
+                      }
+                    });
+                  }
+                },
+                child: const Text('Yes'),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 

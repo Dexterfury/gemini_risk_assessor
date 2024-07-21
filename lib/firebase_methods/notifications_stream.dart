@@ -5,6 +5,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/notification_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
@@ -177,14 +178,17 @@ class NotificationItem extends StatelessWidget {
         FirebaseMethods.getOrganizationData(
           orgID: notification.organizationID,
         ).then((orgModel) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OrganizationDetails(
-                orgModel: orgModel,
+          context
+              .read<OrganizationProvider>()
+              .setOrganizationModel(orgModel: orgModel)
+              .whenComplete(() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const OrganizationDetails(),
               ),
-            ),
-          );
+            );
+          });
         });
 
         break;

@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:provider/provider.dart';
 
@@ -21,14 +22,17 @@ navigationControler({
       FirebaseMethods.getOrganizationData(
         orgID: message.data[Constants.organizationID],
       ).then((orgModel) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrganizationDetails(
-              orgModel: orgModel,
+        context
+            .read<OrganizationProvider>()
+            .setOrganizationModel(orgModel: orgModel)
+            .whenComplete(() {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const OrganizationDetails(),
             ),
-          ),
-        );
+          );
+        });
       });
       break;
     case Constants.dstiNotification:

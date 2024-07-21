@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,7 @@ class UserWidget extends StatelessWidget {
     required this.showCheckMark,
     required this.viewType,
     this.onTap,
+    this.onLongPress,
     this.onChanged,
   });
 
@@ -21,11 +23,13 @@ class UserWidget extends StatelessWidget {
   final bool showCheckMark;
   final UserViewType viewType;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback? onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final name = userData.name;
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
+    final name = userData.uid == uid ? 'You' : userData.name;
 
     return ListTile(
       minLeadingWidth: 0.0,
@@ -49,6 +53,7 @@ class UserWidget extends StatelessWidget {
               ? const Icon(Icons.admin_panel_settings_rounded)
               : null,
       onTap: onTap,
+      onLongPress: onLongPress,
     );
   }
 

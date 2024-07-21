@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
@@ -33,9 +35,9 @@ class MembersCard extends StatelessWidget {
             // builder: (context, snapshot)
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox(
-                  height: 200,
-                  child: Center(
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
                     child: CircularProgressIndicator(),
                   ),
                 );
@@ -56,7 +58,8 @@ class MembersCard extends StatelessWidget {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final member = snapshot.data![index];
-                    final isAdmin = orgModel.adminsUIDs.contains(member.uid);
+                    final isMemberAdmin =
+                        orgModel.adminsUIDs.contains(member.uid);
                     return Padding(
                       padding: const EdgeInsets.only(
                         left: 8.0,
@@ -64,9 +67,14 @@ class MembersCard extends StatelessWidget {
                       ),
                       child: UserWidget(
                         userData: member,
-                        isAdminView: isAdmin,
+                        isAdminView: isMemberAdmin,
                         showCheckMark: false,
                         viewType: UserViewType.user,
+                        onLongPress: !isAdmin
+                            ? null
+                            : () {
+                                // show dialog for added member as admin
+                              },
                       ),
                     );
                   });
