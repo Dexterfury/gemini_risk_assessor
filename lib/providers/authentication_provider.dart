@@ -564,7 +564,9 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<UserCredential?> _signInWithApple({bool link = false}) async {
+    print("Starting _signInWithApple function");
     try {
+      print("Attempting to get Apple ID credential");
       final appleIdCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
@@ -579,21 +581,27 @@ class AuthenticationProvider extends ChangeNotifier {
               )
             : null,
       );
+      print("Successfully obtained Apple ID credential");
 
+      print("Creating OAuth credential");
       final oAuthCredential = OAuthProvider('apple.com');
       final credential = oAuthCredential.credential(
         idToken: appleIdCredential.identityToken,
         accessToken: appleIdCredential.authorizationCode,
       );
+      print("OAuth credential created");
 
       UserCredential userCredential;
       if (link && isUserAnonymous() == true) {
+        print("Linking credential to anonymous user");
         userCredential = await FirebaseAuth.instance.currentUser!
             .linkWithCredential(credential);
       } else {
+        print("Signing in with credential");
         userCredential =
             await FirebaseAuth.instance.signInWithCredential(credential);
       }
+      print("Sign in/link successful");
 
       // Determine the display name
       String displayName;
@@ -604,24 +612,90 @@ class AuthenticationProvider extends ChangeNotifier {
       } else {
         displayName = 'Apple User';
       }
+      print("Display name set to: $displayName");
 
       // Update the user's display name
+      print("Updating user's display name");
       await userCredential.user?.updateDisplayName(displayName);
 
       // Fetch the user again to ensure we have the updated information
+      print("Reloading user data");
       await userCredential.user?.reload();
 
+      print("_signInWithApple function completed successfully");
       return userCredential;
     } on SignInWithAppleAuthorizationException catch (e) {
       log('User cancelled the authorization flow: $e');
+      print("SignInWithAppleAuthorizationException: ${e.toString()}");
       setLoading(false);
       return null;
     } catch (e) {
       log('error Apple Sign In : ${e.toString()}');
+      print("Unexpected error in Apple Sign In: ${e.toString()}");
       setLoading(false);
       return null;
     }
   }
+
+  // Future<UserCredential?> _signInWithApple({bool link = false}) async {
+  //   try {
+  //     final appleIdCredential = await SignInWithApple.getAppleIDCredential(
+  //       scopes: [
+  //         AppleIDAuthorizationScopes.email,
+  //         AppleIDAuthorizationScopes.fullName,
+  //       ],
+  //       webAuthenticationOptions: Platform.isAndroid
+  //           ? WebAuthenticationOptions(
+  //               clientId: 'com.raphaeldaka.geminiriskassessor.signin',
+  //               redirectUri: Uri.parse(
+  //                 'https://gemini-risk-assessor.firebaseapp.com/__/auth/handler',
+  //               ),
+  //             )
+  //           : null,
+  //     );
+
+  //     final oAuthCredential = OAuthProvider('apple.com');
+  //     final credential = oAuthCredential.credential(
+  //       idToken: appleIdCredential.identityToken,
+  //       accessToken: appleIdCredential.authorizationCode,
+  //     );
+
+  //     UserCredential userCredential;
+  //     if (link && isUserAnonymous() == true) {
+  //       userCredential = await FirebaseAuth.instance.currentUser!
+  //           .linkWithCredential(credential);
+  //     } else {
+  //       userCredential =
+  //           await FirebaseAuth.instance.signInWithCredential(credential);
+  //     }
+
+  //     // Determine the display name
+  //     String displayName;
+  //     if (appleIdCredential.givenName != null &&
+  //         appleIdCredential.familyName != null) {
+  //       displayName =
+  //           '${appleIdCredential.givenName} ${appleIdCredential.familyName}';
+  //     } else {
+  //       displayName = 'Apple User';
+  //     }
+
+  //     // Update the user's display name
+  //     await userCredential.user?.updateDisplayName(displayName);
+
+  //     // Fetch the user again to ensure we have the updated information
+  //     await userCredential.user?.reload();
+
+  //     return userCredential;
+  //   } on SignInWithAppleAuthorizationException catch (e) {
+  //     log('User cancelled the authorization flow: $e');
+  //     setLoading(false);
+  //     return null;
+  //   } catch (e) {
+  //     log('error Apple Sign In : ${e.toString()}');
+  //     setLoading(false);
+  //     return null;
+  //   }
+  // }
 
   // send verification email
   Future<void> sendEmailVerification() async {

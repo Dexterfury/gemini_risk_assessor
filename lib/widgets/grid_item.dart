@@ -22,20 +22,18 @@ class GridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if both models are null
+    if (toolModel == null && orgModel == null) {
+      return const Card(
+        child: Center(child: Text('No data available')),
+      );
+    }
+
     // get title and subtitle based on model type
     bool isTool = toolModel != null;
-    String title = getTitle(
-      toolModel,
-      orgModel,
-    );
-    String subtitle = getSubTitle(
-      toolModel,
-      orgModel,
-    );
-    String imageUrl = getImageUrl(
-      toolModel,
-      orgModel,
-    );
+    String title = getTitle();
+    String subtitle = getSubTitle();
+    String imageUrl = getImageUrl();
 
     return Card(
       color: Theme.of(context).cardColor,
@@ -65,9 +63,7 @@ class GridItem extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: textHeight * 0.1,
-                  ), // Spacing between image and text
+                  SizedBox(height: textHeight * 0.1),
                   SizedBox(
                     height: textHeight * 0.9,
                     child: Padding(
@@ -84,19 +80,23 @@ class GridItem extends StatelessWidget {
             ),
             openBuilder: (context, action) {
               if (isDiscussion) {
-                // open tools chat discussusion
                 return ChatDiscussionScreen(
-                  orgID: orgModel != null ? orgModel!.organizationID : '',
+                  orgID: orgModel?.organizationID ?? '',
                   toolModel: toolModel,
                 );
               } else {
-                if (isTool) {
+                if (isTool && toolModel != null) {
                   return ExplainerDetailsScreen(
                     currentModel: toolModel!,
                   );
-                } else {
+                } else if (orgModel != null) {
                   return OrganizationDetails(
                     orgModel: orgModel!,
+                  );
+                } else {
+                  // Fallback in case neither model is available
+                  return const Scaffold(
+                    body: Center(child: Text('No data available')),
                   );
                 }
               }
@@ -115,40 +115,31 @@ class GridItem extends StatelessWidget {
     );
   }
 
-  String getTitle(
-    ToolModel? toolModel,
-    OrganizationModel? orgModel,
-  ) {
+  String getTitle() {
     if (toolModel != null) {
-      return toolModel.title;
+      return toolModel!.title;
     } else if (orgModel != null) {
-      return orgModel.name;
+      return orgModel!.name;
     } else {
       return "No title";
     }
   }
 
-  String getSubTitle(
-    ToolModel? toolModel,
-    OrganizationModel? orgModel,
-  ) {
+  String getSubTitle() {
     if (toolModel != null) {
-      return toolModel.summary;
+      return toolModel!.summary;
     } else if (orgModel != null) {
-      return orgModel.aboutOrganization;
+      return orgModel!.aboutOrganization;
     } else {
       return "No subtitle";
     }
   }
 
-  String getImageUrl(
-    ToolModel? toolModel,
-    OrganizationModel? orgModel,
-  ) {
-    if (toolModel != null) {
-      return toolModel.images[0];
-    } else if (orgModel != null) {
-      return orgModel.imageUrl!;
+  String getImageUrl() {
+    if (toolModel != null && toolModel!.images.isNotEmpty) {
+      return toolModel!.images[0];
+    } else if (orgModel != null && orgModel!.imageUrl != null) {
+      return orgModel!.imageUrl!;
     } else {
       return "No image";
     }
