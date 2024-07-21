@@ -4,7 +4,6 @@ import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:gemini_risk_assessor/widgets/organization_grid_item.dart';
 import 'package:provider/provider.dart';
 

@@ -129,10 +129,13 @@ class _OrganizationSettingsScreenState
                 },
               ),
               const SizedBox(height: 40),
-              MainAppButton(
-                label: ' Edit Terms and Conditions ',
-                borderRadius: 15.0,
-                onTap: () => _showTermsEditDialog(context),
+              SizedBox(
+                height: 50,
+                child: MainAppButton(
+                  label: ' Edit Terms and Conditions ',
+                  borderRadius: 15.0,
+                  onTap: () => _showTermsEditDialog(context),
+                ),
               ),
             ],
           ),

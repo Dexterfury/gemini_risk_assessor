@@ -56,7 +56,7 @@ dependencies:
   firebase_storage: ^12.0.1
   shared_preferences: ^2.2.3
   animations: ^2.0.11
-  floating_action_bubble: ^1.1.4
+  # floating_action_bubble: ^1.1.4
   smooth_page_indicator: ^1.1.0
   http: ^1.2.1
   cached_network_image: ^3.3.1
@@ -75,11 +75,20 @@ dependencies:
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^6.1.1
   flutter_pw_validator: ^1.6.0
+  flutter_launcher_icons: ^0.13.1
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+    
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

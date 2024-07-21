@@ -12,7 +12,7 @@ ThemeData lightTheme = ThemeData(
       ),
   dialogBackgroundColor: Colors.grey[200],
   colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.green,
+    seedColor: Colors.blue,
     brightness: Brightness.light,
   ),
   useMaterial3: true,
@@ -36,7 +36,7 @@ ThemeData darkTheme = ThemeData(
   dialogBackgroundColor: Colors.grey[800],
   highlightColor: Colors.grey[600],
   colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.green,
+    seedColor: Colors.blue,
     brightness: Brightness.dark,
   ),
   useMaterial3: true,

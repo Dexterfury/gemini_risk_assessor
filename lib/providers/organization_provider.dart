@@ -128,6 +128,55 @@ class OrganizationProvider extends ChangeNotifier {
         initialAwaiting.difference(currentAwaiting).isNotEmpty;
   }
 
+  Future<void> handleMemberChanges({
+    required UserModel memberData,
+    required String orgID,
+    required bool isAdding,
+  }) async {
+    // update the member data in firebase
+    if (isAdding) {
+      // add the member to admins list in firebase
+      await addMemberAsAdmin(
+        memberData: memberData,
+        orgID: orgID,
+      );
+    } else {
+      // remove the member from admins list in firebase
+      await removeMemberAsAdmin(
+        memberData: memberData,
+        orgID: orgID,
+      );
+    }
+  }
+
+  // add member as admin
+  Future<void> addMemberAsAdmin({
+    required UserModel memberData,
+    required String orgID,
+  }) async {
+    // add the membeer to adminslist
+    await _organizationCollection.doc(orgID).update({
+      Constants.adminsUIDs: FieldValue.arrayUnion([memberData.uid]),
+    });
+    // to to locally update the list
+    _organizationModel.adminsUIDs.add(memberData.uid);
+    notifyListeners();
+  }
+
+  // remove member as admin
+  Future<void> removeMemberAsAdmin({
+    required UserModel memberData,
+    required String orgID,
+  }) async {
+    // remove the member from adminslist
+    await _organizationCollection.doc(orgID).update({
+      Constants.adminsUIDs: FieldValue.arrayRemove([memberData.uid]),
+    });
+    // to update the local list
+    _organizationModel.adminsUIDs.remove(memberData.uid);
+    notifyListeners();
+  }
+
   // clear awaiting approval list
   void clearAwaitingApprovalList() {
     _awaitApprovalList.clear();

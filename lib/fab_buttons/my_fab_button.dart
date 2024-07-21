@@ -1,6 +1,7 @@
-import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
+import 'package:gemini_risk_assessor/utilities/custom_floating_action_button.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 
 class MyFabButton extends StatelessWidget {
@@ -18,7 +19,7 @@ class MyFabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionBubble(
+    return CustomFloatingActionBubble(
       items: [
         Bubble(
           title: "Tools Explainer",
@@ -74,9 +75,11 @@ class MyFabButton extends StatelessWidget {
       onPress: () => _animationController.isCompleted
           ? _animationController.reverse()
           : _animationController.forward(),
-      iconColor: Colors.white,
-      animatedIconData: AnimatedIcons.menu_close, // Animated icon
-      backGroundColor: Theme.of(context).colorScheme.primary,
+      iconColor: Colors.black,
+      backGroundColor: Colors.white,
+      closedImage:
+          AssetImage(AssetsManager.geminiLogo1), // Add your image asset
+      openIcon: Icons.close, // Icon to show when open
     );
   }
 }
