@@ -27,56 +27,62 @@ class OrganizationGridItem extends StatelessWidget {
         builder: (context, constraints) {
           final imageHeight = constraints.maxHeight * 0.8;
           final textHeight = constraints.maxHeight * 0.2;
-
-          return OpenContainer(
-            closedBuilder: (context, action) => InkWell(
-              onTap: action,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: imageHeight,
-                    width: constraints.maxWidth,
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10.0),
-                        topRight: Radius.circular(10.0),
-                      ),
-                      child: MyImageCacheManager.showImage(
-                        imageUrl: imageUrl,
-                        isTool: false,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: textHeight * 0.1),
-                  SizedBox(
-                    height: textHeight * 0.9,
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Text(
-                        title,
-                        style: textStyle16w600,
-                        overflow: TextOverflow.ellipsis,
+          try {
+            return OpenContainer(
+              closedBuilder: (context, action) => InkWell(
+                onTap: action,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: imageHeight,
+                      width: constraints.maxWidth,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10.0),
+                          topRight: Radius.circular(10.0),
+                        ),
+                        child: MyImageCacheManager.showImage(
+                          imageUrl: imageUrl,
+                          isTool: false,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: textHeight * 0.1),
+                    SizedBox(
+                      height: textHeight * 0.9,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          title,
+                          style: textStyle16w600,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            openBuilder: (context, action) {
-              return OrganizationDetails(
-                orgModel: orgModel,
-              );
-            },
-            transitionType: ContainerTransitionType.fadeThrough,
-            transitionDuration: const Duration(milliseconds: 500),
-            closedElevation: 0,
-            openElevation: 4,
-            closedShape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            ),
-            openShape: const RoundedRectangleBorder(),
-          );
+              openBuilder: (context, action) {
+                return OrganizationDetails(
+                  orgModel: orgModel,
+                );
+              },
+              transitionType: ContainerTransitionType.fadeThrough,
+              transitionDuration: const Duration(milliseconds: 500),
+              closedElevation: 0,
+              openElevation: 4,
+              closedShape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              openShape: const RoundedRectangleBorder(),
+            );
+          } catch (e, stackTrace) {
+            print('Error in OpenContainer: $e');
+            print('Stack trace: $stackTrace');
+            // Return a fallback widget
+            return Card(child: Text(title));
+          }
         },
       ),
     );
