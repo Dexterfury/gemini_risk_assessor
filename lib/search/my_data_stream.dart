@@ -94,7 +94,7 @@ class MyDataStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
 
                             final tool = ToolModel.fromJson(data);
-                            return GridItem(
+                            return ToolGridItem(
                               toolModel: tool,
                               isDiscussion: isDiscussion,
                             );
@@ -112,7 +112,7 @@ class MyDataStream extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
 
                             final tool = ToolModel.fromJson(data);
-                            return GridItem(
+                            return ToolGridItem(
                               toolModel: tool,
                               isDiscussion: isDiscussion,
                             );

@@ -3,7 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
-import 'package:gemini_risk_assessor/screens/chat_discussion_screen.dart';
+import 'package:gemini_risk_assessor/screens/org_chat_discussion_screen.dart';
+import 'package:gemini_risk_assessor/screens/tool_chat_discussion_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
@@ -62,9 +63,8 @@ class ListItem extends StatelessWidget {
         },
         openBuilder: (context, action) {
           if (isDiscussion) {
-            return ChatDiscussionScreen(
-              orgID: orgID,
-              currentModel: data,
+            return OrgChatDiscussionScreen(
+              orgModel: data,
             );
           } else {
             return AssessmentDetailsScreen(

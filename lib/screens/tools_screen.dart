@@ -139,7 +139,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                               as Map<String, dynamic>;
 
                                           final tool = ToolModel.fromJson(data);
-                                          return GridItem(
+                                          return ToolGridItem(
                                             toolModel: tool,
                                             isDiscussion: widget.isDiscussion,
                                           );

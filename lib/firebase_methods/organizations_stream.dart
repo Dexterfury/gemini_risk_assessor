@@ -5,6 +5,7 @@ import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/grid_item.dart';
+import 'package:gemini_risk_assessor/widgets/organization_grid_item.dart';
 import 'package:provider/provider.dart';
 
 class OrganizationsStream extends StatelessWidget {
@@ -53,9 +54,8 @@ class OrganizationsStream extends StatelessWidget {
                 final doc = snapshot.data!.docs[index];
                 final orgData = doc.data() as Map<String, dynamic>;
                 final org = OrganizationModel.fromJson(orgData);
-                return GridItem(
+                return OrganizationGridItem(
                   orgModel: org,
-                  isDiscussion: false,
                 );
               }),
         );

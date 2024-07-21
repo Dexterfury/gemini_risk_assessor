@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -131,7 +129,6 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                                             doc.data() as Map<String, dynamic>;
                                         final item =
                                             AssessmentModel.fromJson(data);
-                                        // I WANT TO PASS ISDISCUSSION HERE IF ITS NOT NULL
                                         return ListItem(
                                           docTitle: Constants.riskAssessment,
                                           orgID: widget.orgID,

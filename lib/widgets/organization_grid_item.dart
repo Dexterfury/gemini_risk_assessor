@@ -1,26 +1,24 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
-import 'package:gemini_risk_assessor/screens/tool_chat_discussion_screen.dart';
-import 'package:gemini_risk_assessor/screens/explainer_details_screen.dart';
+import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/screens/organization_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
-class ToolGridItem extends StatelessWidget {
-  const ToolGridItem({
+class OrganizationGridItem extends StatelessWidget {
+  const OrganizationGridItem({
     super.key,
-    required this.toolModel,
-    required this.isDiscussion,
+    required this.orgModel,
   });
 
-  final ToolModel toolModel;
-  final bool isDiscussion;
+  final OrganizationModel orgModel;
 
   @override
   Widget build(BuildContext context) {
-    String title = toolModel.title;
-    //String subtitle = toolModel.summary;
-    String imageUrl = toolModel.images[0];
+    String title = orgModel.name;
+    String subtitle = orgModel.aboutOrganization;
+    String imageUrl = orgModel.imageUrl!;
+    ;
 
     return Card(
       color: Theme.of(context).cardColor,
@@ -46,7 +44,7 @@ class ToolGridItem extends StatelessWidget {
                       ),
                       child: MyImageCacheManager.showImage(
                         imageUrl: imageUrl,
-                        isTool: true,
+                        isTool: false,
                       ),
                     ),
                   ),
@@ -66,15 +64,9 @@ class ToolGridItem extends StatelessWidget {
               ),
             ),
             openBuilder: (context, action) {
-              if (isDiscussion) {
-                return ToolChatDiscussionScreen(
-                  toolModel: toolModel,
-                );
-              } else {
-                return ExplainerDetailsScreen(
-                  currentModel: toolModel!,
-                );
-              }
+              return OrganizationDetails(
+                orgModel: orgModel,
+              );
             },
             transitionType: ContainerTransitionType.fadeThrough,
             transitionDuration: const Duration(milliseconds: 500),

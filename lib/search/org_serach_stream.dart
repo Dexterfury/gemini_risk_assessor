@@ -6,7 +6,7 @@ import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/grid_item.dart';
+import 'package:gemini_risk_assessor/widgets/organization_grid_item.dart';
 import 'package:provider/provider.dart';
 
 class OrgSearchStream extends StatelessWidget {
@@ -66,9 +66,8 @@ class OrgSearchStream extends StatelessWidget {
                 final doc = results[index];
                 final orgData = doc.data() as Map<String, dynamic>;
                 final org = OrganizationModel.fromJson(orgData);
-                return GridItem(
+                return OrganizationGridItem(
                   orgModel: org,
-                  isDiscussion: false,
                 );
               });
         },
