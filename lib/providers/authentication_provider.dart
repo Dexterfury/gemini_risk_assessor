@@ -568,6 +568,14 @@ class AuthenticationProvider extends ChangeNotifier {
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
+        webAuthenticationOptions: Platform.isAndroid
+            ? WebAuthenticationOptions(
+                clientId: 'com.raphaeldaka.geminiriskassessor.signin',
+                redirectUri: Uri.parse(
+                  'https://gemini-risk-assessor.firebaseapp.com/callbacks/sign_in_with_apple',
+                ),
+              )
+            : null,
       );
 
       final oAuthCredential = OAuthProvider('apple.com');
