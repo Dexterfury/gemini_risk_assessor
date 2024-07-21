@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/gemini_button.dart';

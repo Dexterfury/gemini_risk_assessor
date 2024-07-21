@@ -604,9 +604,11 @@ class AuthenticationProvider extends ChangeNotifier {
       return userCredential;
     } on SignInWithAppleAuthorizationException catch (e) {
       log('User cancelled the authorization flow: $e');
+      setLoading(false);
       return null;
     } catch (e) {
       log('error Apple Sign In : ${e.toString()}');
+      setLoading(false);
       return null;
     }
   }
