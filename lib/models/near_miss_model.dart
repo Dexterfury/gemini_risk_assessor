@@ -1,32 +1,38 @@
 import 'package:gemini_risk_assessor/constants.dart';
 
-class DiscussionModel {
+class NearMissModel {
   String id;
   String title;
   String description;
-  Map discussingAbout;
+  List<String> images;
+  List<String> sharedWith;
+  List<String> reactions;
   String createdBy;
   String organizationID;
   String createdAt;
 
   // constructor
-  DiscussionModel({
+  NearMissModel({
     required this.id,
     required this.title,
     required this.description,
-    required this.discussingAbout,
+    required this.images,
+    required this.sharedWith,
+    required this.reactions,
     required this.createdBy,
     required this.organizationID,
     required this.createdAt,
   });
 
   // fromJson method
-  factory DiscussionModel.fromJson(Map<String, dynamic> json) {
-    return DiscussionModel(
+  factory NearMissModel.fromJson(Map<String, dynamic> json) {
+    return NearMissModel(
       id: json[Constants.id] ?? '',
       title: json[Constants.title] ?? '',
       description: json[Constants.description] ?? '',
-      discussingAbout: json[Constants.discussingAbout] ?? '',
+      images: List<String>.from(json[Constants.images] ?? []),
+      sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
+      reactions: List<String>.from(json[Constants.reactions] ?? []),
       createdBy: json[Constants.createdBy] ?? '',
       organizationID: json[Constants.organizationID] ?? '',
       createdAt: json[Constants.createdAt] ?? '',
@@ -39,7 +45,9 @@ class DiscussionModel {
       Constants.id: id,
       Constants.title: title,
       Constants.description: description,
-      Constants.discussingAbout: discussingAbout,
+      Constants.images: images,
+      Constants.sharedWith: sharedWith,
+      Constants.reactions: reactions,
       Constants.createdBy: createdBy,
       Constants.organizationID: organizationID,
       Constants.createdAt: createdAt,

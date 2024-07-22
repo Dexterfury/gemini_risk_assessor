@@ -216,7 +216,11 @@ class _ChatListState extends State<ChatList> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(
-            child: Text('Something went wrong'),
+            child: Text(
+              'Something went wrong',
+              textAlign: TextAlign.center,
+              style: textStyle18Bold,
+            ),
           );
         }
         if (snapshot.connectionState == ConnectionState.waiting) {

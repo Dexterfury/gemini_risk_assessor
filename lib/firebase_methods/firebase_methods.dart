@@ -117,7 +117,7 @@ class FirebaseMethods {
 
     // Check for tools
     final toolsQuery =
-        await orgRef.collection(Constants.toolsChatsCollection).limit(1).get();
+        await orgRef.collection(Constants.toolsCollection).limit(1).get();
     results[Constants.hasTools] = toolsQuery.docs.isNotEmpty;
 
     return results;
@@ -392,12 +392,12 @@ class FirebaseMethods {
 
   // CHAT METHODS
   // discussion stream from firestore
-  static Stream<QuerySnapshot> discussionStream({
+  static Stream<QuerySnapshot> nearMissessStream({
     required String orgID,
   }) {
     return _organizationsCollection
         .doc(orgID)
-        .collection(Constants.discussionsCollection)
+        .collection(Constants.nearMissesCollection)
         .snapshots();
   }
 
@@ -411,7 +411,7 @@ class FirebaseMethods {
     // handle group message
     return _organizationsCollection
         .doc(orgID)
-        .collection(Constants.discussionsCollection)
+        .collection(collection)
         .doc(itemID)
         .collection(Constants.chatMessagesCollection)
         .snapshots()

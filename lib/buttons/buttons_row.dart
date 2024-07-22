@@ -2,8 +2,9 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/screens/discussion_screen.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_screen.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
+import 'package:gemini_risk_assessor/screens/near_misses_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -61,9 +62,9 @@ class ButtonsRow extends StatelessWidget {
                 width: 5,
               ),
               buildButton(
-                FontAwesomeIcons.peopleGroup,
+                FontAwesomeIcons.circleExclamation,
                 orgID,
-                'Discussions',
+                'Near Misses',
                 isAdmin,
                 isMember,
               ),
@@ -160,7 +161,7 @@ Widget _navigateToScreen(
         orgID: orgID,
       );
     default:
-      return DiscussionScreen(
+      return NearMissesScreen(
         orgID: orgID,
         isAdmin: isAdmin,
       );

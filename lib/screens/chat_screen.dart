@@ -5,6 +5,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_chat_field.dart';
 import 'package:gemini_risk_assessor/widgets/message_bubble.dart';
 import 'package:provider/provider.dart';
@@ -30,15 +31,15 @@ class _ChatScreenState extends State<ChatScreen> {
   // scroll controller
   final ScrollController _scrollController = ScrollController();
 
-  SpeechToText _speechToText = SpeechToText();
+  //SpeechToText _speechToText = SpeechToText();
 
-  String _spokenWords = '';
+  //String _spokenWords = '';
 
   @override
   void dispose() {
-    if (_speechToText.isListening) {
-      _speechToText.stop();
-    }
+    // if (_speechToText.isListening) {
+    //   _speechToText.stop();
+    // }
     _scrollController.dispose();
     super.dispose();
   }
@@ -56,38 +57,38 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  // speech to text method for later
-  Future<void> _start({required bool isClicked}) async {
-    final chatProvider = context.read<ChatProvider>();
-    final uid = context.read<AuthenticationProvider>().userModel!.uid;
-    bool isAvailable = await _speechToText.initialize();
+  // // speech to text method for later
+  // Future<void> _start({required bool isClicked}) async {
+  //   final chatProvider = context.read<ChatProvider>();
+  //   final uid = context.read<AuthenticationProvider>().userModel!.uid;
+  //   bool isAvailable = await _speechToText.initialize();
 
-    String docID = widget.assesmentModel != null
-        ? widget.assesmentModel!.id
-        : widget.toolModel != null
-            ? widget.toolModel!.id
-            : '';
+  //   String docID = widget.assesmentModel != null
+  //       ? widget.assesmentModel!.id
+  //       : widget.toolModel != null
+  //           ? widget.toolModel!.id
+  //           : '';
 
-    if (isClicked && isAvailable) {
-      chatProvider.setIsListening(listening: true);
+  //   if (isClicked && isAvailable) {
+  //     chatProvider.setIsListening(listening: true);
 
-      await _speechToText.listen(
-        onResult: (result) async {
-          _spokenWords = result.recognizedWords;
+  //     await _speechToText.listen(
+  //       onResult: (result) async {
+  //         _spokenWords = result.recognizedWords;
 
-          await chatProvider.addAndDisplayMessage(
-            uid: uid,
-            chatID: docID,
-            generationType: widget.generationType,
-            finalWords: result.finalResult,
-            spokenWords: _spokenWords,
-            onSuccess: () {},
-            onError: (error) {},
-          );
-        },
-      );
-    }
-  }
+  //         await chatProvider.addAndDisplayMessage(
+  //           uid: uid,
+  //           chatID: docID,
+  //           generationType: widget.generationType,
+  //           finalWords: result.finalResult,
+  //           spokenWords: _spokenWords,
+  //           onSuccess: () {},
+  //           onError: (error) {},
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
             centerTitle: true,
             title: const Text('Chat with Gemini'),
             actions: [
-              if (chatProvider.messages.isNotEmpty)
+              if (chatProvider.messages.length > 1)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
@@ -133,7 +134,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                   // pop dialog
                                   Navigator.pop(context);
                                 },
-                                child: const Text('Cancel'),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () async {
@@ -181,7 +187,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: chatProvider.messages.isEmpty
                         ? const Center(
-                            child: Text('No messages yet'),
+                            child: Text(
+                              'No messages yet',
+                              style: textStyle18w500,
+                            ),
                           )
                         : MessageBubble(
                             scrollController: _scrollController,

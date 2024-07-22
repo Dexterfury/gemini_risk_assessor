@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
-import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
@@ -14,7 +12,7 @@ class EnhancedListTile extends StatelessWidget {
   final int messageCount;
   final int likeCount;
   final VoidCallback onMessageTap;
-  final VoidCallback onLikeTap;
+  final VoidCallback onGeminiTap;
 
   const EnhancedListTile({
     Key? key,
@@ -25,7 +23,7 @@ class EnhancedListTile extends StatelessWidget {
     required this.messageCount,
     required this.likeCount,
     required this.onMessageTap,
-    required this.onLikeTap,
+    required this.onGeminiTap,
   }) : super(key: key);
 
   @override
@@ -77,44 +75,38 @@ class EnhancedListTile extends StatelessWidget {
                       Expanded(
                         child: _buildButton(
                           context,
-                          FontAwesomeIcons.commentDots,
+                          FontAwesomeIcons.message,
                           messageCount,
                           onMessageTap,
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildButton(
-                          context,
-                          FontAwesomeIcons.heart,
-                          likeCount,
-                          onLikeTap,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: FloatingActionButton(
-                            onPressed: () {},
-                            backgroundColor: Colors.white,
-                            elevation: 4.0,
-                            highlightElevation: 2.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                backgroundImage:
-                                    AssetImage(AssetsManager.geminiLogo1),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: FloatingActionButton(
+                              onPressed: onGeminiTap,
+                              backgroundColor: Colors.white,
+                              elevation: 4.0,
+                              highlightElevation: 2.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
                               ),
-                            )
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage:
+                                      AssetImage(AssetsManager.geminiLogo1),
+                                ),
+                              )
 
-                            // Icon(widget.icon,
-                            //     color: widget.iconColor, size: buttonSize * 0.5),
-                            ),
+                              // Icon(widget.icon,
+                              //     color: widget.iconColor, size: buttonSize * 0.5),
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -140,10 +132,25 @@ class EnhancedListTile extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: Theme.of(context).hintColor),
+            Text(
+              '$count',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+              ),
+            ),
             const SizedBox(width: 4),
-            Text('$count',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            Icon(
+              icon,
+              size: 16,
+              color: Theme.of(context).hintColor,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Discussions',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+              ),
+            ),
           ],
         ),
       ),

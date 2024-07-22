@@ -99,11 +99,11 @@ Future<List<XFile>?> pickPromptImages({
 
 getCollectionRef(GenerationType generationType) {
   if (generationType == GenerationType.tool) {
-    return Constants.toolsChatsCollection;
+    return Constants.toolsCollection;
   } else if (generationType == GenerationType.riskAssessment) {
-    return Constants.assessmentsChatsCollection;
+    return Constants.assessmentCollection;
   } else if (generationType == GenerationType.dsti) {
-    return Constants.dstisChatsCollection;
+    return Constants.dstiCollections;
   }
 }
 

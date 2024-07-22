@@ -141,6 +141,8 @@ class Constants {
   static const String changeName = 'Change Name';
   static const String changeDescription = 'Change Description';
 
+  static const String nearMissesTitle = 'Near Misses';
+
   // firestore collections
   static const String usersCollection = 'users';
   static const String promptCollection = 'prompts';
@@ -149,12 +151,10 @@ class Constants {
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
   static const String chatMessagesCollection = 'chatMessages';
-  static const String toolsChatsCollection = 'toolsChats';
-  static const String assessmentsChatsCollection = 'assessmentsChats';
-  static const String dstisChatsCollection = 'dstisChats';
   static const String chatDataCollection = 'chatData';
   static const String notificationsCollection = 'notifications';
   static const String discussionsCollection = 'discussions';
+  static const String nearMissesCollection = 'nearMisses';
 
   static const String organizationImage = 'organizationImage';
 

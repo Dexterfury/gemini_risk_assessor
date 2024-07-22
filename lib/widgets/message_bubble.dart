@@ -22,7 +22,7 @@ class MessageBubble extends StatelessWidget {
       itemBuilder: (context, index) {
         final message = chatProvider.messages[index];
         return Column(children: [
-          _userMessage(context, message),
+          if (message.question.isNotEmpty) _userMessage(context, message),
           const SizedBox(
             height: 5,
           ),
@@ -61,7 +61,7 @@ class MessageBubble extends StatelessWidget {
             maxWidth: MediaQuery.of(context).size.width * 0.9,
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(18),
           ),
           padding: const EdgeInsets.all(15),

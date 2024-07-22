@@ -44,6 +44,8 @@ class ChatProvider extends ChangeNotifier {
   bool _isAudioSending = false;
   bool _isStreaming = false;
 
+  bool _isFirstUserMessage = true;
+
   // current mode
   String _modelType = 'gemini-1.0-pro';
 
@@ -289,11 +291,56 @@ class ChatProvider extends ChangeNotifier {
         generationType: generationType,
       );
 
+      // Check if messages are empty and send AI first message if needed
+      if (_messages.isEmpty) {
+        await sendAIFirstMessage(uid, generationType);
+        _isFirstUserMessage = true;
+      } else {
+        _isFirstUserMessage = false;
+      }
+
       _isLoading = false;
       notifyListeners();
     } on FirebaseException catch (e) {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> sendAIFirstMessage(
+      String uid, GenerationType generationType) async {
+    final String messageID = const Uuid().v4();
+    final String aiMessage = _getAIFirstMessage(generationType);
+
+    final newMessage = Message(
+      senderID: uid,
+      messageID: messageID,
+      chatID: _currentAssessment?.id ?? _toolModel!.id,
+      question: '',
+      answer: StringBuffer(aiMessage),
+      imagesUrls: [],
+      reactions: [],
+      sentencesUrls: [],
+      finalWords: true,
+      timeSent: DateTime.now(),
+    );
+
+    _messages.add(newMessage);
+    _historyMessages.add(Content.model([TextPart(aiMessage)]));
+
+    notifyListeners();
+  }
+
+  String _getAIFirstMessage(GenerationType generationType) {
+    if (_currentAssessment != null) {
+      final docType = generationType == GenerationType.dsti
+          ? 'daily safety task instruction'
+          : 'risk assessment';
+      return "Hello! I'm here to discuss the $docType titled '${_currentAssessment!.title}'. I have information about the task, equipment, hazards, risks, control measures, and more. Feel free to ask any questions related to this specific $docType.";
+    } else if (_toolModel != null) {
+      return "Hello! I'm here to discuss the tool '${_toolModel!.title}'. I can provide information on how to use this tool, give practical use case examples, and offer guidance on its safe and effective use. Please feel free to ask any questions related to this specific tool.";
+    } else {
+      return "Hello! I'm here to assist you. How can I help you today?";
     }
   }
 
@@ -334,12 +381,64 @@ class ChatProvider extends ChangeNotifier {
         onError: onError,
       );
 
+      // Save messages to Firestore if this is the first user message
+      if (_isFirstUserMessage) {
+        await saveAllMessagesToFirestore(uid, chatID, generationType);
+        _isFirstUserMessage = false;
+      } else {
+        // Save only the current message pair to Firestore
+        await saveMessagePairToFirestore(uid, chatID, generationType);
+      }
+
       onSuccess();
     } catch (error) {
       _isLoading = false;
       notifyListeners();
       onError(error.toString());
     }
+  }
+
+  Future<void> saveAllMessagesToFirestore(
+    String uid,
+    String chatID,
+    GenerationType generationType,
+  ) async {
+    final collection = getCollectionRef(generationType);
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (var message in _messages) {
+      final docRef = _usersCollection
+          .doc(uid)
+          .collection(collection)
+          .doc(chatID)
+          .collection(Constants.chatMessagesCollection)
+          .doc(message.messageID);
+      batch.set(docRef, message.toJson());
+    }
+
+    await batch.commit();
+  }
+
+  Future<void> saveMessagePairToFirestore(
+    String uid,
+    String chatID,
+    GenerationType generationType,
+  ) async {
+    final collection = getCollectionRef(generationType);
+    final batch = FirebaseFirestore.instance.batch();
+
+    // Save the last two messages (user message and AI response)
+    for (var message in _messages.sublist(_messages.length - 2)) {
+      final docRef = _usersCollection
+          .doc(uid)
+          .collection(collection)
+          .doc(chatID)
+          .collection(Constants.chatMessagesCollection)
+          .doc(message.messageID);
+      batch.set(docRef, message.toJson());
+    }
+
+    await batch.commit();
   }
 
   Future<void> sendMessageToGeminiAndGetStreamedAnswer({
@@ -365,8 +464,6 @@ class ChatProvider extends ChangeNotifier {
       collection,
     );
   }
-
-  
 
   Future<void> streamResponse(
     String uid,
@@ -396,26 +493,35 @@ class ChatProvider extends ChangeNotifier {
     _historyMessages.add(Content.model([TextPart(fullStreamedAnswer)]));
 
     // Save the message to Firestore
-    final messageModel = Message(
-      senderID: uid,
-      messageID: messageID,
-      chatID: chatID,
-      question: message,
-      answer: StringBuffer(fullStreamedAnswer),
-      imagesUrls: [],
-      reactions: [],
-      sentencesUrls: [],
-      finalWords: true,
-      timeSent: DateTime.now(),
-    );
+    // final messageModel = Message(
+    //   senderID: uid,
+    //   messageID: messageID,
+    //   chatID: chatID,
+    //   question: message,
+    //   answer: StringBuffer(fullStreamedAnswer),
+    //   imagesUrls: [],
+    //   reactions: [],
+    //   sentencesUrls: [],
+    //   finalWords: true,
+    //   timeSent: DateTime.now(),
+    // );
 
-    await _usersCollection
-        .doc(uid)
-        .collection(collectionRef)
-        .doc(chatID)
-        .collection(Constants.chatMessagesCollection)
-        .doc(messageID)
-        .set(messageModel.toJson());
+    // await _usersCollection
+    //     .doc(uid)
+    //     .collection(collectionRef)
+    //     .doc(chatID)
+    //     .collection(Constants.chatMessagesCollection)
+    //     .doc(messageID)
+    //     .set(messageModel.toJson());
+    // Update the message model with the full answer
+    final messageIndex =
+        _messages.indexWhere((element) => element.messageID == messageID);
+    if (messageIndex != -1) {
+      _messages[messageIndex] = _messages[messageIndex].copyWith(
+        answer: StringBuffer(fullStreamedAnswer),
+        finalWords: true,
+      );
+    }
     _isLoading = false;
     notifyListeners();
   }
