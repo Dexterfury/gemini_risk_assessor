@@ -4,6 +4,7 @@ import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
+import 'package:gemini_risk_assessor/widgets/add_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/widgets/title_widget.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,7 @@ class _CreateNearMissState extends State<CreateNearMiss> {
       ),
       body: SafeArea(
           child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
@@ -52,38 +53,45 @@ class _CreateNearMissState extends State<CreateNearMiss> {
               Container(
                 height: 120,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.grey),
                 ),
-                child: SizedBox(
-                  height: 100,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      for (var image in nearMissProvider.nearMiss!.images)
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  child: SizedBox(
-                                    height: 100,
-                                    width: 100,
-                                    child: MyImageCacheManager.showImage(
-                                      imageUrl: image,
-                                      isTool: false,
-                                    ),
-                                  )),
-                            ],
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: SizedBox(
+                    height: 100,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        AddImage(onTap: () async {
+                          // showImagePickerDialog(context);
+                        }),
+                        for (var image in nearMissProvider.nearMiss!.images)
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    child: SizedBox(
+                                      height: 100,
+                                      width: 100,
+                                      child: MyImageCacheManager.showImage(
+                                        imageUrl: image,
+                                        isTool: false,
+                                      ),
+                                    )),
+                              ],
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
 
               const SizedBox(
-                height: 20,
+                height: 40,
               ),
 
               // assessment description field
