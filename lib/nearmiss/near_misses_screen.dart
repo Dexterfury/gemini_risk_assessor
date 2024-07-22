@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -5,8 +6,11 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/near_miss_model.dart';
+import 'package:gemini_risk_assessor/nearmiss/create_near_miss.dart';
+import 'package:gemini_risk_assessor/providers/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:provider/provider.dart';
 
 class NearMissesScreen extends StatefulWidget {
   const NearMissesScreen({
@@ -71,73 +75,31 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                          height: 50.0,
-                          child: MainAppButton(
-                            label: ' Create a Near Miss',
-                            borderRadius: 15.0,
-                            onTap: () async {
-                              // Map<String, bool> results = {
-                              //   Constants.hasAssessments: true,
-                              //   Constants.hasDSTI: true,
-                              //   Constants.hasTools: true,
-                              // };
-                              // // If there's data, show a dialog
-                              // MyDialogs.showMyDiscussionsDialog(
-                              //   context: context,
-                              //   title: 'Start a Discussion for a?',
-                              //   results: results,
-                              //   tapAction: (value) {
-                              //     switch (value) {
-                              //       case Constants.riskAssessment:
-                              //         Future.delayed(const Duration(seconds: 1))
-                              //             .whenComplete(() {
-                              //           Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //               builder: (context) =>
-                              //                   RiskAssessmentsScreen(
-                              //                 orgID: widget.orgID,
-                              //                 isDiscussion: true,
-                              //               ),
-                              //             ),
-                              //           );
-                              //         });
-
-                              //         break;
-                              //       case Constants.dailySafetyTaskInstructions:
-                              //         Future.delayed(const Duration(seconds: 1))
-                              //             .whenComplete(() {
-                              //           Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //               builder: (context) => DSTIScreen(
-                              //                 orgID: widget.orgID,
-                              //                 isDiscussion: true,
-                              //               ),
-                              //             ),
-                              //           );
-                              //         });
-                              //         break;
-                              //       case Constants.tools:
-                              //         Future.delayed(const Duration(seconds: 1))
-                              //             .whenComplete(() {
-                              //           Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //               builder: (context) => ToolsScreen(
-                              //                 orgID: widget.orgID,
-                              //                 isDiscussion: true,
-                              //               ),
-                              //             ),
-                              //           );
-                              //         });
-                              //         break;
-                              //     }
-                              //   },
-                              // );
-                            },
-                          ),
+                        OpenContainer(
+                          closedBuilder: (context, action) {
+                            return SizedBox(
+                              height: 50.0,
+                              child: MainAppButton(
+                                  label: ' Create a Near Miss',
+                                  borderRadius: 15.0,
+                                  onTap: () async {
+                                    await context
+                                        .read<NearMissProvider>()
+                                        .initializeDefaultModel();
+                                    action();
+                                  }),
+                            );
+                          },
+                          openBuilder: (context, action) {
+                            // navigate to screen depending on the clicked icon
+                            return CreateNearMiss();
+                          },
+                          closedShape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          transitionType: ContainerTransitionType.fadeThrough,
+                          transitionDuration: const Duration(milliseconds: 500),
+                          closedElevation: cardElevation,
+                          openElevation: 4,
                         ),
                       ],
                     ),

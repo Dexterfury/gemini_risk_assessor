@@ -44,6 +44,17 @@ class ListItem extends StatelessWidget {
             likeCount: 10, // Replace with actual count
             onMessageTap: () {
               // Handle message tap
+              // Navigate to the chat screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatDiscussionScreen(
+                    orgID: orgID,
+                    assessment: data,
+                    generationType: generationType,
+                  ),
+                ),
+              );
             },
             onGeminiTap: () async {
               // handle gemini tap
@@ -59,7 +70,7 @@ class ListItem extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatScreen(
-                      assesmentModel: data,
+                      assessmentModel: data,
                       generationType: generationType,
                     ),
                   ),
@@ -104,6 +115,7 @@ class ListItem extends StatelessWidget {
         openBuilder: (context, action) {
           if (isDiscussion) {
             return ChatDiscussionScreen(
+              orgID: orgID,
               assessment: data,
               generationType: generationType,
             );

@@ -15,10 +15,11 @@ import 'package:provider/provider.dart';
 class ChatList extends StatefulWidget {
   const ChatList({
     super.key,
+    required this.orgID,
     required this.assessment,
     required this.generationType,
   });
-
+  final String orgID;
   final AssessmentModel assessment;
   final GenerationType generationType;
 
@@ -209,7 +210,7 @@ class _ChatListState extends State<ChatList> {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     return StreamBuilder<List<DiscussionMessage>>(
       stream: FirebaseMethods.getMessagesStream(
-        orgID: widget.assessment.organizationID,
+        orgID: widget.orgID,
         itemID: widget.assessment.id,
         generationType: widget.generationType,
       ),

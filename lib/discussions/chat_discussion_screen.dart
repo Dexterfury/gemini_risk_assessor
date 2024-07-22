@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/appBars/discussion_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
@@ -9,10 +9,11 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 class ChatDiscussionScreen extends StatefulWidget {
   const ChatDiscussionScreen({
     super.key,
+    required this.orgID,
     required this.assessment,
     required this.generationType,
   });
-
+  final String orgID;
   final AssessmentModel assessment;
   final GenerationType generationType;
 
@@ -23,49 +24,32 @@ class ChatDiscussionScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatDiscussionScreen> {
   @override
   Widget build(BuildContext context) {
+    final appBarTitle = widget.assessment.title;
+    final appBarSubtitle = widget.assessment.summary;
+    final appBarImage = widget.assessment.images[0];
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        leading: BackButton(),
-        title: Row(
-          children: [
-            CircleAvatar(),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.assessment.title,
-                ),
-                Text(
-                  widget.assessment.summary,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // See assessment details
-            },
-            icon: Icon(FontAwesomeIcons.info),
-          ),
-          GeminiFloatingChatButton(
-            onPressed: () {},
-            size: ChatButtonSize.small,
-            iconColor: Colors.white,
-          )
-        ],
-      ),
+      appBar: DiscussionAppBar(
+          title: appBarTitle,
+          subtitle: appBarSubtitle,
+          imageUrl: appBarImage,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: GeminiFloatingChatButton(
+                onPressed: () {},
+                size: ChatButtonSize.small,
+                iconColor: Colors.white,
+              ),
+            )
+          ]),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Expanded(
               child: ChatList(
+                orgID: widget.orgID,
                 assessment: widget.assessment,
                 generationType: widget.generationType,
               ),

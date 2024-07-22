@@ -2,9 +2,8 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/discussions/discussion_screen.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
-import 'package:gemini_risk_assessor/screens/near_misses_screen.dart';
+import 'package:gemini_risk_assessor/nearmiss/near_misses_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -64,7 +63,7 @@ class ButtonsRow extends StatelessWidget {
               buildButton(
                 FontAwesomeIcons.circleExclamation,
                 orgID,
-                'Near Misses',
+                Constants.nearMisses,
                 isAdmin,
                 isMember,
               ),

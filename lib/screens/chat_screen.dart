@@ -15,12 +15,12 @@ class ChatScreen extends StatefulWidget {
   const ChatScreen({
     super.key,
     required this.generationType,
-    this.assesmentModel,
+    this.assessmentModel,
     this.toolModel,
   });
 
   final GenerationType generationType; // 'assessment', 'dsti' or 'tool'
-  final AssessmentModel? assesmentModel;
+  final AssessmentModel? assessmentModel;
   final ToolModel? toolModel;
 
   @override
@@ -94,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final docID = getDocID(
       widget.generationType,
-      widget.assesmentModel,
+      widget.assessmentModel,
       widget.toolModel,
     );
     return Consumer<ChatProvider>(
@@ -166,7 +166,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   await chatProvider.clearChat(
                                     uid: uid,
                                     generationType: widget.generationType,
-                                    assessmentModel: widget.assesmentModel,
+                                    assessmentModel: widget.assessmentModel,
                                     toolModel: widget.toolModel,
                                   );
                                 },

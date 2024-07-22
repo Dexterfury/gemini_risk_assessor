@@ -26,6 +26,8 @@ class Constants {
   // tools
   static const String tools = 'Tools';
 
+  static const String nearMisses = 'Near Misses';
+
   // daily task instructions
   static const String dailyTaskInstructions = 'Daily Safety Task Instructions';
 

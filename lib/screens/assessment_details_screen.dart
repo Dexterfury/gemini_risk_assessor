@@ -111,7 +111,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ChatScreen(
-                              assesmentModel: assessmentModel,
+                              assessmentModel: assessmentModel,
                               generationType: generationType,
                             ),
                           ),
