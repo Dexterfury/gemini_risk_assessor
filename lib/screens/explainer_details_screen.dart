@@ -48,7 +48,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
           currentModel != null
               ? Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: AnimatedChatButton(
+                  child: GeminiFloatingChatButton(
                     onPressed: () async {
                       // Open chat or navigate to chat screen
                       // Open chat or navigate to chat screen

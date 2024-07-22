@@ -66,3 +66,29 @@ enum AuthStatus {
   authenticatedButNoData,
   unauthenticated,
 }
+
+// message type
+enum MessageType {
+  text,
+  image,
+  video,
+  audio,
+}
+
+// extension convertMessageEnumToString on String
+extension MessageTypeExtension on String {
+  MessageType toMessageType() {
+    switch (this) {
+      case 'text':
+        return MessageType.text;
+      case 'image':
+        return MessageType.image;
+      case 'video':
+        return MessageType.video;
+      case 'audio':
+        return MessageType.audio;
+      default:
+        return MessageType.text;
+    }
+  }
+}

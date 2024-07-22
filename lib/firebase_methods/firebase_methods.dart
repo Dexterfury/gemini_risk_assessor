@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/models/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class FirebaseMethods {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -77,14 +80,6 @@ class FirebaseMethods {
           .collection(Constants.assessmentCollection)
           .snapshots();
     }
-  }
-
-  // discussion stream from firestore
-  static Stream<QuerySnapshot> discussionStream({required String orgID}) {
-    return _organizationsCollection
-        .doc(orgID)
-        .collection(Constants.discussionsCollection)
-        .snapshots();
   }
 
   // stream organizations from firestore
@@ -393,5 +388,64 @@ class FirebaseMethods {
     required String orgID,
   }) {
     return _organizationsCollection.doc(orgID).get();
+  }
+
+  // CHAT METHODS
+  // discussion stream from firestore
+  static Stream<QuerySnapshot> discussionStream({
+    required String orgID,
+  }) {
+    return _organizationsCollection
+        .doc(orgID)
+        .collection(Constants.discussionsCollection)
+        .snapshots();
+  }
+
+  // stream messages from chat collection
+  static Stream<List<DiscussionMessage>> getMessagesStream({
+    required String orgID,
+    required String itemID,
+    required GenerationType generationType,
+  }) {
+    final collection = getCollectionRef(generationType);
+    // handle group message
+    return _organizationsCollection
+        .doc(orgID)
+        .collection(Constants.discussionsCollection)
+        .doc(itemID)
+        .collection(Constants.chatMessagesCollection)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return DiscussionMessage.fromMap(doc.data());
+      }).toList();
+    });
+  }
+
+  // set message status
+  static Future<void> setMessageStatus({
+    required String currentUserId,
+    required String orgID,
+    required String messageID,
+    required String itemID,
+    required List<String> isSeenByList,
+    required GenerationType generationType,
+  }) async {
+    // check if you have already seen this message
+    if (isSeenByList.contains(currentUserId)) {
+      return;
+    } else {
+      final collection = getCollectionRef(generationType);
+      // add the current user to the seenByList in all messages
+      await _organizationsCollection
+          .doc(orgID)
+          .collection(collection)
+          .doc(itemID)
+          .collection(Constants.chatMessagesCollection)
+          .doc(messageID)
+          .update({
+        Constants.seenBy: FieldValue.arrayUnion([currentUserId]),
+      });
+    }
   }
 }

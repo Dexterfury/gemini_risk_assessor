@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/organization_model.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
@@ -92,6 +94,95 @@ Future<List<XFile>?> pickPromptImages({
   } catch (e) {
     onError(e.toString());
     return [];
+  }
+}
+
+getCollectionRef(GenerationType generationType) {
+  if (generationType == GenerationType.tool) {
+    return Constants.toolsChatsCollection;
+  } else if (generationType == GenerationType.riskAssessment) {
+    return Constants.assessmentsChatsCollection;
+  } else if (generationType == GenerationType.dsti) {
+    return Constants.dstisChatsCollection;
+  }
+}
+
+Center buildDateTime(groupedByValue) {
+  return Center(
+    child: Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          formatDate(groupedByValue.timeSent, [dd, ' ', M, ', ', yyyy]),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ),
+  );
+}
+
+getGenerationType(String appBarTitle) {
+  if (appBarTitle == Constants.dailySafetyTaskInstructions) {
+    return GenerationType.dsti;
+  } else {
+    return GenerationType.riskAssessment;
+  }
+}
+
+Widget messageToShow({
+  required MessageType type,
+  required String message,
+}) {
+  switch (type) {
+    case MessageType.text:
+      return Text(
+        message,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    case MessageType.image:
+      return const Row(
+        children: [
+          Icon(Icons.image_outlined),
+          SizedBox(width: 10),
+          Text(
+            'Image',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
+    case MessageType.video:
+      return const Row(
+        children: [
+          Icon(Icons.video_library_outlined),
+          SizedBox(width: 10),
+          Text(
+            'Video',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
+    case MessageType.audio:
+      return const Row(
+        children: [
+          Icon(Icons.audiotrack_outlined),
+          SizedBox(width: 10),
+          Text(
+            'Audio',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
+    default:
+      return Text(
+        message,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
   }
 }
 

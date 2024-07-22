@@ -93,7 +93,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
           currentModel != null
               ? Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: AnimatedChatButton(
+                  child: GeminiFloatingChatButton(
                     onPressed: () async {
                       // Open chat or navigate to chat screen
                       final uid =
@@ -446,14 +446,6 @@ class AssessmentDetailsScreen extends StatelessWidget {
     } else {
       // If no current model is available, return the default PPE list from the provider
       return context.watch<AssessmentProvider>().ppeModelList;
-    }
-  }
-
-  getGenerationType(String appBarTitle) {
-    if (appBarTitle == Constants.dailySafetyTaskInstructions) {
-      return GenerationType.dsti;
-    } else {
-      return GenerationType.riskAssessment;
     }
   }
 }

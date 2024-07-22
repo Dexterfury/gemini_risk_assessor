@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 
-class AnimatedChatButton extends StatefulWidget {
+class GeminiFloatingChatButton extends StatefulWidget {
   final VoidCallback onPressed;
   final ChatButtonSize size;
   final Color color;
   final Color iconColor;
   final IconData icon;
 
-  const AnimatedChatButton({
+  const GeminiFloatingChatButton({
     super.key,
     required this.onPressed,
     this.size = ChatButtonSize.large,
@@ -19,10 +19,11 @@ class AnimatedChatButton extends StatefulWidget {
   });
 
   @override
-  State<AnimatedChatButton> createState() => _AnimatedChatButtonState();
+  State<GeminiFloatingChatButton> createState() =>
+      _GeminiFloatingChatButtonState();
 }
 
-class _AnimatedChatButtonState extends State<AnimatedChatButton>
+class _GeminiFloatingChatButtonState extends State<GeminiFloatingChatButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;

@@ -174,6 +174,20 @@ class Constants {
   static const String finalWords = 'finalWords';
   static const String timeSent = 'timeSent';
 
+  // discussion message constants
+  static const String senderUID = 'senderUID';
+  static const String senderName = 'senderName';
+  static const String senderImage = 'senderImage';
+  static const String message = 'message';
+  static const String messageType = 'messageType';
+  static const String isSeen = 'isSeen';
+  static const String repliedMessage = 'repliedMessage';
+  static const String repliedTo = 'repliedTo';
+  static const String repliedMessageType = 'repliedMessageType';
+  static const String seenBy = 'seenBy';
+  static const String deletedBy = 'deletedBy';
+  static const String isMe = 'isMe';
+
   // shared preferences keys
   static const String voiceIndex = 'voiceIndex';
   static const String volume = 'volume';

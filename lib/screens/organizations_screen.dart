@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/organization_provider.dart';
-import 'package:gemini_risk_assessor/search/org_serach_stream.dart';
+import 'package:gemini_risk_assessor/search/org_search_stream.dart';
 import 'package:gemini_risk_assessor/firebase_methods/organizations_stream.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';

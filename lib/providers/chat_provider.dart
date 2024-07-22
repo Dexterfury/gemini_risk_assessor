@@ -9,6 +9,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -365,15 +366,7 @@ class ChatProvider extends ChangeNotifier {
     );
   }
 
-  getCollectionRef(GenerationType generationType) {
-    if (generationType == GenerationType.tool) {
-      return Constants.toolsChatsCollection;
-    } else if (generationType == GenerationType.riskAssessment) {
-      return Constants.assessmentsChatsCollection;
-    } else if (generationType == GenerationType.dsti) {
-      return Constants.dstisChatsCollection;
-    }
-  }
+  
 
   Future<void> streamResponse(
     String uid,
