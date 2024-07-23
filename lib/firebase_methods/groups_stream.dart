@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/organization_grid_item.dart';
+import 'package:gemini_risk_assessor/groups/group_grid_item.dart';
 import 'package:provider/provider.dart';
 
-class OrganizationsStream extends StatelessWidget {
-  const OrganizationsStream({
+class GroupsStream extends StatelessWidget {
+  const GroupsStream({
     super.key,
   });
 
@@ -16,7 +16,7 @@ class OrganizationsStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseMethods.organizationsStream(
+      stream: FirebaseMethods.groupsStream(
         userId: uid,
       ),
       builder: (
@@ -35,7 +35,7 @@ class OrganizationsStream extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(20.0),
-              child: Text('You are not part of \n any organizations yet!',
+              child: Text('You are not part of \n any group yet!',
                   textAlign: TextAlign.center, style: textStyle18w500),
             ),
           );
@@ -52,9 +52,9 @@ class OrganizationsStream extends StatelessWidget {
               itemBuilder: (context, index) {
                 final doc = snapshot.data!.docs[index];
                 final orgData = doc.data() as Map<String, dynamic>;
-                final org = OrganizationModel.fromJson(orgData);
-                return OrganizationGridItem(
-                  orgModel: org,
+                final org = GroupModel.fromJson(orgData);
+                return GroupGridItem(
+                  groupModel: org,
                 );
               }),
         );

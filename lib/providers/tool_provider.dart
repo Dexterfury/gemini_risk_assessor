@@ -22,7 +22,7 @@ class ToolsProvider extends ChangeNotifier {
   String _description = '';
   File? _pdfToolFile;
   String _uid = '';
-  String _organizationID = '';
+  String _groupID = '';
   List<XFile>? _imagesFileList = [];
   ToolModel? _toolModel;
   List<ToolModel> _toolsList = [];
@@ -33,7 +33,7 @@ class ToolsProvider extends ChangeNotifier {
   String get description => _description;
   File? get pdfToolFile => _pdfToolFile;
   String get uid => _uid;
-  String get organizationID => _organizationID;
+  String get groupID => _groupID;
   List<XFile>? get imagesFileList => _imagesFileList;
   ToolModel? get toolModel => _toolModel;
   List<ToolModel> get toolsList => _toolsList;
@@ -44,7 +44,7 @@ class ToolsProvider extends ChangeNotifier {
   Future<bool> saveToolToFirestore() async {
     if (_toolModel != null) {
       try {
-        String id = _organizationID.isNotEmpty ? _organizationID : _uid;
+        String id = _groupID.isNotEmpty ? _groupID : _uid;
 
         if (_toolModel!.images.isNotEmpty) {
           List<String> imagesUrls = [];
@@ -155,11 +155,11 @@ class ToolsProvider extends ChangeNotifier {
   Future<void> setToolData(
     String desc,
     String creatorID,
-    String orgID,
+    String groupID,
   ) async {
     _description = desc;
     _uid = creatorID;
-    _organizationID = orgID;
+    _groupID = groupID;
     notifyListeners();
   }
 
@@ -295,7 +295,7 @@ class ToolsProvider extends ChangeNotifier {
 
   Future<void> submitPrompt({
     required String creatorID,
-    required String organizationID,
+    required String groupID,
     required String description,
     required Function() onSuccess,
     required Function(String) onError,
@@ -313,7 +313,7 @@ class ToolsProvider extends ChangeNotifier {
     await setToolData(
       description,
       creatorID,
-      organizationID,
+      groupID,
     );
 
     // get promptDara
@@ -341,7 +341,7 @@ class ToolsProvider extends ChangeNotifier {
           content,
           toolId,
           creatorID,
-          organizationID,
+          groupID,
           images,
           DateTime.now(),
         );

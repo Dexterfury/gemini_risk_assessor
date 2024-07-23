@@ -2,8 +2,67 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Function to check if the document is being created (doesn't exist yet)
+    function isCreatingDocument() {
+      return resource == null;
+    }
+
+    match /users/{userID} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userID;
+      
+      // Rules for sub-collections
+      match /{subcollection}/{docID} {
+        allow read, write: if isAuthenticated() && request.auth.uid == userID;
+      }
+      
+      match /notifications/{notificationID} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated(); // Allow creating notifications
+        allow update, delete: if resource.data.receiverUID == request.auth.uid;
+      }
+    }
+    
+    match /groups/{groupID} {
+      // Allow read if user is awaiting approval or is a member
+      allow read: if isAuthenticated() &&
+        (request.auth.uid in resource.data.awaitingApprovalUIDs ||
+         request.auth.uid in resource.data.membersUIDs);
+      
+      // Allow create if the user is authenticated and it's a new document
+      allow create: if isAuthenticated() && isCreatingDocument();
+      
+      // Allow update if the user is an admin of the existing group
+      allow update: if isAuthenticated() && request.auth.uid in resource.data.adminsUIDs;
+
+      // Function to check if the user is an admin
+      function isAdmin() {
+        return isAuthenticated() &&
+          request.auth.uid in get(/databases/$(database)/documents/groups/$(groupID)).data.adminsUIDs;
+      }
+
+      // Function to check if the user is a member
+      function isMember() {
+        return isAuthenticated() &&
+          request.auth.uid in get(/databases/$(database)/documents/groups/$(groupID)).data.membersUIDs;
+      }
+
+      // Function to check if sharing is allowed
+      function isSharingAllowed() {
+        return get(/databases/$(database)/documents/groups/$(groupID)).data.allowSharing == true;
+      }
+
+      // Rules for sub-collections
+      match /{subcollection}/{docID} {
+        allow read: if isMember();
+        allow create: if isMember() && (isAdmin() || isSharingAllowed());
+        allow update, delete: if isAdmin() || (isMember() && isSharingAllowed());
+      }
     }
   }
 }

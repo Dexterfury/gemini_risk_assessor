@@ -8,7 +8,7 @@ class NearMissModel {
   List<String> sharedWith;
   List<String> reactions;
   String createdBy;
-  String organizationID;
+  String groupID;
   String createdAt;
 
   // constructor
@@ -20,7 +20,7 @@ class NearMissModel {
     required this.sharedWith,
     required this.reactions,
     required this.createdBy,
-    required this.organizationID,
+    required this.groupID,
     required this.createdAt,
   });
 
@@ -34,7 +34,7 @@ class NearMissModel {
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       createdBy: json[Constants.createdBy] ?? '',
-      organizationID: json[Constants.organizationID] ?? '',
+      groupID: json[Constants.groupID] ?? '',
       createdAt: json[Constants.createdAt] ?? '',
     );
   }
@@ -49,7 +49,7 @@ class NearMissModel {
       Constants.sharedWith: sharedWith,
       Constants.reactions: reactions,
       Constants.createdBy: createdBy,
-      Constants.organizationID: organizationID,
+      Constants.groupID: groupID,
       Constants.createdAt: createdAt,
     };
   }

@@ -5,10 +5,10 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/notification_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
-import 'package:gemini_risk_assessor/screens/organization_details.dart';
-import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
+import 'package:gemini_risk_assessor/groups/group_details.dart';
+import 'package:gemini_risk_assessor/groups/groups_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/screens/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -148,7 +148,7 @@ class NotificationItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => DSTIScreen(
-              orgID: notification.organizationID,
+              groupID: notification.groupID,
             ),
           ),
         );
@@ -158,7 +158,7 @@ class NotificationItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => RiskAssessmentsScreen(
-              orgID: notification.organizationID,
+              groupID: notification.groupID,
             ),
           ),
         );
@@ -168,24 +168,24 @@ class NotificationItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ToolsScreen(
-              orgID: notification.organizationID,
+              groupID: notification.groupID,
             ),
           ),
         );
         break;
-      case Constants.organizationInvitation:
-        // get organization model and navigate to organization details page
-        FirebaseMethods.getOrganizationData(
-          orgID: notification.organizationID,
+      case Constants.groupInvitation:
+        // get group model and navigate to group details page
+        FirebaseMethods.getGroupData(
+          groupID: notification.groupID,
         ).then((orgModel) {
           context
-              .read<OrganizationProvider>()
-              .setOrganizationModel(orgModel: orgModel)
+              .read<GroupProvider>()
+              .setGroupModel(groupModel: orgModel)
               .whenComplete(() {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const OrganizationDetails(),
+                builder: (context) => const GroupDetails(),
               ),
             );
           });
@@ -196,7 +196,7 @@ class NotificationItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const OrganizationsScreen(),
+            builder: (context) => const GroupsScreen(),
           ),
         );
         break;

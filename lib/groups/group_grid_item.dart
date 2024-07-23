@@ -1,25 +1,25 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
-import 'package:gemini_risk_assessor/screens/organization_details.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_details.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
 
-class OrganizationGridItem extends StatelessWidget {
-  const OrganizationGridItem({
+class GroupGridItem extends StatelessWidget {
+  const GroupGridItem({
     super.key,
-    required this.orgModel,
+    required this.groupModel,
   });
 
-  final OrganizationModel orgModel;
+  final GroupModel groupModel;
 
   @override
   Widget build(BuildContext context) {
-    String title = orgModel.name;
-    String subtitle = orgModel.aboutOrganization;
-    String imageUrl = orgModel.imageUrl!;
+    String title = groupModel.name;
+    String subtitle = groupModel.aboutGroup;
+    String imageUrl = groupModel.groupImage!;
     ;
 
     return Card(
@@ -34,8 +34,8 @@ class OrganizationGridItem extends StatelessWidget {
             closedBuilder: (context, action) => InkWell(
               onTap: () async {
                 context
-                    .read<OrganizationProvider>()
-                    .setOrganizationModel(orgModel: orgModel)
+                    .read<GroupProvider>()
+                    .setGroupModel(groupModel: groupModel)
                     .whenComplete(() {
                   action();
                 });
@@ -73,7 +73,7 @@ class OrganizationGridItem extends StatelessWidget {
               ),
             ),
             openBuilder: (context, action) {
-              return const OrganizationDetails();
+              return const GroupDetails();
             },
             transitionType: ContainerTransitionType.fadeThrough,
             transitionDuration: const Duration(milliseconds: 500),

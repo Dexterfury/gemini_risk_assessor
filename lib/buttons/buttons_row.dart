@@ -12,12 +12,12 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 class ButtonsRow extends StatelessWidget {
   const ButtonsRow({
     super.key,
-    required this.orgID,
+    required this.groupID,
     required this.isAdmin,
     required this.isMember,
   });
 
-  final String orgID;
+  final String groupID;
   final bool isAdmin;
   final bool isMember;
 
@@ -32,7 +32,7 @@ class ButtonsRow extends StatelessWidget {
             children: <Widget>[
               buildButton(
                 Icons.assignment_add,
-                orgID,
+                groupID,
                 'DSTI',
                 isAdmin,
                 isMember,
@@ -42,7 +42,7 @@ class ButtonsRow extends StatelessWidget {
               ),
               buildButton(
                 Icons.assignment_late_outlined,
-                orgID,
+                groupID,
                 'Assessments',
                 isAdmin,
                 isMember,
@@ -52,7 +52,7 @@ class ButtonsRow extends StatelessWidget {
               ),
               buildButton(
                 Icons.handyman,
-                orgID,
+                groupID,
                 Constants.tools,
                 isAdmin,
                 isMember,
@@ -62,7 +62,7 @@ class ButtonsRow extends StatelessWidget {
               ),
               buildButton(
                 FontAwesomeIcons.circleExclamation,
-                orgID,
+                groupID,
                 Constants.nearMisses,
                 isAdmin,
                 isMember,
@@ -97,7 +97,7 @@ Widget buildButton(
             if (!isMember) {
               showSnackBar(
                 context: context,
-                message: 'Join Organization to view this screen',
+                message: 'Join Group to view this screen',
               );
             } else {
               action();
@@ -151,17 +151,17 @@ Widget _navigateToScreen(
   switch (icon) {
     case Icons.assignment_add:
       return DSTIScreen(
-        orgID: orgID,
+        groupID: orgID,
       );
     case Icons.assignment_late_outlined:
-      return RiskAssessmentsScreen(orgID: orgID);
+      return RiskAssessmentsScreen(groupID: orgID);
     case Icons.handyman:
       return ToolsScreen(
-        orgID: orgID,
+        groupID: orgID,
       );
     default:
       return NearMissesScreen(
-        orgID: orgID,
+        groupID: orgID,
         isAdmin: isAdmin,
       );
   }

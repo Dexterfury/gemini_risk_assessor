@@ -15,13 +15,13 @@ import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/providers/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/providers/near_miss_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
-import 'package:gemini_risk_assessor/screens/create_organization_screen.dart';
+import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
@@ -51,7 +51,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
       ChangeNotifierProvider(create: (context) => ToolsProvider()),
-      ChangeNotifierProvider(create: (context) => OrganizationProvider()),
+      ChangeNotifierProvider(create: (context) => GroupProvider()),
       ChangeNotifierProvider(create: (context) => TabProvider()),
       ChangeNotifierProvider(create: (context) => ChatProvider()),
       ChangeNotifierProvider(create: (context) => SearchProvider()),
@@ -86,8 +86,7 @@ class MyApp extends StatelessWidget {
               const CreateAssessmentScreen(),
           Constants.createToolRoute: (context) => const CreateExplainerScreen(),
           Constants.profileRoute: (context) => const ProfileScreen(),
-          Constants.createOrganizationRoute: (context) =>
-              const CreateOrganizationScreen(),
+          Constants.createGroupRoute: (context) => const CreateGroupScreen(),
           Constants.emailSignInRoute: (context) => const EmailLogin(),
           Constants.emailSignUpRoute: (context) => const EmailSignUp(),
           Constants.forgotPasswordRoute: (context) => const ForgotPassword(),

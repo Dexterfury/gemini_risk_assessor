@@ -4,14 +4,14 @@ import 'package:gemini_risk_assessor/constants.dart';
 class NotificationModel {
   String creatorUID;
   String recieverUID;
-  String organizationID;
+  String groupID;
   String notificationID;
   String title;
   String description;
   String imageUrl;
-  String aboutOrganization;
+  String aboutGroup;
   String notificationType;
-  String organizationTerms;
+  String groupTerms;
   bool wasClicked;
   DateTime createdAt;
   DateTime notificationDate;
@@ -20,14 +20,14 @@ class NotificationModel {
   NotificationModel({
     required this.creatorUID,
     required this.recieverUID,
-    required this.organizationID,
+    required this.groupID,
     required this.notificationID,
     required this.title,
     required this.description,
     required this.imageUrl,
-    required this.aboutOrganization,
+    required this.aboutGroup,
     required this.notificationType,
-    required this.organizationTerms,
+    required this.groupTerms,
     required this.wasClicked,
     required this.createdAt,
     required this.notificationDate,
@@ -38,14 +38,14 @@ class NotificationModel {
     return NotificationModel(
       creatorUID: json[Constants.creatorUID] ?? '',
       recieverUID: json[Constants.recieverUID] ?? '',
-      organizationID: json[Constants.organizationID] ?? '',
+      groupID: json[Constants.groupID] ?? '',
       notificationID: json[Constants.notificationID] ?? '',
       title: json[Constants.title] ?? '',
       description: json[Constants.description] ?? '',
       imageUrl: json[Constants.imageUrl] ?? '',
-      aboutOrganization: json[Constants.aboutOrganization] ?? '',
+      aboutGroup: json[Constants.aboutGroup] ?? '',
       notificationType: json[Constants.notificationType] ?? '',
-      organizationTerms: json[Constants.organizationTerms] ?? '',
+      groupTerms: json[Constants.groupTerms] ?? '',
       wasClicked: json[Constants.wasClicked] ?? false,
       createdAt: (json[Constants.createdAt] as Timestamp).toDate(),
       notificationDate:
@@ -58,14 +58,14 @@ class NotificationModel {
     return {
       Constants.creatorUID: creatorUID,
       Constants.recieverUID: recieverUID,
-      Constants.organizationID: organizationID,
+      Constants.groupID: groupID,
       Constants.notificationID: notificationID,
       Constants.title: title,
       Constants.description: description,
       Constants.imageUrl: imageUrl,
-      Constants.aboutOrganization: aboutOrganization,
+      Constants.aboutGroup: aboutGroup,
       Constants.notificationType: notificationType,
-      Constants.organizationTerms: organizationTerms,
+      Constants.groupTerms: groupTerms,
       Constants.wasClicked: wasClicked,
       Constants.createdAt: createdAt,
       Constants.notificationDate: notificationDate,

@@ -9,13 +9,13 @@ class MyFabButton extends StatelessWidget {
     super.key,
     required AnimationController animationController,
     required Animation<double> animation,
-    this.organisationID = '',
+    this.groupID = '',
   })  : _animationController = animationController,
         _animation = animation;
 
   final AnimationController _animationController;
   final Animation<double> _animation;
-  final String organisationID;
+  final String groupID;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class MyFabButton extends StatelessWidget {
               context: context,
               route: Constants.createToolRoute,
               titleArg: Constants.toolExplainer,
-              orgArg: organisationID,
+              groupArg: groupID,
             );
           },
         ),
@@ -49,7 +49,7 @@ class MyFabButton extends StatelessWidget {
               context: context,
               route: Constants.createAssessmentRoute,
               titleArg: Constants.createAssessment,
-              orgArg: organisationID,
+              groupArg: groupID,
             );
           },
         ),
@@ -66,7 +66,7 @@ class MyFabButton extends StatelessWidget {
               context: context,
               route: Constants.createAssessmentRoute,
               titleArg: Constants.createDsti,
-              orgArg: organisationID,
+              groupArg: groupID,
             );
           },
         ),

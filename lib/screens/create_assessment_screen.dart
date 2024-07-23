@@ -40,7 +40,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     // get the arguments
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     final title = args[Constants.title] as String;
-    final orgID = args[Constants.orgArg] as String;
+    final groupID = args[Constants.groupArg] as String;
     final assessmentProvider = context.watch<AssessmentProvider>();
 
     final String docTitle = Constants.getDoctTitle(title);
@@ -153,7 +153,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
 
                         await assessmentProvider.submitPrompt(
                           creatorID: creatorID,
-                          orgID: orgID,
+                          groupID: groupID,
                           description: _descriptionController.text,
                           docTitle: docTitle,
                           onSuccess: () {
@@ -176,7 +176,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
                     // navigate to screen depending on the clicked icon
                     return AssessmentDetailsScreen(
                       appBarTitle: docTitle,
-                      orgID: orgID,
+                      groupID: groupID,
                     );
                   },
                   closedShape: RoundedRectangleBorder(

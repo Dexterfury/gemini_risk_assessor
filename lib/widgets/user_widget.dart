@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:provider/provider.dart';
 
@@ -58,7 +58,7 @@ class UserWidget extends StatelessWidget {
   }
 
   Widget _buildCheckbox(BuildContext context) {
-    return Consumer<OrganizationProvider>(
+    return Consumer<GroupProvider>(
       builder: (context, orgProvider, _) {
         bool isChecked = _getValue(orgProvider);
         return Checkbox(
@@ -74,18 +74,18 @@ class UserWidget extends StatelessWidget {
     );
   }
 
-  bool _getValue(OrganizationProvider orgProvider) {
+  bool _getValue(GroupProvider orgProvider) {
     switch (viewType) {
       case UserViewType.admin:
-        return orgProvider.orgAdminsList
+        return orgProvider.groupAdminsList
             .any((admin) => admin.uid == userData.uid);
       case UserViewType.creator:
         return orgProvider.awaitApprovalsList.contains(userData.uid);
       case UserViewType.tempPlus:
         return orgProvider.awaitApprovalsList.contains(userData.uid) ||
-            orgProvider.tempOrgMemberUIDs.contains(userData.uid);
+            orgProvider.tempGroupMemberUIDs.contains(userData.uid);
       default:
-        return orgProvider.orgMembersList
+        return orgProvider.groupMembersList
             .any((member) => member.uid == userData.uid);
     }
   }
@@ -97,7 +97,7 @@ void _handleCheckBox(
   bool? value,
   UserViewType viewType,
 ) {
-  final orgProvider = context.read<OrganizationProvider>();
+  final orgProvider = context.read<GroupProvider>();
   switch (viewType) {
     case UserViewType.admin:
       break;
@@ -105,14 +105,14 @@ void _handleCheckBox(
       if (value == true) {
         orgProvider.addToWaitingApproval(groupMember: userData);
       } else {
-        orgProvider.removeWaitingApproval(orgMember: userData);
+        orgProvider.removeWaitingApproval(groupMember: userData);
       }
       break;
     case UserViewType.tempPlus:
       if (value == true) {
-        orgProvider.addMemberToTempOrg(memberUID: userData.uid);
+        orgProvider.addMemberToTempGroup(memberUID: userData.uid);
       } else {
-        orgProvider.removeMemberFromTempOrg(memberUID: userData.uid);
+        orgProvider.removeMemberFromTempGroup(memberUID: userData.uid);
       }
       break;
     default:

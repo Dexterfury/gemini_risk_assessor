@@ -15,12 +15,10 @@ import 'package:provider/provider.dart';
 class ToolsScreen extends StatefulWidget {
   const ToolsScreen({
     super.key,
-    this.orgID = '',
-    this.isDiscussion = false,
+    this.groupID = '',
   });
 
-  final String orgID;
-  final bool isDiscussion;
+  final String groupID;
 
   @override
   State<ToolsScreen> createState() => _ToolsScreenState();
@@ -45,7 +43,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseMethods.toolsStream(
             userId: uid,
-            orgID: widget.orgID,
+            groupID: widget.groupID,
           ),
           builder: (
             BuildContext context,
@@ -61,7 +59,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
 
             if (snapshot.data!.docs.isEmpty) {
               return Scaffold(
-                appBar: widget.orgID.isNotEmpty
+                appBar: widget.groupID.isNotEmpty
                     ? const MyAppBar(
                         leading: BackButton(),
                         title: Constants.tools,
@@ -91,7 +89,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
                           ),
                     )
                     .toList();
-                return widget.orgID.isNotEmpty
+                return widget.groupID.isNotEmpty
                     ? CustomScrollView(
                         slivers: [
                           SliverAppBar(
@@ -141,7 +139,6 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                           final tool = ToolModel.fromJson(data);
                                           return ToolGridItem(
                                             toolModel: tool,
-                                            isDiscussion: widget.isDiscussion,
                                           );
                                         },
                                         childCount: results.length,

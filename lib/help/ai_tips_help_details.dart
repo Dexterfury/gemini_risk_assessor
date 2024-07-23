@@ -47,7 +47,7 @@ class AiTipsHelpDetails extends StatelessWidget {
               Constants.buildSection('Editing AI-Generated Content', [
                 'Remove any irrelevant or redundant information',
                 'Add specific details pertinent to your situation',
-                'Adjust language for clarity and your organization\'s style',
+                'Adjust language for clarity and your group\'s style',
                 'Enhance safety measures based on your knowledge and experience',
                 'Ensure all content aligns with current best practices and regulations'
               ]),

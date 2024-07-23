@@ -52,7 +52,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     // get the arguments
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     final title = args[Constants.title] as String;
-    final orgID = args[Constants.orgArg] as String;
+    final groupID = args[Constants.groupArg] as String;
     final toolProvider = context.watch<ToolsProvider>();
     final images = _getImages(toolProvider);
     final bool isViewOnly = widget.tool != null;
@@ -93,7 +93,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                   : buildInputGenerationBtn(
                       toolProvider,
                       context,
-                      orgID,
+                      groupID,
                     ),
               const SizedBox(
                 height: 10,
@@ -108,7 +108,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
   buildInputGenerationBtn(
     ToolsProvider toolProvider,
     BuildContext context,
-    String orgID,
+    String groupID,
   ) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -154,7 +154,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
 
                     await toolProvider.submitPrompt(
                       creatorID: authProvider.userModel!.uid,
-                      organizationID: orgID,
+                      groupID: groupID,
                       description: description,
                       onSuccess: () {
                         // pop the loading dialog

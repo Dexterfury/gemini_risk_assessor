@@ -15,12 +15,10 @@ import 'package:provider/provider.dart';
 class RiskAssessmentsScreen extends StatefulWidget {
   const RiskAssessmentsScreen({
     super.key,
-    this.orgID = '',
-    this.isDiscussion = false,
+    this.groupID = '',
   });
 
-  final String orgID;
-  final bool isDiscussion;
+  final String groupID;
 
   @override
   State<RiskAssessmentsScreen> createState() => _RiskAssessmentsScreenState();
@@ -45,7 +43,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseMethods.ristAssessmentsStream(
             userId: uid,
-            orgID: widget.orgID,
+            groupID: widget.groupID,
           ),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -59,7 +57,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
 
             if (snapshot.data!.docs.isEmpty) {
               return Scaffold(
-                appBar: widget.orgID.isNotEmpty
+                appBar: widget.groupID.isNotEmpty
                     ? const MyAppBar(
                         leading: BackButton(),
                         title: Constants.riskAssessments,
@@ -86,7 +84,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                       ),
                 );
 
-                return widget.orgID.isNotEmpty
+                return widget.groupID.isNotEmpty
                     ? CustomScrollView(
                         slivers: [
                           SliverAppBar(
@@ -131,9 +129,8 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                                             AssessmentModel.fromJson(data);
                                         return ListItem(
                                           docTitle: Constants.riskAssessment,
-                                          orgID: widget.orgID,
+                                          groupID: widget.groupID,
                                           data: item,
-                                          isDiscussion: widget.isDiscussion,
                                         );
                                       },
                                       childCount: results.length,

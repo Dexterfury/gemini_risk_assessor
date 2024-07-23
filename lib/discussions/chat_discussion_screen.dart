@@ -9,11 +9,11 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 class ChatDiscussionScreen extends StatefulWidget {
   const ChatDiscussionScreen({
     super.key,
-    required this.orgID,
+    required this.groupID,
     required this.assessment,
     required this.generationType,
   });
-  final String orgID;
+  final String groupID;
   final AssessmentModel assessment;
   final GenerationType generationType;
 
@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
           children: [
             Expanded(
               child: ChatList(
-                orgID: widget.orgID,
+                groupID: widget.groupID,
                 assessment: widget.assessment,
                 generationType: widget.generationType,
               ),

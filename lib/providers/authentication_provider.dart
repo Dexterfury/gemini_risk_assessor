@@ -777,7 +777,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
 
     if (!isUser) {
-      await FirebaseMethods.updateOrgName(id, newName);
+      await FirebaseMethods.updateGroupName(id, newName);
       final nameToReturn = newName;
       newName = '';
       return nameToReturn;
@@ -805,7 +805,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
 
     if (!isUser) {
-      await FirebaseMethods.updateOrgDesc(id, newDesc);
+      await FirebaseMethods.updateGroupDesc(id, newDesc);
       final descToReturn = newDesc;
       newDesc = '';
       return descToReturn;
@@ -821,19 +821,19 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  // update the organization image
+  // update the group image
   Future<void> setImageUrl(String imageUrl) async {
     _userModel!.imageUrl = imageUrl;
     notifyListeners();
   }
 
-  // up date the organization name
+  // up date the group name
   Future<void> setName(String name) async {
     _userModel!.name = name;
     notifyListeners();
   }
 
-  // up date the organization description
+  // up date the group description
   Future<void> setDescription(String description) async {
     _userModel!.aboutMe = description;
     notifyListeners();

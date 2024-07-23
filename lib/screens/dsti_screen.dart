@@ -15,12 +15,10 @@ import 'package:provider/provider.dart';
 class DSTIScreen extends StatefulWidget {
   const DSTIScreen({
     super.key,
-    this.orgID = '',
-    this.isDiscussion = false,
+    this.groupID = '',
   });
 
-  final String orgID;
-  final bool isDiscussion;
+  final String groupID;
 
   @override
   State<DSTIScreen> createState() => _DSTIScreenState();
@@ -45,7 +43,7 @@ class _DSTIScreenState extends State<DSTIScreen> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseMethods.dstiStream(
             userId: uid,
-            orgID: widget.orgID,
+            groupID: widget.groupID,
           ),
           builder: (
             BuildContext context,
@@ -61,7 +59,7 @@ class _DSTIScreenState extends State<DSTIScreen> {
 
             if (snapshot.data!.docs.isEmpty) {
               return Scaffold(
-                appBar: widget.orgID.isNotEmpty
+                appBar: widget.groupID.isNotEmpty
                     ? const MyAppBar(
                         leading: BackButton(),
                         title: Constants.dailySafetyTaskInstructions,
@@ -86,7 +84,7 @@ class _DSTIScreenState extends State<DSTIScreen> {
                         _searchQuery.toLowerCase(),
                       ),
                 );
-                return widget.orgID.isNotEmpty
+                return widget.groupID.isNotEmpty
                     ? CustomScrollView(
                         slivers: [
                           SliverAppBar(
@@ -132,9 +130,8 @@ class _DSTIScreenState extends State<DSTIScreen> {
                                         return ListItem(
                                           docTitle: Constants
                                               .dailySafetyTaskInstructions,
-                                          orgID: widget.orgID,
+                                          groupID: widget.groupID,
                                           data: item,
-                                          isDiscussion: widget.isDiscussion,
                                         );
                                       },
                                       childCount: results.length,

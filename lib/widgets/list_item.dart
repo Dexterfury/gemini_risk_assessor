@@ -15,14 +15,12 @@ class ListItem extends StatelessWidget {
   const ListItem({
     super.key,
     required this.docTitle,
-    required this.orgID,
+    required this.groupID,
     required this.data,
-    required this.isDiscussion,
   });
   final String docTitle;
-  final String orgID;
+  final String groupID;
   final AssessmentModel data;
-  final bool isDiscussion;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +47,7 @@ class ListItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatDiscussionScreen(
-                    orgID: orgID,
+                    groupID: groupID,
                     assessment: data,
                     generationType: generationType,
                   ),
@@ -113,19 +111,11 @@ class ListItem extends StatelessWidget {
           // );
         },
         openBuilder: (context, action) {
-          if (isDiscussion) {
-            return ChatDiscussionScreen(
-              orgID: orgID,
-              assessment: data,
-              generationType: generationType,
-            );
-          } else {
-            return AssessmentDetailsScreen(
-              appBarTitle: docTitle,
-              orgID: orgID,
-              currentModel: data,
-            );
-          }
+          return AssessmentDetailsScreen(
+            appBarTitle: docTitle,
+            groupID: groupID,
+            currentModel: data,
+          );
         },
         transitionType: ContainerTransitionType.fadeThrough,
         transitionDuration: const Duration(milliseconds: 500),

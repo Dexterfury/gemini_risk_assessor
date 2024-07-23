@@ -5,7 +5,7 @@ navigationController({
   required BuildContext context,
   required String route,
   String titleArg = '',
-  String orgArg = '',
+  String groupArg = '',
 }) {
   switch (route) {
     case Constants.screensControllerRoute:
@@ -41,7 +41,7 @@ navigationController({
         route,
         arguments: {
           Constants.title: titleArg,
-          Constants.orgArg: orgArg,
+          Constants.groupArg: groupArg,
         },
       );
       break;

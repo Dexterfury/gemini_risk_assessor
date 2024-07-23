@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/search/org_search_stream.dart';
-import 'package:gemini_risk_assessor/firebase_methods/organizations_stream.dart';
+import 'package:gemini_risk_assessor/firebase_methods/groups_stream.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
-class OrganizationsScreen extends StatelessWidget {
-  const OrganizationsScreen({super.key});
+class GroupsScreen extends StatelessWidget {
+  const GroupsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     bool isAnonymous = context.read<AuthenticationProvider>().isUserAnonymous();
-    return Consumer<OrganizationProvider>(
-        builder: (context, organizationProvider, child) {
+    return Consumer<GroupProvider>(builder: (context, groupProvider, child) {
       handleSearch(String query) {
         if (!isAnonymous) {
-          organizationProvider.setSearchQuery(query);
+          groupProvider.setSearchQuery(query);
         }
       }
 
@@ -34,11 +33,11 @@ class OrganizationsScreen extends StatelessWidget {
         ),
         body: isAnonymous
             ? const AnonymouseView(
-                message: 'Please Sign In to view organizations',
+                message: 'Please Sign In to view groups',
               )
-            : organizationProvider.searchQuery.isEmpty
-                ? const OrganizationsStream()
-                : const OrgSearchStream(),
+            : groupProvider.searchQuery.isEmpty
+                ? const GroupsStream()
+                : const GroupsSearchStream(),
       );
     });
   }

@@ -84,7 +84,7 @@ class PdfApi {
     final headerRow = grid.headers.add(1)[0];
     headerRow.cells[0].value = 'NAME';
     headerRow.cells[1].value = 'SURNAME';
-    headerRow.cells[2].value = 'ORGANIZATION';
+    headerRow.cells[2].value = 'GROUP';
     headerRow.cells[3].value = 'SIGNATURE';
 
     // Apply styling to header row

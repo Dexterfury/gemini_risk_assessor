@@ -1,16 +1,16 @@
 import 'package:gemini_risk_assessor/constants.dart';
 
-class OrganizationModel {
+class GroupModel {
   String creatorUID;
-  String organizationID;
+  String groupID;
   String name;
-  String? imageUrl;
-  String aboutOrganization;
+  String? groupImage;
+  String aboutGroup;
   String address;
   String phoneNumber;
   String emailAddress;
   String websiteURL;
-  String organizationTerms;
+  String groupTerms;
   List<String> awaitingApprovalUIDs;
   List<String> membersUIDs;
   List<String> adminsUIDs;
@@ -19,17 +19,17 @@ class OrganizationModel {
   DateTime createdAt;
 
   // Constructor with default values
-  OrganizationModel({
+  GroupModel({
     this.creatorUID = '',
-    this.organizationID = '',
+    this.groupID = '',
     this.name = '',
-    this.imageUrl,
-    this.aboutOrganization = '',
+    this.groupImage,
+    this.aboutGroup = '',
     this.address = '',
     this.phoneNumber = '',
     this.emailAddress = '',
     this.websiteURL = '',
-    this.organizationTerms = '',
+    this.groupTerms = '',
     List<String>? awaitingApprovalUIDs,
     List<String>? membersUIDs,
     List<String>? adminsUIDs,
@@ -42,18 +42,18 @@ class OrganizationModel {
         createdAt = createdAt ?? DateTime.now();
 
   // Factory constructor
-  factory OrganizationModel.fromJson(Map<String, dynamic> json) {
-    return OrganizationModel(
+  factory GroupModel.fromJson(Map<String, dynamic> json) {
+    return GroupModel(
       creatorUID: json[Constants.creatorUID] ?? '',
-      organizationID: json[Constants.organizationID] ?? '',
+      groupID: json[Constants.groupID] ?? '',
       name: json[Constants.name] ?? '',
-      imageUrl: json[Constants.imageUrl],
-      aboutOrganization: json[Constants.aboutOrganization] ?? '',
+      groupImage: json[Constants.groupImage],
+      aboutGroup: json[Constants.aboutGroup] ?? '',
       address: json[Constants.address] ?? '',
       phoneNumber: json[Constants.phoneNumber] ?? '',
       emailAddress: json[Constants.emailAddress] ?? '',
       websiteURL: json[Constants.websiteURL] ?? '',
-      organizationTerms: json[Constants.organizationTerms] ?? '',
+      groupTerms: json[Constants.groupTerms] ?? '',
       awaitingApprovalUIDs:
           List<String>.from(json[Constants.awaitingApprovalUIDs] ?? []),
       membersUIDs: List<String>.from(json[Constants.membersUIDs] ?? []),
@@ -70,15 +70,15 @@ class OrganizationModel {
   Map<String, dynamic> toJson() {
     return {
       Constants.creatorUID: creatorUID,
-      Constants.organizationID: organizationID,
+      Constants.groupID: groupID,
       Constants.name: name,
-      Constants.imageUrl: imageUrl,
-      Constants.aboutOrganization: aboutOrganization,
+      Constants.groupImage: groupImage,
+      Constants.aboutGroup: aboutGroup,
       Constants.address: address,
       Constants.phoneNumber: phoneNumber,
       Constants.emailAddress: emailAddress,
       Constants.websiteURL: websiteURL,
-      Constants.organizationTerms: organizationTerms,
+      Constants.groupTerms: groupTerms,
       Constants.awaitingApprovalUIDs: awaitingApprovalUIDs,
       Constants.membersUIDs: membersUIDs,
       Constants.adminsUIDs: adminsUIDs,
@@ -88,8 +88,8 @@ class OrganizationModel {
     };
   }
 
-  // empty organization
-  factory OrganizationModel.empty() {
-    return OrganizationModel();
+  // empty group
+  factory GroupModel.empty() {
+    return GroupModel();
   }
 }

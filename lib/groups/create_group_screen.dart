@@ -7,28 +7,27 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
-import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
+import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
-import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
+import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
-class CreateOrganizationScreen extends StatefulWidget {
-  const CreateOrganizationScreen({super.key});
+class CreateGroupScreen extends StatefulWidget {
+  const CreateGroupScreen({super.key});
 
   @override
-  State<CreateOrganizationScreen> createState() =>
-      _CreateOrganizationScreenState();
+  State<CreateGroupScreen> createState() => _CreateGroupScreenState();
 }
 
-class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
+class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
@@ -44,11 +43,11 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final organizationProvider = context.watch<OrganizationProvider>();
-    final selectedCount = getMembersCount(organizationProvider);
+    final groupProvider = context.watch<GroupProvider>();
+    final selectedCount = getMembersCount(groupProvider);
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Create Organization',
+        title: 'Create Group',
         leading: const BackButton(),
         actions: [
           IconButton(
@@ -56,12 +55,12 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => OrganizationSettingsScreen(
+                  builder: (context) => GroupSettingsScreen(
                     isNew: true,
                     initialSettings: DataSettings(
                       requestToReadTerms: _dataSettings.requestToReadTerms,
                       allowSharing: _dataSettings.allowSharing,
-                      organizationTerms: _dataSettings.organizationTerms,
+                      groupTerms: _dataSettings.groupTerms,
                     ),
                     onSave: (DataSettings settings) {
                       setState(() {
@@ -98,7 +97,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                         border: Border.all(),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: DisplayOrgImage(
+                      child: DisplayGroupImage(
                         fileImage: _finalFileImage,
                         onPressed: () async {
                           final file =
@@ -130,7 +129,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                           closedBuilder: (context, action) {
                             return IconButton(
                               onPressed: () {
-                                if (organizationProvider.isLoading) {
+                                if (groupProvider.isLoading) {
                                   return;
                                 }
 
@@ -159,21 +158,21 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
               ),
               const SizedBox(height: 30),
 
-              // organization name input field
+              // group name input field
               InputField(
-                labelText: Constants.organizationName,
-                hintText: Constants.organizationName,
+                labelText: Constants.groupName,
+                hintText: Constants.groupName,
                 controller: _nameController,
-                organizationProvider: organizationProvider,
+                groupProvider: groupProvider,
               ),
 
               const SizedBox(height: 20),
-              // organization description input field
+              // group description input field
               InputField(
                 labelText: Constants.enterDescription,
                 hintText: Constants.enterDescription,
                 controller: _descriptionController,
-                organizationProvider: organizationProvider,
+                groupProvider: groupProvider,
               ),
 
               const SizedBox(height: 40),
@@ -182,10 +181,10 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                 height: 50,
                 width: MediaQuery.of(context).size.width,
                 child: MainAppButton(
-                  label: ' Create Organization ',
+                  label: ' Create Group ',
                   borderRadius: 15,
                   onTap: () {
-                    if (organizationProvider.isLoading) {
+                    if (groupProvider.isLoading) {
                       return;
                     }
                     // check name
@@ -203,8 +202,8 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                       showSnackBar(
                         context: context,
                         message: emptyName
-                            ? 'Please enter organization name'
-                            : 'organization name must be at least 3 characters',
+                            ? 'Please enter group name'
+                            : 'Group name must be at least 3 characters',
                       );
                       return;
                     }
@@ -213,19 +212,19 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                     //   showSnackBar(
                     //     context: context,
                     //     message: emptyDescription
-                    //         ? 'Please enter organization description'
-                    //         : 'organization description must be at least 10 characters',
+                    //         ? 'Please enter group description'
+                    //         : 'Group description must be at least 10 characters',
                     //   );
                     //   return;
                     // }
 
-                    final orgModel = OrganizationModel(
+                    final groupModel = GroupModel(
                       creatorUID:
                           context.read<AuthenticationProvider>().userModel!.uid,
                       name: _nameController.text,
-                      aboutOrganization: _descriptionController.text,
-                      imageUrl: '',
-                      organizationTerms: _dataSettings.organizationTerms,
+                      aboutGroup: _descriptionController.text,
+                      groupID: '',
+                      groupTerms: _dataSettings.groupTerms,
                       requestToReadTerms: _dataSettings.requestToReadTerms,
                       allowSharing: _dataSettings.allowSharing,
                     );
@@ -234,7 +233,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                     // show my alert dialog for loading
                     MyDialogs.showMyAnimatedDialog(
                       context: context,
-                      title: 'Creating organization',
+                      title: 'Creating group',
                       loadingIndicator: const SizedBox(
                         height: 100,
                         width: 100,
@@ -242,10 +241,10 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                       ),
                     );
 
-                    // save organization data to firestore
-                    organizationProvider.createOrganization(
+                    // save group data to firestore
+                    groupProvider.createGroup(
                       fileImage: _finalFileImage,
-                      newOrganizationModel: orgModel,
+                      newgroupModel: groupModel,
                       onSuccess: () {
                         // pop the loading dialog
                         Navigator.pop(context);
@@ -256,7 +255,7 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
                           _finalFileImage = null;
                         });
                         showSnackBar(
-                            context: context, message: 'Organization created');
+                            context: context, message: 'Group created');
                         // pop to previous screen
                         Navigator.pop(context);
                       },

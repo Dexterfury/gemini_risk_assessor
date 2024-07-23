@@ -66,24 +66,26 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                         AddImage(onTap: () async {
                           // showImagePickerDialog(context);
                         }),
-                        for (var image in nearMissProvider.nearMiss!.images)
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    child: SizedBox(
-                                      height: 100,
-                                      width: 100,
-                                      child: MyImageCacheManager.showImage(
-                                        imageUrl: image,
-                                        isTool: false,
-                                      ),
-                                    )),
-                              ],
+                        if (nearMissProvider.nearMiss != null &&
+                            nearMissProvider.nearMiss!.images.isNotEmpty)
+                          for (var image in nearMissProvider.nearMiss!.images)
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      child: SizedBox(
+                                        height: 100,
+                                        width: 100,
+                                        child: MyImageCacheManager.showImage(
+                                          imageUrl: image,
+                                          isTool: false,
+                                        ),
+                                      )),
+                                ],
+                              ),
                             ),
-                          ),
                       ],
                     ),
                   ),

@@ -1,12 +1,12 @@
 class DataSettings {
   bool requestToReadTerms;
   bool allowSharing;
-  String organizationTerms;
+  String groupTerms;
 
   // constructor
   DataSettings({
     this.requestToReadTerms = false,
     this.allowSharing = false,
-    this.organizationTerms = '',
+    this.groupTerms = '',
   });
 }

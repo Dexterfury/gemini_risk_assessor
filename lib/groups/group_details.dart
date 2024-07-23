@@ -8,33 +8,33 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
+import 'package:gemini_risk_assessor/buttons/my_fab_button.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
-import 'package:gemini_risk_assessor/screens/organization_settings_screen.dart';
+import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
-import 'package:gemini_risk_assessor/widgets/display_org_image.dart';
+import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
 
-class OrganizationDetails extends StatefulWidget {
-  const OrganizationDetails({
+class GroupDetails extends StatefulWidget {
+  const GroupDetails({
     super.key,
   });
 
   @override
-  State<OrganizationDetails> createState() => _OrganizationDetailsState();
+  State<GroupDetails> createState() => _GroupDetailsState();
 }
 
-class _OrganizationDetailsState extends State<OrganizationDetails>
+class _GroupDetailsState extends State<GroupDetails>
     with SingleTickerProviderStateMixin {
   File? _finalFileImage;
   bool _hasReadTerms = false;
@@ -81,59 +81,57 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     );
     _animation =
         CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
-    //setOrgModel();
+    //setGroupModel();
 
     super.initState();
   }
 
-  // void setOrgModel() async {
+  // void setGroupModel() async {
   //   // wait for widget  to be built before setting state
   //   WidgetsBinding.instance.addPostFrameCallback((_) {
   //     context
-  //         .read<OrganizationProvider>()
-  //         .setOrganizationModel(orgModel: widget.orgModel);
+  //         .read<GroupProvider>()
+  //         .setGroupModel(groupModel: widget.groupModel);
   //   });
   // }
 
   // set new image from file and update provider
   Future<void> setNewImageInProvider(String imageUrl) async {
     // set newimage in provider
-    await context.read<OrganizationProvider>().setImageUrl(imageUrl);
+    await context.read<GroupProvider>().setImageUrl(imageUrl);
   }
 
   // set new name  in provider
   Future<void> setNewNameInProvider(String newName) async {
     // set new name in provider
-    await context.read<OrganizationProvider>().setName(newName);
+    await context.read<GroupProvider>().setName(newName);
   }
 
   // set new description in provider
   Future<void> setNewDescriptionInProvider(String newDescription) async {
     // set new description in provider
-    await context.read<OrganizationProvider>().setDescription(newDescription);
+    await context.read<GroupProvider>().setDescription(newDescription);
   }
 
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
 
-    return Consumer<OrganizationProvider>(
-        builder: (context, orgProvider, child) {
-      final orgModel = orgProvider.organizationModel;
-      bool isAdmin = orgModel.adminsUIDs.contains(uid);
-      bool isMember = orgModel.membersUIDs.contains(uid);
-      String orgID = orgModel.organizationID;
-      String orgTerms = orgModel.organizationTerms;
-      bool requestToReadTerms =
-          orgProvider.organizationModel.requestToReadTerms;
-      bool allowSharing = orgProvider.organizationModel.allowSharing;
+    return Consumer<GroupProvider>(builder: (context, groupProvider, child) {
+      final groupModel = groupProvider.groupModel;
+      bool isAdmin = groupModel.adminsUIDs.contains(uid);
+      bool isMember = groupModel.membersUIDs.contains(uid);
+      String groupID = groupModel.groupID;
+      String groupTerms = groupModel.groupTerms;
+      bool requestToReadTerms = groupProvider.groupModel.requestToReadTerms;
+      bool allowSharing = groupProvider.groupModel.allowSharing;
 
-      //String membersCount = getMembersCount(orgProvider.organizationModel);
+      //String membersCount = getMembersCount(groupProvider.groupModel);
       bool showAcceptBtn =
-          orgProvider.organizationModel.awaitingApprovalUIDs.contains(uid);
+          groupProvider.groupModel.awaitingApprovalUIDs.contains(uid);
       return Scaffold(
         appBar: MyAppBar(
-          title: 'Organisation Details',
+          title: 'Group Details',
           leading: const BackButton(),
           actions: [
             if (isAdmin)
@@ -144,15 +142,15 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => OrganizationSettingsScreen(
+                        builder: (context) => GroupSettingsScreen(
                           isNew: false,
                           initialSettings: DataSettings(
                             requestToReadTerms: requestToReadTerms,
                             allowSharing: allowSharing,
-                            organizationTerms: orgTerms,
+                            groupTerms: groupTerms,
                           ),
                           onSave: (DataSettings settings) {
-                            orgProvider.updateOrganizationSettings(settings);
+                            groupProvider.updateGroupSettings(settings);
                           },
                         ),
                       ),
@@ -175,12 +173,12 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        //  organisation name and image
+                        //  group name and image
                         buildImageAndName(
                           isAdmin,
                           context,
                           showAcceptBtn,
-                          orgProvider,
+                          groupProvider,
                           uid,
                         ),
 
@@ -192,10 +190,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                           color: Colors.black26,
                         ),
 
-                        //  organisation description
+                        //  group description
                         buildDescription(
                           isAdmin,
-                          orgProvider,
+                          groupProvider,
                         ),
                       ],
                     ),
@@ -206,7 +204,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
                 //  add members button if the user is an admin
                 ButtonsRow(
-                  orgID: orgID,
+                  groupID: groupID,
                   isAdmin: isAdmin,
                   isMember: isMember,
                 ),
@@ -215,7 +213,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
                 // members list
                 MembersCard(
-                  orgModel: orgModel,
+                  groupModel: groupModel,
                   isAdmin: isAdmin,
                 ),
 
@@ -225,8 +223,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 buildExitCard(
                   isAdmin,
                   uid,
-                  orgID,
-                  orgProvider,
+                  groupID,
+                  groupProvider,
                 )
               ],
             ),
@@ -235,7 +233,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
         floatingActionButton: MyFabButton(
           animationController: _animationController,
           animation: _animation,
-          organisationID: orgProvider.organizationModel.organizationID,
+          groupID: groupProvider.groupModel.groupID,
         ),
       );
     });
@@ -244,22 +242,22 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
   buildExitCard(
     bool isAdmin,
     String uid,
-    String orgID,
-    OrganizationProvider orgProvider,
+    String groupID,
+    GroupProvider groupProvider,
   ) {
     return Card(
       color: Theme.of(context).cardColor,
       elevation: cardElevation,
       child: SettingsListTile(
-        title: 'Exit Organization',
+        title: 'Exit Group',
         icon: FontAwesomeIcons.arrowRightFromBracket,
         iconContainerColor: Colors.red,
         onTap: () {
           // exit group
           MyDialogs.showMyAnimatedDialog(
             context: context,
-            title: 'Exit Organization',
-            content: 'Are you sure you want to leave this Organisation?',
+            title: 'Exit Group',
+            content: 'Are you sure you want to leave this Group?',
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -278,10 +276,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                     title: 'Exiting',
                   );
 
-                  String result = await orgProvider.exitOrganization(
+                  String result = await groupProvider.exitgroup(
                     isAdmin: isAdmin,
                     uid: uid,
-                    orgID: orgID,
+                    groupID: groupID,
                   );
 
                   if (result == Constants.exitSuccessful ||
@@ -296,7 +294,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                           context: context,
                           message: result,
                         );
-                        // pop the Organization details Screen
+                        // pop the Group details Screen
                         Navigator.pop(context);
                       }
                     });
@@ -326,9 +324,9 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
 
   Column buildDescription(
     bool isAdmin,
-    OrganizationProvider orgProvider,
+    GroupProvider groupProvider,
   ) {
-    final desc = orgProvider.organizationModel.aboutOrganization;
+    final desc = groupProvider.groupModel.aboutGroup;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -344,14 +342,12 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
-                        // edit org description
-                        // edit org name
+                        // edit group description
                         MyDialogs.showMyEditAnimatedDialog(
                           context: context,
                           title: 'Edit Description',
                           maxLength: 500,
-                          hintText:
-                              orgProvider.organizationModel.aboutOrganization,
+                          hintText: groupProvider.groupModel.aboutGroup,
                           textAction: "Change",
                           onActionTap: (value, updatedText) async {
                             if (value) {
@@ -359,11 +355,9 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                                   context.read<AuthenticationProvider>();
                               final desc = await authProvider.updateDescription(
                                 isUser: false,
-                                id: orgProvider
-                                    .organizationModel.organizationID,
+                                id: groupProvider.groupModel.groupID,
                                 newDesc: updatedText,
-                                oldDesc: orgProvider
-                                    .organizationModel.aboutOrganization,
+                                oldDesc: groupProvider.groupModel.aboutGroup,
                               );
                               if (desc == 'Invalid description.') return;
                               await setNewDescriptionInProvider(desc);
@@ -411,7 +405,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
     bool isAdmin,
     BuildContext context,
     bool showAcceptBtn,
-    OrganizationProvider orgProvider,
+    GroupProvider groupProvider,
     String uid,
   ) {
     return SizedBox(
@@ -424,10 +418,10 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
               border: Border.all(),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: DisplayOrgImage(
+            child: DisplayGroupImage(
               isViewOnly: true,
               fileImage: _finalFileImage,
-              imageUrl: orgProvider.organizationModel.imageUrl ?? '',
+              imageUrl: groupProvider.groupModel.groupImage ?? '',
               onPressed: !isAdmin
                   ? null
                   : () async {
@@ -447,9 +441,9 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                         final imageUrl = await FileUploadHandler.updateImage(
                           file: file,
                           isUser: false,
-                          id: orgProvider.organizationModel.organizationID,
+                          id: groupProvider.groupModel.groupID,
                           reference:
-                              '${Constants.organizationImage}/${orgProvider.organizationModel.organizationID}.jpg',
+                              '${Constants.groupImage}/${groupProvider.groupModel.groupID}.jpg',
                         );
 
                         // set newimage in provider
@@ -473,7 +467,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                   children: [
                     Flexible(
                       child: Text(
-                        orgProvider.organizationModel.name,
+                        groupProvider.groupModel.name,
                         style: textStyle18Bold,
                         softWrap: true,
                         overflow: TextOverflow.visible,
@@ -482,11 +476,11 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                     if (isAdmin)
                       GestureDetector(
                         onTap: () {
-                          // edit org name
+                          // edit group name
                           MyDialogs.showMyEditAnimatedDialog(
                             context: context,
                             title: 'Edit Name',
-                            hintText: orgProvider.organizationModel.name,
+                            hintText: groupProvider.groupModel.name,
                             textAction: "Change",
                             onActionTap: (value, updatedText) async {
                               if (value) {
@@ -494,10 +488,9 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                                     context.read<AuthenticationProvider>();
                                 final name = await authProvider.updateName(
                                   isUser: false,
-                                  id: orgProvider
-                                      .organizationModel.organizationID,
+                                  id: groupProvider.groupModel.groupID,
                                   newName: updatedText,
-                                  oldName: orgProvider.organizationModel.name,
+                                  oldName: groupProvider.groupModel.name,
                                 );
                                 if (name == 'Invalid name.') return;
                                 // set new name
@@ -555,8 +548,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 //           onActionTap: (value) async {
                 //             if (value) {
                 //               bool isSaved = await context
-                //                   .read<OrganizationProvider>()
-                //                   .updateOrganizationDataInFireStore();
+                //                   .read<GroupProvider>()
+                //                   .updateGroupDataInFireStore();
 
                 //               if (isSaved) {
                 //                 Future.delayed(
@@ -574,7 +567,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 //                 .whenComplete(() async {
                 //               // clear search query
                 //               context
-                //                   .read<OrganizationProvider>()
+                //                   .read<GroupProvider>()
                 //                   .setSearchQuery('');
                 //             });
                 //           });
@@ -585,7 +578,7 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                 //   ),
                 // ),
                 if (showAcceptBtn)
-                  orgProvider.isLoading
+                  groupProvider.isLoading
                       ? const CircularProgressIndicator()
                       : MainAppButton(
                           icon: Icons.person_add,
@@ -594,20 +587,19 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                           onTap: () async {
                             // accept invite
                             // first check if admin set to read terms and conditions
-                            if (orgProvider
-                                .organizationModel.requestToReadTerms) {
+                            if (groupProvider.groupModel.requestToReadTerms) {
                               if (!_hasReadTerms) {
                                 MyDialogs.animatedTermsDialog(
                                     context: context,
                                     title: "Terms and Conditions",
-                                    content: orgProvider
-                                        .organizationModel.organizationTerms,
-                                    isMember: orgProvider
-                                        .organizationModel.membersUIDs
+                                    content:
+                                        groupProvider.groupModel.groupTerms,
+                                    isMember: groupProvider
+                                        .groupModel.membersUIDs
                                         .contains(uid),
                                     onAccept: () {
                                       // Handle acceptance here
-                                      // join org and update data in firestore
+                                      // join group and update data in firestore
                                       Navigator.of(context)
                                           .pop(); // Close the dialog
                                       setState(() {
@@ -620,46 +612,42 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
                                           .pop(); // Close the dialog
                                     });
                               } else {
-                                // join org and update data in firestore
-                                await orgProvider
-                                    .addMemberToOrganization(
+                                // join group and update data in firestore
+                                await groupProvider
+                                    .addMemberToGroup(
                                   uid: uid,
                                 )
                                     .whenComplete(() {
                                   showSnackBar(
                                     context: context,
-                                    message:
-                                        'You are a member of this Organization',
+                                    message: 'You are a member of this Group',
                                   );
                                 });
                               }
                             } else {
-                              // join org and update data in firestore
-                              // join org and update data in firestore
-                              await orgProvider
-                                  .addMemberToOrganization(
+                              // join group and update data in firestore
+                              await groupProvider
+                                  .addMemberToGroup(
                                 uid: uid,
                               )
                                   .whenComplete(() {
                                 showSnackBar(
                                   context: context,
-                                  message:
-                                      'You are a member of this Organization',
+                                  message: 'You are a member of this Group',
                                 );
                               });
                             }
                           },
                         ),
-                if (orgProvider.organizationModel.organizationTerms.isNotEmpty)
+                if (groupProvider.groupModel.groupTerms.isNotEmpty)
                   TextButton(
                     onPressed: () {
                       // show terms and conditions dialog
                       MyDialogs.animatedTermsDialog(
                           context: context,
                           title: "Terms and Conditions",
-                          content:
-                              orgProvider.organizationModel.organizationTerms,
-                          isMember: orgProvider.organizationModel.membersUIDs
+                          content: groupProvider.groupModel.groupTerms,
+                          isMember: groupProvider.groupModel.membersUIDs
                               .contains(uid),
                           onAccept: () {
                             // Handle acceptance here
@@ -684,8 +672,8 @@ class _OrganizationDetailsState extends State<OrganizationDetails>
   }
 
   //  get member count function
-  String getMembersCount(OrganizationModel orgModel) {
-    int count = orgModel.membersUIDs.length;
+  String getMembersCount(GroupModel groupModel) {
+    int count = groupModel.membersUIDs.length;
 
     if (count == 0) {
       return '';

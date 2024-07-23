@@ -5,7 +5,7 @@ class DiscussionMessage {
   final String senderUID;
   final String senderName;
   final String senderImage;
-  final String organizationID;
+  final String groupID;
   final String message;
   final MessageType messageType;
   final DateTime timeSent;
@@ -22,7 +22,7 @@ class DiscussionMessage {
     required this.senderUID,
     required this.senderName,
     required this.senderImage,
-    required this.organizationID,
+    required this.groupID,
     required this.message,
     required this.messageType,
     required this.timeSent,
@@ -42,7 +42,7 @@ class DiscussionMessage {
       Constants.senderUID: senderUID,
       Constants.senderName: senderName,
       Constants.senderImage: senderImage,
-      Constants.organizationID: organizationID,
+      Constants.groupID: groupID,
       Constants.message: message,
       Constants.messageType: messageType.name,
       Constants.timeSent: timeSent.millisecondsSinceEpoch,
@@ -63,7 +63,7 @@ class DiscussionMessage {
       senderUID: map[Constants.senderUID] ?? '',
       senderName: map[Constants.senderName] ?? '',
       senderImage: map[Constants.senderImage] ?? '',
-      organizationID: map[Constants.organizationID] ?? '',
+      groupID: map[Constants.groupID] ?? '',
       message: map[Constants.message] ?? '',
       messageType: map[Constants.messageType].toString().toMessageType(),
       timeSent: DateTime.fromMillisecondsSinceEpoch(map[Constants.timeSent]),
@@ -84,7 +84,7 @@ class DiscussionMessage {
     String? senderUID,
     String? senderName,
     String? senderImage,
-    String? organizationID,
+    String? groupID,
     String? message,
     MessageType? messageType,
     DateTime? timeSent,
@@ -101,7 +101,7 @@ class DiscussionMessage {
       senderUID: senderUID ?? this.senderUID,
       senderName: senderName ?? this.senderName,
       senderImage: senderImage ?? this.senderImage,
-      organizationID: organizationID ?? this.organizationID,
+      groupID: groupID ?? this.groupID,
       message: message ?? this.message,
       messageType: messageType ?? this.messageType,
       timeSent: timeSent ?? this.timeSent,

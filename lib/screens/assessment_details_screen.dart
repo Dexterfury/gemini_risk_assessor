@@ -9,7 +9,7 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
@@ -29,12 +29,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
   const AssessmentDetailsScreen({
     super.key,
     required this.appBarTitle,
-    required this.orgID,
+    required this.groupID,
     this.currentModel,
   });
 
   final String appBarTitle;
-  final String orgID;
+  final String groupID;
   final AssessmentModel? currentModel;
 
   @override
@@ -259,7 +259,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
               currentModel == null
                   ? const SizedBox()
                   : DeleteButton(
-                      orgID: orgID,
+                      groupID: groupID,
                       docID: id,
                       generationType: generationType,
                       assessment: assessmentModel,
@@ -453,13 +453,13 @@ class AssessmentDetailsScreen extends StatelessWidget {
 class DeleteButton extends StatelessWidget {
   const DeleteButton({
     super.key,
-    required this.orgID,
+    required this.groupID,
     required this.docID,
     required this.generationType,
     required this.assessment,
   });
 
-  final String orgID;
+  final String groupID;
   final String docID;
   final GenerationType generationType;
   final AssessmentModel assessment;
@@ -469,7 +469,7 @@ class DeleteButton extends StatelessWidget {
     final isDSTI = generationType == GenerationType.dsti;
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     Widget buttonWidget() {
-      if (orgID.isEmpty) {
+      if (groupID.isEmpty) {
         return MainAppButton(
           icon: FontAwesomeIcons.deleteLeft,
           label: ' Delete ',
@@ -491,7 +491,7 @@ class DeleteButton extends StatelessWidget {
               docID: assessment.id,
               isDSTI: isDSTI,
               ownerID: uid,
-              orgID: orgID,
+              groupID: groupID,
               assessment: assessment,
               onSuccess: () {
                 // pop the loading dialog
@@ -517,7 +517,7 @@ class DeleteButton extends StatelessWidget {
       } else {
         final uid = context.read<AuthenticationProvider>().userModel!.uid;
         return FutureBuilder<DocumentSnapshot>(
-          future: FirebaseMethods.getOrgData(orgID: orgID),
+          future: FirebaseMethods.getGroupSnapShot(groupID: groupID),
           builder:
               (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasError) {
@@ -531,10 +531,10 @@ class DeleteButton extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.done) {
               // Map<String, dynamic> data =
               //     snapshot.data!.data() as Map<String, dynamic>;
-              final orgModel = OrganizationModel.fromJson(
+              final groupModel = GroupModel.fromJson(
                   snapshot.data!.data() as Map<String, dynamic>);
 
-              final isAdmin = orgModel.adminsUIDs.contains(uid);
+              final isAdmin = groupModel.adminsUIDs.contains(uid);
               return isAdmin
                   ? MainAppButton(
                       icon: FontAwesomeIcons.deleteLeft,
@@ -557,7 +557,7 @@ class DeleteButton extends StatelessWidget {
                           docID: assessment.id,
                           isDSTI: isDSTI,
                           ownerID: assessment.createdBy,
-                          orgID: orgID,
+                          groupID: groupID,
                           assessment: assessment,
                           onSuccess: () {
                             // pop the loading dialog

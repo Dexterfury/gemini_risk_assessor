@@ -73,7 +73,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 '• AI-powered Daily Safety Task Instructions (DSTI)\n'
                     '• Intelligent Risk Assessments\n'
                     '• Comprehensive Tools Management\n'
-                    '• Collaborative Organization Features'),
+                    '• Collaborative Group Features'),
             _buildInfoSection(
                 'Our Commitment',
                 'We are committed to enhancing workplace safety by providing '

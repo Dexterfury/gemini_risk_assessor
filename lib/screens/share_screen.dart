@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -8,14 +6,13 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
-import 'package:gemini_risk_assessor/widgets/grid_item.dart';
 import 'package:provider/provider.dart';
 
 class ShareScreen extends StatefulWidget {
@@ -44,39 +41,39 @@ class _ShareScreenState extends State<ShareScreen> {
     super.dispose();
   }
 
-  void _handleSharing(OrganizationModel org, String uid) {
-    if (!org.allowSharing) {
+  void _handleSharing(GroupModel groupModel, String uid) {
+    if (!groupModel.allowSharing) {
       showSnackBar(
         context: context,
-        message: 'Sharing not allowed for this organization',
+        message: 'Sharing not allowed for this group',
       );
       return;
     }
 
     final isAlreadyShared = widget.generationType == GenerationType.tool
-        ? widget.toolModel!.sharedWith.contains(org.organizationID)
-        : widget.itemModel!.sharedWith.contains(org.organizationID);
+        ? widget.toolModel!.sharedWith.contains(groupModel.groupID)
+        : widget.itemModel!.sharedWith.contains(groupModel.groupID);
 
     if (isAlreadyShared) {
       showSnackBar(
         context: context,
-        message: 'Already sharing this item with this organization',
+        message: 'Already sharing this item with this group',
       );
 
       return;
     }
 
     _showSharingDialog(
-      org,
+      groupModel,
       uid,
     );
   }
 
-  void _showSharingDialog(OrganizationModel org, String uid) {
+  void _showSharingDialog(GroupModel groupModel, String uid) {
     MyDialogs.showMyAnimatedDialog(
       context: context,
       title: 'Share',
-      content: 'Share with ${org.name}',
+      content: 'Share with ${groupModel.name}',
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -85,7 +82,7 @@ class _ShareScreenState extends State<ShareScreen> {
         TextButton(
           onPressed: () async {
             Navigator.pop(context);
-            await _performSharing(org, uid);
+            await _performSharing(groupModel, uid);
           },
           child: const Text('Yes'),
         ),
@@ -93,18 +90,18 @@ class _ShareScreenState extends State<ShareScreen> {
     );
   }
 
-  Future<void> _performSharing(OrganizationModel org, String uid) async {
+  Future<void> _performSharing(GroupModel groupModel, String uid) async {
     if (widget.generationType == GenerationType.tool) {
-      await FirebaseMethods.shareToolWithOrganization(
+      await FirebaseMethods.shareToolWithGroup(
         uid: uid,
         toolModel: widget.toolModel!,
-        orgID: org.organizationID,
+        groupID: groupModel.groupID,
       );
     } else {
-      await FirebaseMethods.shareWithOrganization(
+      await FirebaseMethods.shareWithGroup(
         uid: uid,
         itemModel: widget.itemModel!,
-        orgID: org.organizationID,
+        groupID: groupModel.groupID,
         isDSTI: widget.generationType == GenerationType.dsti,
       ).whenComplete(() {
         showSnackBar(
@@ -121,7 +118,7 @@ class _ShareScreenState extends State<ShareScreen> {
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseMethods.organizationsStream(
+          stream: FirebaseMethods.groupsStream(
             userId: uid,
           ),
           builder:
@@ -138,12 +135,12 @@ class _ShareScreenState extends State<ShareScreen> {
               return const Scaffold(
                 appBar: MyAppBar(
                   leading: BackButton(),
-                  title: Constants.shareWithTitle,
+                  title: Constants.sharedWith,
                 ),
                 body: Center(
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Text('No Organizations Found!',
+                    child: Text('No Groups Found!',
                         textAlign: TextAlign.center, style: textStyle18w500),
                   ),
                 ),
@@ -209,10 +206,9 @@ class _ShareScreenState extends State<ShareScreen> {
                                     final data =
                                         doc.data() as Map<String, dynamic>;
 
-                                    final org =
-                                        OrganizationModel.fromJson(data);
+                                    final group = GroupModel.fromJson(data);
 
-                                    return shareGridItem(org, uid);
+                                    return shareGridItem(group, uid);
                                   },
                                   childCount: results.length,
                                 ),
@@ -227,11 +223,11 @@ class _ShareScreenState extends State<ShareScreen> {
     );
   }
 
-  shareGridItem(OrganizationModel org, String uid) {
+  shareGridItem(GroupModel group, String uid) {
     return Card(
       child: GestureDetector(
         onTap: () {
-          _handleSharing(org, uid);
+          _handleSharing(group, uid);
         },
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -249,7 +245,7 @@ class _ShareScreenState extends State<ShareScreen> {
                       topRight: Radius.circular(10.0),
                     ),
                     child: MyImageCacheManager.showImage(
-                      imageUrl: org.imageUrl!,
+                      imageUrl: group.groupImage!,
                       isTool: false,
                     ),
                   ),
@@ -262,7 +258,7 @@ class _ShareScreenState extends State<ShareScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Text(
-                      org.name,
+                      group.name,
                       style: textStyle16w600,
                       overflow: TextOverflow.ellipsis,
                     ),

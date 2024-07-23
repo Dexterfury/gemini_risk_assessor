@@ -15,10 +15,10 @@ import 'package:provider/provider.dart';
 class NearMissesScreen extends StatefulWidget {
   const NearMissesScreen({
     super.key,
-    required this.orgID,
+    required this.groupID,
     required this.isAdmin,
   });
-  final String orgID;
+  final String groupID;
   final bool isAdmin;
 
   @override
@@ -41,7 +41,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseMethods.nearMissessStream(
-            orgID: widget.orgID,
+            groupID: widget.groupID,
           ),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -55,7 +55,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
 
             if (snapshot.data!.docs.isEmpty) {
               return Scaffold(
-                appBar: widget.orgID.isNotEmpty
+                appBar: widget.groupID.isNotEmpty
                     ? const MyAppBar(
                         leading: BackButton(),
                         title: Constants.nearMissesTitle,
@@ -80,14 +80,10 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                             return SizedBox(
                               height: 50.0,
                               child: MainAppButton(
-                                  label: ' Create a Near Miss',
-                                  borderRadius: 15.0,
-                                  onTap: () async {
-                                    await context
-                                        .read<NearMissProvider>()
-                                        .initializeDefaultModel();
-                                    action();
-                                  }),
+                                label: ' Create a Near Miss',
+                                borderRadius: 15.0,
+                                onTap: action,
+                              ),
                             );
                           },
                           openBuilder: (context, action) {

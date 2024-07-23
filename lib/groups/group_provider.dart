@@ -1,23 +1,24 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:uuid/uuid.dart';
 
-class OrganizationProvider extends ChangeNotifier {
+class GroupProvider extends ChangeNotifier {
   bool _isLoading = false;
   String _searchQuery = '';
-  List<UserModel> _orgMembersList = [];
-  List<UserModel> _orgAdminsList = [];
+  List<UserModel> _groupMembersList = [];
+  List<UserModel> _groupAdminsList = [];
   List<String> _awaitApprovalList = [];
 
   List<UserModel> _tempWaitingApprovalMembersList = [];
 
-  List<String> _tempOrgMemberUIDs = [];
+  List<String> _tempGroupMemberUIDs = [];
 
   List<UserModel> _tempRemovedWaitingApprovalMembersList = [];
   List<String> _tempRemovedWaitingApprovalMemberUIDs = [];
@@ -25,22 +26,22 @@ class OrganizationProvider extends ChangeNotifier {
   List<String> _initialMemberUIDs = [];
   List<String> _initialAwaitingApprovalUIDs = [];
 
-  OrganizationModel _organizationModel = OrganizationModel.empty();
+  GroupModel _groupModel = GroupModel.empty();
 
   // getters
   bool get isLoading => _isLoading;
   String get searchQuery => _searchQuery;
-  List<UserModel> get orgMembersList => _orgMembersList;
-  List<UserModel> get orgAdminsList => _orgAdminsList;
+  List<UserModel> get groupMembersList => _groupMembersList;
+  List<UserModel> get groupAdminsList => _groupAdminsList;
   List<String> get awaitApprovalsList => _awaitApprovalList;
-  OrganizationModel get organizationModel => _organizationModel;
-  List<String> get tempOrgMemberUIDs => _tempOrgMemberUIDs;
+  GroupModel get groupModel => _groupModel;
+  List<String> get tempGroupMemberUIDs => _tempGroupMemberUIDs;
 
   final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
 
-  final CollectionReference _organizationCollection =
-      FirebaseFirestore.instance.collection(Constants.organizationCollection);
+  final CollectionReference _groupsCollection =
+      FirebaseFirestore.instance.collection(Constants.groupsCollection);
 
   final Map<String, ValueNotifier<bool>> _adminValueNotifiers = {};
   final Map<String, ValueNotifier<bool>> _awaitingApprovalValueNotifiers = {};
@@ -50,7 +51,7 @@ class OrganizationProvider extends ChangeNotifier {
   ValueNotifier<bool> getAdminValueNotifier(String uid) {
     return _adminValueNotifiers.putIfAbsent(
       uid,
-      () => ValueNotifier(_orgAdminsList.any((admin) => admin.uid == uid)),
+      () => ValueNotifier(_groupAdminsList.any((admin) => admin.uid == uid)),
     );
   }
 
@@ -64,60 +65,59 @@ class OrganizationProvider extends ChangeNotifier {
   ValueNotifier<bool> getTempMemberValueNotifier(String uid) {
     return _tempMemberValueNotifiers.putIfAbsent(
       uid,
-      () => ValueNotifier(
-          _tempOrgMemberUIDs.contains(uid) || _awaitApprovalList.contains(uid)),
+      () => ValueNotifier(_tempGroupMemberUIDs.contains(uid) ||
+          _awaitApprovalList.contains(uid)),
     );
   }
 
   ValueNotifier<bool> getMemberValueNotifier(String uid) {
     return _memberValueNotifiers.putIfAbsent(
       uid,
-      () => ValueNotifier(_orgMembersList.any((member) => member.uid == uid)),
+      () => ValueNotifier(_groupMembersList.any((member) => member.uid == uid)),
     );
   }
 
   // Update these methods to use ValueNotifiers
   void addToWaitingApproval({required UserModel groupMember}) {
     _awaitApprovalList.add(groupMember.uid);
-    _organizationModel.awaitingApprovalUIDs.add(groupMember.uid);
+    _groupModel.awaitingApprovalUIDs.add(groupMember.uid);
     _tempWaitingApprovalMembersList.add(groupMember);
     _awaitingApprovalValueNotifiers[groupMember.uid]?.value = true;
     _tempMemberValueNotifiers[groupMember.uid]?.value = true;
     notifyListeners();
   }
 
-  void removeWaitingApproval({required UserModel orgMember}) {
-    _awaitApprovalList.remove(orgMember.uid);
-    _organizationModel.awaitingApprovalUIDs.remove(orgMember.uid);
+  void removeWaitingApproval({required UserModel groupMember}) {
+    _awaitApprovalList.remove(groupMember.uid);
+    _groupModel.awaitingApprovalUIDs.remove(groupMember.uid);
     _tempWaitingApprovalMembersList
-        .removeWhere((member) => member.uid == orgMember.uid);
-    _awaitingApprovalValueNotifiers[orgMember.uid]?.value = false;
-    _tempMemberValueNotifiers[orgMember.uid]?.value = false;
+        .removeWhere((member) => member.uid == groupMember.uid);
+    _awaitingApprovalValueNotifiers[groupMember.uid]?.value = false;
+    _tempMemberValueNotifiers[groupMember.uid]?.value = false;
     notifyListeners();
   }
 
-  void addMemberToTempOrg({required String memberUID}) {
-    if (!_tempOrgMemberUIDs.contains(memberUID)) {
-      _tempOrgMemberUIDs.add(memberUID);
+  void addMemberToTempGroup({required String memberUID}) {
+    if (!_tempGroupMemberUIDs.contains(memberUID)) {
+      _tempGroupMemberUIDs.add(memberUID);
       _tempMemberValueNotifiers[memberUID]?.value = true;
       notifyListeners();
     }
   }
 
-  void removeMemberFromTempOrg({required String memberUID}) {
-    _tempOrgMemberUIDs.remove(memberUID);
+  void removeMemberFromTempGroup({required String memberUID}) {
+    _tempGroupMemberUIDs.remove(memberUID);
     _tempMemberValueNotifiers[memberUID]?.value = false;
     notifyListeners();
   }
 
   void setInitialMemberState() {
-    _initialMemberUIDs = List.from(_organizationModel.membersUIDs);
-    _initialAwaitingApprovalUIDs =
-        List.from(_organizationModel.awaitingApprovalUIDs);
+    _initialMemberUIDs = List.from(_groupModel.membersUIDs);
+    _initialAwaitingApprovalUIDs = List.from(_groupModel.awaitingApprovalUIDs);
   }
 
   bool hasChanges() {
-    final currentMembers = Set.from(_tempOrgMemberUIDs);
+    final currentMembers = Set.from(_tempGroupMemberUIDs);
     final initialMembers = Set.from(_initialMemberUIDs);
     final currentAwaiting = Set.from(_awaitApprovalList);
     final initialAwaiting = Set.from(_initialAwaitingApprovalUIDs);
@@ -130,7 +130,7 @@ class OrganizationProvider extends ChangeNotifier {
 
   Future<void> handleMemberChanges({
     required UserModel memberData,
-    required String orgID,
+    required String groupID,
     required bool isAdding,
   }) async {
     // update the member data in firebase
@@ -138,13 +138,13 @@ class OrganizationProvider extends ChangeNotifier {
       // add the member to admins list in firebase
       await addMemberAsAdmin(
         memberData: memberData,
-        orgID: orgID,
+        groupID: groupID,
       );
     } else {
       // remove the member from admins list in firebase
       await removeMemberAsAdmin(
         memberData: memberData,
-        orgID: orgID,
+        groupID: groupID,
       );
     }
   }
@@ -152,28 +152,28 @@ class OrganizationProvider extends ChangeNotifier {
   // add member as admin
   Future<void> addMemberAsAdmin({
     required UserModel memberData,
-    required String orgID,
+    required String groupID,
   }) async {
     // add the membeer to adminslist
-    await _organizationCollection.doc(orgID).update({
+    await _groupsCollection.doc(groupID).update({
       Constants.adminsUIDs: FieldValue.arrayUnion([memberData.uid]),
     });
     // to to locally update the list
-    _organizationModel.adminsUIDs.add(memberData.uid);
+    _groupModel.adminsUIDs.add(memberData.uid);
     notifyListeners();
   }
 
   // remove member as admin
   Future<void> removeMemberAsAdmin({
     required UserModel memberData,
-    required String orgID,
+    required String groupID,
   }) async {
     // remove the member from adminslist
-    await _organizationCollection.doc(orgID).update({
+    await _groupsCollection.doc(groupID).update({
       Constants.adminsUIDs: FieldValue.arrayRemove([memberData.uid]),
     });
     // to update the local list
-    _organizationModel.adminsUIDs.remove(memberData.uid);
+    _groupModel.adminsUIDs.remove(memberData.uid);
     notifyListeners();
   }
 
@@ -200,42 +200,40 @@ class OrganizationProvider extends ChangeNotifier {
   }
 
   // get a list UIDs from group members list
-  List<String> getOrgMembersUIDs() {
-    return _orgMembersList.map((e) => e.uid).toList();
+  List<String> getGroupMembersUIDs() {
+    return _groupMembersList.map((e) => e.uid).toList();
   }
 
   // get a list UIDs from group admins list
-  List<String> getOrgAdminsUIDs() {
-    return _orgAdminsList.map((e) => e.uid).toList();
+  List<String> getGroupAdminsUIDs() {
+    return _groupAdminsList.map((e) => e.uid).toList();
   }
 
-  Future<void> setOrganizationModel({
-    required OrganizationModel orgModel,
+  Future<void> setGroupModel({
+    required GroupModel groupModel,
   }) async {
-    _organizationModel = orgModel;
+    _groupModel = groupModel;
     // set temp members
-    _tempOrgMemberUIDs = List<String>.from(orgModel.membersUIDs);
-    _awaitApprovalList = List<String>.from(orgModel.awaitingApprovalUIDs);
+    _tempGroupMemberUIDs = List<String>.from(groupModel.membersUIDs);
+    _awaitApprovalList = List<String>.from(groupModel.awaitingApprovalUIDs);
     notifyListeners();
   }
 
-  Future<void> updateOrganizationSettings(DataSettings settings) async {
+  Future<void> updateGroupSettings(DataSettings settings) async {
     // updates settings in firestore
-    await _organizationCollection
-        .doc(_organizationModel.organizationID)
-        .update({
-      Constants.organizationTerms: settings.organizationTerms,
+    await _groupsCollection.doc(_groupModel.groupID).update({
+      Constants.groupTerms: settings.groupTerms,
       Constants.allowSharing: settings.allowSharing,
       Constants.requestToReadTerms: settings.requestToReadTerms,
     });
     // update in provider
-    _organizationModel.organizationTerms = settings.organizationTerms;
-    _organizationModel.allowSharing = settings.allowSharing;
-    _organizationModel.requestToReadTerms = settings.requestToReadTerms;
+    _groupModel.groupTerms = settings.groupTerms;
+    _groupModel.allowSharing = settings.allowSharing;
+    _groupModel.requestToReadTerms = settings.requestToReadTerms;
     notifyListeners();
   }
 
-  Future<bool> updateOrganizationDataInFireStore() async {
+  Future<bool> updateGroupDataInFireStore() async {
     if (!hasChanges()) {
       return false;
     }
@@ -243,21 +241,19 @@ class OrganizationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final removedMembers =
-          _initialMemberUIDs.where((uid) => !_tempOrgMemberUIDs.contains(uid));
-      final addedMembers =
-          _tempOrgMemberUIDs.where((uid) => !_initialMemberUIDs.contains(uid));
+      final removedMembers = _initialMemberUIDs
+          .where((uid) => !_tempGroupMemberUIDs.contains(uid));
+      final addedMembers = _tempGroupMemberUIDs
+          .where((uid) => !_initialMemberUIDs.contains(uid));
 
-      await _organizationCollection
-          .doc(_organizationModel.organizationID)
-          .update({
+      await _groupsCollection.doc(_groupModel.groupID).update({
         Constants.membersUIDs: FieldValue.arrayRemove(removedMembers.toList()),
         Constants.awaitingApprovalUIDs:
             FieldValue.arrayUnion(addedMembers.toList()),
       });
 
-      _organizationModel.membersUIDs = _tempOrgMemberUIDs;
-      _organizationModel.awaitingApprovalUIDs = _awaitApprovalList;
+      _groupModel.membersUIDs = _tempGroupMemberUIDs;
+      _groupModel.awaitingApprovalUIDs = _awaitApprovalList;
 
       setInitialMemberState();
       _isLoading = false;
@@ -273,7 +269,7 @@ class OrganizationProvider extends ChangeNotifier {
 
   // set the temp lists to empty
   Future<void> setEmptyTemps() async {
-    _tempOrgMemberUIDs = [];
+    _tempGroupMemberUIDs = [];
     _tempWaitingApprovalMembersList = [];
 
     notifyListeners();
@@ -281,68 +277,68 @@ class OrganizationProvider extends ChangeNotifier {
 
   // set empty lists
   Future<void> setEmptyLists() async {
-    _orgMembersList = [];
-    _orgAdminsList = [];
+    _groupMembersList = [];
+    _groupAdminsList = [];
     _awaitApprovalList = [];
     notifyListeners();
   }
 
-  // update the organization image
+  // update the group image
   Future<void> setImageUrl(String imageUrl) async {
-    _organizationModel.imageUrl = imageUrl;
+    _groupModel.groupImage = imageUrl;
     notifyListeners();
   }
 
-  // up date the organization name
+  // up date the group name
   Future<void> setName(String name) async {
-    _organizationModel.name = name;
+    _groupModel.name = name;
     notifyListeners();
   }
 
-  // up date the organization description
+  // up date the group description
   Future<void> setDescription(String description) async {
-    _organizationModel.aboutOrganization = description;
+    _groupModel.aboutGroup = description;
     notifyListeners();
   }
 
-  // add a organization member
+  // add a group member
   // void addToWaitingApproval({required UserModel groupMember}) {
   //   _awaitApprovalList.add(groupMember.uid);
-  //   _organizationModel.awaitingApprovalUIDs.add(groupMember.uid);
+  //   _groupModel.awaitingApprovalUIDs.add(groupMember.uid);
   //   // add data to temp lists
   //   _tempWaitingApprovalMembersList.add(groupMember);
   //   notifyListeners();
   // }
 
-  // add member to organization
-  Future<void> addMemberToOrganization({
+  // add member to group
+  Future<void> addMemberToGroup({
     required String uid,
   }) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final DocumentReference orgRef =
-        _organizationCollection.doc(organizationModel.organizationID);
+    final DocumentReference groupRef =
+        _groupsCollection.doc(groupModel.groupID);
 
     return firestore.runTransaction((transaction) async {
       _isLoading = true;
       notifyListeners();
-      final DocumentSnapshot orgSnapshot = await transaction.get(orgRef);
+      final DocumentSnapshot groupSnapshot = await transaction.get(groupRef);
 
-      if (!orgSnapshot.exists) {
+      if (!groupSnapshot.exists) {
         _isLoading = false;
         notifyListeners();
-        throw Exception('Organization does not exist');
+        throw Exception('group does not exist');
       }
 
-      final OrganizationModel org = OrganizationModel.fromJson(
-          orgSnapshot.data() as Map<String, dynamic>);
+      final GroupModel group =
+          GroupModel.fromJson(groupSnapshot.data() as Map<String, dynamic>);
 
-      if (!org.awaitingApprovalUIDs.contains(uid)) {
+      if (!group.awaitingApprovalUIDs.contains(uid)) {
         _isLoading = false;
         notifyListeners();
         throw Exception('User is not in the awaiting approval list');
       }
 
-      if (org.membersUIDs.contains(uid)) {
+      if (group.membersUIDs.contains(uid)) {
         _isLoading = false;
         notifyListeners();
         throw Exception('User is already a member');
@@ -350,22 +346,22 @@ class OrganizationProvider extends ChangeNotifier {
 
       // Remove UID from awaiting approval list
       final List<String> updatedAwaitingApproval =
-          List.from(org.awaitingApprovalUIDs)..remove(uid);
+          List.from(group.awaitingApprovalUIDs)..remove(uid);
 
       // remove uid from awaiting approval local list
-      _organizationModel.awaitingApprovalUIDs
-          .removeWhere((element) => element == uid);
+      _groupModel.awaitingApprovalUIDs.removeWhere((element) => element == uid);
 
       // Add UID to members list
-      final List<String> updatedMembers = List.from(org.membersUIDs)..add(uid);
+      final List<String> updatedMembers = List.from(group.membersUIDs)
+        ..add(uid);
 
       // update local temp list
-      _organizationModel.membersUIDs.add(uid);
+      _groupModel.membersUIDs.add(uid);
 
       notifyListeners();
 
       // Update the document
-      transaction.update(orgRef, {
+      transaction.update(groupRef, {
         Constants.awaitingApprovalUIDs: updatedAwaitingApproval,
         Constants.membersUIDs: updatedMembers,
       });
@@ -375,51 +371,51 @@ class OrganizationProvider extends ChangeNotifier {
   }
 
   // // add member to temp list for saving changes later
-  // void addMemberToTempOrg({
+  // void addMemberToTempGroup({
   //   required String memberUID,
   // }) {
-  //   _tempOrgMemberUIDs.add(memberUID);
+  //   _tempGroupMemberUIDs.add(memberUID);
   //   notifyListeners();
   // }
 
   // remove member from temp list for saving changes later
-  // void removeMemberFromTempOrg({
+  // void removeMemberFromTempGroup({
   //   required String memberUID,
   // }) {
-  //   _tempOrgMemberUIDs.removeWhere((element) => element == memberUID);
+  //   _tempGroupMemberUIDs.removeWhere((element) => element == memberUID);
   //   notifyListeners();
   // }
 
-  // Future<void> removeWaitingApproval({required UserModel orgMember}) async {
-  //   _awaitApprovalList.remove(orgMember.uid);
-  //   // also remove this member from organization model
-  //   _organizationModel.awaitingApprovalUIDs.remove(orgMember.uid);
+  // Future<void> removeWaitingApproval({required UserModel groupMember}) async {
+  //   _awaitApprovalList.remove(groupMember.uid);
+  //   // also remove this member from group model
+  //   _groupModel.awaitingApprovalUIDs.remove(groupMember.uid);
 
   //   // remove from temp lists
-  //   _tempWaitingApprovalMembersList.remove(orgMember);
+  //   _tempWaitingApprovalMembersList.remove(groupMember);
 
   //   // add  this member to the list of removed members
-  //   _tempRemovedWaitingApprovalMembersList.add(orgMember);
-  //   _tempRemovedWaitingApprovalMemberUIDs.add(orgMember.uid);
+  //   _tempRemovedWaitingApprovalMembersList.add(groupMember);
+  //   _tempRemovedWaitingApprovalMemberUIDs.add(groupMember.uid);
 
   //   notifyListeners();
   // }
 
   // update group settings in firestore
-  // Future<bool> updateOrganizationDataInFireStore() async {
-  //   if (_tempOrgMemberUIDs == _organizationModel.membersUIDs) {
+  // Future<bool> updategroupDataInFireStore() async {
+  //   if (_tempGroupMemberUIDs == _groupModel.membersUIDs) {
   //     return false;
   //   }
 
-  //   // remove all membersUIDs who are already in the organizationModel.membersUIDs list
-  //   _tempOrgMemberUIDs.removeWhere(
-  //       (element) => _organizationModel.membersUIDs.contains(element));
+  //   // remove all membersUIDs who are already in the groupModel.membersUIDs list
+  //   _tempGroupMemberUIDs.removeWhere(
+  //       (element) => _groupModel.membersUIDs.contains(element));
 
   //   try {
-  //     await _organizationCollection
-  //         .doc(_organizationModel.organizationID)
+  //     await _groupCollection
+  //         .doc(_groupModel.groupID)
   //         .update({
-  //       Constants.awaitingApprovalUIDs: _tempOrgMemberUIDs,
+  //       Constants.awaitingApprovalUIDs: _tempGroupMemberUIDs,
   //     });
   //     notifyListeners();
   //     return true;
@@ -431,14 +427,14 @@ class OrganizationProvider extends ChangeNotifier {
 
   // get a list of goup members data from firestore
   Future<List<UserModel>> getMembersDataFromFirestore({
-    required String orgID,
+    required String groupID,
   }) async {
     try {
       List<UserModel> membersData = [];
 
       // get the list of membersUIDs
       List<String> membersUIDs = [];
-      await _organizationCollection.doc(orgID).get().then((value) {
+      await _groupsCollection.doc(groupID).get().then((value) {
         if (value.exists) {
           membersUIDs = List<String>.from(value[Constants.membersUIDs]);
         }
@@ -456,53 +452,49 @@ class OrganizationProvider extends ChangeNotifier {
     }
   }
 
-  // create organization
-  Future<void> createOrganization({
+  // create group
+  Future<void> createGroup({
     required File? fileImage,
-    required OrganizationModel newOrganizationModel,
+    required GroupModel newgroupModel,
     required Function() onSuccess,
     required Function(String) onError,
   }) async {
     setLoading(true);
     try {
-      var organizationID = const Uuid().v4();
-      newOrganizationModel.organizationID = organizationID;
+      var groupID = const Uuid().v4();
+      newgroupModel.groupID = groupID;
 
-      // check if we have the organization image
+      // check if we have the group image
       if (fileImage != null) {
         // upload the image to firestore
         String imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
           file: fileImage,
-          reference: '${Constants.organizationImage}/$organizationID.jpg',
+          reference: '${Constants.groupImage}/$groupID.jpg',
         );
-        newOrganizationModel.imageUrl = imageUrl;
+        newgroupModel.groupImage = imageUrl;
       }
 
-      _organizationModel.createdAt = DateTime.now();
+      _groupModel.createdAt = DateTime.now();
 
-      newOrganizationModel.awaitingApprovalUIDs = [
-        ...getAwaitingApprovalUIDs()
-      ];
+      newgroupModel.awaitingApprovalUIDs = [...getAwaitingApprovalUIDs()];
 
       // add the group admins
-      newOrganizationModel.adminsUIDs = [
-        newOrganizationModel.creatorUID,
-        //...getOrgAdminsUIDs()
+      newgroupModel.adminsUIDs = [
+        newgroupModel.creatorUID,
+        //...getGroupAdminsUIDs()
       ];
 
       // add the group members
-      newOrganizationModel.membersUIDs = [
-        newOrganizationModel.creatorUID,
-        //...getOrgMembersUIDs()
+      newgroupModel.membersUIDs = [
+        newgroupModel.creatorUID,
+        //...getGroupMembersUIDs()
       ];
 
       // update the global groupModel
-      setOrganizationModel(orgModel: newOrganizationModel);
+      setGroupModel(groupModel: newgroupModel);
 
       // add group to firebase
-      await _organizationCollection
-          .doc(organizationID)
-          .set(organizationModel.toJson());
+      await _groupsCollection.doc(groupID).set(groupModel.toJson());
 
       // reset the lists
       await setEmptyLists();
@@ -516,56 +508,56 @@ class OrganizationProvider extends ChangeNotifier {
     }
   }
 
-  // exit organization
-  Future<String> exitOrganization({
+  // exit group
+  Future<String> exitgroup({
     required bool isAdmin,
     required String uid,
-    required String orgID,
+    required String groupID,
   }) async {
     try {
       if (isAdmin) {
-        // get organization data from firestore
-        DocumentSnapshot doc = await _organizationCollection.doc(orgID).get();
-        OrganizationModel organizationModel =
-            OrganizationModel.fromJson(doc.data() as Map<String, dynamic>);
+        // get group data from firestore
+        DocumentSnapshot doc = await _groupsCollection.doc(groupID).get();
+        GroupModel groupModel =
+            GroupModel.fromJson(doc.data() as Map<String, dynamic>);
         // check if there are other admins left
-        if (organizationModel.adminsUIDs.length > 1) {
+        if (groupModel.adminsUIDs.length > 1) {
           // remove the admin from admins list
-          await _organizationCollection.doc(orgID).update({
+          await _groupsCollection.doc(groupID).update({
             Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
           });
           // remove the admin from group members list
-          await _organizationCollection.doc(orgID).update({
+          await _groupsCollection.doc(groupID).update({
             Constants.membersUIDs: FieldValue.arrayRemove([uid]),
           });
 
           return Constants.exitSuccessful;
         } else {
           // if there are no other admins check if there are other members left
-          if (organizationModel.membersUIDs.length > 1) {
-            await _organizationCollection.doc(orgID).update({
+          if (groupModel.membersUIDs.length > 1) {
+            await _groupsCollection.doc(groupID).update({
               Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
             });
 
             // remove the admin from group members list
-            await _organizationCollection.doc(orgID).update({
+            await _groupsCollection.doc(groupID).update({
               Constants.membersUIDs: FieldValue.arrayRemove([uid]),
             });
             // pick up a new admin, get one member and make him admin
-            String newAdminUID = organizationModel.membersUIDs[0];
-            await _organizationCollection.doc(orgID).update({
+            String newAdminUID = groupModel.membersUIDs[0];
+            await _groupsCollection.doc(groupID).update({
               Constants.adminsUIDs: FieldValue.arrayUnion([newAdminUID]),
             });
             return Constants.exitSuccessful;
           } else {
             // If there are no other admins and members left, delete the group from firestore
-            await _organizationCollection.doc(orgID).delete();
+            await _groupsCollection.doc(groupID).delete();
 
             return Constants.deletedSuccessfully;
           }
         }
       } else {
-        await _organizationCollection.doc(orgID).update({
+        await _groupsCollection.doc(groupID).update({
           Constants.membersUIDs: FieldValue.arrayRemove([uid]),
         });
 

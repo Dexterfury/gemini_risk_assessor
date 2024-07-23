@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
+import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
@@ -13,11 +13,11 @@ import 'package:provider/provider.dart';
 class MembersCard extends StatelessWidget {
   const MembersCard({
     Key? key,
-    required this.orgModel,
+    required this.groupModel,
     required this.isAdmin,
   }) : super(key: key);
 
-  final OrganizationModel orgModel;
+  final GroupModel groupModel;
   final bool isAdmin;
 
   @override
@@ -26,10 +26,9 @@ class MembersCard extends StatelessWidget {
       color: Theme.of(context).cardColor,
       elevation: cardElevation,
       child: FutureBuilder<List<UserModel>>(
-        future:
-            context.read<OrganizationProvider>().getMembersDataFromFirestore(
-                  orgID: orgModel.organizationID,
-                ),
+        future: context.read<GroupProvider>().getMembersDataFromFirestore(
+              groupID: groupModel.groupID,
+            ),
         builder: _buildMembersList,
       ),
     );
@@ -66,7 +65,7 @@ class MembersCard extends StatelessWidget {
 
   Widget _buildMemberTile(BuildContext context, UserModel member) {
     final uid = context.read<AuthenticationProvider>().userModel?.uid;
-    final isMemberAdmin = orgModel.adminsUIDs.contains(member.uid);
+    final isMemberAdmin = groupModel.adminsUIDs.contains(member.uid);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -146,10 +145,10 @@ class MembersCard extends StatelessWidget {
   ) {
     Navigator.pop(context);
     context
-        .read<OrganizationProvider>()
+        .read<GroupProvider>()
         .handleMemberChanges(
           memberData: member,
-          orgID: orgModel.organizationID,
+          groupID: groupModel.groupID,
           isAdding: addToAdmins,
         )
         .whenComplete(() {

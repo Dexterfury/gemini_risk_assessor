@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/fab_buttons/organization_fab_button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/buttons/group_fab_button.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
-import 'package:gemini_risk_assessor/screens/organizations_screen.dart';
-import 'package:gemini_risk_assessor/fab_buttons/my_fab_button.dart';
+import 'package:gemini_risk_assessor/groups/groups_screen.dart';
+import 'package:gemini_risk_assessor/buttons/my_fab_button.dart';
 import 'package:provider/provider.dart';
 
 class ScreensController extends StatefulWidget {
@@ -18,7 +19,7 @@ class _ScreensControllerState extends State<ScreensController>
   int _selectedIndex = 0;
   final List<Widget> _tabs = [
     const HomeScreen(),
-    const OrganizationsScreen(),
+    const GroupsScreen(),
   ];
 
   late Animation<double> _animation;
@@ -50,12 +51,12 @@ class _ScreensControllerState extends State<ScreensController>
         currentIndex: _selectedIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(FontAwesomeIcons.house),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Organizations',
+            icon: Icon(FontAwesomeIcons.peopleGroup),
+            label: 'Groups',
           ),
         ],
         onTap: (value) {
@@ -64,16 +65,14 @@ class _ScreensControllerState extends State<ScreensController>
           });
           if (_selectedIndex == 1 && mounted) {
             // set search hintext
-            context
-                .read<TabProvider>()
-                .setSearchHintText('Search Organizations');
+            context.read<TabProvider>().setSearchHintText('Search Groups');
           }
         },
       ),
 
       // float action button to add new risk assessment
       floatingActionButton: _selectedIndex == 1
-          ? const OrganizationFabButton()
+          ? const GroupFabButton()
           : MyFabButton(
               animationController: _animationController,
               animation: _animation,

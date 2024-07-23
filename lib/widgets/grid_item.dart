@@ -10,11 +10,9 @@ class ToolGridItem extends StatelessWidget {
   const ToolGridItem({
     super.key,
     required this.toolModel,
-    required this.isDiscussion,
   });
 
   final ToolModel toolModel;
-  final bool isDiscussion;
 
   @override
   Widget build(BuildContext context) {
@@ -66,15 +64,9 @@ class ToolGridItem extends StatelessWidget {
               ),
             ),
             openBuilder: (context, action) {
-              if (isDiscussion) {
-                return ToolChatDiscussionScreen(
-                  toolModel: toolModel,
-                );
-              } else {
-                return ExplainerDetailsScreen(
-                  currentModel: toolModel!,
-                );
-              }
+              return ExplainerDetailsScreen(
+                currentModel: toolModel,
+              );
             },
             transitionType: ContainerTransitionType.fadeThrough,
             transitionDuration: const Duration(milliseconds: 500),

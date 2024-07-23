@@ -14,23 +14,23 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
-// oncreate organization
-exports.onCreateOrganization = functions.firestore
-    .document("organizations/{orgId}")
+// oncreate group
+exports.onCreateGroup = functions.firestore
+    .document("groups/{groupID}")
     .onCreate(async (snapshot, context) => {
       try {
-        const orgData = snapshot.data();
-        const creatorUID = orgData.creatorUID;
-        const orgName = orgData.name;
-        const orgID = context.params.orgId;
-        const aboutOrg = orgData.aboutOrganization;
-        const orgTerms = orgData.organizationTerms;
-        const awaitingApprovalUIDs = orgData.awaitingApprovalUIDs;
-        let orgImage = orgData.imageUrl;
+        const groupData = snapshot.data();
+        const creatorUID = groupData.creatorUID;
+        const groupName = groupData.name;
+        const groupID = context.params.groupID;
+        const aboutGroup = groupData.aboutGroup;
+        const groupTerms = groupData.groupTerms;
+        const awaitingApprovalUIDs = groupData.awaitingApprovalUIDs;
+        let groupImage = groupData.groupImage;
 
-        if (!orgImage) {
+        if (!groupImage) {
           const defaultImageUrl = "https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FdefaultImages%2Fgroup_icon.png?alt=media&token=657685ea-507c-4a4b-a05b-2d825ac2fc9f";
-          orgImage = defaultImageUrl;
+          groupImage = defaultImageUrl;
         }
 
         const notificationBatch = db.batch();
@@ -43,14 +43,14 @@ exports.onCreateOrganization = functions.firestore
           const notificationData = {
             creatorUID: creatorUID,
             recieverUID: uid,
-            organizationID: orgID,
+            groupID: groupID,
             notificationID: notificationId,
-            title: "New Organization Invitation",
-            description: `You've been invited to join ${orgName}`,
-            imageUrl: orgImage,
-            aboutOrganization: aboutOrg,
-            notificationType: "ORGANIZATION_INVITATION",
-            organizationTerms: orgTerms,
+            title: "New Group Invitation",
+            description: `You've been invited to join ${groupName}`,
+            imageUrl: groupImage,
+            aboutGroup: aboutGroup,
+            notificationType: "GROUP_INVITATION",
+            groupTerms: groupTerms,
             wasClicked: false,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             notificationDate: admin.firestore.FieldValue.serverTimestamp(),
@@ -67,9 +67,9 @@ exports.onCreateOrganization = functions.firestore
             if (userToken) {
               const message = {
                 notification: {
-                  title: "New Organization Invitation",
-                  body: `You've been invited to join ${orgName}`,
-                  image: orgImage,
+                  title: "New Group Invitation",
+                  body: `You've been invited to join ${groupName}`,
+                  image: groupImage,
                 },
                 android: {
                   notification: {
@@ -77,9 +77,9 @@ exports.onCreateOrganization = functions.firestore
                   },
                 },
                 data: {
-                  organizationID: orgID,
+                  groupID: groupID,
                   notificationID: notificationId,
-                  notificationType: "ORGANIZATION_INVITATION",
+                  notificationType: "GROUP_INVITATION",
                 },
                 token: userToken,
               };
@@ -94,20 +94,20 @@ exports.onCreateOrganization = functions.firestore
         await notificationBatch.commit();
         await Promise.all(notificationPromises);
 
-        log(`Notifications created and sent for new organization: ${orgID}`);
+        log(`Notifications created and sent for new group: ${groupID}`);
       } catch (e) {
-        log(`Error in onCreateOrganization for ${context.params.orgId}:`, e);
+        log(`Error in onCreateGroup for ${context.params.groupID}:`, e);
         throw e; // Re-throw the error to ensure the function fails
       }
     });
 
-exports.onUpdateOrganization = functions.firestore
-    .document("organizations/{orgId}")
+exports.onUpdateGroup = functions.firestore
+    .document("groups/{groupID}")
     .onUpdate(async (change, context) => {
       try {
         const newData = change.after.data();
         const previousData = change.before.data();
-        const orgID = context.params.orgId;
+        const groupID = context.params.groupID;
 
         // Check if awaitingApprovalUIDs has changed
         if (JSON.stringify(newData.awaitingApprovalUIDs) === JSON.stringify(previousData.awaitingApprovalUIDs)) {
@@ -123,11 +123,11 @@ exports.onUpdateOrganization = functions.firestore
         }
 
         const creatorUID = newData.creatorUID;
-        const orgName = newData.name;
-        let orgImage = newData.imageUrl;
+        const groupName = newData.name;
+        let groupImage = newData.groupImage;
 
-        if (!orgImage) {
-          orgImage = "https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FdefaultImages%2Fgroup_icon.png?alt=media&token=657685ea-507c-4a4b-a05b-2d825ac2fc9f";
+        if (!groupImage) {
+          groupImage = "https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FdefaultImages%2Fgroup_icon.png?alt=media&token=657685ea-507c-4a4b-a05b-2d825ac2fc9f";
         }
 
         const notificationBatch = db.batch();
@@ -140,14 +140,14 @@ exports.onUpdateOrganization = functions.firestore
           const notificationData = {
             creatorUID: creatorUID,
             recieverUID: uid,
-            organizationID: orgID,
+            groupID: groupID,
             notificationID: notificationId,
             title: "New Organization Invitation",
-            description: `You've been invited to join ${orgName}`,
-            imageUrl: orgImage,
-            aboutOrganization: newData.aboutOrganization,
-            notificationType: "ORGANIZATION_INVITATION",
-            organizationTerms: newData.organizationTerms,
+            description: `You've been invited to join ${groupName}`,
+            imageUrl: groupImage,
+            aboutGroup: newData.aboutGroup,
+            notificationType: "GROUP_INVITATION",
+            groupTerms: newData.groupTerms,
             wasClicked: false,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             notificationDate: admin.firestore.FieldValue.serverTimestamp(),
@@ -165,8 +165,8 @@ exports.onUpdateOrganization = functions.firestore
               const message = {
                 notification: {
                   title: "New Organization Invitation",
-                  body: `You've been invited to join ${orgName}`,
-                  image: orgImage,
+                  body: `You've been invited to join ${groupName}`,
+                  image: groupImage,
                 },
                 android: {
                   notification: {
@@ -174,9 +174,9 @@ exports.onUpdateOrganization = functions.firestore
                   },
                 },
                 data: {
-                  organizationID: orgID,
+                  groupID: groupID,
                   notificationID: notificationId,
-                  notificationType: "ORGANIZATION_INVITATION",
+                  notificationType: "GROUP_INVITATION",
                 },
                 token: userToken,
               };
@@ -191,26 +191,26 @@ exports.onUpdateOrganization = functions.firestore
         await notificationBatch.commit();
         await Promise.all(notificationPromises);
 
-        log(`Notifications created and sent for updated organization: ${orgID}. New UIDs: ${newUIDs.join(", ")}`);
+        log(`Notifications created and sent for updated group: ${groupID}. New UIDs: ${newUIDs.join(", ")}`);
       } catch (e) {
-        log(`Error in onUpdateOrganization for ${context.params.orgId}:`, e);
+        log(`Error in onUpdateGroup for ${context.params.groupID}:`, e);
         throw e;
       }
     });
 
 /**
  * Helper function to create and send notifications.
- * @param {string} orgID - The organization ID.
+ * @param {string} groupID - The organization ID.
  * @param {string} itemID - The ID of the created item.
  * @param {string} itemType - The type of the created item.
  * @param {string} itemTitle - The title of the created item.
  * @param {string} senderUID - The UID of the sender.
  * @return {Promise<void>}
  */
-async function createAndSendNotifications(orgID, itemID, itemType, itemTitle, senderUID) {
-  const orgDoc = await admin.firestore().doc(`organizations/${orgID}`).get();
-  const orgData = orgDoc.data();
-  const membersUIDs = orgData.membersUIDs || [];
+async function createAndSendNotifications(groupID, itemID, itemType, itemTitle, senderUID) {
+  const orgDoc = await admin.firestore().doc(`groups/${groupID}`).get();
+  const groupData = orgDoc.data();
+  const membersUIDs = groupData.membersUIDs || [];
 
   // Batch get user data
   const userRefs = membersUIDs.map((uid) => admin.firestore().doc(`users/${uid}`));
@@ -233,7 +233,7 @@ async function createAndSendNotifications(orgID, itemID, itemType, itemTitle, se
             },
             data: {
               [`${itemType.toLowerCase()}ID`]: itemID,
-              orgID: orgID,
+              groupID: groupID,
               notificationType: `${itemType.toUpperCase()}_NOTIFICATION`,
             },
             token: userData.token,
@@ -260,14 +260,14 @@ async function createAndSendNotifications(orgID, itemID, itemType, itemTitle, se
  */
 function createNotificationFunction(itemType, collectionPath) {
   return functions.firestore
-      .document(`organizations/{orgID}/${collectionPath}/{itemID}`)
+      .document(`groups/{groupID}/${collectionPath}/{itemID}`)
       .onCreate(async (snapshot, context) => {
         const itemData = snapshot.data();
-        const orgID = context.params.orgID;
+        const groupID = context.params.groupID;
         const itemID = context.params.itemID;
         const senderUID = itemData.createdBy;
 
-        await createAndSendNotifications(orgID, itemID, itemType, itemData.title, senderUID);
+        await createAndSendNotifications(groupID, itemID, itemType, itemData.title, senderUID);
       });
 }
 

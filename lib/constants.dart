@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/help/ai_tips_help_details.dart';
 import 'package:gemini_risk_assessor/help/dsti_help_details.dart';
 import 'package:gemini_risk_assessor/help/help_item.dart';
 import 'package:gemini_risk_assessor/help/navigation_help_details.dart';
-import 'package:gemini_risk_assessor/help/organisation_help_details.dart';
+import 'package:gemini_risk_assessor/help/group_help_details.dart';
 import 'package:gemini_risk_assessor/help/risk_assessment_help_details.dart';
 import 'package:gemini_risk_assessor/help/tools_help_details.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
@@ -58,7 +58,7 @@ class Constants {
   static const String screensControllerRoute = '/screensController';
   static const String optRoute = '/opt';
   static const String createToolRoute = '/createTool';
-  static const String createOrganizationRoute = '/createOrganization';
+  static const String createGroupRoute = '/createGroup';
   static const String chatRoute = '/chat';
   static const String emailSignUpRoute = '/emailSignUp';
   static const String emailSignInRoute = '/emailSignIn';
@@ -108,25 +108,25 @@ class Constants {
   static const String weather = 'weather';
   static const String summary = 'summary';
   static const String createdBy = 'createdBy';
-  static const String organizationID = 'organizationID';
+  static const String groupID = 'groupID';
   static const String pdfUrl = 'pdfUrl';
   static const String isShared = 'isShared';
 
   static const String password = 'password';
 
-  static const String orgArg = 'orgArg';
+  static const String groupArg = 'groupArg';
 
   static const String shareWithTitle = 'Shared With';
   static const String sharedWith = 'sharedWith';
   static const String discussions = 'Discussions';
 
-  // organization model constants
+  // group model constants
   static const String creatorUID = 'creatorUID';
-  static const String aboutOrganization = 'aboutOrganization';
+  static const String aboutGroup = 'aboutGroup';
   static const String address = 'address';
   static const String emailAddress = 'emailAddress';
   static const String websiteURL = 'websiteURL';
-  static const String organizationTerms = 'organizationTerms';
+  static const String groupTerms = 'groupTerms';
   static const String awaitingApprovalUIDs = 'awaitingApprovalUIDs';
   static const String membersUIDs = 'membersUIDs';
   static const String adminsUIDs = 'adminsUIDs';
@@ -134,11 +134,11 @@ class Constants {
   static const String allowSharing = 'allowSharing';
 
   static const String enterYourName = 'Enter your name';
-  static const String organizationName = 'Enter name';
+  static const String groupName = 'Enter name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
   static const String enterDescription = 'Enter description';
-  static const String enterTerms = 'Organization terms';
-  static const String termsOptional = 'Enter organization terms (optional)';
+  static const String enterTerms = 'Group terms';
+  static const String termsOptional = 'Enter group terms (optional)';
 
   static const String changeName = 'Change Name';
   static const String changeDescription = 'Change Description';
@@ -149,7 +149,7 @@ class Constants {
   static const String usersCollection = 'users';
   static const String promptCollection = 'prompts';
   static const String assessmentCollection = 'assessments';
-  static const String organizationCollection = 'organizations';
+  static const String groupsCollection = 'groups';
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
   static const String chatMessagesCollection = 'chatMessages';
@@ -158,7 +158,7 @@ class Constants {
   static const String discussionsCollection = 'discussions';
   static const String nearMissesCollection = 'nearMisses';
 
-  static const String organizationImage = 'organizationImage';
+  static const String groupImage = 'groupImage';
 
   static const String exitSuccessful = 'Exit Successful';
   static const String exitFailed = 'Exit Failed';
@@ -211,7 +211,7 @@ class Constants {
   static const String dstiNotification = 'DSTI_NOTIFICATION';
   static const String assessmentNotification = 'ASSESSMENT_NOTIFICATION';
   static const String toolsNotification = 'TOOLS_NOTIFICATION';
-  static const String organizationInvitation = 'ORGANIZATION_INVITATION';
+  static const String groupInvitation = 'GROUP_INVITATION';
   static const String requestNotification = 'REQUEST_NOTIFICATION';
   static const String descussNotification = 'DESCUSS_NOTIFICATION';
 
@@ -220,7 +220,7 @@ class Constants {
   static const String signature = 'signature';
 
   // default description
-  static const String defaultDescription = 'Organization Description';
+  static const String defaultDescription = 'Group Description';
 
   static String getDoctTitle(String docTitle) {
     if (docTitle == createAssessment) {
@@ -300,9 +300,9 @@ class Constants {
       detailScreen: const ToolsHelpDetails(),
     ),
     HelpItem(
-      title: 'Organization Management',
-      description: 'Managing and interacting with organizations',
-      detailScreen: const OrganizationHelpDetails(),
+      title: 'Group Management',
+      description: 'Managing and interacting with groups',
+      detailScreen: const GroupHelpDetails(),
     ),
     HelpItem(
       title: 'AI Integration Tips',

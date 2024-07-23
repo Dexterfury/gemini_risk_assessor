@@ -18,20 +18,18 @@ class MyDataStream extends StatelessWidget {
   const MyDataStream({
     super.key,
     required this.generationType,
-    this.orgID = '',
-    this.isDiscussion = false,
+    this.groupID = '',
   });
 
   final GenerationType generationType;
-  final String orgID;
-  final bool isDiscussion;
+  final String groupID;
 
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final stream = getStream(
       uid,
-      orgID,
+      groupID,
       generationType,
     );
 
@@ -96,7 +94,6 @@ class MyDataStream extends StatelessWidget {
                             final tool = ToolModel.fromJson(data);
                             return ToolGridItem(
                               toolModel: tool,
-                              isDiscussion: isDiscussion,
                             );
                           },
                         )
@@ -114,7 +111,6 @@ class MyDataStream extends StatelessWidget {
                             final tool = ToolModel.fromJson(data);
                             return ToolGridItem(
                               toolModel: tool,
-                              isDiscussion: isDiscussion,
                             );
                           },
                         )
@@ -127,9 +123,8 @@ class MyDataStream extends StatelessWidget {
                             final assessment = AssessmentModel.fromJson(data);
                             return ListItem(
                               docTitle: title,
-                              orgID: '',
+                              groupID: '',
                               data: assessment,
-                              isDiscussion: isDiscussion,
                             );
                           },
                         )
@@ -141,9 +136,8 @@ class MyDataStream extends StatelessWidget {
                             final item = AssessmentModel.fromJson(data);
                             return ListItem(
                               docTitle: title,
-                              orgID: '',
+                              groupID: '',
                               data: item,
-                              isDiscussion: isDiscussion,
                             );
                           },
                         );
@@ -156,29 +150,29 @@ class MyDataStream extends StatelessWidget {
 
   getStream(
     String uid,
-    String orgID,
+    String groupID,
     GenerationType generationType,
   ) {
     switch (generationType) {
       case GenerationType.dsti:
         return FirebaseMethods.dstiStream(
           userId: uid,
-          orgID: orgID,
+          groupID: groupID,
         );
       case GenerationType.riskAssessment:
         return FirebaseMethods.ristAssessmentsStream(
           userId: uid,
-          orgID: orgID,
+          groupID: groupID,
         );
       case GenerationType.tool:
         return FirebaseMethods.toolsStream(
           userId: uid,
-          orgID: orgID,
+          groupID: groupID,
         );
       default:
         return FirebaseMethods.dstiStream(
           userId: uid,
-          orgID: orgID,
+          groupID: groupID,
         );
     }
   }

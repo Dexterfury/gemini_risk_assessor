@@ -26,8 +26,7 @@ class NearMissProvider extends ChangeNotifier {
       sharedWith: [],
       reactions: [],
       createdBy: '', // You might want to set this to the current user's ID
-      organizationID:
-          '', // You might want to set this to the current organization's ID
+      groupID: '', // You might want to set this to the current group's ID
       createdAt: DateTime.now().toIso8601String(),
     );
     notifyListeners();

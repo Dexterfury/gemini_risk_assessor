@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/search/people_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -34,7 +34,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<OrganizationProvider>().setInitialMemberState();
+      context.read<GroupProvider>().setInitialMemberState();
     });
   }
 
@@ -46,8 +46,8 @@ class _PeopleScreenState extends State<PeopleScreen> {
   }
 
   void _updateHasChanges() {
-    final orgProvider = context.read<OrganizationProvider>();
-    _hasChanges.value = orgProvider.hasChanges();
+    final groupProvider = context.read<GroupProvider>();
+    _hasChanges.value = groupProvider.hasChanges();
   }
 
   @override
@@ -152,9 +152,9 @@ class _PeopleScreenState extends State<PeopleScreen> {
   }
 
   Widget _buildSliverAppBar(BuildContext context) {
-    final orgProvider = context.watch<OrganizationProvider>();
+    final groupProvider = context.watch<GroupProvider>();
     final isCreation = widget.userViewType == UserViewType.creator;
-    final listNotEmpty = orgProvider.awaitApprovalsList.isNotEmpty;
+    final listNotEmpty = groupProvider.awaitApprovalsList.isNotEmpty;
     return SliverAppBar(
       leading: const BackButton(),
       title: const FittedBox(
@@ -167,10 +167,9 @@ class _PeopleScreenState extends State<PeopleScreen> {
             if (widget.userViewType == UserViewType.tempPlus && hasChanges) {
               return IconButton(
                 onPressed: () async {
-                  final orgProvider = context.read<OrganizationProvider>();
-                  if (orgProvider.isLoading) return;
-                  await orgProvider
-                      .updateOrganizationDataInFireStore()
+                  if (groupProvider.isLoading) return;
+                  await groupProvider
+                      .updateGroupDataInFireStore()
                       .whenComplete(() {
                     showSnackBar(
                       context: context,
@@ -206,7 +205,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            orgProvider.clearAwaitingApprovalList();
+                            groupProvider.clearAwaitingApprovalList();
                             Navigator.pop(context);
                           },
                           child: const Text('Yes'),

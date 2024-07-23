@@ -39,7 +39,7 @@ class AssessmentProvider extends ChangeNotifier {
   //File? _pdfAssessmentFile;
   bool _hasSigned = false;
   Uint8List? _signatureImage;
-  String _organizationID = '';
+  String _groupID = '';
   String _uid = '';
   final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
 
@@ -55,25 +55,25 @@ class AssessmentProvider extends ChangeNotifier {
   //File? get pdfAssessmentFile => _pdfAssessmentFile;
   bool get hasSigned => _hasSigned;
   Uint8List? get signatureImage => _signatureImage;
-  String get organizationID => _organizationID;
+  String get groupID => _groupID;
   String get uid => _uid;
   GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
-  final CollectionReference _organizationCollection =
-      FirebaseFirestore.instance.collection(Constants.organizationCollection);
+  final CollectionReference _groupsCollection =
+      FirebaseFirestore.instance.collection(Constants.groupsCollection);
 
   Future<void> setDocData(
     String desc,
     String creatorID,
-    String orgID,
+    String groupID,
     String docTitle,
   ) async {
     _description = desc;
     _uid = creatorID;
-    _organizationID = orgID;
+    _groupID = groupID;
     _pdfHeading = docTitle;
     notifyListeners();
   }
@@ -164,7 +164,7 @@ class AssessmentProvider extends ChangeNotifier {
 
   // save assement to firetore
   Future<void> saveDataToFirestore() async {
-    final id = _organizationID.isNotEmpty ? _organizationID : _uid;
+    final id = _groupID.isNotEmpty ? _groupID : _uid;
     // get folder directory
     final folderName = Constants.getFolderName(_pdfHeading);
 
@@ -182,7 +182,7 @@ class AssessmentProvider extends ChangeNotifier {
       _assessmentModel.images = imagesUrls;
     }
 
-    if (_organizationID.isEmpty) {
+    if (_groupID.isEmpty) {
       if (_pdfHeading == Constants.riskAssessment) {
         // save to user's database
         await _usersCollection
@@ -201,20 +201,20 @@ class AssessmentProvider extends ChangeNotifier {
         // save to user's database end.
       }
     } else {
-      // add organizationID
-      assessmentModel.organizationID = _organizationID;
+      // add groupID
+      assessmentModel.groupID = _groupID;
 
       if (_pdfHeading == Constants.riskAssessment) {
-        // save to organization's database
-        await _organizationCollection
-            .doc(_organizationID)
+        // save to group's database
+        await _groupsCollection
+            .doc(_groupID)
             .collection(Constants.assessmentCollection)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
       } else {
-        // save to organization's database
-        await _organizationCollection
-            .doc(_organizationID)
+        // save to group's database
+        await _groupsCollection
+            .doc(_groupID)
             .collection(Constants.dstiCollections)
             .doc(assessmentModel.id)
             .set(assessmentModel.toJson());
@@ -548,7 +548,7 @@ class AssessmentProvider extends ChangeNotifier {
 
   Future<void> submitPrompt({
     required String creatorID,
-    required String orgID,
+    required String groupID,
     required String description,
     required String docTitle,
     required Function() onSuccess,
@@ -568,7 +568,7 @@ class AssessmentProvider extends ChangeNotifier {
     await setDocData(
       description,
       creatorID,
-      orgID,
+      groupID,
       docTitle,
     );
 
@@ -595,7 +595,7 @@ class AssessmentProvider extends ChangeNotifier {
           content,
           assessmentId,
           creatorID,
-          _organizationID,
+          _groupID,
           _weather.name,
           _assessmentModel.ppe,
           images,
@@ -659,14 +659,14 @@ equipments, hazards and risks should be of type List<String>
 
   Future<void> submitTestAssessment({
     required String creatorID,
-    required String orgID,
+    required String groupID,
     required String docTitle,
   }) async {
     _isLoading = true;
     await setDocData(
       description,
       creatorID,
-      orgID,
+      groupID,
       docTitle,
     );
     final List<String> images = [];
@@ -681,7 +681,7 @@ equipments, hazards and risks should be of type List<String>
       testAssessment,
       assessmentId,
       creatorID,
-      organizationID,
+      groupID,
       _weather.name,
       _assessmentModel.ppe,
       images,

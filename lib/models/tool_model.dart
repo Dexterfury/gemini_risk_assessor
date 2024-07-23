@@ -14,7 +14,7 @@ class ToolModel {
   List<String> sharedWith;
   int discussions;
   String createdBy;
-  String organizationID;
+  String groupID;
   DateTime createdAt;
 
   // constructor
@@ -29,7 +29,7 @@ class ToolModel {
     required this.sharedWith,
     required this.discussions,
     required this.createdBy,
-    required this.organizationID,
+    required this.groupID,
     required this.createdAt,
   });
 
@@ -37,7 +37,7 @@ class ToolModel {
     GenerateContentResponse content,
     String toolId,
     String creatorID,
-    String organizationID,
+    String groupID,
     List<String> images,
     DateTime createdAt,
   ) {
@@ -58,7 +58,7 @@ class ToolModel {
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
         discussions: json[Constants.discussions] ?? 0,
         createdBy: creatorID,
-        organizationID: organizationID,
+        groupID: groupID,
         createdAt: createdAt,
       );
     }
@@ -79,7 +79,7 @@ class ToolModel {
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
       discussions: json[Constants.discussions] ?? 0,
       createdBy: json[Constants.createdBy] ?? '',
-      organizationID: json[Constants.organizationID] ?? '',
+      groupID: json[Constants.groupID] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
     );
   }
@@ -97,7 +97,7 @@ class ToolModel {
       Constants.sharedWith: sharedWith,
       Constants.discussions: discussions,
       Constants.createdBy: createdBy,
-      Constants.organizationID: organizationID,
+      Constants.groupID: groupID,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }
@@ -114,7 +114,7 @@ class ToolModel {
     List<String>? sharedWith,
     int? discussions,
     String? createdBy,
-    String? organizationID,
+    String? groupID,
     DateTime? createdAt,
   }) {
     return ToolModel(
@@ -128,7 +128,7 @@ class ToolModel {
       sharedWith: sharedWith ?? this.sharedWith,
       discussions: discussions ?? this.discussions,
       createdBy: createdBy ?? this.createdBy,
-      organizationID: organizationID ?? this.organizationID,
+      groupID: groupID ?? this.groupID,
       createdAt: createdAt ?? this.createdAt,
     );
   }

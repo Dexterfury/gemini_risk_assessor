@@ -1,10 +1,10 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/screens/create_organization_screen.dart';
+import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 
-class OrganizationFabButton extends StatelessWidget {
-  const OrganizationFabButton({
+class GroupFabButton extends StatelessWidget {
+  const GroupFabButton({
     super.key,
   });
 
@@ -15,7 +15,7 @@ class OrganizationFabButton extends StatelessWidget {
         return FloatingActionButton.extended(
           backgroundColor: Theme.of(context).primaryColor,
           label: const Text(
-            'Create Organization',
+            'Create Group',
             style: TextStyle(color: Colors.white),
           ),
           onPressed: action,
@@ -23,7 +23,7 @@ class OrganizationFabButton extends StatelessWidget {
       },
       openBuilder: (context, action) {
         // navigate to people screen
-        return const CreateOrganizationScreen();
+        return const CreateGroupScreen();
       },
       closedShape:
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -38,7 +38,7 @@ class OrganizationFabButton extends StatelessWidget {
     //   transitionType: ContainerTransitionType.fadeThrough,
     //   transitionDuration: const Duration(milliseconds: 500),
     //   openBuilder: (BuildContext context, VoidCallback _) {
-    //     return const CreateOrganizationScreen();
+    //     return const CreateGroupScreen();
     //   },
     //   closedElevation: cardElevation,
     //   closedShape: const RoundedRectangleBorder(

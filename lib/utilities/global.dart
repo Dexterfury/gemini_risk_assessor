@@ -5,8 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/organization_model.dart';
-import 'package:gemini_risk_assessor/providers/organization_provider.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../providers/tool_provider.dart';
@@ -253,9 +252,9 @@ IconData getAuthIcon(SignInType signInType) {
 
 //  get member count function
 String getMembersCount(
-  OrganizationProvider orgProvider,
+  GroupProvider groupProvider,
 ) {
-  int count = orgProvider.awaitApprovalsList.length;
+  int count = groupProvider.awaitApprovalsList.length;
 
   if (count == 0) {
     return '';

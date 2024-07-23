@@ -6,12 +6,12 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/widgets/settings_switch_list_tile.dart';
 
-class OrganizationSettingsScreen extends StatefulWidget {
+class GroupSettingsScreen extends StatefulWidget {
   final bool isNew;
   final DataSettings initialSettings;
   final Function(DataSettings) onSave;
 
-  const OrganizationSettingsScreen({
+  const GroupSettingsScreen({
     super.key,
     required this.isNew,
     required this.initialSettings,
@@ -19,12 +19,10 @@ class OrganizationSettingsScreen extends StatefulWidget {
   });
 
   @override
-  State<OrganizationSettingsScreen> createState() =>
-      _OrganizationSettingsScreenState();
+  State<GroupSettingsScreen> createState() => _GroupSettingsScreenState();
 }
 
-class _OrganizationSettingsScreenState
-    extends State<OrganizationSettingsScreen> {
+class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   late DataSettings _currentSettings;
 
   @override
@@ -33,14 +31,14 @@ class _OrganizationSettingsScreenState
     _currentSettings = DataSettings(
       requestToReadTerms: widget.initialSettings.requestToReadTerms,
       allowSharing: widget.initialSettings.allowSharing,
-      organizationTerms: widget.initialSettings.organizationTerms,
+      groupTerms: widget.initialSettings.groupTerms,
     );
   }
 
   void _showTermsEditDialog(BuildContext context, {bool fromSwitch = false}) {
     MyDialogs.animatedEditTermsDialog(
       context: context,
-      initialTerms: _currentSettings.organizationTerms,
+      initialTerms: _currentSettings.groupTerms,
       action: (String newTerms) {
         if (newTerms.length < 10) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +52,7 @@ class _OrganizationSettingsScreenState
           });
         } else {
           setState(() {
-            _currentSettings.organizationTerms = newTerms;
+            _currentSettings.groupTerms = newTerms;
             if (fromSwitch) {
               _currentSettings.requestToReadTerms = true;
             }
@@ -66,7 +64,7 @@ class _OrganizationSettingsScreenState
 
   void _handleRequestToReadChange(bool value) {
     if (value) {
-      if (_currentSettings.organizationTerms.length < 10) {
+      if (_currentSettings.groupTerms.length < 10) {
         _showTermsEditDialog(context, fromSwitch: true);
       } else {
         setState(() {
@@ -97,47 +95,47 @@ class _OrganizationSettingsScreenState
       child: Scaffold(
         appBar: MyAppBar(
           leading: BackButton(onPressed: _saveAndPop),
-          title: widget.isNew
-              ? 'Organization Settings'
-              : 'Edit Organization Settings',
+          title: widget.isNew ? 'Group Settings' : 'Edit Group Settings',
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
-          child: Column(
-            children: [
-              SettingsSwitchListTile(
-                title: 'Request to read terms',
-                subtitle:
-                    'Request new members to read the team\'s information before they can join',
-                icon: FontAwesomeIcons.readme,
-                containerColor: Colors.green,
-                value: _currentSettings.requestToReadTerms,
-                onChanged: _handleRequestToReadChange,
-              ),
-              const SizedBox(height: 20),
-              SettingsSwitchListTile(
-                title: 'Allow sharing',
-                subtitle:
-                    'Allow members to share their generated DSTIs, RiskAssessments, and Tools with this organization',
-                icon: FontAwesomeIcons.share,
-                containerColor: Colors.blue,
-                value: _currentSettings.allowSharing,
-                onChanged: (value) {
-                  setState(() {
-                    _currentSettings.allowSharing = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 40),
-              SizedBox(
-                height: 50,
-                child: MainAppButton(
-                  label: ' Edit Terms and Conditions ',
-                  borderRadius: 15.0,
-                  onTap: () => _showTermsEditDialog(context),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SettingsSwitchListTile(
+                  title: 'Request to read terms',
+                  subtitle:
+                      'Request new members to read the team\'s information before they can join',
+                  icon: FontAwesomeIcons.readme,
+                  containerColor: Colors.green,
+                  value: _currentSettings.requestToReadTerms,
+                  onChanged: _handleRequestToReadChange,
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                SettingsSwitchListTile(
+                  title: 'Allow sharing',
+                  subtitle:
+                      'Allow members to share their generated DSTIs, RiskAssessments, and Tools with this organization',
+                  icon: FontAwesomeIcons.share,
+                  containerColor: Colors.blue,
+                  value: _currentSettings.allowSharing,
+                  onChanged: (value) {
+                    setState(() {
+                      _currentSettings.allowSharing = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  height: 50,
+                  child: MainAppButton(
+                    label: ' Edit Terms and Conditions ',
+                    borderRadius: 15.0,
+                    onTap: () => _showTermsEditDialog(context),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -21,7 +21,7 @@ class AssessmentModel {
   String weather;
   String summary;
   String createdBy;
-  String organizationID;
+  String groupID;
   String pdfUrl;
   DateTime createdAt;
 
@@ -43,7 +43,7 @@ class AssessmentModel {
     required this.weather,
     required this.summary,
     required this.createdBy,
-    required this.organizationID,
+    required this.groupID,
     required this.pdfUrl,
     required this.createdAt,
   });
@@ -52,7 +52,7 @@ class AssessmentModel {
     String testString,
     String assessmentId,
     String creatorID,
-    String organizationID,
+    String groupID,
     String weather,
     List<String> testppe,
     List<String> testImages,
@@ -80,7 +80,7 @@ class AssessmentModel {
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
-        organizationID: organizationID,
+        groupID: groupID,
         pdfUrl: json[Constants.pdfFiles] ?? '',
         createdAt: createdAt,
       );
@@ -93,7 +93,7 @@ class AssessmentModel {
     GenerateContentResponse content,
     String assessmentId,
     String creatorID,
-    String organizationID,
+    String groupID,
     String weather,
     List<String> ppe,
     List<String> images,
@@ -123,7 +123,7 @@ class AssessmentModel {
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
-        organizationID: organizationID,
+        groupID: groupID,
         pdfUrl: json[Constants.pdfUrl] ?? '',
         createdAt: createdAt,
       );
@@ -151,7 +151,7 @@ class AssessmentModel {
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
-      organizationID: json[Constants.organizationID] ?? '',
+      groupID: json[Constants.groupID] ?? '',
       pdfUrl: json[Constants.pdfUrl] ?? '',
       createdAt:
           DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt] ?? 0),
@@ -177,7 +177,7 @@ class AssessmentModel {
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
-      Constants.organizationID: organizationID,
+      Constants.groupID: groupID,
       Constants.pdfUrl: pdfUrl,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
@@ -202,7 +202,7 @@ class AssessmentModel {
     String? weather,
     String? summary,
     String? createdBy,
-    String? organizationID,
+    String? groupID,
     String? pdfUrl,
     DateTime? createdAt,
   }) {
@@ -224,7 +224,7 @@ class AssessmentModel {
       weather: weather ?? this.weather,
       summary: summary ?? this.summary,
       createdBy: createdBy ?? this.createdBy,
-      organizationID: organizationID ?? this.organizationID,
+      groupID: groupID ?? this.groupID,
       pdfUrl: pdfUrl ?? this.pdfUrl,
       createdAt: createdAt ?? this.createdAt,
     );

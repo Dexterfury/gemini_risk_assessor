@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';

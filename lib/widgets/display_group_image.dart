@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
-class DisplayOrgImage extends StatelessWidget {
-  const DisplayOrgImage({
+class DisplayGroupImage extends StatelessWidget {
+  const DisplayGroupImage({
     super.key,
     this.isViewOnly = false,
     this.fileImage,
@@ -21,7 +21,7 @@ class DisplayOrgImage extends StatelessWidget {
       height: 100,
       width: 130,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
         child: GestureDetector(
           onTap: onPressed,
           child: MyImageCacheManager.showImage(
@@ -35,7 +35,7 @@ class DisplayOrgImage extends StatelessWidget {
     );
   }
 
-  // Widget showOrganisationImage(
+  // Widget showGroupImage(
   //   File? fileImage,
   //   String imageUrl,
   // ) {
