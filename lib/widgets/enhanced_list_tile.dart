@@ -10,7 +10,7 @@ class EnhancedListTile extends StatelessWidget {
   final String summary;
   final VoidCallback onTap;
   final int messageCount;
-  final int likeCount;
+  final bool isGroup;
   final VoidCallback onMessageTap;
   final VoidCallback onGeminiTap;
 
@@ -21,7 +21,7 @@ class EnhancedListTile extends StatelessWidget {
     required this.summary,
     required this.onTap,
     required this.messageCount,
-    required this.likeCount,
+    required this.isGroup,
     required this.onMessageTap,
     required this.onGeminiTap,
   }) : super(key: key);
@@ -35,24 +35,26 @@ class EnhancedListTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox(
-                width: 80,
-                height: 80,
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Center(
-                    child: Icon(Icons.error, color: Colors.red),
+            if (imageUrl.isNotEmpty) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(Icons.error, color: Colors.red),
+                    ),
+                    cacheManager: MyImageCacheManager.itemsCacheManager,
                   ),
-                  cacheManager: MyImageCacheManager.itemsCacheManager,
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
+              const SizedBox(width: 16),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,23 +72,24 @@ class EnhancedListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildButton(
-                          context,
-                          FontAwesomeIcons.message,
-                          messageCount,
-                          onMessageTap,
+                  if (isGroup)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildButton(
+                            context,
+                            FontAwesomeIcons.message,
+                            messageCount,
+                            onMessageTap,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: SizedBox(
-                          height: 30,
-                          width: 30,
-                          child: FloatingActionButton(
+                        const SizedBox(width: 16),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: FloatingActionButton(
                               onPressed: onGeminiTap,
                               backgroundColor: Colors.white,
                               elevation: 4.0,
@@ -101,15 +104,12 @@ class EnhancedListTile extends StatelessWidget {
                                   backgroundImage:
                                       AssetImage(AssetsManager.geminiLogo1),
                                 ),
-                              )
-
-                              // Icon(widget.icon,
-                              //     color: widget.iconColor, size: buttonSize * 0.5),
                               ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                 ],
               ),
             ),

@@ -116,7 +116,7 @@ class Constants {
 
   static const String groupArg = 'groupArg';
 
-  static const String shareWithTitle = 'Shared With';
+  static const String shareWithTitle = 'Share With';
   static const String sharedWith = 'sharedWith';
   static const String discussions = 'Discussions';
 

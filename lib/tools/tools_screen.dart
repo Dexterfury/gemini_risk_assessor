@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/search/my_data_stream.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/grid_item.dart';
+import 'package:gemini_risk_assessor/tools/tool_item.dart';
 import 'package:provider/provider.dart';
 
 class ToolsScreen extends StatefulWidget {
@@ -118,32 +118,29 @@ class _ToolsScreenState extends State<ToolsScreen> {
                             ),
                           ),
                           SliverPadding(
-                              padding: const EdgeInsets.all(8.0),
-                              sliver: results.isEmpty
-                                  ? const SliverFillRemaining(
-                                      child: Center(
-                                          child: Text('No matching results')),
-                                    )
-                                  : SliverGrid(
-                                      gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        childAspectRatio: 1,
-                                      ),
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, index) {
-                                          final doc = results[index];
-                                          final data = doc.data()
-                                              as Map<String, dynamic>;
+                            padding: const EdgeInsets.all(8.0),
+                            sliver: results.isEmpty
+                                ? const SliverFillRemaining(
+                                    child: Center(
+                                        child: Text('No matching results')),
+                                  )
+                                : SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        final doc = results[index];
+                                        final data =
+                                            doc.data() as Map<String, dynamic>;
 
-                                          final tool = ToolModel.fromJson(data);
-                                          return ToolGridItem(
-                                            toolModel: tool,
-                                          );
-                                        },
-                                        childCount: results.length,
-                                      ),
-                                    )),
+                                        final tool = ToolModel.fromJson(data);
+                                        return ToolItem(
+                                          toolModel: tool,
+                                          groupID: widget.groupID,
+                                        );
+                                      },
+                                      childCount: results.length,
+                                    ),
+                                  ),
+                          ),
                         ],
                       )
                     : const MyDataStream(

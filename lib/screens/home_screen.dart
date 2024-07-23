@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
-import 'package:gemini_risk_assessor/screens/tools_screen.dart';
+import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';

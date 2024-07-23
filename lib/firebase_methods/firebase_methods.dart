@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,7 +6,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/discussion_message.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class FirebaseMethods {
@@ -30,11 +28,19 @@ class FirebaseMethods {
       return _groupsCollection
           .doc(groupID)
           .collection(Constants.toolsCollection)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
           .snapshots();
     } else {
       return _usersCollection
           .doc(userId)
           .collection(Constants.toolsCollection)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
           .snapshots();
     }
   }
@@ -48,11 +54,19 @@ class FirebaseMethods {
       return _groupsCollection
           .doc(groupID)
           .collection(Constants.dstiCollections)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
           .snapshots();
     } else {
       return _usersCollection
           .doc(userId)
           .collection(Constants.dstiCollections)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
           .snapshots();
     }
   }
@@ -73,25 +87,56 @@ class FirebaseMethods {
       return _groupsCollection
           .doc(groupID)
           .collection(Constants.assessmentCollection)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
           .snapshots();
     } else {
       return _usersCollection
           .doc(userId)
           .collection(Constants.assessmentCollection)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
           .snapshots();
     }
   }
 
   // stream groups from firestore
-  static Stream<QuerySnapshot> groupsStream({
-    required String userId,
-  }) {
-    return _groupsCollection
-        .where(
-          Constants.membersUIDs,
-          arrayContains: userId,
-        )
-        .snapshots();
+  static Stream<QuerySnapshot> groupsStream(
+      {required String userId,
+      required String groupID,
+      required bool fromShare}) {
+    if (fromShare) {
+      if (groupID.isNotEmpty) {
+        return _groupsCollection
+            .where(Constants.membersUIDs, arrayContains: userId)
+            .where(Constants.groupID, isNotEqualTo: groupID)
+            .orderBy(
+              Constants.createdAt,
+              descending: true,
+            )
+            .snapshots();
+      } else {
+        return _groupsCollection
+            .where(Constants.membersUIDs, arrayContains: userId)
+            .orderBy(
+              Constants.createdAt,
+              descending: true,
+            )
+            .snapshots();
+      }
+    } else {
+      return _groupsCollection
+          .where(Constants.membersUIDs, arrayContains: userId)
+          .orderBy(
+            Constants.createdAt,
+            descending: true,
+          )
+          .snapshots();
+    }
   }
 
   // check if the group has any assessments, dsti or tools saved in firestore
@@ -132,12 +177,14 @@ class FirebaseMethods {
       return _usersCollection
           .doc(userId)
           .collection(Constants.notificationsCollection)
+          .orderBy(Constants.createdAt)
           .snapshots();
     } else {
       return _usersCollection
           .doc(userId)
           .collection(Constants.notificationsCollection)
           .where(Constants.wasClicked, isEqualTo: false)
+          .orderBy(Constants.createdAt)
           .snapshots();
     }
   }
@@ -400,6 +447,7 @@ class FirebaseMethods {
     return _groupsCollection
         .doc(groupID)
         .collection(Constants.nearMissesCollection)
+        .orderBy(Constants.createdAt)
         .snapshots();
   }
 

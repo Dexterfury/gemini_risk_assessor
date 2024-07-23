@@ -26,7 +26,8 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
   Widget build(BuildContext context) {
     final appBarTitle = widget.assessment.title;
     final appBarSubtitle = widget.assessment.summary;
-    final appBarImage = widget.assessment.images[0];
+    final appBarImage =
+        widget.assessment.images.isNotEmpty ? widget.assessment.images[0] : '';
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: DiscussionAppBar(

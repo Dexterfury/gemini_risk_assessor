@@ -19,6 +19,8 @@ class GroupsSearchStream extends StatelessWidget {
       return StreamBuilder<QuerySnapshot>(
         stream: FirebaseMethods.groupsStream(
           userId: uid,
+          groupID: '',
+          fromShare: false,
         ),
         builder: (
           BuildContext context,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 
 class ToolChatDiscussionScreen extends StatefulWidget {
   const ToolChatDiscussionScreen({

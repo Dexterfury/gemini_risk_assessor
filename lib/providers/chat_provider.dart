@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';

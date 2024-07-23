@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
@@ -104,9 +104,9 @@ class ImagesDisplay extends StatelessWidget {
       return _assessmentViewImages();
     } else if (isViewOnly && currentToolModel != null) {
       return _toolViewImages();
-    }
-    if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
-      return const Text('No images added');
+      // }
+      // if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
+      //   return const Text('No images added');
     } else {
       return ProviderViewImages(
         isViewOnly: isViewOnly,

@@ -28,18 +28,19 @@ class ListItem extends StatelessWidget {
     final generationType = getGenerationType(docTitle);
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final chatProvider = context.read<ChatProvider>();
+    final image = data.images.isNotEmpty ? data.images.first : '';
     return Card(
       color: Theme.of(context).cardColor,
       elevation: cardElevation,
       child: OpenContainer(
         closedBuilder: (context, action) {
           return EnhancedListTile(
-            imageUrl: data.images.first,
+            imageUrl: image,
             title: data.title,
             summary: data.summary,
             onTap: action,
             messageCount: 5, // Replace with actual count
-            likeCount: 10, // Replace with actual count
+            isGroup: groupID.isNotEmpty,
             onMessageTap: () {
               // Handle message tap
               // Navigate to the chat screen

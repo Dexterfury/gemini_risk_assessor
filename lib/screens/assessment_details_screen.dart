@@ -73,6 +73,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
     // id
     final id = assessmentModel.id;
 
+    final capitalizedWeather = weather.isNotEmpty
+        ? weather[0].toUpperCase() + weather.substring(1)
+        : 'Unknown';
+
     // get generationType
     final generationType = getGenerationType(appBarTitle);
 
@@ -145,36 +149,29 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Task to Achieve:',
+                    'Task',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: SizedBox(
-                      width: 100,
-                      child: WeatherButton(
-                          title: weather,
-                          value: true,
-                          iconData: getWeatherIcon(
-                            WeatherExtension.fromString(
-                              weather,
-                            ),
-                          ),
-                          onChanged: () {}),
+                  Icon(
+                    getWeatherIcon(
+                      WeatherExtension.fromString(
+                        weather,
+                      ),
                     ),
                   ),
                 ],
               ),
               Text(task),
               const SizedBox(height: 10),
-              ImagesDisplay(
-                isViewOnly: true,
-                assessmentProvider: assessmentProvider,
-                currentAssessmentModel: currentModel,
-              ),
+              if (assessmentModel.images.isNotEmpty)
+                ImagesDisplay(
+                  isViewOnly: true,
+                  assessmentProvider: assessmentProvider,
+                  currentAssessmentModel: currentModel,
+                ),
               const SizedBox(height: 10),
               AssessmentGridItems(
                 equipments: equipments,
@@ -333,6 +330,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   // navigate to screen depending on the clicked icon
                   return ShareScreen(
                     itemModel: assessmentModel,
+                    groupID: groupID,
                     generationType: generationType,
                   );
                 },

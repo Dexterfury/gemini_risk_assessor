@@ -20,7 +20,7 @@ import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
-import 'package:gemini_risk_assessor/screens/create_explainer_screen.dart';
+import 'package:gemini_risk_assessor/tools/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/profile_screen.dart';

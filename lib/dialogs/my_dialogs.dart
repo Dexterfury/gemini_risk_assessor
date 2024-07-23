@@ -304,7 +304,7 @@ class MyDialogs {
     required String textAction,
     required Function(bool, String) onActionTap,
   }) {
-    TextEditingController controller = TextEditingController(text: hintText);
+    TextEditingController controller = TextEditingController();
     showGeneralDialog(
       context: context,
       barrierDismissible: true,

@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_misses_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
-import 'package:gemini_risk_assessor/screens/tools_screen.dart';
+import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 

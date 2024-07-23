@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
@@ -20,11 +20,13 @@ class ShareScreen extends StatefulWidget {
     super.key,
     this.itemModel,
     this.toolModel,
+    this.groupID = '',
     required this.generationType,
   });
 
   final AssessmentModel? itemModel;
   final ToolModel? toolModel;
+  final String groupID;
   final GenerationType generationType;
 
   @override
@@ -77,7 +79,12 @@ class _ShareScreenState extends State<ShareScreen> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(
+              color: Colors.red,
+            ),
+          ),
         ),
         TextButton(
           onPressed: () async {
@@ -120,6 +127,8 @@ class _ShareScreenState extends State<ShareScreen> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseMethods.groupsStream(
             userId: uid,
+            groupID: widget.groupID,
+            fromShare: true,
           ),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -135,7 +144,7 @@ class _ShareScreenState extends State<ShareScreen> {
               return const Scaffold(
                 appBar: MyAppBar(
                   leading: BackButton(),
-                  title: Constants.sharedWith,
+                  title: Constants.shareWithTitle,
                 ),
                 body: Center(
                   child: Padding(
@@ -166,7 +175,7 @@ class _ShareScreenState extends State<ShareScreen> {
                       leading: const BackButton(),
                       title: const FittedBox(
                         child: Text(
-                          Constants.sharedWith,
+                          Constants.shareWithTitle,
                         ),
                       ),
                       pinned: true,
@@ -207,6 +216,9 @@ class _ShareScreenState extends State<ShareScreen> {
                                         doc.data() as Map<String, dynamic>;
 
                                     final group = GroupModel.fromJson(data);
+                                    if (group.groupID == widget.groupID) {
+                                      return const SizedBox.shrink();
+                                    }
 
                                     return shareGridItem(group, uid);
                                   },
@@ -225,6 +237,7 @@ class _ShareScreenState extends State<ShareScreen> {
 
   shareGridItem(GroupModel group, String uid) {
     return Card(
+      color: Theme.of(context).cardColor,
       child: GestureDetector(
         onTap: () {
           _handleSharing(group, uid);

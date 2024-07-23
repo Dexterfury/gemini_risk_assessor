@@ -10,7 +10,7 @@ import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
 import 'package:gemini_risk_assessor/groups/groups_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
-import 'package:gemini_risk_assessor/screens/tools_screen.dart';
+import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';

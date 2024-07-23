@@ -1,83 +1,66 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
 class DiscussionAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String subtitle;
   final String imageUrl;
-  final List<Widget>? actions;
+  final List<Widget> actions;
 
   const DiscussionAppBar({
     Key? key,
     required this.title,
     required this.subtitle,
     required this.imageUrl,
-    this.actions,
+    required this.actions,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      titleSpacing: 0,
-      title: Row(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Center(
-                    child: Icon(Icons.error, color: Colors.red),
-                  ),
-                  cacheManager: MyImageCacheManager.itemsCacheManager,
-                ),
-              ),
-            ),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),
       actions: actions,
+      flexibleSpace: imageUrl.isNotEmpty
+          ? FlexibleSpaceBar(
+              background: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => const SizedBox(),
+              ),
+            )
+          : null,
     );
   }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+
+// Usage example:
+// DiscussionAppBar(
+//   title: appBarTitle,
+//   subtitle: appBarSubtitle,
+//   imageUrl: appBarImage,
+//   actions: [
+//     Padding(
+//       padding: const EdgeInsets.only(right: 8.0),
+//       child: GeminiFloatingChatButton(
+//         onPressed: () {},
+//         size: ChatButtonSize.small,
+//         iconColor: Colors.white,
+//       ),
+//     )
+//   ],
+// )

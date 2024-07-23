@@ -1,16 +1,14 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/models/tool_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/grid_item.dart';
+import 'package:gemini_risk_assessor/tools/tool_item.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
 
@@ -80,37 +78,29 @@ class MyDataStream extends StatelessWidget {
 
               return generationType == GenerationType.tool
                   ? searchQuery.isNotEmpty
-                      ? GridView.builder(
+                      ? ListView.builder(
                           itemCount: results.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1,
-                          ),
                           itemBuilder: (context, index) {
                             final doc = results[index];
                             final data = doc.data() as Map<String, dynamic>;
 
                             final tool = ToolModel.fromJson(data);
-                            return ToolGridItem(
+                            return ToolItem(
                               toolModel: tool,
+                              groupID: groupID,
                             );
                           },
                         )
-                      : GridView.builder(
+                      : ListView.builder(
                           itemCount: snapshot.data!.docs.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1,
-                          ),
                           itemBuilder: (context, index) {
                             final doc = snapshot.data!.docs[index];
                             final data = doc.data() as Map<String, dynamic>;
 
                             final tool = ToolModel.fromJson(data);
-                            return ToolGridItem(
+                            return ToolItem(
                               toolModel: tool,
+                              groupID: groupID,
                             );
                           },
                         )
