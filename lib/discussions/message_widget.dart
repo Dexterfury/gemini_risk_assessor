@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/contact_discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/my_discussion_message.dart';
-import 'package:gemini_risk_assessor/models/discussion_message.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:swipe_to/swipe_to.dart';
 
 class MessageWidget extends StatelessWidget {

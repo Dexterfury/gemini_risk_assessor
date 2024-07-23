@@ -4,7 +4,7 @@ import 'package:flutter_chat_reactions/widgets/stacked_reactions.dart';
 import 'package:gemini_risk_assessor/discussions/display_message_type.dart';
 import 'package:gemini_risk_assessor/discussions/message_reply_preview.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/discussion_message.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 
 class ContactDiscussionMessage extends StatelessWidget {

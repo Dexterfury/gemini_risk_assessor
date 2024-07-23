@@ -12,8 +12,8 @@ class PromptDataModel {
   PromptDataModel({
     required this.images,
     required this.textInput,
-    required this.numberOfPeople,
-    required this.selectedPpe,
+    this.numberOfPeople = '',
+    this.selectedPpe = '',
     required this.additionalTextInputs,
   });
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/display_message_type.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/models/discussion_message.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/providers/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';

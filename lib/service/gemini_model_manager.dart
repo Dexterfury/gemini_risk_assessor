@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
@@ -114,5 +117,119 @@ class GeminiModelManager {
     ];
 
     return await model.generateContent(input);
+  }
+
+  // generate safety advice using the generated content
+  Future<GenerateContentResponse> generateSafetyAdvice(
+    String question,
+    AssessmentModel assessment,
+  ) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    final prompt = PromptDataModel(
+      textInput: '''
+You are a Safety AI Advisor participating in a group discussion about a safety assessment. 
+Provide a concise, professional response to the following question, considering the context of the assessment:
+
+Assessment Context:
+Title: ${assessment.title}
+Task: ${assessment.taskToAchieve}
+Hazards: ${assessment.hazards.join(', ')}
+Risks: ${assessment.risks.join(', ')}
+Control Measures: ${assessment.control.join(', ')}
+
+Question: $question
+
+Respond in a helpful, safety-focused manner, providing practical advice or clarifications related to the assessment.
+''',
+      additionalTextInputs: [],
+      images: [],
+      numberOfPeople: '',
+    );
+
+    return await generateContent(model, prompt);
+  }
+
+// generate safety quiz using the generated content
+  Future<Map<String, dynamic>> generateSafetyQuiz(
+      AssessmentModel assessment) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    final prompt = PromptDataModel(
+      textInput: '''
+Generate a short safety quiz based on the following assessment:
+
+Title: ${assessment.title}
+Task: ${assessment.taskToAchieve}
+Hazards: ${assessment.hazards.join(', ')}
+Risks: ${assessment.risks.join(', ')}
+Control Measures: ${assessment.control.join(', ')}
+
+Create 3 multiple-choice questions related to the safety aspects of this assessment. 
+Format the response as a JSON object with the following structure:
+{
+  "questions": [
+    {
+      "question": "Question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": "Correct option letter (A, B, C, or D)"
+    },
+    // ... (2 more questions)
+  ]
+}
+''',
+      additionalTextInputs: [],
+      images: [],
+    );
+
+    final response = await generateContent(model, prompt);
+    return json.decode(response.text ?? '{}');
+  }
+
+// generate safety tip of the day using the generated content
+  Future<String> generateSafetyTipOfTheDay(List<String> recentTopics) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    final prompt = PromptDataModel(
+      textInput: '''
+Generate a concise, practical "Safety Tip of the Day" related to one of the following recent topics in our safety discussions:
+
+${recentTopics.join('\n')}
+
+The tip should be informative, easy to understand, and immediately applicable in a workplace setting.
+Limit the response to 2-3 sentences.
+''',
+      additionalTextInputs: [],
+      images: [],
+    );
+
+    final response = await generateContent(model, prompt);
+    return response.text ?? 'Unable to generate a safety tip at this time.';
+  }
+
+// generate a list of additional risks based on the given assessment
+  Future<List<String>> suggestAdditionalRisks(
+      AssessmentModel assessment) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    final prompt = PromptDataModel(
+      textInput: '''
+Review the following safety assessment and suggest up to 3 potential additional risks or hazards that may have been overlooked:
+
+Title: ${assessment.title}
+Task: ${assessment.taskToAchieve}
+Current Hazards: ${assessment.hazards.join(', ')}
+Current Risks: ${assessment.risks.join(', ')}
+Control Measures: ${assessment.control.join(', ')}
+
+Provide the response as a JSON array of strings, each representing a potential additional risk or hazard.
+''',
+      additionalTextInputs: [],
+      images: [],
+    );
+
+    final response = await generateContent(model, prompt);
+    final List<dynamic> risks = json.decode(response.text ?? '[]');
+    return risks.cast<String>();
   }
 }
