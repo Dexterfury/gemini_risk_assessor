@@ -271,7 +271,7 @@ class _ChatListState extends State<ChatList> {
               // set seen by
               FirebaseMethods.setMessageStatus(
                 currentUserId: uid,
-                groupID: widget.assessment.groupID,
+                groupID: widget.groupID,
                 messageID: message.messageID,
                 itemID: widget.assessment.id,
                 isSeenByList: message.seenBy,
