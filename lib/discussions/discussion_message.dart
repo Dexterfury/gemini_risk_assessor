@@ -11,6 +11,7 @@ class DiscussionMessage {
   final DateTime timeSent;
   final String messageID;
   final bool isSeen;
+  final bool isAIMessage;
   final String repliedMessage;
   final String repliedTo;
   final MessageType repliedMessageType;
@@ -28,6 +29,7 @@ class DiscussionMessage {
     required this.timeSent,
     required this.messageID,
     required this.isSeen,
+    required this.isAIMessage,
     required this.repliedMessage,
     required this.repliedTo,
     required this.repliedMessageType,
@@ -48,6 +50,7 @@ class DiscussionMessage {
       Constants.timeSent: timeSent.millisecondsSinceEpoch,
       Constants.messageID: messageID,
       Constants.isSeen: isSeen,
+      Constants.isAIMessage: isAIMessage,
       Constants.repliedMessage: repliedMessage,
       Constants.repliedTo: repliedTo,
       Constants.repliedMessageType: repliedMessageType.name,
@@ -69,6 +72,7 @@ class DiscussionMessage {
       timeSent: DateTime.fromMillisecondsSinceEpoch(map[Constants.timeSent]),
       messageID: map[Constants.messageID] ?? '',
       isSeen: map[Constants.isSeen] ?? false,
+      isAIMessage: map[Constants.isAIMessage] ?? false,
       repliedMessage: map[Constants.repliedMessage] ?? '',
       repliedTo: map[Constants.repliedTo] ?? '',
       repliedMessageType:
@@ -90,6 +94,7 @@ class DiscussionMessage {
     DateTime? timeSent,
     String? messageID,
     bool? isSeen,
+    bool? isAIMessage,
     String? repliedMessage,
     String? repliedTo,
     MessageType? repliedMessageType,
@@ -107,6 +112,7 @@ class DiscussionMessage {
       timeSent: timeSent ?? this.timeSent,
       messageID: messageID ?? this.messageID,
       isSeen: isSeen ?? this.isSeen,
+      isAIMessage: isAIMessage ?? this.isAIMessage,
       repliedMessage: repliedMessage ?? this.repliedMessage,
       repliedTo: repliedTo ?? this.repliedTo,
       repliedMessageType: repliedMessageType ?? this.repliedMessageType,

@@ -1,9 +1,16 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
+import 'package:gemini_risk_assessor/providers/chat_provider.dart';
+import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/tools/explainer_details_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:gemini_risk_assessor/widgets/enhanced_list_tile.dart';
+import 'package:gemini_risk_assessor/groups/group_list_tile.dart';
+import 'package:gemini_risk_assessor/widgets/my_list_tile.dart';
+import 'package:provider/provider.dart';
 
 class ToolItem extends StatelessWidget {
   const ToolItem({
@@ -17,8 +24,10 @@ class ToolItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
+    final chatProvider = context.read<ChatProvider>();
     String title = toolModel.title;
-    String subtitle = toolModel.summary;
+    String summary = toolModel.summary;
     String imageUrl = toolModel.images[0];
 
     return Card(
@@ -26,21 +35,60 @@ class ToolItem extends StatelessWidget {
       elevation: cardElevation,
       child: OpenContainer(
         closedBuilder: (context, action) {
-          return EnhancedListTile(
-            imageUrl: imageUrl,
-            title: title,
-            summary: subtitle,
-            onTap: action,
-            messageCount: 5, // Replace with actual count
-            isGroup: groupID.isNotEmpty,
-            onMessageTap: () {
-              // Handle message tap
-              // Navigate to the chat screen
-            },
-            onGeminiTap: () async {
-              // handle gemini tap
-            },
-          );
+          return groupID.isEmpty
+              ? MyListTile(
+                  imageUrl: imageUrl,
+                  title: title,
+                  summary: summary,
+                  onTap: action,
+                )
+              : StreamBuilder<int>(
+                  stream: FirebaseMethods.getMessageCountStream(
+                    groupID: groupID,
+                    itemID: toolModel.id,
+                    generationType: GenerationType.tool,
+                  ),
+                  builder: (context, snapshot) {
+                    final messageCount = snapshot.data ?? 0;
+                    return groupListTile(
+                      imageUrl: imageUrl,
+                      title: title,
+                      summary: summary,
+                      onTap: action,
+                      messageCount: messageCount,
+                      onMessageTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => ChatDiscussionScreen(
+                        //       groupID: groupID,
+                        //       assessment: data,
+                        //       generationType: generationType,
+                        //     ),
+                        //   ),
+                        // );
+                      },
+                      onGeminiTap: () async {
+                        await chatProvider
+                            .getChatHistoryFromFirebase(
+                                uid: uid,
+                                generationType: GenerationType.tool,
+                                toolModel: toolModel)
+                            .whenComplete(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                toolModel: toolModel,
+                                generationType: GenerationType.tool,
+                              ),
+                            ),
+                          );
+                        });
+                      },
+                    );
+                  },
+                );
         },
         openBuilder: (context, action) {
           return ExplainerDetailsScreen(

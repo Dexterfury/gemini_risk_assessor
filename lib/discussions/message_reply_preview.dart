@@ -3,7 +3,8 @@ import 'package:gemini_risk_assessor/discussions/display_message_type.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
-import 'package:gemini_risk_assessor/providers/discussion_chat_provider.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
+import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 
@@ -21,10 +22,11 @@ class MessageReplyPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final discussionChatProvider = context.read<DiscussionChatProvider>();
+    final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final type = replyMessageModel != null
         ? replyMessageModel!.messageType
         : message!.messageType;
-    final discussionChatProvider = context.read<DiscussionChatProvider>();
 
     final intrisitPadding = replyMessageModel != null
         ? const EdgeInsets.all(10)
@@ -38,9 +40,12 @@ class MessageReplyPreview extends StatelessWidget {
         padding: intrisitPadding,
         decoration: BoxDecoration(
           color: decorationColor,
-          borderRadius: replyMessageModel != null
-              ? BorderRadius.circular(20)
-              : BorderRadius.circular(10),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(
+              25,
+            ),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -56,7 +61,7 @@ class MessageReplyPreview extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            buildNameAndMessage(type),
+            buildNameAndMessage(type, uid),
             replyMessageModel != null ? const Spacer() : const SizedBox(),
             replyMessageModel != null
                 ? closeButton(discussionChatProvider, context)
@@ -90,11 +95,11 @@ class MessageReplyPreview extends StatelessWidget {
     );
   }
 
-  Column buildNameAndMessage(MessageType type) {
+  Column buildNameAndMessage(MessageType type, String uid) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        getTitle(),
+        getTitle(uid),
         const SizedBox(height: 5),
         replyMessageModel != null
             ? messageToShow(
@@ -114,9 +119,9 @@ class MessageReplyPreview extends StatelessWidget {
     );
   }
 
-  Widget getTitle() {
+  Widget getTitle(String uid) {
     if (replyMessageModel != null) {
-      bool isMe = replyMessageModel!.isMe;
+      bool isMe = replyMessageModel!.senderUID == uid;
       return Text(
         isMe ? 'You' : replyMessageModel!.senderName,
         style: TextStyle(

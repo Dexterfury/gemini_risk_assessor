@@ -396,7 +396,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               );
             },
-            child: const Icon(Icons.edit_rounded),
+            child: Text(
+              'Edit',
+              style: const TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           )
       ],
     );
@@ -440,7 +446,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               );
             },
-            child: const Icon(Icons.edit_rounded),
+            child: Text(
+              'Edit',
+              style: const TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
       ],
     );

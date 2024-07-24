@@ -6,11 +6,12 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
-import 'package:gemini_risk_assessor/providers/discussion_chat_provider.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({
@@ -337,7 +338,6 @@ class _ChatListState extends State<ChatList> {
                               senderName: element.senderName,
                               senderImage: element.senderImage,
                               messageType: element.messageType,
-                              isMe: isMe,
                             );
 
                             context

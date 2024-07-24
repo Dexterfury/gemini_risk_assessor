@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   @override
   Widget build(BuildContext context) {
     final groupProvider = context.watch<GroupProvider>();
-    final selectedCount = getMembersCount(groupProvider);
+    final count = groupProvider.awaitApprovalsList.length;
+    final selectedCount = getFormatedCount(count);
     return Scaffold(
       appBar: MyAppBar(
         title: 'Create Group',
@@ -218,6 +220,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     //   return;
                     // }
 
+                    log('Terms: ${_dataSettings.groupTerms}');
+
                     final groupModel = GroupModel(
                       creatorUID:
                           context.read<AuthenticationProvider>().userModel!.uid,
@@ -253,6 +257,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           _nameController.text = '';
                           _descriptionController.text = '';
                           _finalFileImage = null;
+                          setState(() {
+                            // reset data settings
+                            _dataSettings = DataSettings();
+                          });
                         });
                         showSnackBar(
                             context: context, message: 'Group created');

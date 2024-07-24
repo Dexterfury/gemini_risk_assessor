@@ -181,7 +181,10 @@ class MyDialogs {
                 ? [
                     TextButton(
                       onPressed: onDecline,
-                      child: const Text('Close'),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(color: Colors.red),
+                      ),
                     )
                   ]
                 : [
@@ -278,7 +281,12 @@ class MyDialogs {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {

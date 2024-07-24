@@ -62,7 +62,7 @@ class MyDiscussionMessage extends StatelessWidget {
                     bottomLeft: Radius.circular(15),
                   ),
                 ),
-                color: Colors.deepPurple,
+                color: Theme.of(context).primaryColor,
                 child: Padding(
                   padding: message.messageType == MessageType.text
                       ? const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 10.0)
@@ -101,7 +101,7 @@ class MyDiscussionMessage extends StatelessWidget {
                             Icon(
                               messageSeen() ? Icons.done_all : Icons.done,
                               color:
-                                  messageSeen() ? Colors.blue : Colors.white60,
+                                  messageSeen() ? Colors.green : Colors.white60,
                               size: 15,
                             ),
                           ],

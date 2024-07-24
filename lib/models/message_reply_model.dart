@@ -7,7 +7,6 @@ class MessageReplyModel {
   final String senderName;
   final String senderImage;
   final MessageType messageType;
-  final bool isMe;
 
   MessageReplyModel({
     required this.message,
@@ -15,7 +14,6 @@ class MessageReplyModel {
     required this.senderName,
     required this.senderImage,
     required this.messageType,
-    required this.isMe,
   });
 
   // to map
@@ -26,7 +24,6 @@ class MessageReplyModel {
       Constants.senderName: senderName,
       Constants.senderImage: senderImage,
       Constants.messageType: messageType.name,
-      Constants.isMe: isMe,
     };
   }
 
@@ -38,7 +35,6 @@ class MessageReplyModel {
       senderName: map[Constants.senderName] ?? '',
       senderImage: map[Constants.senderImage] ?? '',
       messageType: map[Constants.messageType].toString().toMessageType(),
-      isMe: map[Constants.isMe] ?? false,
     );
   }
 }

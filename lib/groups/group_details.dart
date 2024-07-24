@@ -174,7 +174,7 @@ class _GroupDetailsState extends State<GroupDetails>
                     child: Column(
                       children: [
                         //  group name and image
-                        buildImageAndName(
+                        buildImageAndTerms(
                           isAdmin,
                           context,
                           showAcceptBtn,
@@ -184,11 +184,7 @@ class _GroupDetailsState extends State<GroupDetails>
 
                         const SizedBox(height: 10),
 
-                        // divider
-                        const Divider(
-                          thickness: 1,
-                          color: Colors.black26,
-                        ),
+                        buildName(isAdmin, groupProvider),
 
                         //  group description
                         buildDescription(
@@ -322,351 +318,528 @@ class _GroupDetailsState extends State<GroupDetails>
     );
   }
 
+  buildName(
+    bool isAdmin,
+    GroupProvider groupProvider,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            groupProvider.groupModel.name,
+            style: textStyle18Bold,
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (isAdmin)
+          GestureDetector(
+            onTap: () {
+              // edit group name
+              MyDialogs.showMyEditAnimatedDialog(
+                context: context,
+                title: 'Edit Name',
+                hintText: groupProvider.groupModel.name,
+                textAction: "Change",
+                onActionTap: (value, updatedText) async {
+                  if (value) {
+                    final authProvider = context.read<AuthenticationProvider>();
+                    final name = await authProvider.updateName(
+                      isUser: false,
+                      id: groupProvider.groupModel.groupID,
+                      newName: updatedText,
+                      oldName: groupProvider.groupModel.name,
+                    );
+                    if (name == 'Invalid name.') return;
+                    // set new name
+                    await setNewNameInProvider(name);
+                    Future.delayed(const Duration(milliseconds: 200))
+                        .whenComplete(() {
+                      showSnackBar(
+                          context: context, message: 'Change successful');
+                    });
+                  }
+                },
+              );
+            },
+            child: Text(
+              'Edit',
+              style: const TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Column buildDescription(
     bool isAdmin,
     GroupProvider groupProvider,
   ) {
     final desc = groupProvider.groupModel.aboutGroup;
+
+    // If not admin and description is empty, return an empty widget
+    if (!isAdmin && desc.isEmpty) {
+      return const Column(children: []);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // divider
+        const Divider(
+          thickness: 1,
+          color: Colors.black26,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'About Us',
+            Text(
+              isAdmin && desc.isEmpty ? 'Add About Us' : 'About Us',
               style: textStyle18Bold,
             ),
-            isAdmin
-                ? Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        // edit group description
-                        MyDialogs.showMyEditAnimatedDialog(
-                          context: context,
-                          title: 'Edit Description',
-                          maxLength: 500,
-                          hintText: groupProvider.groupModel.aboutGroup,
-                          textAction: "Change",
-                          onActionTap: (value, updatedText) async {
-                            if (value) {
-                              final authProvider =
-                                  context.read<AuthenticationProvider>();
-                              final desc = await authProvider.updateDescription(
-                                isUser: false,
-                                id: groupProvider.groupModel.groupID,
-                                newDesc: updatedText,
-                                oldDesc: groupProvider.groupModel.aboutGroup,
-                              );
-                              if (desc == 'Invalid description.') return;
-                              await setNewDescriptionInProvider(desc);
-                              Future.delayed(const Duration(milliseconds: 200))
-                                  .whenComplete(() {
-                                showSnackBar(
-                                    context: context,
-                                    message: 'Change successful');
-                              });
-                            }
-                          },
+            if (isAdmin)
+              GestureDetector(
+                onTap: () {
+                  // edit group description
+                  MyDialogs.showMyEditAnimatedDialog(
+                    context: context,
+                    title:
+                        desc.isEmpty ? 'Add Description' : 'Edit Description',
+                    maxLength: 500,
+                    hintText: groupProvider.groupModel.aboutGroup,
+                    textAction: desc.isEmpty ? "Add" : "Change",
+                    onActionTap: (value, updatedText) async {
+                      if (value) {
+                        final authProvider =
+                            context.read<AuthenticationProvider>();
+                        final newDesc = await authProvider.updateDescription(
+                          isUser: false,
+                          id: groupProvider.groupModel.groupID,
+                          newDesc: updatedText,
+                          oldDesc: groupProvider.groupModel.aboutGroup,
                         );
-                      },
-                      child: const Icon(
-                        Icons.edit,
-                      ),
-                    ),
-                  )
-                : const SizedBox(),
-          ],
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        desc.isEmpty
-            ? const SizedBox.shrink()
-            : AnimatedReadMoreText(
-                desc,
-                maxLines: 3,
-                // Set a custom text style for the main block of text
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                ),
-                // Set a custom text style for the expand/collapse button
-                buttonTextStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                        if (newDesc == 'Invalid description.') return;
+                        await setNewDescriptionInProvider(newDesc);
+                        Future.delayed(const Duration(milliseconds: 200))
+                            .whenComplete(() {
+                          showSnackBar(
+                            context: context,
+                            message: desc.isEmpty
+                                ? 'Description added'
+                                : 'Description updated',
+                          );
+                        });
+                      }
+                    },
+                  );
+                },
+                child: Text(
+                  desc.isEmpty ? 'Add' : 'Edit',
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+          ],
+        ),
+        if (desc.isNotEmpty) ...[
+          const SizedBox(height: 5),
+          AnimatedReadMoreText(
+            desc,
+            maxLines: 3,
+            textStyle: const TextStyle(fontSize: 16),
+            buttonTextStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ],
     );
   }
 
-  buildImageAndName(
+  buildImageAndTerms(
     bool isAdmin,
     BuildContext context,
     bool showAcceptBtn,
     GroupProvider groupProvider,
     String uid,
   ) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: DisplayGroupImage(
-              isViewOnly: true,
-              fileImage: _finalFileImage,
-              imageUrl: groupProvider.groupModel.groupImage ?? '',
-              onPressed: !isAdmin
-                  ? null
-                  : () async {
-                      final file =
-                          await ImagePickerHandler.showImagePickerDialog(
-                        context: context,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: DisplayGroupImage(
+            isViewOnly: !isAdmin,
+            fileImage: _finalFileImage,
+            imageUrl: groupProvider.groupModel.groupImage ?? '',
+            onPressed: isAdmin
+                ? () async {
+                    final file = await ImagePickerHandler.showImagePickerDialog(
+                        context: context);
+                    if (file != null) {
+                      setState(() async {
+                        _finalFileImage = file;
+                      });
+                      // show loading dialog
+                      showLoadingDialog(
+                        title: 'Saving,',
                       );
-                      if (file != null) {
-                        setState(() async {
-                          _finalFileImage = file;
-                        });
-                        // show loading dialog
-                        showLoadingDialog(
-                          title: 'Saving,',
-                        );
 
-                        final imageUrl = await FileUploadHandler.updateImage(
-                          file: file,
-                          isUser: false,
-                          id: groupProvider.groupModel.groupID,
-                          reference:
-                              '${Constants.groupImage}/${groupProvider.groupModel.groupID}.jpg',
-                        );
+                      final imageUrl = await FileUploadHandler.updateImage(
+                        file: file,
+                        isUser: false,
+                        id: groupProvider.groupModel.groupID,
+                        reference:
+                            '${Constants.groupImage}/${groupProvider.groupModel.groupID}.jpg',
+                      );
 
-                        // set newimage in provider
-                        await setNewImageInProvider(imageUrl);
+                      // set newimage in provider
+                      await setNewImageInProvider(imageUrl);
 
-                        // pop loading dialog
-                        popDialog();
-                      }
-                    },
-            ),
+                      // pop loading dialog
+                      popDialog();
+                    }
+                  }
+                : null,
           ),
-          const SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        groupProvider.groupModel.name,
-                        style: textStyle18Bold,
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                      ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (isAdmin)
+                    OpenContainer(
+                      closedBuilder: (context, action) {
+                        return TextButton.icon(
+                          icon: const Icon(Icons.person_add, size: 18),
+                          label: const Text('Add People'),
+                          onPressed: action,
+                        );
+                      },
+                      openBuilder: (context, action) {
+                        // navigate to people screen
+                        return const PeopleScreen(
+                          userViewType: UserViewType.tempPlus,
+                        );
+                      },
+                      transitionType: ContainerTransitionType.fadeThrough,
+                      transitionDuration: const Duration(milliseconds: 500),
+                      closedElevation: cardElevation,
+                      openElevation: 4,
                     ),
-                    if (isAdmin)
-                      GestureDetector(
-                        onTap: () {
-                          // edit group name
-                          MyDialogs.showMyEditAnimatedDialog(
+                  if (showAcceptBtn)
+                    groupProvider.isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : _buildAcceeptBtn(groupProvider, context, uid),
+                  if (groupProvider.groupModel.groupTerms.isNotEmpty)
+                    TextButton.icon(
+                      icon: const Icon(Icons.description, size: 18),
+                      label: const Text('Terms'),
+                      onPressed: () {
+                        // show terms and conditions dialog
+                        MyDialogs.animatedTermsDialog(
                             context: context,
-                            title: 'Edit Name',
-                            hintText: groupProvider.groupModel.name,
-                            textAction: "Change",
-                            onActionTap: (value, updatedText) async {
-                              if (value) {
-                                final authProvider =
-                                    context.read<AuthenticationProvider>();
-                                final name = await authProvider.updateName(
-                                  isUser: false,
-                                  id: groupProvider.groupModel.groupID,
-                                  newName: updatedText,
-                                  oldName: groupProvider.groupModel.name,
-                                );
-                                if (name == 'Invalid name.') return;
-                                // set new name
-                                await setNewNameInProvider(name);
-                                Future.delayed(
-                                        const Duration(milliseconds: 200))
-                                    .whenComplete(() {
-                                  showSnackBar(
-                                      context: context,
-                                      message: 'Change successful');
-                                });
-                              }
-                            },
-                          );
-                        },
-                        child: const Icon(
-                          Icons.edit,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (isAdmin)
-                  OpenContainer(
-                    closedBuilder: (context, action) {
-                      return IconButton(
-                        onPressed: action,
-                        icon: const Icon(
-                          FontAwesomeIcons.userPlus,
-                        ),
-                      );
-                    },
-                    openBuilder: (context, action) {
-                      // navigate to people screen
-                      return const PeopleScreen(
-                        userViewType: UserViewType.tempPlus,
-                      );
-                    },
-                    transitionType: ContainerTransitionType.fadeThrough,
-                    transitionDuration: const Duration(milliseconds: 500),
-                    closedElevation: cardElevation,
-                    openElevation: 4,
-                  ),
-                // Card(
-                //   color: Theme.of(context).cardColor,
-                //   elevation: cardElevation,
-                //   shape: const CircleBorder(),
-                //   child: IconButton(
-                //     onPressed: () {
-                //       // show people dialog
-                //       _showPeopleDialog(
-                //           context: context,
-                //           onActionTap: (value) async {
-                //             if (value) {
-                //               bool isSaved = await context
-                //                   .read<GroupProvider>()
-                //                   .updateGroupDataInFireStore();
-
-                //               if (isSaved) {
-                //                 Future.delayed(
-                //                         const Duration(milliseconds: 100))
-                //                     .whenComplete(() {
-                //                   showSnackBar(
-                //                     context: context,
-                //                     message: 'Requests sent to added members',
-                //                   );
-                //                 });
-                //               }
-                //             }
-
-                //             Future.delayed(const Duration(milliseconds: 100))
-                //                 .whenComplete(() async {
-                //               // clear search query
-                //               context
-                //                   .read<GroupProvider>()
-                //                   .setSearchQuery('');
-                //             });
-                //           });
-                //     },
-                //     icon: const Icon(
-                //       FontAwesomeIcons.userPlus,
-                //     ),
-                //   ),
-                // ),
-                if (showAcceptBtn)
-                  groupProvider.isLoading
-                      ? const CircularProgressIndicator()
-                      : MainAppButton(
-                          icon: Icons.person_add,
-                          label: 'Accept Invite',
-                          contanerColor: Colors.orangeAccent,
-                          onTap: () async {
-                            // accept invite
-                            // first check if admin set to read terms and conditions
-                            if (groupProvider.groupModel.requestToReadTerms) {
-                              if (!_hasReadTerms) {
-                                MyDialogs.animatedTermsDialog(
-                                    context: context,
-                                    title: "Terms and Conditions",
-                                    content:
-                                        groupProvider.groupModel.groupTerms,
-                                    isMember: groupProvider
-                                        .groupModel.membersUIDs
-                                        .contains(uid),
-                                    onAccept: () {
-                                      // Handle acceptance here
-                                      // join group and update data in firestore
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog
-                                      setState(() {
-                                        _hasReadTerms = true;
-                                      });
-                                    },
-                                    onDecline: () {
-                                      // Handle decline here
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog
-                                    });
-                              } else {
-                                // join group and update data in firestore
-                                await groupProvider
-                                    .addMemberToGroup(
-                                  uid: uid,
-                                )
-                                    .whenComplete(() {
-                                  showSnackBar(
-                                    context: context,
-                                    message: 'You are a member of this Group',
-                                  );
-                                });
-                              }
-                            } else {
-                              // join group and update data in firestore
-                              await groupProvider
-                                  .addMemberToGroup(
-                                uid: uid,
-                              )
-                                  .whenComplete(() {
-                                showSnackBar(
-                                  context: context,
-                                  message: 'You are a member of this Group',
-                                );
+                            title: "Terms and Conditions",
+                            content: groupProvider.groupModel.groupTerms,
+                            isMember: groupProvider.groupModel.membersUIDs
+                                .contains(uid),
+                            onAccept: () {
+                              // Handle acceptance here
+                              Navigator.of(context).pop(); // Close the dialog
+                              setState(() {
+                                _hasReadTerms = true;
                               });
-                            }
-                          },
-                        ),
-                if (groupProvider.groupModel.groupTerms.isNotEmpty)
-                  TextButton(
-                    onPressed: () {
-                      // show terms and conditions dialog
-                      MyDialogs.animatedTermsDialog(
-                          context: context,
-                          title: "Terms and Conditions",
-                          content: groupProvider.groupModel.groupTerms,
-                          isMember: groupProvider.groupModel.membersUIDs
-                              .contains(uid),
-                          onAccept: () {
-                            // Handle acceptance here
-                            Navigator.of(context).pop(); // Close the dialog
-                            setState(() {
-                              _hasReadTerms = true;
+                            },
+                            onDecline: () {
+                              // Handle decline here
+                              Navigator.of(context).pop(); // Close the dialog
                             });
-                          },
-                          onDecline: () {
-                            // Handle decline here
-                            Navigator.of(context).pop(); // Close the dialog
-                          });
+                      },
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // buildImageAndName(
+  //   bool isAdmin,
+  //   BuildContext context,
+  //   bool showAcceptBtn,
+  //   GroupProvider groupProvider,
+  //   String uid,
+  // ) {
+  //   return SizedBox(
+  //     width: MediaQuery.of(context).size.width,
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Container(
+  //           decoration: BoxDecoration(
+  //             border: Border.all(),
+  //             borderRadius: BorderRadius.circular(15),
+  //           ),
+  //           child: DisplayGroupImage(
+  //             isViewOnly: true,
+  //             fileImage: _finalFileImage,
+  //             imageUrl: groupProvider.groupModel.groupImage ?? '',
+  //             onPressed: !isAdmin
+  //                 ? null
+  //                 : () async {
+  //                     final file =
+  //                         await ImagePickerHandler.showImagePickerDialog(
+  //                       context: context,
+  //                     );
+  //                     if (file != null) {
+  //                       setState(() async {
+  //                         _finalFileImage = file;
+  //                       });
+  //                       // show loading dialog
+  //                       showLoadingDialog(
+  //                         title: 'Saving,',
+  //                       );
+
+  //                       final imageUrl = await FileUploadHandler.updateImage(
+  //                         file: file,
+  //                         isUser: false,
+  //                         id: groupProvider.groupModel.groupID,
+  //                         reference:
+  //                             '${Constants.groupImage}/${groupProvider.groupModel.groupID}.jpg',
+  //                       );
+
+  //                       // set newimage in provider
+  //                       await setNewImageInProvider(imageUrl);
+
+  //                       // pop loading dialog
+  //                       popDialog();
+  //                     }
+  //                   },
+  //           ),
+  //         ),
+  //         const SizedBox(
+  //           width: 10,
+  //         ),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.end,
+  //             children: [
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.end,
+  //                 children: [
+  //                   Flexible(
+  //                     child: Text(
+  //                       groupProvider.groupModel.name,
+  //                       style: textStyle18Bold,
+  //                       softWrap: true,
+  //                       overflow: TextOverflow.visible,
+  //                     ),
+  //                   ),
+  //                   if (isAdmin)
+  //                     GestureDetector(
+  //                       onTap: () {
+  //                         // edit group name
+  //                         MyDialogs.showMyEditAnimatedDialog(
+  //                           context: context,
+  //                           title: 'Edit Name',
+  //                           hintText: groupProvider.groupModel.name,
+  //                           textAction: "Change",
+  //                           onActionTap: (value, updatedText) async {
+  //                             if (value) {
+  //                               final authProvider =
+  //                                   context.read<AuthenticationProvider>();
+  //                               final name = await authProvider.updateName(
+  //                                 isUser: false,
+  //                                 id: groupProvider.groupModel.groupID,
+  //                                 newName: updatedText,
+  //                                 oldName: groupProvider.groupModel.name,
+  //                               );
+  //                               if (name == 'Invalid name.') return;
+  //                               // set new name
+  //                               await setNewNameInProvider(name);
+  //                               Future.delayed(
+  //                                       const Duration(milliseconds: 200))
+  //                                   .whenComplete(() {
+  //                                 showSnackBar(
+  //                                     context: context,
+  //                                     message: 'Change successful');
+  //                               });
+  //                             }
+  //                           },
+  //                         );
+  //                       },
+  //                       child: const Icon(
+  //                         Icons.edit,
+  //                       ),
+  //                     ),
+  //                 ],
+  //               ),
+  //               const SizedBox(
+  //                 height: 10,
+  //               ),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   if (isAdmin)
+  //                     OpenContainer(
+  //                       closedBuilder: (context, action) {
+  //                         return TextButton(
+  //                           onPressed: action,
+  //                           child: Text(
+  //                             'Add People',
+  //                             style: TextStyle(
+  //                               color: Colors.blue,
+  //                               fontWeight: FontWeight.bold,
+  //                             ),
+  //                           ),
+  //                         );
+  //                       },
+  //                       openBuilder: (context, action) {
+  //                         // navigate to people screen
+  //                         return const PeopleScreen(
+  //                           userViewType: UserViewType.tempPlus,
+  //                         );
+  //                       },
+  //                       transitionType: ContainerTransitionType.fadeThrough,
+  //                       transitionDuration: const Duration(milliseconds: 500),
+  //                       closedElevation: 0,
+  //                       openElevation: 4,
+  //                     ),
+  //                   if (showAcceptBtn)
+  //                     groupProvider.isLoading
+  //                         ? const CircularProgressIndicator()
+  //                         : _buildAcceeptBtn(
+  //                             groupProvider,
+  //                             context,
+  //                             uid,
+  //                           ),
+  //                   if (groupProvider.groupModel.groupTerms.isNotEmpty)
+  //                     GestureDetector(
+  //                       onTap: () {
+  //                         // show terms and conditions dialog
+  //                         MyDialogs.animatedTermsDialog(
+  //                             context: context,
+  //                             title: "Terms and Conditions",
+  //                             content: groupProvider.groupModel.groupTerms,
+  //                             isMember: groupProvider.groupModel.membersUIDs
+  //                                 .contains(uid),
+  //                             onAccept: () {
+  //                               // Handle acceptance here
+  //                               Navigator.of(context).pop(); // Close the dialog
+  //                               setState(() {
+  //                                 _hasReadTerms = true;
+  //                               });
+  //                             },
+  //                             onDecline: () {
+  //                               // Handle decline here
+  //                               Navigator.of(context).pop(); // Close the dialog
+  //                             });
+  //                       },
+  //                       child: const Text(
+  //                         'Terms',
+  //                         style: TextStyle(
+  //                           color: Colors.blue,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Card _buildAcceeptBtn(
+      GroupProvider groupProvider, BuildContext context, String uid) {
+    return Card(
+      color: Colors.orangeAccent,
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: GestureDetector(
+          onTap: () async {
+            // accept invite
+            // first check if admin set to read terms and conditions
+            if (groupProvider.groupModel.requestToReadTerms) {
+              if (!_hasReadTerms) {
+                MyDialogs.animatedTermsDialog(
+                    context: context,
+                    title: "Terms and Conditions",
+                    content: groupProvider.groupModel.groupTerms,
+                    isMember:
+                        groupProvider.groupModel.membersUIDs.contains(uid),
+                    onAccept: () {
+                      // Handle acceptance here
+                      // join group and update data in firestore
+                      Navigator.of(context).pop(); // Close the dialog
+                      setState(() {
+                        _hasReadTerms = true;
+                      });
                     },
-                    child: const Text('Terms'),
-                  ),
-              ],
+                    onDecline: () {
+                      // Handle decline here
+                      Navigator.of(context).pop(); // Close the dialog
+                    });
+              } else {
+                // join group and update data in firestore
+                await groupProvider
+                    .addMemberToGroup(
+                  uid: uid,
+                )
+                    .whenComplete(() {
+                  showSnackBar(
+                    context: context,
+                    message: 'You are a member of this Group',
+                  );
+                });
+              }
+            } else {
+              // join group and update data in firestore
+              await groupProvider
+                  .addMemberToGroup(
+                uid: uid,
+              )
+                  .whenComplete(() {
+                showSnackBar(
+                  context: context,
+                  message: 'You are a member of this Group',
+                );
+              });
+            }
+          },
+          child: FittedBox(
+            child: Text(
+              'Accept Invite',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

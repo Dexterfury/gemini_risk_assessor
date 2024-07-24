@@ -499,6 +499,7 @@ class GroupProvider extends ChangeNotifier {
       // reset the lists
       await setEmptyLists();
       await setEmptyTemps();
+      clearAwaitingApprovalList();
       // set onSuccess
       onSuccess();
       setLoading(false);

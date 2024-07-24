@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 import 'package:gemini_risk_assessor/appBars/discussion_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/service/gemini_actions.dart';
 
 class ChatDiscussionScreen extends StatefulWidget {
   const ChatDiscussionScreen({
@@ -22,6 +24,14 @@ class ChatDiscussionScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatDiscussionScreen> {
+  void showGeminiActions() {
+    Navigator.of(context).push(
+      HeroDialogRoute(builder: (context) {
+        return GeminiActions(geminiID: 'gemmaSafe');
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appBarTitle = widget.assessment.title;
@@ -38,7 +48,7 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: GeminiFloatingChatButton(
-                onPressed: () {},
+                onPressed: showGeminiActions,
                 size: ChatButtonSize.small,
                 iconColor: Colors.white,
               ),
@@ -57,6 +67,7 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
                 ),
               ),
               DiscussionChatField(
+                groupID: widget.groupID,
                 assessment: widget.assessment,
                 generationType: widget.generationType,
               ),

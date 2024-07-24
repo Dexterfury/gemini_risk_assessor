@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
-class EnhancedListTile extends StatelessWidget {
+class groupListTile extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String summary;
   final VoidCallback onTap;
   final int messageCount;
-  final bool isGroup;
   final VoidCallback onMessageTap;
   final VoidCallback onGeminiTap;
 
-  const EnhancedListTile({
+  const groupListTile({
     Key? key,
     required this.imageUrl,
     required this.title,
     required this.summary,
     required this.onTap,
     required this.messageCount,
-    required this.isGroup,
     required this.onMessageTap,
     required this.onGeminiTap,
   }) : super(key: key);
@@ -72,44 +71,43 @@ class EnhancedListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
-                  if (isGroup)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildButton(
-                            context,
-                            FontAwesomeIcons.message,
-                            messageCount,
-                            onMessageTap,
-                          ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildButton(
+                          context,
+                          FontAwesomeIcons.message,
+                          messageCount,
+                          onMessageTap,
                         ),
-                        const SizedBox(width: 16),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: FloatingActionButton(
-                              onPressed: onGeminiTap,
-                              backgroundColor: Colors.white,
-                              elevation: 4.0,
-                              highlightElevation: 2.0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(2.0),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  backgroundImage:
-                                      AssetImage(AssetsManager.geminiLogo1),
-                                ),
+                      ),
+                      const SizedBox(width: 16),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: FloatingActionButton(
+                            onPressed: onGeminiTap,
+                            backgroundColor: Colors.white,
+                            elevation: 4.0,
+                            highlightElevation: 2.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                backgroundImage:
+                                    AssetImage(AssetsManager.geminiLogo1),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -132,12 +130,13 @@ class EnhancedListTile extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              '$count',
-              style: TextStyle(
-                color: Theme.of(context).hintColor,
+            if (count != 0)
+              Text(
+                getFormatedCount(count),
+                style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                ),
               ),
-            ),
             const SizedBox(width: 4),
             Icon(
               icon,

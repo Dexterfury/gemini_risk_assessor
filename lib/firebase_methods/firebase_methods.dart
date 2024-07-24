@@ -12,13 +12,13 @@ import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class FirebaseMethods {
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final FirebaseStorage _storage = FirebaseStorage.instance;
+  static final FirebaseAuth auth = FirebaseAuth.instance;
+  static final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  static final FirebaseStorage storage = FirebaseStorage.instance;
 
-  static final CollectionReference _usersCollection =
+  static final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
-  static final CollectionReference _groupsCollection =
+  static final CollectionReference groupsCollection =
       FirebaseFirestore.instance.collection(Constants.groupsCollection);
 
   // stream my tools from firestore
@@ -27,7 +27,7 @@ class FirebaseMethods {
     required String groupID,
   }) {
     if (groupID.isNotEmpty) {
-      return _groupsCollection
+      return groupsCollection
           .doc(groupID)
           .collection(Constants.toolsCollection)
           .orderBy(
@@ -36,7 +36,7 @@ class FirebaseMethods {
           )
           .snapshots();
     } else {
-      return _usersCollection
+      return usersCollection
           .doc(userId)
           .collection(Constants.toolsCollection)
           .orderBy(
@@ -53,7 +53,7 @@ class FirebaseMethods {
     required String groupID,
   }) {
     if (groupID.isNotEmpty) {
-      return _groupsCollection
+      return groupsCollection
           .doc(groupID)
           .collection(Constants.dstiCollections)
           .orderBy(
@@ -62,7 +62,7 @@ class FirebaseMethods {
           )
           .snapshots();
     } else {
-      return _usersCollection
+      return usersCollection
           .doc(userId)
           .collection(Constants.dstiCollections)
           .orderBy(
@@ -75,7 +75,7 @@ class FirebaseMethods {
 
   // get all users stream
   static Stream<QuerySnapshot> allUsersStream() {
-    return _usersCollection
+    return usersCollection
         .where(Constants.isAnonymous, isEqualTo: false)
         .snapshots();
   }
@@ -86,7 +86,7 @@ class FirebaseMethods {
     required String groupID,
   }) {
     if (groupID.isNotEmpty) {
-      return _groupsCollection
+      return groupsCollection
           .doc(groupID)
           .collection(Constants.assessmentCollection)
           .orderBy(
@@ -95,7 +95,7 @@ class FirebaseMethods {
           )
           .snapshots();
     } else {
-      return _usersCollection
+      return usersCollection
           .doc(userId)
           .collection(Constants.assessmentCollection)
           .orderBy(
@@ -113,7 +113,7 @@ class FirebaseMethods {
       required bool fromShare}) {
     if (fromShare) {
       if (groupID.isNotEmpty) {
-        return _groupsCollection
+        return groupsCollection
             .where(Constants.membersUIDs, arrayContains: userId)
             .where(Constants.groupID, isNotEqualTo: groupID)
             .orderBy(
@@ -122,7 +122,7 @@ class FirebaseMethods {
             )
             .snapshots();
       } else {
-        return _groupsCollection
+        return groupsCollection
             .where(Constants.membersUIDs, arrayContains: userId)
             .orderBy(
               Constants.createdAt,
@@ -131,7 +131,7 @@ class FirebaseMethods {
             .snapshots();
       }
     } else {
-      return _groupsCollection
+      return groupsCollection
           .where(Constants.membersUIDs, arrayContains: userId)
           .orderBy(
             Constants.createdAt,
@@ -144,7 +144,7 @@ class FirebaseMethods {
   // check if the group has any assessments, dsti or tools saved in firestore
   static Future<Map<String, bool>> checkGroupData(
       {required String groupID}) async {
-    final orgRef = _groupsCollection.doc(groupID);
+    final orgRef = groupsCollection.doc(groupID);
 
     Map<String, bool> results = {
       Constants.hasAssessments: false,
@@ -176,13 +176,13 @@ class FirebaseMethods {
     required bool isAll,
   }) {
     if (isAll) {
-      return _usersCollection
+      return usersCollection
           .doc(userId)
           .collection(Constants.notificationsCollection)
           .orderBy(Constants.createdAt)
           .snapshots();
     } else {
-      return _usersCollection
+      return usersCollection
           .doc(userId)
           .collection(Constants.notificationsCollection)
           .where(Constants.wasClicked, isEqualTo: false)
@@ -193,32 +193,32 @@ class FirebaseMethods {
 
   // update groupName
   static Future<void> updateGroupName(String id, String newName) async {
-    await _groupsCollection.doc(id).update({
+    await groupsCollection.doc(id).update({
       Constants.groupName: newName,
     });
   }
 
   // update userName
   static Future<void> updateUserName(String id, String newName) async {
-    await _auth.currentUser!.updateDisplayName(newName);
-    await _usersCollection.doc(id).update({
+    await auth.currentUser!.updateDisplayName(newName);
+    await usersCollection.doc(id).update({
       Constants.name: newName,
     });
   }
 
   // update aboutMe
   static Future<void> updateAboutMe(String id, String newDesc) async {
-    await _usersCollection.doc(id).update({Constants.aboutMe: newDesc});
+    await usersCollection.doc(id).update({Constants.aboutMe: newDesc});
   }
 
   // update group desc
   static Future<void> updateGroupDesc(String id, String newDesc) async {
-    await _groupsCollection.doc(id).update({Constants.aboutGroup: newDesc});
+    await groupsCollection.doc(id).update({Constants.aboutGroup: newDesc});
   }
 
   static Future<String> getCreatorName(String creatorUid) async {
     try {
-      DocumentSnapshot userDoc = await _usersCollection.doc(creatorUid).get();
+      DocumentSnapshot userDoc = await usersCollection.doc(creatorUid).get();
       return userDoc.get(Constants.name) as String;
     } catch (e) {
       print('Error fetching creator name: $e');
@@ -228,7 +228,7 @@ class FirebaseMethods {
 
   // get user stream
   static Stream<DocumentSnapshot> userStream({required String userID}) {
-    return _usersCollection.doc(userID).snapshots();
+    return usersCollection.doc(userID).snapshots();
   }
 
   // // get groups stream
@@ -247,12 +247,12 @@ class FirebaseMethods {
     // we get the database referrence for the group and the user
     final String collectionName =
         isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
-    final orgRef = _groupsCollection
+    final orgRef = groupsCollection
         .doc(groupID)
         .collection(collectionName)
         .doc(itemModel.id);
     final userRef =
-        _usersCollection.doc(uid).collection(collectionName).doc(itemModel.id);
+        usersCollection.doc(uid).collection(collectionName).doc(itemModel.id);
 
     // we create a new assessment object with updated sharedWith list
     final updatedAssessment = itemModel.copyWith(
@@ -275,12 +275,12 @@ class FirebaseMethods {
     required String groupID,
   }) async {
     // we get the database referrence for the group and the user
-    final orgRef = _groupsCollection
+    final orgRef = groupsCollection
         .doc(groupID)
         .collection(Constants.tools)
         .doc(toolModel.id);
     final userRef =
-        _usersCollection.doc(uid).collection(Constants.tools).doc(toolModel.id);
+        usersCollection.doc(uid).collection(Constants.tools).doc(toolModel.id);
 
     // we create a new assessment object with updated sharedWith list
     final updatedTool = toolModel.copyWith(
@@ -312,19 +312,19 @@ class FirebaseMethods {
         : Constants.usersCollection;
 
     try {
-      final docRef = _firestore
+      final docRef = firestore
           .collection(rootCollection)
           .doc(ownerID)
           .collection(collectionName)
           .doc(docID);
 
       // Start a batch write
-      final WriteBatch batch = _firestore.batch();
+      final WriteBatch batch = firestore.batch();
 
       if (groupID.isNotEmpty) {
         // If it's an group deleting a shared document, remove org from user's sharedWith
         if (assessment.sharedWith.contains(ownerID)) {
-          final userRef = _usersCollection
+          final userRef = usersCollection
               .doc(assessment.createdBy)
               .collection(collectionName)
               .doc(groupID);
@@ -367,7 +367,7 @@ class FirebaseMethods {
     required Function(String) onError,
   }) async {
     try {
-      final ref = _storage.refFromURL(imageUrl);
+      final ref = storage.refFromURL(imageUrl);
       await ref.delete();
       print('Deleted image: $imageUrl');
     } catch (e) {
@@ -412,7 +412,7 @@ class FirebaseMethods {
     required String uid,
     required String notificationID,
   }) async {
-    await _usersCollection
+    await usersCollection
         .doc(uid)
         .collection(Constants.notificationsCollection)
         .doc(notificationID)
@@ -425,7 +425,7 @@ class FirebaseMethods {
   static Future<DocumentSnapshot> getGroupSnapShot({
     required String groupID,
   }) {
-    return _groupsCollection.doc(groupID).get();
+    return groupsCollection.doc(groupID).get();
   }
 
   // get group data from firestore
@@ -433,7 +433,7 @@ class FirebaseMethods {
     required String groupID,
   }) async {
     try {
-      DocumentSnapshot groupDoc = await _groupsCollection.doc(groupID).get();
+      DocumentSnapshot groupDoc = await groupsCollection.doc(groupID).get();
       return GroupModel.fromJson(groupDoc.data()! as Map<String, dynamic>);
     } catch (e) {
       print('Error fetching group data: $e');
@@ -446,7 +446,7 @@ class FirebaseMethods {
   static Stream<QuerySnapshot> nearMissessStream({
     required String groupID,
   }) {
-    return _groupsCollection
+    return groupsCollection
         .doc(groupID)
         .collection(Constants.nearMissesCollection)
         .orderBy(Constants.createdAt)
@@ -461,7 +461,7 @@ class FirebaseMethods {
   }) {
     final collection = getCollectionRef(generationType);
     // handle group message
-    return _groupsCollection
+    return groupsCollection
         .doc(groupID)
         .collection(collection)
         .doc(itemID)
@@ -489,7 +489,7 @@ class FirebaseMethods {
     } else {
       final collection = getCollectionRef(generationType);
       // add the current user to the seenByList in all messages
-      await _groupsCollection
+      await groupsCollection
           .doc(groupID)
           .collection(collection)
           .doc(itemID)
@@ -499,5 +499,20 @@ class FirebaseMethods {
         Constants.seenBy: FieldValue.arrayUnion([currentUserId]),
       });
     }
+  }
+
+  static Stream<int> getMessageCountStream({
+    required String groupID,
+    required String itemID,
+    required GenerationType generationType,
+  }) {
+    final collection = getCollectionRef(generationType);
+    return groupsCollection
+        .doc(groupID)
+        .collection(collection)
+        .doc(itemID)
+        .collection(Constants.chatMessagesCollection)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
   }
 }

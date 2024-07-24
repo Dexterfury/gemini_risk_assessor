@@ -250,12 +250,10 @@ IconData getAuthIcon(SignInType signInType) {
               : FontAwesomeIcons.solidCircleUser;
 }
 
-//  get member count function
-String getMembersCount(
-  GroupProvider groupProvider,
+//  get count function
+String getFormatedCount(
+  int count,
 ) {
-  int count = groupProvider.awaitApprovalsList.length;
-
   if (count == 0) {
     return '';
   } else if (count == 1) {

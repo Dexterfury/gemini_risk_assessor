@@ -116,6 +116,8 @@ class Constants {
 
   static const String groupArg = 'groupArg';
 
+  static const String isAIMessage = 'isAIMessage';
+
   static const String shareWithTitle = 'Share With';
   static const String sharedWith = 'sharedWith';
   static const String discussions = 'Discussions';
@@ -153,9 +155,7 @@ class Constants {
   static const String toolsCollection = 'tools';
   static const String dstiCollections = 'dsti';
   static const String chatMessagesCollection = 'chatMessages';
-  static const String chatDataCollection = 'chatData';
   static const String notificationsCollection = 'notifications';
-  static const String discussionsCollection = 'discussions';
   static const String nearMissesCollection = 'nearMisses';
 
   static const String groupImage = 'groupImage';
