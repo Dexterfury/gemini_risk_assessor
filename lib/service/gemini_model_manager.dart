@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiModelManager {
@@ -183,7 +184,9 @@ Format the response as a JSON object with the following structure:
     );
 
     final response = await generateContent(model, prompt);
-    return json.decode(response.text ?? '{}');
+    final validJson = cleanJson(response.text!);
+    final json = jsonDecode(validJson);
+    return json;
   }
 
 // generate safety tip of the day using the generated content

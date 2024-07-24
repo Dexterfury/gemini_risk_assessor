@@ -1,12 +1,17 @@
+import 'dart:developer';
+
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 import 'package:gemini_risk_assessor/appBars/discussion_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_actions.dart';
+import 'package:provider/provider.dart';
 
 class ChatDiscussionScreen extends StatefulWidget {
   const ChatDiscussionScreen({
@@ -25,9 +30,31 @@ class ChatDiscussionScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatDiscussionScreen> {
   void showGeminiActions() {
+    final discussionsProvider = context.read<DiscussionChatProvider>();
     Navigator.of(context).push(
       HeroDialogRoute(builder: (context) {
-        return GeminiActions(geminiID: 'gemmaSafe');
+        return GeminiActions(
+          onTapAction: (AiActions aiAction) async {
+            switch (aiAction) {
+              case AiActions.safetyQuiz:
+                log('generate a safety quiz');
+                await discussionsProvider.generateQuiz(
+                    assessment: widget.assessment);
+                break;
+              case AiActions.tipOfTheDay:
+                log('generate a tip of the day');
+                break;
+              case AiActions.identifyRisk:
+                log('generate a risk identification');
+                break;
+              case AiActions.none:
+                log('do nothing');
+                break;
+              default:
+                break;
+            }
+          },
+        );
       }),
     );
   }

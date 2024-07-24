@@ -18,29 +18,58 @@ class DiscussionAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      flexibleSpace: Stack(
+        children: [
+          if (imageUrl.isNotEmpty)
+            Positioned.fill(
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => const SizedBox(),
+              ),
+            ),
+          // Add a semi-transparent overlay
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5), // Adjust opacity as needed
+            ),
+          ),
+        ],
+      ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.white, // Ensure text is white for contrast
+              shadows: [
+                Shadow(
+                  offset: Offset(1, 1),
+                  blurRadius: 3,
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ],
+            ),
           ),
           Text(
             subtitle,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Colors.white70, // Slightly transparent white for subtitle
+              shadows: [
+                Shadow(
+                  offset: Offset(1, 1),
+                  blurRadius: 2,
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ],
+            ),
           ),
         ],
       ),
       actions: actions,
-      flexibleSpace: imageUrl.isNotEmpty
-          ? FlexibleSpaceBar(
-              background: CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) => const SizedBox(),
-              ),
-            )
-          : null,
+      backgroundColor: Colors.transparent, // Make AppBar transparent
+      elevation: 0, // Remove elevation
     );
   }
 
@@ -48,19 +77,50 @@ class DiscussionAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-// Usage example:
-// DiscussionAppBar(
-//   title: appBarTitle,
-//   subtitle: appBarSubtitle,
-//   imageUrl: appBarImage,
-//   actions: [
-//     Padding(
-//       padding: const EdgeInsets.only(right: 8.0),
-//       child: GeminiFloatingChatButton(
-//         onPressed: () {},
-//         size: ChatButtonSize.small,
-//         iconColor: Colors.white,
+// class DiscussionAppBar extends StatelessWidget implements PreferredSizeWidget {
+//   final String title;
+//   final String subtitle;
+//   final String imageUrl;
+//   final List<Widget> actions;
+
+//   const DiscussionAppBar({
+//     Key? key,
+//     required this.title,
+//     required this.subtitle,
+//     required this.imageUrl,
+//     required this.actions,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return AppBar(
+//       title: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             title,
+//             style: Theme.of(context).textTheme.titleLarge,
+//           ),
+//           Text(
+//             subtitle,
+//             style: Theme.of(context).textTheme.bodySmall,
+//           ),
+//         ],
 //       ),
-//     )
-//   ],
-// )
+//       actions: actions,
+//       flexibleSpace: imageUrl.isNotEmpty
+//           ? FlexibleSpaceBar(
+//               background: CachedNetworkImage(
+//                 imageUrl: imageUrl,
+//                 fit: BoxFit.cover,
+//                 errorWidget: (context, url, error) => const SizedBox(),
+//               ),
+//             )
+//           : null,
+//     );
+//   }
+
+//   @override
+//   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+// }
+

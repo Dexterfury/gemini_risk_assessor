@@ -5,12 +5,15 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
+import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:uuid/uuid.dart';
 
 class DiscussionChatProvider extends ChangeNotifier {
+  final GeminiModelManager _modelManager = GeminiModelManager();
   bool _isLoading = false;
   MessageReplyModel? _messageReplyModel;
 
@@ -20,6 +23,19 @@ class DiscussionChatProvider extends ChangeNotifier {
   void setMessageReplyModel(MessageReplyModel? messageReply) {
     _messageReplyModel = messageReply;
     notifyListeners();
+  }
+
+  Future<void> generateQuiz({
+    required AssessmentModel assessment,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    log('generating a quiz');
+    final quiz = await _modelManager.generateSafetyQuiz(assessment);
+
+    _isLoading = false;
+    notifyListeners();
+    log('quiz: $quiz');
   }
 
   // send text message to firestore

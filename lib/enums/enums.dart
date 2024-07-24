@@ -92,3 +92,28 @@ extension MessageTypeExtension on String {
     }
   }
 }
+
+enum AiActions {
+  safetyQuiz,
+  tipOfTheDay,
+  identifyRisk,
+  none,
+}
+
+// extension convertAIActionEnumToString on String
+extension AiActionExtension on String {
+  AiActions toAIAction() {
+    switch (this) {
+      case 'safetyQuiz':
+        return AiActions.safetyQuiz;
+      case 'tipOfTheDay':
+        return AiActions.tipOfTheDay;
+      case 'identifyRisk':
+        return AiActions.identifyRisk;
+      case 'none':
+        return AiActions.none;
+      default:
+        return AiActions.safetyQuiz;
+    }
+  }
+}

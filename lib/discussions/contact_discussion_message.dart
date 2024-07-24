@@ -48,63 +48,65 @@ class ContactDiscussionMessage extends StatelessWidget {
                 onPressed: () {},
               ),
             ),
-            Stack(
-              children: [
-                Padding(
-                  padding: padding,
-                  child: Card(
-                    elevation: 5,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                        bottomRight: Radius.circular(15),
+            Expanded(
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: padding,
+                    child: Card(
+                      elevation: 5,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
+                        ),
                       ),
-                    ),
-                    color: Theme.of(context).cardColor,
-                    child: Padding(
-                      padding: message.messageType == MessageType.text
-                          ? const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 10.0)
-                          : const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (isReplying) ...[
-                              MessageReplyPreview(
-                                message: message,
+                      color: Theme.of(context).cardColor,
+                      child: Padding(
+                        padding: message.messageType == MessageType.text
+                            ? const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 10.0)
+                            : const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (isReplying) ...[
+                                MessageReplyPreview(
+                                  message: message,
+                                  viewOnly: viewOnly,
+                                )
+                              ],
+                              DisplayMessageType(
+                                message: message.message,
+                                type: message.messageType,
+                                color: isDarkMode ? Colors.white : Colors.black,
+                                isReply: false,
                                 viewOnly: viewOnly,
-                              )
+                              ),
+                              Text(
+                                time,
+                                style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white60
+                                        : Colors.grey.shade500,
+                                    fontSize: 10),
+                              ),
                             ],
-                            DisplayMessageType(
-                              message: message.message,
-                              type: message.messageType,
-                              color: isDarkMode ? Colors.white : Colors.black,
-                              isReply: false,
-                              viewOnly: viewOnly,
-                            ),
-                            Text(
-                              time,
-                              style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.white60
-                                      : Colors.grey.shade500,
-                                  fontSize: 10),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 50,
-                  child: StackedReactions(
-                    reactions: messageReations,
+                  Positioned(
+                    bottom: 0,
+                    left: 50,
+                    child: StackedReactions(
+                      reactions: messageReations,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

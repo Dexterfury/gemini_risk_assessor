@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -7,52 +6,74 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 class GeminiActions extends StatefulWidget {
   const GeminiActions({
     super.key,
-    required this.geminiID,
+    required this.onTapAction,
   });
 
-  final String geminiID;
+  final Function(AiActions) onTapAction;
 
   @override
   State<GeminiActions> createState() => _GeminiActionsState();
 }
 
 class _GeminiActionsState extends State<GeminiActions> {
+  void _selectAndPop(AiActions action) {
+    widget.onTapAction(action);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(right: 20.0, left: 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // gemini bubble
-              buildGemini(),
-              const SizedBox(
-                height: 10,
-              ),
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          widget.onTapAction(AiActions.none);
+        }
+      },
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // gemini bubble
+                buildGemini(),
+                const SizedBox(
+                  height: 10,
+                ),
 
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildActionButton(context, 'Generate Safety Quiz', () {
-                    // TODO: Implement quiz generation
-                    Navigator.of(context).pop();
-                  }),
-                  _buildActionButton(context, 'Get Safety Tip', () {
-                    // TODO: Implement safety tip retrieval
-                    Navigator.of(context).pop();
-                  }),
-                  _buildActionButton(context, 'Identify Risks', () {
-                    // TODO: Implement risk identification
-                    Navigator.of(context).pop();
-                  }),
-                ],
-              ),
-              // context menu
-              //buildMenuItems(context),
-            ],
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildActionButton(
+                      context: context,
+                      label: 'Generate Safety Quiz',
+                      onPressed: () {
+                        _selectAndPop(AiActions.safetyQuiz);
+                      },
+                    ),
+                    _buildActionButton(
+                      context: context,
+                      label: 'Get Safety Tip',
+                      onPressed: () {
+                        _selectAndPop(AiActions.tipOfTheDay);
+                      },
+                    ),
+                    _buildActionButton(
+                      context: context,
+                      label: 'Identify Risks',
+                      onPressed: () {
+                        _selectAndPop(AiActions.identifyRisk);
+                      },
+                    ),
+                  ],
+                ),
+                // context menu
+                //buildMenuItems(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -71,7 +92,9 @@ class _GeminiActionsState extends State<GeminiActions> {
   }
 
   Widget _buildActionButton(
-      BuildContext context, String label, VoidCallback onPressed) {
+      {required BuildContext context,
+      required String label,
+      required VoidCallback onPressed}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton(
