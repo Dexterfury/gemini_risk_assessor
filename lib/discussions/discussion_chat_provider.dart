@@ -15,9 +15,13 @@ import 'package:uuid/uuid.dart';
 class DiscussionChatProvider extends ChangeNotifier {
   final GeminiModelManager _modelManager = GeminiModelManager();
   bool _isLoading = false;
+  bool _isLoadingQuiz = false;
+  bool _isLoadingAnswer = false;
   MessageReplyModel? _messageReplyModel;
 
   bool get isLoading => _isLoading;
+  bool get isLoadingQuiz => _isLoadingQuiz;
+  bool get isLoadingAnswer => _isLoadingAnswer;
   MessageReplyModel? get messageReplyModel => _messageReplyModel;
 
   void setMessageReplyModel(MessageReplyModel? messageReply) {
@@ -26,16 +30,118 @@ class DiscussionChatProvider extends ChangeNotifier {
   }
 
   Future<void> generateQuiz({
+    required UserModel userModel,
     required AssessmentModel assessment,
+    required String groupID,
+    required GenerationType generationType,
   }) async {
-    _isLoading = true;
+    _isLoadingQuiz = true;
     notifyListeners();
-    log('generating a quiz');
-    final quiz = await _modelManager.generateSafetyQuiz(assessment);
+    try {
+      final quiz = await _modelManager.generateSafetyQuiz(assessment);
 
-    _isLoading = false;
-    notifyListeners();
-    log('quiz: $quiz');
+      final messageID = const Uuid().v4();
+
+      final discussionMessage = DiscussionMessage(
+        senderUID: userModel.uid,
+        senderName: userModel.name,
+        senderImage: userModel.imageUrl,
+        groupID: groupID,
+        message: 'New safety quiz available! Tap to participate.',
+        messageType: MessageType.quiz,
+        timeSent: DateTime.now(),
+        messageID: messageID,
+        isSeen: false,
+        isAIMessage: true,
+        repliedMessage: '',
+        repliedTo: '',
+        repliedMessageType: MessageType.text,
+        reactions: [],
+        seenBy: [],
+        deletedBy: [],
+        quizData: quiz,
+        quizResults: {},
+      );
+
+      final collection = getCollectionRef(generationType);
+
+      // save the quiz to firestore
+      await FirebaseMethods.groupsCollection
+          .doc(groupID)
+          .collection(collection)
+          .doc(assessment.id)
+          .collection(Constants.chatMessagesCollection)
+          .doc(messageID)
+          .set(discussionMessage.toMap());
+
+      _isLoadingQuiz = false;
+      notifyListeners();
+    } catch (e) {
+      log('Error generating quiz: $e');
+      _isLoadingQuiz = false;
+      notifyListeners();
+    }
+  }
+
+  // update quiz in firestore
+  Future<void> updateQuiz({
+    required String currentUID,
+    required String groupID,
+    required String messageID,
+    required String itemID,
+    required GenerationType generationType,
+    required Map<String, dynamic> quizResults,
+  }) async {
+    log('quizResults: $quizResults');
+    try {
+      _isLoadingAnswer = true;
+      notifyListeners();
+      final collection = getCollectionRef(generationType);
+
+      // Fetch the current message data
+      final docSnapshot = await FirebaseMethods.groupsCollection
+          .doc(groupID)
+          .collection(collection)
+          .doc(itemID)
+          .collection(Constants.chatMessagesCollection)
+          .doc(messageID)
+          .get();
+
+      if (docSnapshot.exists) {
+        final currentData = docSnapshot.data() as Map<String, dynamic>;
+        final currentQuizResults =
+            Map<String, dynamic>.from(currentData[Constants.quizResults] ?? {});
+
+        // Convert int keys to string keys in the answers map
+        final answers =
+            (quizResults[Constants.answers] as Map<dynamic, dynamic>).map(
+          (key, value) => MapEntry(key.toString(), value),
+        );
+
+        // Add or update the current user's quiz results
+        currentQuizResults[currentUID] = {
+          Constants.userUID: currentUID,
+          Constants.answers: answers,
+        };
+
+        // Update the document with the new quiz results
+        await FirebaseMethods.groupsCollection
+            .doc(groupID)
+            .collection(collection)
+            .doc(itemID)
+            .collection(Constants.chatMessagesCollection)
+            .doc(messageID)
+            .update({
+          Constants.quizResults: currentQuizResults,
+        });
+      }
+      _isLoadingAnswer = false;
+      notifyListeners();
+    } catch (e) {
+      log('Error updating quiz: $e');
+      _isLoadingAnswer = false;
+      notifyListeners();
+    }
   }
 
   // send text message to firestore
@@ -81,7 +187,11 @@ class DiscussionChatProvider extends ChangeNotifier {
         reactions: [],
         seenBy: [sender.uid],
         deletedBy: [],
+        quizData: {},
+        quizResults: {},
       );
+
+      log('Message Data: ${discussionMessage.toMap()}');
 
       final collection = getCollectionRef(generationType);
 

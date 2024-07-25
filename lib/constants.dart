@@ -189,6 +189,15 @@ class Constants {
   static const String seenBy = 'seenBy';
   static const String deletedBy = 'deletedBy';
   static const String isMe = 'isMe';
+  static const String quizData = 'quizData';
+  static const String quizResults = 'quizResults';
+
+  static const String options = 'options';
+  static const String questions = 'questions';
+  static const String correctAnswer = 'correctAnswer';
+  static const String safetyQuiz = 'Safety Quiz';
+  static const String answers = 'answers';
+  static const String userUID = 'userUID';
 
   // shared preferences keys
   static const String voiceIndex = 'voiceIndex';

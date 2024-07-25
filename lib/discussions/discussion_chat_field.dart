@@ -66,7 +66,14 @@ class _BottomChatFieldState extends State<DiscussionChatField> {
       itemID: widget.assessment.id,
       isAIMessage: false,
       generationType: widget.generationType,
-      onSucess: () {},
+      onSucess: () {
+        // clear controller
+        setState(() {
+          _textEditingController.clear();
+        });
+        // remove keyboard focus
+        _focusNode.unfocus();
+      },
       onError: (error) {},
     );
   }

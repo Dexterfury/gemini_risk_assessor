@@ -73,6 +73,7 @@ enum MessageType {
   image,
   video,
   audio,
+  quiz,
 }
 
 // extension convertMessageEnumToString on String
@@ -87,6 +88,8 @@ extension MessageTypeExtension on String {
         return MessageType.video;
       case 'audio':
         return MessageType.audio;
+      case 'quiz':
+        return MessageType.quiz;
       default:
         return MessageType.text;
     }

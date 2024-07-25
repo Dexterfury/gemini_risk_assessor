@@ -18,6 +18,8 @@ class DiscussionMessage {
   final List<String> reactions;
   final List<String> seenBy;
   final List<String> deletedBy;
+  final Map<String, dynamic> quizData;
+  final Map<String, dynamic> quizResults;
 
   DiscussionMessage({
     required this.senderUID,
@@ -36,6 +38,8 @@ class DiscussionMessage {
     required this.reactions,
     required this.seenBy,
     required this.deletedBy,
+    required this.quizData,
+    required this.quizResults,
   });
 
   // to map
@@ -57,6 +61,8 @@ class DiscussionMessage {
       Constants.reactions: reactions,
       Constants.seenBy: seenBy,
       Constants.deletedBy: deletedBy,
+      Constants.quizData: quizData,
+      Constants.quizResults: quizResults,
     };
   }
 
@@ -80,6 +86,8 @@ class DiscussionMessage {
       reactions: List<String>.from(map[Constants.reactions] ?? []),
       seenBy: List<String>.from(map[Constants.seenBy] ?? []),
       deletedBy: List<String>.from(map[Constants.deletedBy] ?? []),
+      quizData: map[Constants.quizData] ?? {},
+      quizResults: Map<String, dynamic>.from(map[Constants.quizResults] ?? {}),
     );
   }
 
@@ -101,6 +109,8 @@ class DiscussionMessage {
     List<String>? reactions,
     List<String>? seenBy,
     List<String>? deletedBy,
+    Map<String, dynamic>? quizData,
+    Map<String, dynamic>? quizResults,
   }) {
     return DiscussionMessage(
       senderUID: senderUID ?? this.senderUID,
@@ -119,6 +129,8 @@ class DiscussionMessage {
       reactions: reactions ?? this.reactions,
       seenBy: seenBy ?? this.seenBy,
       deletedBy: deletedBy ?? this.deletedBy,
+      quizData: quizData ?? this.quizData,
+      quizResults: quizResults ?? this.quizResults,
     );
   }
 }

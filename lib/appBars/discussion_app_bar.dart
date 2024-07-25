@@ -18,6 +18,9 @@ class DiscussionAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      leading: BackButton(
+        color: Colors.white,
+      ),
       flexibleSpace: Stack(
         children: [
           if (imageUrl.isNotEmpty)
