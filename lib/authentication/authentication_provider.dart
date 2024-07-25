@@ -8,14 +8,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -753,6 +751,8 @@ class AuthenticationProvider extends ChangeNotifier {
       imageUrl: user.photoURL ?? '',
       token: '',
       aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+      rating: 0,
+      safetyPoints: 0,
       isAnonymous: wasAnonymous,
       createdAt: DateTime.now().toIso8601String(),
     );

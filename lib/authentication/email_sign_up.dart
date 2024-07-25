@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
+import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
@@ -139,6 +139,8 @@ class _EmailSignUpState extends State<EmailSignUp> {
           imageUrl: '',
           token: '',
           aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
+          rating: 0,
+          safetyPoints: 0,
           isAnonymous: false,
           createdAt: DateTime.now().toIso8601String(),
         );

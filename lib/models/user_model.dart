@@ -8,6 +8,8 @@ class UserModel {
   String imageUrl;
   String token;
   String aboutMe;
+  double rating;
+  double safetyPoints;
   bool isAnonymous;
   String createdAt;
 
@@ -20,6 +22,8 @@ class UserModel {
     required this.imageUrl,
     required this.token,
     required this.aboutMe,
+    required this.rating,
+    required this.safetyPoints,
     required this.isAnonymous,
     required this.createdAt,
   });
@@ -34,6 +38,8 @@ class UserModel {
       imageUrl: json[Constants.imageUrl] ?? '',
       token: json[Constants.token] ?? '',
       aboutMe: json[Constants.aboutMe] ?? '',
+      rating: json[Constants.rating] ?? 0.0,
+      safetyPoints: json[Constants.safetyPoints] ?? 0.0,
       isAnonymous: json[Constants.isAnonymous] ?? false,
       createdAt: json[Constants.createdAt] ?? '',
     );
@@ -49,6 +55,8 @@ class UserModel {
       Constants.imageUrl: imageUrl,
       Constants.token: token,
       Constants.aboutMe: aboutMe,
+      Constants.rating: rating,
+      Constants.safetyPoints: safetyPoints,
       Constants.isAnonymous: isAnonymous,
       Constants.createdAt: createdAt,
     };

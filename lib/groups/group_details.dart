@@ -12,7 +12,7 @@ import 'package:gemini_risk_assessor/buttons/my_fab_button.dart';
 import 'package:gemini_risk_assessor/groups/group_details_card.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
-import 'package:gemini_risk_assessor/providers/authentication_provider.dart';
+import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
