@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 
 class QuizResultsWidget extends StatelessWidget {
-  final Map<String, dynamic> quizData;
+  final QuizModel quizData;
   final Map<String, dynamic> quizResults;
   final String userUID;
 
@@ -43,7 +44,7 @@ class QuizResultsWidget extends StatelessWidget {
     final answers = Map<String, String>.from(
         participantResult[Constants.answers] as Map<String, dynamic>);
 
-    quizData[Constants.questions].asMap().forEach((index, question) {
+    quizData.questions.asMap().forEach((index, question) {
       final userAnswer = answers[index.toString()];
       final correctAnswer = question[Constants.correctAnswer];
       if (userAnswer == correctAnswer) {
@@ -59,7 +60,7 @@ class QuizResultsWidget extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         Text(
-          'Score: $correctAnswers / ${quizData['questions'].length}',
+          'Score: $correctAnswers / ${quizData.questions.length}',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         SizedBox(height: 8),

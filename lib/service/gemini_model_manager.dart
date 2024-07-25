@@ -152,7 +152,7 @@ Respond in a helpful, safety-focused manner, providing practical advice or clari
   }
 
 // generate safety quiz using the generated content
-  Future<Map<String, dynamic>> generateSafetyQuiz(
+  Future<GenerateContentResponse> generateSafetyQuiz(
       AssessmentModel assessment) async {
     final model = await getModel(isVision: false, isDocumentSpecific: true);
 
@@ -185,9 +185,8 @@ Format the response as a JSON object with the following structure:
     );
 
     final response = await generateContent(model, prompt);
-    final validJson = cleanJson(response.text!);
-    final json = jsonDecode(validJson);
-    return json;
+
+    return response;
   }
 
 // generate safety tip of the day using the generated content

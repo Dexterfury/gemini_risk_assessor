@@ -106,69 +106,72 @@ class _BottomChatFieldState extends State<DiscussionChatField> {
       builder: (context, chatProvider, child) {
         final messageReply = chatProvider.messageReplyModel;
         final isMessageReply = messageReply != null;
-        return Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Theme.of(context).cardColor,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                  )),
-              child: Column(
-                children: [
-                  if (isMessageReply)
-                    MessageReplyPreview(
-                      replyMessageModel: messageReply,
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _textEditingController,
-                            focusNode: _focusNode,
-                            decoration: const InputDecoration.collapsed(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(30),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Theme.of(context).cardColor,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
+                child: Column(
+                  children: [
+                    if (isMessageReply)
+                      MessageReplyPreview(
+                        replyMessageModel: messageReply,
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _textEditingController,
+                              focusNode: _focusNode,
+                              decoration: const InputDecoration.collapsed(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(30),
+                                  ),
+                                  borderSide: BorderSide.none,
                                 ),
-                                borderSide: BorderSide.none,
+                                hintText: 'Type a message',
                               ),
-                              hintText: 'Type a message',
                             ),
                           ),
-                        ),
-                        chatProvider.isLoading
-                            ? const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(),
-                              )
-                            : GestureDetector(
-                                onTap: sendTextMessage,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  margin: const EdgeInsets.all(5),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Icon(
-                                      Icons.arrow_upward,
-                                      color: Colors.white,
+                          chatProvider.isLoading
+                              ? const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: CircularProgressIndicator(),
+                                )
+                              : GestureDetector(
+                                  onTap: sendTextMessage,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    margin: const EdgeInsets.all(5),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: const Icon(
+                                        Icons.arrow_upward,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

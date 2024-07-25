@@ -74,7 +74,7 @@ enum MessageType {
   video,
   audio,
   quiz,
-  quizAnser,
+  quizAnswer,
 }
 
 // extension convertMessageEnumToString on String
@@ -91,6 +91,7 @@ extension MessageTypeExtension on String {
         return MessageType.audio;
       case 'quiz':
         return MessageType.quiz;
+      case 'quizAnswer':
       default:
         return MessageType.text;
     }

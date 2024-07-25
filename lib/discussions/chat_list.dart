@@ -52,6 +52,7 @@ class _ChatListState extends State<ChatList> {
       ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
+          log('snapshort error: ${snapshot.error}');
           return const Center(
             child: Text(
               'Something went wrong',
@@ -141,13 +142,13 @@ class _ChatListState extends State<ChatList> {
                               .setMessageReplyModel(messageReply);
                         },
                         onSubmitQuizResult: (messageID, reults) async {
-                          log('results: $reults');
                           discussionChatProvider.updateQuiz(
                             currentUser: userModel,
                             groupID: widget.groupID,
                             messageID: messageID,
                             itemID: widget.assessment.id,
                             generationType: widget.generationType,
+                            quizData: message.quizData,
                             quizResults: reults,
                           );
                         },

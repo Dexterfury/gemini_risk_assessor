@@ -1,4 +1,5 @@
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 
 class DiscussionMessage {
@@ -18,7 +19,7 @@ class DiscussionMessage {
   final List<String> reactions;
   final List<String> seenBy;
   final List<String> deletedBy;
-  final Map<String, dynamic> quizData;
+  final QuizModel quizData;
   final Map<String, dynamic> quizResults;
 
   DiscussionMessage({
@@ -61,7 +62,7 @@ class DiscussionMessage {
       Constants.reactions: reactions,
       Constants.seenBy: seenBy,
       Constants.deletedBy: deletedBy,
-      Constants.quizData: quizData,
+      Constants.quizData: quizData.toJson(),
       Constants.quizResults: quizResults,
     };
   }
@@ -86,7 +87,7 @@ class DiscussionMessage {
       reactions: List<String>.from(map[Constants.reactions] ?? []),
       seenBy: List<String>.from(map[Constants.seenBy] ?? []),
       deletedBy: List<String>.from(map[Constants.deletedBy] ?? []),
-      quizData: map[Constants.quizData] ?? {},
+      quizData: QuizModel.fromJson(map[Constants.quizData] ?? {}),
       quizResults: Map<String, dynamic>.from(map[Constants.quizResults] ?? {}),
     );
   }
@@ -109,7 +110,7 @@ class DiscussionMessage {
     List<String>? reactions,
     List<String>? seenBy,
     List<String>? deletedBy,
-    Map<String, dynamic>? quizData,
+    QuizModel? quizData,
     Map<String, dynamic>? quizResults,
   }) {
     return DiscussionMessage(

@@ -198,6 +198,10 @@ class Constants {
   static const String safetyQuiz = 'Safety Quiz';
   static const String answers = 'answers';
   static const String userUID = 'userUID';
+  static const String quizID = 'quizID';
+  static const String itemID = 'itemID';
+
+  static const String quizTitle = 'quizTitle';
 
   // shared preferences keys
   static const String voiceIndex = 'voiceIndex';

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
+import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -35,45 +36,54 @@ class DiscussionChatProvider extends ChangeNotifier {
     required String groupID,
     required GenerationType generationType,
   }) async {
-    _isLoadingQuiz = true;
-    notifyListeners();
     try {
-      final quiz = await _modelManager.generateSafetyQuiz(assessment);
+      _isLoadingQuiz = true;
+      notifyListeners();
+      final content = await _modelManager.generateSafetyQuiz(assessment);
 
-      final messageID = const Uuid().v4();
+      if (content.text != null) {
+        final messageID = const Uuid().v4();
 
-      final discussionMessage = DiscussionMessage(
-        senderUID: userModel.uid,
-        senderName: userModel.name,
-        senderImage: userModel.imageUrl,
-        groupID: groupID,
-        message: 'New safety quiz available! Tap to participate.',
-        messageType: MessageType.quiz,
-        timeSent: DateTime.now(),
-        messageID: messageID,
-        isSeen: false,
-        isAIMessage: true,
-        repliedMessage: '',
-        repliedTo: '',
-        repliedMessageType: MessageType.text,
-        reactions: [],
-        seenBy: [],
-        deletedBy: [],
-        quizData: quiz,
-        quizResults: {},
-      );
+        final quiz = QuizModel.fromGeneratedContent(
+          content,
+          assessment.id,
+          userModel.uid,
+          messageID,
+          DateTime.now(),
+        );
 
-      final collection = getCollectionRef(generationType);
+        final discussionMessage = DiscussionMessage(
+          senderUID: userModel.uid,
+          senderName: userModel.name,
+          senderImage: userModel.imageUrl,
+          groupID: groupID,
+          message: 'New safety quiz available! Tap to participate.',
+          messageType: MessageType.quiz,
+          timeSent: DateTime.now(),
+          messageID: messageID,
+          isSeen: false,
+          isAIMessage: true,
+          repliedMessage: '',
+          repliedTo: '',
+          repliedMessageType: MessageType.text,
+          reactions: [],
+          seenBy: [userModel.uid],
+          deletedBy: [],
+          quizData: quiz,
+          quizResults: {},
+        );
 
-      // save the quiz to firestore
-      await FirebaseMethods.groupsCollection
-          .doc(groupID)
-          .collection(collection)
-          .doc(assessment.id)
-          .collection(Constants.chatMessagesCollection)
-          .doc(messageID)
-          .set(discussionMessage.toMap());
+        final collection = getCollectionRef(generationType);
 
+        // save the quiz to firestore
+        await FirebaseMethods.groupsCollection
+            .doc(groupID)
+            .collection(collection)
+            .doc(assessment.id)
+            .collection(Constants.chatMessagesCollection)
+            .doc(messageID)
+            .set(discussionMessage.toMap());
+      }
       _isLoadingQuiz = false;
       notifyListeners();
     } catch (e) {
@@ -85,14 +95,14 @@ class DiscussionChatProvider extends ChangeNotifier {
 
   // update quiz in firestore
   Future<void> updateQuiz({
-    required UserModel currenUser,
+    required UserModel currentUser,
     required String groupID,
     required String messageID,
     required String itemID,
     required GenerationType generationType,
+    required QuizModel quizData,
     required Map<String, dynamic> quizResults,
   }) async {
-    log('quizResults: $quizResults');
     try {
       _isLoadingAnswer = true;
       notifyListeners();
@@ -115,13 +125,15 @@ class DiscussionChatProvider extends ChangeNotifier {
         // Convert int keys to string keys in the answers map
         final answers =
             (quizResults[Constants.answers] as Map<dynamic, dynamic>).map(
-          (key, value) => MapEntry(key.toString(), value),
+          (key, value) => MapEntry(key.toString(), value.toString()),
         );
 
         // Add or update the current user's quiz results
-        currentQuizResults[currenUser.uid] = {
-          Constants.userUID: currenUser.uid,
+        currentQuizResults[currentUser.uid] = {
+          Constants.quizTitle: quizData.title,
+          Constants.userUID: currentUser.uid,
           Constants.answers: answers,
+          Constants.createdAt: DateTime.now(),
         };
 
         // Update the document with the new quiz results
@@ -138,25 +150,37 @@ class DiscussionChatProvider extends ChangeNotifier {
         final answerMessageID = const Uuid().v4();
 
         final answerMessage = DiscussionMessage(
-          senderUID: currenUser.uid,
-          senderName: currenUser.name,
-          senderImage: currenUser.imageUrl,
+          senderUID: currentUser.uid,
+          senderName: currentUser.name,
+          senderImage: currentUser.imageUrl,
           groupID: groupID,
           message: 'Results',
-          messageType: MessageType.quizAnser,
+          messageType: MessageType.quizAnswer,
           timeSent: DateTime.now(),
           messageID: answerMessageID,
           isSeen: false,
           isAIMessage: false,
-          repliedMessage: repliedMessage,
-          repliedTo: repliedTo,
-          repliedMessageType: repliedMessageType,
-          reactions: reactions,
-          seenBy: seenBy,
-          deletedBy: deletedBy,
+          repliedMessage: quizData.title,
+          repliedTo: 'Quiz results',
+          repliedMessageType: MessageType.quizAnswer,
+          reactions: [],
+          seenBy: [currentUser.uid],
+          deletedBy: [],
           quizData: quizData,
-          quizResults: quizResults,
+          quizResults: {
+            Constants.answers: answers,
+            Constants.userUID: currentUser.uid
+          },
         );
+
+        // Add the answer message to the chat messages collection
+        await FirebaseMethods.groupsCollection
+            .doc(groupID)
+            .collection(collection)
+            .doc(itemID)
+            .collection(Constants.chatMessagesCollection)
+            .doc(answerMessageID)
+            .set(answerMessage.toMap());
       }
       _isLoadingAnswer = false;
       notifyListeners();
@@ -192,6 +216,9 @@ class DiscussionChatProvider extends ChangeNotifier {
       MessageType repliedMessageType =
           _messageReplyModel?.messageType ?? MessageType.text;
 
+      // craete an empty quiz model if it is an AI generated message
+      QuizModel quiz = QuizModel.empty;
+
       // 2. update/set the messagemodel
       final discussionMessage = DiscussionMessage(
         senderUID: sender.uid,
@@ -210,11 +237,11 @@ class DiscussionChatProvider extends ChangeNotifier {
         reactions: [],
         seenBy: [sender.uid],
         deletedBy: [],
-        quizData: {},
+        quizData: quiz,
         quizResults: {},
       );
 
-      log('Message Data: ${discussionMessage.toMap()}');
+      //log('Message Data: ${discussionMessage.toMap()}');
 
       final collection = getCollectionRef(generationType);
 
@@ -234,6 +261,7 @@ class DiscussionChatProvider extends ChangeNotifier {
       setMessageReplyModel(null);
     } catch (e) {
       // set loading to false
+      log('erro message: $e');
       _isLoading = false;
       onError(e.toString());
     }

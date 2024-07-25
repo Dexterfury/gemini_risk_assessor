@@ -459,19 +459,24 @@ class FirebaseMethods {
     required String itemID,
     required GenerationType generationType,
   }) {
-    final collection = getCollectionRef(generationType);
-    // handle group message
-    return groupsCollection
-        .doc(groupID)
-        .collection(collection)
-        .doc(itemID)
-        .collection(Constants.chatMessagesCollection)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return DiscussionMessage.fromMap(doc.data());
-      }).toList();
-    });
+    try {
+      final collection = getCollectionRef(generationType);
+      // handle group message
+      return groupsCollection
+          .doc(groupID)
+          .collection(collection)
+          .doc(itemID)
+          .collection(Constants.chatMessagesCollection)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs.map((doc) {
+          return DiscussionMessage.fromMap(doc.data());
+        }).toList();
+      });
+    } catch (e) {
+      log('error loading messages: $e');
+      return Stream.empty();
+    }
   }
 
   // set message status
