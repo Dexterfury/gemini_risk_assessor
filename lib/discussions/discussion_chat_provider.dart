@@ -125,7 +125,7 @@ class DiscussionChatProvider extends ChangeNotifier {
         // Convert int keys to string keys in the answers map
         final answers =
             (quizResults[Constants.answers] as Map<dynamic, dynamic>).map(
-          (key, value) => MapEntry(key.toString(), value.toString()),
+          (key, value) => MapEntry(key.toString(), value),
         );
 
         // Add or update the current user's quiz results
@@ -161,16 +161,13 @@ class DiscussionChatProvider extends ChangeNotifier {
           isSeen: false,
           isAIMessage: false,
           repliedMessage: quizData.title,
-          repliedTo: 'Quiz results',
+          repliedTo: 'Safety Quiz',
           repliedMessageType: MessageType.quizAnswer,
           reactions: [],
           seenBy: [currentUser.uid],
           deletedBy: [],
           quizData: quizData,
-          quizResults: {
-            Constants.answers: answers,
-            Constants.userUID: currentUser.uid
-          },
+          quizResults: currentQuizResults,
         );
 
         // Add the answer message to the chat messages collection

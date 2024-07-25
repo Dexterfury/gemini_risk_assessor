@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/audio_player_widget.dart';
@@ -26,6 +28,7 @@ class DisplayMessageType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('type: $type');
     return _buildMessageContent();
   }
 
@@ -39,6 +42,8 @@ class DisplayMessageType extends StatelessWidget {
         return _buildVideoMessage();
       case MessageType.audio:
         return _buildAudioMessage();
+      case MessageType.quizAnswer:
+        return Text("Quiz Answer");
       default:
         return _buildTextMessage();
     }

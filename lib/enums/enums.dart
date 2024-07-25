@@ -92,6 +92,7 @@ extension MessageTypeExtension on String {
       case 'quiz':
         return MessageType.quiz;
       case 'quizAnswer':
+        return MessageType.quizAnswer;
       default:
         return MessageType.text;
     }

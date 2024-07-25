@@ -121,37 +121,42 @@ class _ChatListState extends State<ChatList> {
                   message.deletedBy.contains(userModel.uid);
               return deletedByCurrentUser
                   ? const SizedBox.shrink()
-                  : Hero(
-                      tag: element.messageID,
-                      child: MessageWidget(
-                        message: element,
-                        isMe: isMe,
-                        currentUserUID: userModel.uid,
-                        onRightSwipe: () {
-                          // set the message reply to true
-                          final messageReply = MessageReplyModel(
-                            message: element.message,
-                            senderUID: element.senderUID,
-                            senderName: element.senderName,
-                            senderImage: element.senderImage,
-                            messageType: element.messageType,
-                          );
+                  : GestureDetector(
+                      onTap: () {
+                        log('type: ${message.messageType}');
+                      },
+                      child: Hero(
+                        tag: element.messageID,
+                        child: MessageWidget(
+                          message: element,
+                          isMe: isMe,
+                          currentUserUID: userModel.uid,
+                          onRightSwipe: () {
+                            // set the message reply to true
+                            final messageReply = MessageReplyModel(
+                              message: element.message,
+                              senderUID: element.senderUID,
+                              senderName: element.senderName,
+                              senderImage: element.senderImage,
+                              messageType: element.messageType,
+                            );
 
-                          context
-                              .read<DiscussionChatProvider>()
-                              .setMessageReplyModel(messageReply);
-                        },
-                        onSubmitQuizResult: (messageID, reults) async {
-                          discussionChatProvider.updateQuiz(
-                            currentUser: userModel,
-                            groupID: widget.groupID,
-                            messageID: messageID,
-                            itemID: widget.assessment.id,
-                            generationType: widget.generationType,
-                            quizData: message.quizData,
-                            quizResults: reults,
-                          );
-                        },
+                            context
+                                .read<DiscussionChatProvider>()
+                                .setMessageReplyModel(messageReply);
+                          },
+                          onSubmitQuizResult: (messageID, reults) async {
+                            discussionChatProvider.updateQuiz(
+                              currentUser: userModel,
+                              groupID: widget.groupID,
+                              messageID: messageID,
+                              itemID: widget.assessment.id,
+                              generationType: widget.generationType,
+                              quizData: message.quizData,
+                              quizResults: reults,
+                            );
+                          },
+                        ),
                       ),
                     );
             },

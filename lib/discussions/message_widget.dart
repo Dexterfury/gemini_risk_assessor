@@ -38,6 +38,13 @@ class MessageWidget extends StatelessWidget {
           },
           quizResults: message.quizResults,
         );
+      case MessageType.quizAnswer: // Corrected spelling
+        log('Quiz answer widget being built');
+        return QuizResultsWidget(
+          quizData: message.quizData,
+          quizResults: message.quizResults,
+          userUID: currentUserUID,
+        );
       default:
         log('Default widget (SwipeTo) being built');
         return _buildSwipeWidget();
