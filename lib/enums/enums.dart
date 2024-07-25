@@ -74,6 +74,7 @@ enum MessageType {
   video,
   audio,
   quiz,
+  quizAnser,
 }
 
 // extension convertMessageEnumToString on String

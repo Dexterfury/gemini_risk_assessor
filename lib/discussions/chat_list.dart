@@ -42,7 +42,7 @@ class _ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
     // current user uid
-    final uid = context.read<AuthenticationProvider>().userModel!.uid;
+    final userModel = context.read<AuthenticationProvider>().userModel!;
     final discussionChatProvider = context.read<DiscussionChatProvider>();
     return StreamBuilder<List<DiscussionMessage>>(
       stream: FirebaseMethods.getMessagesStream(
@@ -105,7 +105,7 @@ class _ChatListState extends State<ChatList> {
 
               // set seen by
               FirebaseMethods.setMessageStatus(
-                currentUserId: uid,
+                currentUserId: userModel.uid,
                 groupID: widget.groupID,
                 messageID: message.messageID,
                 itemID: widget.assessment.id,
@@ -114,9 +114,10 @@ class _ChatListState extends State<ChatList> {
               );
 
               // check if we sent the last message
-              final isMe = element.senderUID == uid;
+              final isMe = element.senderUID == userModel.uid;
               // if the deletedBy contains the current user id then dont show the message
-              bool deletedByCurrentUser = message.deletedBy.contains(uid);
+              bool deletedByCurrentUser =
+                  message.deletedBy.contains(userModel.uid);
               return deletedByCurrentUser
                   ? const SizedBox.shrink()
                   : Hero(
@@ -124,7 +125,7 @@ class _ChatListState extends State<ChatList> {
                       child: MessageWidget(
                         message: element,
                         isMe: isMe,
-                        currentUserUID: uid,
+                        currentUserUID: userModel.uid,
                         onRightSwipe: () {
                           // set the message reply to true
                           final messageReply = MessageReplyModel(
@@ -142,7 +143,7 @@ class _ChatListState extends State<ChatList> {
                         onSubmitQuizResult: (messageID, reults) async {
                           log('results: $reults');
                           discussionChatProvider.updateQuiz(
-                            currentUID: uid,
+                            currentUser: userModel,
                             groupID: widget.groupID,
                             messageID: messageID,
                             itemID: widget.assessment.id,

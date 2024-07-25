@@ -85,7 +85,7 @@ class DiscussionChatProvider extends ChangeNotifier {
 
   // update quiz in firestore
   Future<void> updateQuiz({
-    required String currentUID,
+    required UserModel currenUser,
     required String groupID,
     required String messageID,
     required String itemID,
@@ -119,8 +119,8 @@ class DiscussionChatProvider extends ChangeNotifier {
         );
 
         // Add or update the current user's quiz results
-        currentQuizResults[currentUID] = {
-          Constants.userUID: currentUID,
+        currentQuizResults[currenUser.uid] = {
+          Constants.userUID: currenUser.uid,
           Constants.answers: answers,
         };
 
@@ -134,6 +134,29 @@ class DiscussionChatProvider extends ChangeNotifier {
             .update({
           Constants.quizResults: currentQuizResults,
         });
+
+        final answerMessageID = const Uuid().v4();
+
+        final answerMessage = DiscussionMessage(
+          senderUID: currenUser.uid,
+          senderName: currenUser.name,
+          senderImage: currenUser.imageUrl,
+          groupID: groupID,
+          message: 'Results',
+          messageType: MessageType.quizAnser,
+          timeSent: DateTime.now(),
+          messageID: answerMessageID,
+          isSeen: false,
+          isAIMessage: false,
+          repliedMessage: repliedMessage,
+          repliedTo: repliedTo,
+          repliedMessageType: repliedMessageType,
+          reactions: reactions,
+          seenBy: seenBy,
+          deletedBy: deletedBy,
+          quizData: quizData,
+          quizResults: quizResults,
+        );
       }
       _isLoadingAnswer = false;
       notifyListeners();

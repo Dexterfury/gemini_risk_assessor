@@ -169,6 +169,7 @@ Control Measures: ${assessment.control.join(', ')}
 Create 3 multiple-choice questions related to the safety aspects of this assessment. 
 Format the response as a JSON object with the following structure:
 {
+  "title": \$quizTitle,
   "questions": [
     {
       "question": "Question text",
