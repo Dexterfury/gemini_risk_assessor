@@ -3,6 +3,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiModelManager {
@@ -166,6 +167,40 @@ Risks: ${assessment.risks.join(', ')}
 Control Measures: ${assessment.control.join(', ')}
 
 Create 3 multiple-choice questions related to the safety aspects of this assessment. 
+Format the response as a JSON object with the following structure:
+{
+  "title": \$quizTitle,
+  "questions": [
+    {
+      "question": "Question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": "Correct option letter (A, B, C, or D)"
+    },
+    // ... (2 more questions)
+  ]
+}
+''',
+      additionalTextInputs: [],
+      images: [],
+    );
+
+    final response = await generateContent(model, prompt);
+
+    return response;
+  }
+
+  Future<GenerateContentResponse> generateSafetyToolsQuiz(
+      ToolModel tool) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    final prompt = PromptDataModel(
+      textInput: '''
+Generate a short safety quiz based on the following tool:
+
+Title: ${tool.title}
+description: ${tool.description}
+
+Create 3 multiple-choice questions related to the safety aspects of this tool. 
 Format the response as a JSON object with the following structure:
 {
   "title": \$quizTitle,

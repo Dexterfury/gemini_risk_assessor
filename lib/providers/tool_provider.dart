@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -302,60 +303,67 @@ class ToolsProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    // get model to use text or vision
-    //var model = await GeminiService.getModel(images: _maxImages);
-    var model = await _modelManager.getModel(
-      isVision: _maxImages < 10,
-      isDocumentSpecific: true,
-    );
-
-    // set description to use in prompt
-    await setToolData(
-      description,
-      creatorID,
-      groupID,
-    );
-
-    // get promptDara
-    final prompt = getPromptData();
 
     try {
-      //final content = await GeminiService.generateContent(model, prompt);
+      var model = await _modelManager.getModel(
+        isVision: _maxImages < 10,
+        isDocumentSpecific: true,
+      );
+
+      await setToolData(
+        description,
+        creatorID,
+        groupID,
+      );
+
+      final prompt = getPromptData();
+
       final content = await _modelManager.generateContent(model, prompt);
 
-      // handle no image or image of not-food
       if (content.text != null && content.text!.contains(noToolFound)) {
-        // show error message
         _isLoading = false;
         onError(noToolFound);
-      } else {
-        final List<String> images = [];
-        if (_imagesFileList != null) {
-          for (var image in _imagesFileList!) {
-            images.add(image.path);
-          }
-        }
-
-        final toolId = const Uuid().v4();
-        _toolModel = ToolModel.fromGeneratedContent(
-          content,
-          toolId,
-          creatorID,
-          groupID,
-          images,
-          DateTime.now(),
-        );
-        _isLoading = false;
-        notifyListeners();
-        onSuccess();
+        return;
       }
+
+      final List<String> images = [];
+      if (_imagesFileList != null) {
+        for (var image in _imagesFileList!) {
+          images.add(image.path);
+        }
+      }
+
+      final toolId = const Uuid().v4();
+      _toolModel = ToolModel.fromGeneratedContent(
+        content,
+        toolId,
+        creatorID,
+        groupID,
+        images,
+        DateTime.now(),
+      );
+
+      _isLoading = false;
+      notifyListeners();
+      onSuccess();
     } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+
+      if (error is SocketException) {
+        onError(
+            "Network error: Unable to connect to the server. Please check your internet connection and try again.");
+      } else if (error is TimeoutException) {
+        onError("Request timed out. Please try again later.");
+      } else if (error is HttpException) {
+        onError("HTTP error occurred: ${error.message}");
+      } else {
+        onError("An unexpected error occurred: ${error.toString()}");
+      }
+
       if (kDebugMode) {
         print('error### : $error');
       }
-      _isLoading = false;
-      notifyListeners();
-      onError(error.toString());
     }
   }
 

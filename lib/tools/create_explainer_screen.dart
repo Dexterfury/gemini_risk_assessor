@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -126,9 +127,9 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             alignment: Alignment.centerRight,
             child: OpenContainer(
               closedBuilder: (context, action) {
-                return MainAppButton(
-                  icon: FontAwesomeIcons.wandMagicSparkles,
-                  label: 'Generate Explainer',
+                return GeminiButton(
+                  label: 'Generate',
+                  borderRadius: 15.0,
                   onTap: () async {
                     //check if images are added
                     if (toolProvider.imagesFileList!.isEmpty) {
@@ -163,6 +164,8 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
                             .whenComplete(action);
                       },
                       onError: (error) {
+                        // pop the loading dialog
+                        Navigator.pop(context);
                         showSnackBar(
                           context: context,
                           message: error,
