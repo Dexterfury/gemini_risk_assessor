@@ -8,21 +8,21 @@ import 'package:gemini_risk_assessor/discussions/additional_data_widget.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:provider/provider.dart';
 
 class GeminiActions extends StatefulWidget {
-  const GeminiActions({
-    super.key,
-    required this.groupID,
-    required this.assessment,
-    required this.generationType,
-    required this.onTapAction,
-  });
+  const GeminiActions(
+      {super.key,
+      this.assessment,
+      this.tool,
+      required this.groupID,
+      required this.generationType});
 
+  final AssessmentModel? assessment;
+  final ToolModel? tool;
   final String groupID;
-  final AssessmentModel assessment;
   final GenerationType generationType;
-  final Function(AiActions) onTapAction;
 
   @override
   State<GeminiActions> createState() => _GeminiActionsState();
@@ -48,6 +48,7 @@ class _GeminiActionsState extends State<GeminiActions> {
             .generateQuiz(
           userModel: userModel,
           assessment: widget.assessment,
+          tool: widget.tool,
           groupID: widget.groupID,
           generationType: widget.generationType,
         )
@@ -74,7 +75,7 @@ class _GeminiActionsState extends State<GeminiActions> {
         discussionsProvider
             .addAdditionalData(
           userModel: userModel,
-          assessment: widget.assessment,
+          assessment: widget.assessment!,
           groupID: widget.groupID,
           generationType: widget.generationType,
         )
@@ -113,7 +114,9 @@ class _GeminiActionsState extends State<GeminiActions> {
                             .saveDiscussionMessage(
                           message: message,
                           groupID: widget.groupID,
-                          itemID: widget.assessment.id,
+                          itemID: widget.tool != null
+                              ? widget.tool!.id
+                              : widget.assessment!.id,
                           messageID: message.messageID,
                           generationType: widget.generationType,
                         )
@@ -145,7 +148,7 @@ class _GeminiActionsState extends State<GeminiActions> {
         discussionsProvider
             .summerizeChatMessages(
           groupID: widget.groupID,
-          itemID: widget.assessment.id,
+          itemID: widget.tool != null ? widget.tool!.id : widget.assessment!.id,
           generationType: widget.generationType,
         )
             .then((summery) {
@@ -222,13 +225,14 @@ class _GeminiActionsState extends State<GeminiActions> {
                       _selectAndPop(AiActions.safetyQuiz);
                     },
                   ),
-                  _buildActionButton(
-                    context: context,
-                    label: 'Suggest Additional Risks',
-                    onPressed: () {
-                      _selectAndPop(AiActions.additionalData);
-                    },
-                  ),
+                  if (widget.generationType != GenerationType.tool)
+                    _buildActionButton(
+                      context: context,
+                      label: 'Suggest Additional Risks',
+                      onPressed: () {
+                        _selectAndPop(AiActions.additionalData);
+                      },
+                    ),
                   _buildActionButton(
                     context: context,
                     label: 'Summerize Chat',

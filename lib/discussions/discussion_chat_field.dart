@@ -4,18 +4,21 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:provider/provider.dart';
 
 class DiscussionChatField extends StatefulWidget {
   const DiscussionChatField({
     super.key,
     required this.groupID,
-    required this.assessment,
+    this.assessment,
+    this.tool,
     required this.generationType,
   });
 
   final String groupID;
-  final AssessmentModel assessment;
+  final AssessmentModel? assessment;
+  final ToolModel? tool;
   final GenerationType generationType;
 
   @override
@@ -58,13 +61,15 @@ class _BottomChatFieldState extends State<DiscussionChatField> {
     if (_textEditingController.text.isNotEmpty) {
       final currentUser = context.read<AuthenticationProvider>().userModel!;
       final discussionChatProvider = context.read<DiscussionChatProvider>();
+      final itemID =
+          widget.tool != null ? widget.tool!.id : widget.assessment!.id;
 
       discussionChatProvider.sendTextMessage(
         sender: currentUser,
         message: _textEditingController.text,
         messageType: MessageType.text,
         groupID: widget.groupID,
-        itemID: widget.assessment.id,
+        itemID: itemID,
         isAIMessage: false,
         generationType: widget.generationType,
         onSucess: () {

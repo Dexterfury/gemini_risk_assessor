@@ -11,17 +11,20 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/service/gemini_actions.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:provider/provider.dart';
 
 class ChatDiscussionScreen extends StatefulWidget {
   const ChatDiscussionScreen({
     super.key,
     required this.groupID,
-    required this.assessment,
+    this.assessment,
+    this.tool,
     required this.generationType,
   });
   final String groupID;
-  final AssessmentModel assessment;
+  final AssessmentModel? assessment;
+  final ToolModel? tool;
   final GenerationType generationType;
 
   @override
@@ -30,14 +33,13 @@ class ChatDiscussionScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatDiscussionScreen> {
   void showGeminiActions() {
-    final discussionsProvider = context.read<DiscussionChatProvider>();
     Navigator.of(context).push(
       HeroDialogRoute(builder: (context) {
         return GeminiActions(
           assessment: widget.assessment,
+          tool: widget.tool,
           groupID: widget.groupID,
           generationType: widget.generationType,
-          onTapAction: (AiActions aiAction) async {},
         );
       }),
     );
@@ -45,10 +47,12 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appBarTitle = widget.assessment.title;
-    final appBarSubtitle = widget.assessment.summary;
-    final appBarImage =
-        widget.assessment.images.isNotEmpty ? widget.assessment.images[0] : '';
+    final appBarTitle =
+        widget.tool != null ? widget.tool!.title : widget.assessment!.title;
+    final appBarSubtitle =
+        widget.tool != null ? widget.tool!.summary : widget.assessment!.summary;
+    final appBarImage = getImage(widget.tool, widget.assessment);
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: DiscussionAppBar(
@@ -75,12 +79,14 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
                 child: ChatList(
                   groupID: widget.groupID,
                   assessment: widget.assessment,
+                  tool: widget.tool,
                   generationType: widget.generationType,
                 ),
               ),
               DiscussionChatField(
                 groupID: widget.groupID,
                 assessment: widget.assessment,
+                tool: widget.tool,
                 generationType: widget.generationType,
               ),
             ],
@@ -88,5 +94,16 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
         ),
       ),
     );
+  }
+}
+
+getImage(ToolModel? tool, AssessmentModel? assessment) {
+  if (tool != null && tool.images.isNotEmpty) {
+    return tool.images[0];
+  } else if (assessment != null && assessment.images.isNotEmpty) {
+    return assessment
+        .images[0]; // Assuming images are stored in the AssessmentModel
+  } else {
+    return ''; // Return empty string if no image is found
   }
 }

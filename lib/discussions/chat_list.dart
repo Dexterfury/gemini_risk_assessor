@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/message_widget.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -10,6 +9,7 @@ import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +18,13 @@ class ChatList extends StatefulWidget {
   const ChatList({
     super.key,
     required this.groupID,
-    required this.assessment,
+    this.assessment,
+    this.tool,
     required this.generationType,
   });
   final String groupID;
-  final AssessmentModel assessment;
+  final AssessmentModel? assessment;
+  final ToolModel? tool;
   final GenerationType generationType;
 
   @override
@@ -44,10 +46,12 @@ class _ChatListState extends State<ChatList> {
     // current user uid
     final userModel = context.read<AuthenticationProvider>().userModel!;
     final discussionChatProvider = context.read<DiscussionChatProvider>();
+    final itemID =
+        widget.tool != null ? widget.tool!.id : widget.assessment!.id;
     return StreamBuilder<List<DiscussionMessage>>(
       stream: FirebaseMethods.getMessages(
         groupID: widget.groupID,
-        itemID: widget.assessment.id,
+        itemID: itemID,
         generationType: widget.generationType,
         asStream: true,
       ),
@@ -110,7 +114,7 @@ class _ChatListState extends State<ChatList> {
                 currentUserId: userModel.uid,
                 groupID: widget.groupID,
                 messageID: message.messageID,
-                itemID: widget.assessment.id,
+                itemID: itemID,
                 isSeenByList: message.seenBy,
                 generationType: widget.generationType,
               );
@@ -149,7 +153,7 @@ class _ChatListState extends State<ChatList> {
                               currentUser: userModel,
                               groupID: widget.groupID,
                               messageID: messageID,
-                              itemID: widget.assessment.id,
+                              itemID: itemID,
                               generationType: widget.generationType,
                               quizData: message.quizData,
                               quizResults: reults,

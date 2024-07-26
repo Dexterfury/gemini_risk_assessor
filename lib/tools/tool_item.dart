@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/discussions/chat_discussion_screen.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
@@ -57,16 +58,16 @@ class ToolItem extends StatelessWidget {
                       onTap: action,
                       messageCount: messageCount,
                       onMessageTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => ChatDiscussionScreen(
-                        //       groupID: groupID,
-                        //       assessment: data,
-                        //       generationType: generationType,
-                        //     ),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatDiscussionScreen(
+                              groupID: groupID,
+                              tool: toolModel,
+                              generationType: GenerationType.tool,
+                            ),
+                          ),
+                        );
                       },
                       onGeminiTap: () async {
                         await chatProvider

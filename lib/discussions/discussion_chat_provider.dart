@@ -12,7 +12,9 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
+import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:uuid/uuid.dart';
 
 class DiscussionChatProvider extends ChangeNotifier {
@@ -38,20 +40,29 @@ class DiscussionChatProvider extends ChangeNotifier {
 
   Future<void> generateQuiz({
     required UserModel userModel,
-    required AssessmentModel assessment,
+    AssessmentModel? assessment,
+    ToolModel? tool,
     required String groupID,
     required GenerationType generationType,
   }) async {
     try {
       _isLoadingQuiz = true;
       notifyListeners();
-      final content = await _modelManager.generateSafetyQuiz(assessment);
+
+      GenerateContentResponse content;
+      final itemID = tool != null ? tool.id : assessment!.id;
+
+      if (generationType != GenerationType.tool) {
+        content = await _modelManager.generateSafetyQuiz(assessment!);
+      } else {
+        content = await _modelManager.generateSafetyToolsQuiz(tool!);
+      }
 
       final messageID = const Uuid().v4();
 
       final quiz = QuizModel.fromGeneratedContent(
         content,
-        assessment.id,
+        itemID,
         userModel.uid,
         messageID,
         DateTime.now(),
@@ -88,7 +99,7 @@ class DiscussionChatProvider extends ChangeNotifier {
       await FirebaseMethods.groupsCollection
           .doc(groupID)
           .collection(collection)
-          .doc(assessment.id)
+          .doc(itemID)
           .collection(Constants.chatMessagesCollection)
           .doc(messageID)
           .set(discussionMessage.toMap());
