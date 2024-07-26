@@ -30,7 +30,7 @@ class GeminiActions extends StatefulWidget {
 
 class _GeminiActionsState extends State<GeminiActions> {
   void _selectAndPop(AiActions action) {
-    final discussionsProvider = context.watch<DiscussionChatProvider>();
+    final discussionsProvider = context.read<DiscussionChatProvider>();
     final userModel = context.read<AuthenticationProvider>().userModel!;
 
     switch (action) {
@@ -105,25 +105,26 @@ class _GeminiActionsState extends State<GeminiActions> {
                       child: Text(
                         'Add to Chat',
                       ),
-                      onPressed: discussionsProvider.isLoading
-                          ? null
-                          : () async {
-                              discussionsProvider
-                                  .saveDiscussionMessage(
-                                message: message,
-                                groupID: widget.groupID,
-                                itemID: widget.assessment.id,
-                                messageID: message.messageID,
-                                generationType: widget.generationType,
-                              )
-                                  .whenComplete(() {
-                                Navigator.of(context).pop();
-                                Future.delayed(const Duration(seconds: 1))
-                                    .whenComplete(() {
-                                  Navigator.pop(context); // pop the screen
-                                });
-                              });
-                            },
+                      onPressed: () async {
+                        if (discussionsProvider.isLoading) {
+                          return;
+                        }
+                        discussionsProvider
+                            .saveDiscussionMessage(
+                          message: message,
+                          groupID: widget.groupID,
+                          itemID: widget.assessment.id,
+                          messageID: message.messageID,
+                          generationType: widget.generationType,
+                        )
+                            .whenComplete(() {
+                          Navigator.of(context).pop();
+                          Future.delayed(const Duration(seconds: 1))
+                              .whenComplete(() {
+                            Navigator.pop(context); // pop the screen
+                          });
+                        });
+                      },
                     ),
                   ]);
             });
