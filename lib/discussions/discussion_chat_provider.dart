@@ -268,11 +268,17 @@ class DiscussionChatProvider extends ChangeNotifier {
     notifyListeners();
     try {
       // get the message
-      final messages = await FirebaseMethods.getMessages(
+      List<DiscussionMessage> messages = await FirebaseMethods.getMessages(
         groupID: groupID,
         itemID: itemID,
         generationType: generationType,
       );
+
+      if (messages.isEmpty) {
+        _isSummarizing = false;
+        notifyListeners();
+        return 'No messages found';
+      }
 
       final content = await _modelManager.summarizeChatMessages(messages);
 
@@ -372,7 +378,8 @@ class DiscussionChatProvider extends ChangeNotifier {
     required GenerationType generationType,
   }) async {
     final collection = getCollectionRef(generationType);
-
+    _isLoading = true;
+    notifyListeners();
     await FirebaseMethods.groupsCollection
         .doc(groupID)
         .collection(collection)
@@ -380,5 +387,7 @@ class DiscussionChatProvider extends ChangeNotifier {
         .collection(Constants.chatMessagesCollection)
         .doc(messageID)
         .set(message.toMap());
+    _isLoading = false;
+    notifyListeners();
   }
 }

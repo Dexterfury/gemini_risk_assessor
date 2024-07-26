@@ -15,26 +15,32 @@ class AdditionalDataWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isDialog
-        ? SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Additional Data',
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                _buildListSection('Risks', message.additionalData.risks),
-                _buildListSection('Hazards', message.additionalData.hazards),
-                _buildListSection(
-                    'Control Measures', message.additionalData.control),
-              ],
+        ? ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: MediaQuery.of(context).size.width * 0.8,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Additional Data',
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildListSection('Risks', message.additionalData.risks),
+                  _buildListSection('Hazards', message.additionalData.hazards),
+                  _buildListSection(
+                      'Control Measures', message.additionalData.control),
+                ],
+              ),
             ),
           )
         : GradientBorderContainer(
             child: Card(
-              color: Colors.grey[100],
+              color: Colors.blueGrey[100],
               elevation:
                   0, // Remove shadow as it's now inside another container
               shape: RoundedRectangleBorder(

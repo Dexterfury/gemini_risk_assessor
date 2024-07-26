@@ -38,15 +38,12 @@ class ContactDiscussionMessage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 5),
-              child: DisplayUserImage(
-                radius: 20,
-                isViewOnly: true,
-                fileImage: null,
-                imageUrl: message.senderImage,
-                onPressed: () {},
-              ),
+            DisplayUserImage(
+              radius: 20,
+              isViewOnly: true,
+              fileImage: null,
+              imageUrl: message.senderImage,
+              onPressed: () {},
             ),
             Expanded(
               child: Stack(
@@ -62,7 +59,7 @@ class ContactDiscussionMessage extends StatelessWidget {
                           bottomRight: Radius.circular(15),
                         ),
                       ),
-                      color: Theme.of(context).cardColor,
+                      color: Colors.grey[isDarkMode ? 800 : 200],
                       child: Padding(
                         padding: message.messageType == MessageType.text
                             ? const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 10.0)

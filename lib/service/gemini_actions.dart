@@ -6,10 +6,8 @@ import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/discussions/additional_data_widget.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
-import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 
 class GeminiActions extends StatefulWidget {
@@ -32,7 +30,7 @@ class GeminiActions extends StatefulWidget {
 
 class _GeminiActionsState extends State<GeminiActions> {
   void _selectAndPop(AiActions action) {
-    final discussionsProvider = context.read<DiscussionChatProvider>();
+    final discussionsProvider = context.watch<DiscussionChatProvider>();
     final userModel = context.read<AuthenticationProvider>().userModel!;
 
     switch (action) {
@@ -107,9 +105,25 @@ class _GeminiActionsState extends State<GeminiActions> {
                       child: Text(
                         'Add to Chat',
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      onPressed: discussionsProvider.isLoading
+                          ? null
+                          : () async {
+                              discussionsProvider
+                                  .saveDiscussionMessage(
+                                message: message,
+                                groupID: widget.groupID,
+                                itemID: widget.assessment.id,
+                                messageID: message.messageID,
+                                generationType: widget.generationType,
+                              )
+                                  .whenComplete(() {
+                                Navigator.of(context).pop();
+                                Future.delayed(const Duration(seconds: 1))
+                                    .whenComplete(() {
+                                  Navigator.pop(context); // pop the screen
+                                });
+                              });
+                            },
                     ),
                   ]);
             });
@@ -137,22 +151,44 @@ class _GeminiActionsState extends State<GeminiActions> {
           // pop the loading dialog
           Navigator.pop(context);
 
-          log('summery: $summery');
-          showSnackBar(
+          MyDialogs.showMyDataDialog(
             context: context,
-            message: summery,
+            title: 'Messages Summery',
+            content: summery,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Close',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+              )
+            ],
           );
         });
         break;
-      case AiActions.tipOfTheDay:
-        log('generate a tip of the day');
+      case AiActions.more:
+        MyDialogs.showMyDataDialog(
+          context: context,
+          title: 'More',
+          content: 'More Gemini AI Actions will be added soon...',
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            )
+          ],
+        );
         break;
       case AiActions.identifyRisk:
         log('generate a risk identification');
-        break;
-
-      case AiActions.none:
-        log('do nothing');
         break;
       default:
         break;
@@ -201,13 +237,10 @@ class _GeminiActionsState extends State<GeminiActions> {
                   ),
                   _buildActionButton(
                     context: context,
-                    label: 'Get Safety Tip',
-                    onPressed: () {},
-                  ),
-                  _buildActionButton(
-                    context: context,
-                    label: 'Identify Risks',
-                    onPressed: () {},
+                    label: 'More Actions',
+                    onPressed: () {
+                      _selectAndPop(AiActions.more);
+                    },
                   ),
                 ],
               ),

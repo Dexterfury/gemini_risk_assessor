@@ -45,6 +45,47 @@ class MyDialogs {
     );
   }
 
+  static void showMyDataDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    List<Widget>? actions,
+  }) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, animation1, animation2, child) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: AlertDialog(
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+              ),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                  maxWidth: MediaQuery.of(context).size.width * 0.8,
+                ),
+                child: SingleChildScrollView(
+                  child: Text(content),
+                ),
+              ),
+              actions: actions,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   static void showMyDiscussionsDialog({
     required BuildContext context,
     required String title,

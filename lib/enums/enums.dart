@@ -111,7 +111,7 @@ enum AiActions {
   identifyRisk,
   additionalData,
   summerize,
-  none,
+  more,
 }
 
 // extension convertAIActionEnumToString on String
@@ -120,12 +120,16 @@ extension AiActionExtension on String {
     switch (this) {
       case 'safetyQuiz':
         return AiActions.safetyQuiz;
+      case 'additionalData':
+        return AiActions.additionalData;
+      case 'summerize':
+        return AiActions.summerize;
       case 'tipOfTheDay':
         return AiActions.tipOfTheDay;
       case 'identifyRisk':
         return AiActions.identifyRisk;
-      case 'none':
-        return AiActions.none;
+      case 'more':
+        return AiActions.more;
       default:
         return AiActions.safetyQuiz;
     }

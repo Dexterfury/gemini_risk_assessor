@@ -42,9 +42,7 @@ class MessageReplyPreview extends StatelessWidget {
           color: decorationColor,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(25),
-            topRight: Radius.circular(
-              25,
-            ),
+            topRight: Radius.circular(25),
           ),
         ),
         child: Row(
@@ -61,8 +59,9 @@ class MessageReplyPreview extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            buildNameAndMessage(type, uid),
-            replyMessageModel != null ? const Spacer() : const SizedBox(),
+            Expanded(
+              child: buildNameAndMessage(type, uid),
+            ),
             replyMessageModel != null
                 ? closeButton(discussionChatProvider, context)
                 : const SizedBox(),
@@ -111,7 +110,7 @@ class MessageReplyPreview extends StatelessWidget {
                 type: message!.repliedMessageType,
                 color: Colors.white,
                 isReply: true,
-                maxLines: 1,
+                maxLines: 2,
                 overFlow: TextOverflow.ellipsis,
                 viewOnly: viewOnly,
               ),
@@ -127,8 +126,8 @@ class MessageReplyPreview extends StatelessWidget {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.blue,
-          //fontSize: 12,
         ),
+        overflow: TextOverflow.ellipsis,
       );
     } else {
       return Text(
@@ -136,8 +135,8 @@ class MessageReplyPreview extends StatelessWidget {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.blue,
-          //fontSize: 12,
         ),
+        overflow: TextOverflow.ellipsis,
       );
     }
   }
