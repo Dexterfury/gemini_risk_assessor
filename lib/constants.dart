@@ -137,6 +137,9 @@ class Constants {
   static const String requestToReadTerms = 'requestToReadTerms';
   static const String allowSharing = 'allowSharing';
 
+  static const String additionalID = 'additionalID';
+  static const String additionalData = 'additionalData';
+
   static const String enterYourName = 'Enter your name';
   static const String groupName = 'Enter name';
   static const String signInToAutoFillName = 'Sign In to auto fill name';
@@ -199,7 +202,6 @@ class Constants {
   static const String correctAnswer = 'correctAnswer';
   static const String safetyQuiz = 'Safety Quiz';
   static const String answers = 'answers';
-  static const String userUID = 'userUID';
   static const String quizID = 'quizID';
   static const String itemID = 'itemID';
 

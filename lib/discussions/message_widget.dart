@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/discussions/additional_data_widget.dart';
 import 'package:gemini_risk_assessor/discussions/contact_discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/my_discussion_message.dart';
@@ -26,8 +25,6 @@ class MessageWidget extends StatelessWidget {
   final Function(String messageID, Map<String, dynamic>) onSubmitQuizResult;
 
   Widget _buildMessageWidget() {
-    log('Message type: ${message.messageType}'); // Add this log
-
     switch (message.messageType) {
       case MessageType.quiz:
         return QuizWidget(
@@ -38,15 +35,17 @@ class MessageWidget extends StatelessWidget {
           },
           quizResults: message.quizResults,
         );
-      case MessageType.quizAnswer: // Corrected spelling
-        log('Quiz answer widget being built');
+      case MessageType.quizAnswer:
         return QuizResultsWidget(
-          quizData: message.quizData,
-          quizResults: message.quizResults,
+          message: message,
           userUID: currentUserUID,
         );
+      case MessageType.additional:
+        return AdditionalDataWidget(
+          message: message,
+          isDialog: false,
+        );
       default:
-        log('Default widget (SwipeTo) being built');
         return _buildSwipeWidget();
     }
   }
@@ -68,7 +67,6 @@ class MessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('type : ${message.messageType}');
     return _buildMessageWidget();
   }
 }

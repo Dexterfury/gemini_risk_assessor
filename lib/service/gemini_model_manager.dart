@@ -1,9 +1,9 @@
-import 'dart:convert';
-
+import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiModelManager {
@@ -211,7 +211,7 @@ Limit the response to 2-3 sentences.
   }
 
 // generate a list of additional risks based on the given assessment
-  Future<List<String>> suggestAdditionalRisks(
+  Future<GenerateContentResponse> suggestAdditionalRisks(
       AssessmentModel assessment) async {
     final model = await getModel(isVision: false, isDocumentSpecific: true);
 
@@ -225,14 +225,67 @@ Current Hazards: ${assessment.hazards.join(', ')}
 Current Risks: ${assessment.risks.join(', ')}
 Control Measures: ${assessment.control.join(', ')}
 
-Provide the response as a JSON array of strings, each representing a potential additional risk or hazard.
+Format the response as a JSON object with the following structure:
+{
+  "hazards": \$hazards,
+  "risks": \$risks,
+  "control": \$control,
+}
+
+all data should be of type List<String>
 ''',
       additionalTextInputs: [],
       images: [],
     );
 
     final response = await generateContent(model, prompt);
-    final List<dynamic> risks = json.decode(response.text ?? '[]');
-    return risks.cast<String>();
+    return response;
+  }
+
+// summerize the list of chat messages
+  Future<GenerateContentResponse> summarizeChatMessages(
+      List<DiscussionMessage> messages) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    // Extract relevant data from messages
+    List<Map<String, String>> relevantData = messages
+        .map((msg) => {
+              Constants.senderName: msg.senderName,
+              Constants.message: msg.message,
+            })
+        .toList();
+
+    // Prepare the prompt
+    String prompt = 'Summarize the following conversation:\n\n';
+
+    // Handle token limit (we start at 500000)
+    int tokenLimit = 500000;
+    int estimatedTokens =
+        prompt.length ~/ 4; // Rough estimate: 1 token ≈ 4 characters
+
+    for (var i = relevantData.length - 1; i >= 0; i--) {
+      String messageText =
+          '${relevantData[i][Constants.senderName]}: ${relevantData[i][Constants.message]}\n';
+      int messageTokens = messageText.length ~/ 4;
+
+      if (estimatedTokens + messageTokens > tokenLimit) {
+        // If adding this message would exceed the token limit, stop here
+        break;
+      }
+
+      prompt = messageText + prompt;
+      estimatedTokens += messageTokens;
+    }
+
+    prompt +=
+        '\nPlease provide a concise summary of the main points discussed in this conversation.';
+
+    final promptData = PromptDataModel(
+      textInput: prompt,
+      additionalTextInputs: [],
+      images: [],
+    );
+
+    return await generateContent(model, promptData);
   }
 }

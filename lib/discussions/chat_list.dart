@@ -45,10 +45,11 @@ class _ChatListState extends State<ChatList> {
     final userModel = context.read<AuthenticationProvider>().userModel!;
     final discussionChatProvider = context.read<DiscussionChatProvider>();
     return StreamBuilder<List<DiscussionMessage>>(
-      stream: FirebaseMethods.getMessagesStream(
+      stream: FirebaseMethods.getMessages(
         groupID: widget.groupID,
         itemID: widget.assessment.id,
         generationType: widget.generationType,
+        asStream: true,
       ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -122,9 +123,7 @@ class _ChatListState extends State<ChatList> {
               return deletedByCurrentUser
                   ? const SizedBox.shrink()
                   : GestureDetector(
-                      onTap: () {
-                        log('type: ${message.messageType}');
-                      },
+                      onTap: () {},
                       child: Hero(
                         tag: element.messageID,
                         child: MessageWidget(

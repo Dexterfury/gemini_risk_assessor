@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/additional_data_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -18,11 +20,15 @@ class DiscussionChatProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isLoadingQuiz = false;
   bool _isLoadingAnswer = false;
+  bool _isLoadingAdditionalData = false;
+  bool _isSummarizing = true;
   MessageReplyModel? _messageReplyModel;
 
   bool get isLoading => _isLoading;
   bool get isLoadingQuiz => _isLoadingQuiz;
   bool get isLoadingAnswer => _isLoadingAnswer;
+  bool get isLoadingAdditionalData => _isLoadingAdditionalData;
+  bool get isSummarizing => _isSummarizing;
   MessageReplyModel? get messageReplyModel => _messageReplyModel;
 
   void setMessageReplyModel(MessageReplyModel? messageReply) {
@@ -41,49 +47,51 @@ class DiscussionChatProvider extends ChangeNotifier {
       notifyListeners();
       final content = await _modelManager.generateSafetyQuiz(assessment);
 
-      if (content.text != null) {
-        final messageID = const Uuid().v4();
+      final messageID = const Uuid().v4();
 
-        final quiz = QuizModel.fromGeneratedContent(
-          content,
-          assessment.id,
-          userModel.uid,
-          messageID,
-          DateTime.now(),
-        );
+      final quiz = QuizModel.fromGeneratedContent(
+        content,
+        assessment.id,
+        userModel.uid,
+        messageID,
+        DateTime.now(),
+      );
 
-        final discussionMessage = DiscussionMessage(
-          senderUID: userModel.uid,
-          senderName: userModel.name,
-          senderImage: userModel.imageUrl,
-          groupID: groupID,
-          message: 'New safety quiz available! Tap to participate.',
-          messageType: MessageType.quiz,
-          timeSent: DateTime.now(),
-          messageID: messageID,
-          isSeen: false,
-          isAIMessage: true,
-          repliedMessage: '',
-          repliedTo: '',
-          repliedMessageType: MessageType.text,
-          reactions: [],
-          seenBy: [userModel.uid],
-          deletedBy: [],
-          quizData: quiz,
-          quizResults: {},
-        );
+      // get empty additional data
+      final additionalData = AdditionalDataModel.empty();
 
-        final collection = getCollectionRef(generationType);
+      final discussionMessage = DiscussionMessage(
+        senderUID: userModel.uid,
+        senderName: userModel.name,
+        senderImage: userModel.imageUrl,
+        groupID: groupID,
+        message: 'New safety quiz available! Tap to participate.',
+        messageType: MessageType.quiz,
+        timeSent: DateTime.now(),
+        messageID: messageID,
+        isSeen: false,
+        isAIMessage: true,
+        repliedMessage: '',
+        repliedTo: '',
+        repliedMessageType: MessageType.text,
+        reactions: [],
+        seenBy: [userModel.uid],
+        deletedBy: [],
+        additionalData: additionalData,
+        quizData: quiz,
+        quizResults: {},
+      );
 
-        // save the quiz to firestore
-        await FirebaseMethods.groupsCollection
-            .doc(groupID)
-            .collection(collection)
-            .doc(assessment.id)
-            .collection(Constants.chatMessagesCollection)
-            .doc(messageID)
-            .set(discussionMessage.toMap());
-      }
+      final collection = getCollectionRef(generationType);
+
+      // save the quiz to firestore
+      await FirebaseMethods.groupsCollection
+          .doc(groupID)
+          .collection(collection)
+          .doc(assessment.id)
+          .collection(Constants.chatMessagesCollection)
+          .doc(messageID)
+          .set(discussionMessage.toMap());
       _isLoadingQuiz = false;
       notifyListeners();
     } catch (e) {
@@ -131,9 +139,11 @@ class DiscussionChatProvider extends ChangeNotifier {
         // Add or update the current user's quiz results
         currentQuizResults[currentUser.uid] = {
           Constants.quizTitle: quizData.title,
-          Constants.userUID: currentUser.uid,
+          Constants.uid: currentUser.uid,
+          Constants.name: currentUser.name,
+          Constants.imageUrl: currentUser.imageUrl,
           Constants.answers: answers,
-          Constants.createdAt: DateTime.now(),
+          Constants.createdAt: DateTime.now().millisecondsSinceEpoch,
         };
 
         // Update the document with the new quiz results
@@ -149,6 +159,9 @@ class DiscussionChatProvider extends ChangeNotifier {
 
         final answerMessageID = const Uuid().v4();
 
+        // get empty additional data
+        final additionalData = AdditionalDataModel.empty();
+
         final answerMessage = DiscussionMessage(
           senderUID: currentUser.uid,
           senderName: currentUser.name,
@@ -161,11 +174,12 @@ class DiscussionChatProvider extends ChangeNotifier {
           isSeen: false,
           isAIMessage: false,
           repliedMessage: quizData.title,
-          repliedTo: 'Safety Quiz',
+          repliedTo: 'Safety Quiz Results',
           repliedMessageType: MessageType.quizAnswer,
           reactions: [],
           seenBy: [currentUser.uid],
           deletedBy: [],
+          additionalData: additionalData,
           quizData: quizData,
           quizResults: currentQuizResults,
         );
@@ -185,6 +199,91 @@ class DiscussionChatProvider extends ChangeNotifier {
       log('Error updating quiz: $e');
       _isLoadingAnswer = false;
       notifyListeners();
+    }
+  }
+
+  // add additional data
+  Future<DiscussionMessage?> addAdditionalData({
+    required UserModel userModel,
+    required AssessmentModel assessment,
+    required String groupID,
+    required GenerationType generationType,
+  }) async {
+    try {
+      _isLoadingAdditionalData = true;
+      notifyListeners();
+      final content = await _modelManager.suggestAdditionalRisks(assessment);
+
+      final messageID = const Uuid().v4();
+
+      final additionalDataModel = AdditionalDataModel.fromGeneratedContent(
+        content,
+        userModel.uid,
+        assessment.id,
+        DateTime.now(),
+      );
+
+      // get empty quiz
+      final quiz = QuizModel.empty;
+
+      final additionalDataMessage = DiscussionMessage(
+        senderUID: userModel.uid,
+        senderName: userModel.name,
+        senderImage: userModel.imageUrl,
+        groupID: groupID,
+        message: 'Additional Data',
+        messageType: MessageType.additional,
+        timeSent: DateTime.now(),
+        messageID: messageID,
+        isSeen: false,
+        isAIMessage: true,
+        repliedMessage: '',
+        repliedTo: '',
+        repliedMessageType: MessageType.text,
+        reactions: [],
+        seenBy: [userModel.uid],
+        deletedBy: [],
+        additionalData: additionalDataModel,
+        quizData: quiz,
+        quizResults: {},
+      );
+
+      _isLoadingQuiz = false;
+      notifyListeners();
+      return additionalDataMessage;
+    } catch (e) {
+      _isLoadingAdditionalData = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  // summerize chat messages
+  Future<String> summerizeChatMessages({
+    required String groupID,
+    required String itemID,
+    required GenerationType generationType,
+  }) async {
+    _isSummarizing = true;
+    notifyListeners();
+    try {
+      // get the message
+      final messages = await FirebaseMethods.getMessages(
+        groupID: groupID,
+        itemID: itemID,
+        generationType: generationType,
+      );
+
+      final content = await _modelManager.summarizeChatMessages(messages);
+
+      if (content.text != null) {
+        return content.text!;
+      }
+      return '';
+    } catch (e) {
+      _isSummarizing = false;
+      notifyListeners();
+      return e.toString();
     }
   }
 
@@ -216,6 +315,9 @@ class DiscussionChatProvider extends ChangeNotifier {
       // craete an empty quiz model if it is an AI generated message
       QuizModel quiz = QuizModel.empty;
 
+      // get empty additional data
+      final additionalData = AdditionalDataModel.empty();
+
       // 2. update/set the messagemodel
       final discussionMessage = DiscussionMessage(
         senderUID: sender.uid,
@@ -234,21 +336,18 @@ class DiscussionChatProvider extends ChangeNotifier {
         reactions: [],
         seenBy: [sender.uid],
         deletedBy: [],
+        additionalData: additionalData,
         quizData: quiz,
         quizResults: {},
       );
 
-      //log('Message Data: ${discussionMessage.toMap()}');
-
-      final collection = getCollectionRef(generationType);
-
-      await FirebaseMethods.groupsCollection
-          .doc(groupID)
-          .collection(collection)
-          .doc(itemID)
-          .collection(Constants.chatMessagesCollection)
-          .doc(messageID)
-          .set(discussionMessage.toMap());
+      await saveDiscussionMessage(
+        message: discussionMessage,
+        groupID: groupID,
+        itemID: itemID,
+        messageID: messageID,
+        generationType: generationType,
+      );
 
       // set loading to false
       _isLoading = false;
@@ -262,5 +361,24 @@ class DiscussionChatProvider extends ChangeNotifier {
       _isLoading = false;
       onError(e.toString());
     }
+  }
+
+  // save discussion message to firestore
+  Future<void> saveDiscussionMessage({
+    required DiscussionMessage message,
+    required String groupID,
+    required String itemID,
+    required String messageID,
+    required GenerationType generationType,
+  }) async {
+    final collection = getCollectionRef(generationType);
+
+    await FirebaseMethods.groupsCollection
+        .doc(groupID)
+        .collection(collection)
+        .doc(itemID)
+        .collection(Constants.chatMessagesCollection)
+        .doc(messageID)
+        .set(message.toMap());
   }
 }

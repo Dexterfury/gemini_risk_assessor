@@ -75,6 +75,8 @@ enum MessageType {
   audio,
   quiz,
   quizAnswer,
+  additional,
+  dailyTip,
 }
 
 // extension convertMessageEnumToString on String
@@ -93,6 +95,10 @@ extension MessageTypeExtension on String {
         return MessageType.quiz;
       case 'quizAnswer':
         return MessageType.quizAnswer;
+      case 'additional':
+        return MessageType.additional;
+      case 'dailyTip':
+        return MessageType.dailyTip;
       default:
         return MessageType.text;
     }
@@ -103,6 +109,8 @@ enum AiActions {
   safetyQuiz,
   tipOfTheDay,
   identifyRisk,
+  additionalData,
+  summerize,
   none,
 }
 

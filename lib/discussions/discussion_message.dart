@@ -1,4 +1,5 @@
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/additional_data_model.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 
@@ -19,6 +20,7 @@ class DiscussionMessage {
   final List<String> reactions;
   final List<String> seenBy;
   final List<String> deletedBy;
+  final AdditionalDataModel additionalData;
   final QuizModel quizData;
   final Map<String, dynamic> quizResults;
 
@@ -39,6 +41,7 @@ class DiscussionMessage {
     required this.reactions,
     required this.seenBy,
     required this.deletedBy,
+    required this.additionalData,
     required this.quizData,
     required this.quizResults,
   });
@@ -62,6 +65,7 @@ class DiscussionMessage {
       Constants.reactions: reactions,
       Constants.seenBy: seenBy,
       Constants.deletedBy: deletedBy,
+      Constants.additionalData: additionalData.toJson(),
       Constants.quizData: quizData.toJson(),
       Constants.quizResults: quizResults,
     };
@@ -87,6 +91,8 @@ class DiscussionMessage {
       reactions: List<String>.from(map[Constants.reactions] ?? []),
       seenBy: List<String>.from(map[Constants.seenBy] ?? []),
       deletedBy: List<String>.from(map[Constants.deletedBy] ?? []),
+      additionalData:
+          AdditionalDataModel.fromJson(map[Constants.additionalData] ?? {}),
       quizData: QuizModel.fromJson(map[Constants.quizData] ?? {}),
       quizResults: Map<String, dynamic>.from(map[Constants.quizResults] ?? {}),
     );
@@ -110,6 +116,7 @@ class DiscussionMessage {
     List<String>? reactions,
     List<String>? seenBy,
     List<String>? deletedBy,
+    AdditionalDataModel? additionalData,
     QuizModel? quizData,
     Map<String, dynamic>? quizResults,
   }) {
@@ -130,6 +137,7 @@ class DiscussionMessage {
       reactions: reactions ?? this.reactions,
       seenBy: seenBy ?? this.seenBy,
       deletedBy: deletedBy ?? this.deletedBy,
+      additionalData: additionalData ?? this.additionalData,
       quizData: quizData ?? this.quizData,
       quizResults: quizResults ?? this.quizResults,
     );

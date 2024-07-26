@@ -38,8 +38,8 @@ class UserModel {
       imageUrl: json[Constants.imageUrl] ?? '',
       token: json[Constants.token] ?? '',
       aboutMe: json[Constants.aboutMe] ?? '',
-      rating: json[Constants.rating] ?? 0.0,
-      safetyPoints: json[Constants.safetyPoints] ?? 0.0,
+      rating: (json[Constants.rating] ?? 0).toDouble(),
+      safetyPoints: (json[Constants.safetyPoints] ?? 0).toDouble(),
       isAnonymous: json[Constants.isAnonymous] ?? false,
       createdAt: json[Constants.createdAt] ?? '',
     );

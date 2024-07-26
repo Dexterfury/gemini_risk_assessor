@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 import 'package:gemini_risk_assessor/appBars/discussion_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
@@ -33,31 +34,10 @@ class _ChatScreenState extends State<ChatDiscussionScreen> {
     Navigator.of(context).push(
       HeroDialogRoute(builder: (context) {
         return GeminiActions(
-          onTapAction: (AiActions aiAction) async {
-            switch (aiAction) {
-              case AiActions.safetyQuiz:
-                final userModel =
-                    context.read<AuthenticationProvider>().userModel!;
-                await discussionsProvider.generateQuiz(
-                  userModel: userModel,
-                  assessment: widget.assessment,
-                  groupID: widget.groupID,
-                  generationType: widget.generationType,
-                );
-                break;
-              case AiActions.tipOfTheDay:
-                log('generate a tip of the day');
-                break;
-              case AiActions.identifyRisk:
-                log('generate a risk identification');
-                break;
-              case AiActions.none:
-                log('do nothing');
-                break;
-              default:
-                break;
-            }
-          },
+          assessment: widget.assessment,
+          groupID: widget.groupID,
+          generationType: widget.generationType,
+          onTapAction: (AiActions aiAction) async {},
         );
       }),
     );

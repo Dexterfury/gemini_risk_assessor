@@ -55,27 +55,29 @@ class _BottomChatFieldState extends State<DiscussionChatField> {
 
   // send text message to firestore
   void sendTextMessage() {
-    final currentUser = context.read<AuthenticationProvider>().userModel!;
-    final discussionChatProvider = context.read<DiscussionChatProvider>();
+    if (_textEditingController.text.isNotEmpty) {
+      final currentUser = context.read<AuthenticationProvider>().userModel!;
+      final discussionChatProvider = context.read<DiscussionChatProvider>();
 
-    discussionChatProvider.sendTextMessage(
-      sender: currentUser,
-      message: _textEditingController.text,
-      messageType: MessageType.text,
-      groupID: widget.groupID,
-      itemID: widget.assessment.id,
-      isAIMessage: false,
-      generationType: widget.generationType,
-      onSucess: () {
-        // clear controller
-        setState(() {
-          _textEditingController.clear();
-        });
-        // remove keyboard focus
-        _focusNode.unfocus();
-      },
-      onError: (error) {},
-    );
+      discussionChatProvider.sendTextMessage(
+        sender: currentUser,
+        message: _textEditingController.text,
+        messageType: MessageType.text,
+        groupID: widget.groupID,
+        itemID: widget.assessment.id,
+        isAIMessage: false,
+        generationType: widget.generationType,
+        onSucess: () {
+          // clear controller
+          setState(() {
+            _textEditingController.clear();
+          });
+          // remove keyboard focus
+          _focusNode.unfocus();
+        },
+        onError: (error) {},
+      );
+    }
   }
 
   @override

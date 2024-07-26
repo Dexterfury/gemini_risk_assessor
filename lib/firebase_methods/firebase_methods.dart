@@ -453,29 +453,37 @@ class FirebaseMethods {
         .snapshots();
   }
 
-  // stream messages from chat collection
-  static Stream<List<DiscussionMessage>> getMessagesStream({
+  // get messages
+  static dynamic getMessages({
     required String groupID,
     required String itemID,
     required GenerationType generationType,
+    bool asStream = false,
   }) {
     try {
       final collection = getCollectionRef(generationType);
-      // handle group message
-      return groupsCollection
+      final query = groupsCollection
           .doc(groupID)
           .collection(collection)
           .doc(itemID)
-          .collection(Constants.chatMessagesCollection)
-          .snapshots()
-          .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          return DiscussionMessage.fromMap(doc.data());
-        }).toList();
-      });
+          .collection(Constants.chatMessagesCollection);
+
+      if (asStream) {
+        return query.snapshots().map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return DiscussionMessage.fromMap(doc.data());
+          }).toList();
+        });
+      } else {
+        return query.get().then((snapshot) {
+          return snapshot.docs.map((doc) {
+            return DiscussionMessage.fromMap(doc.data());
+          }).toList();
+        });
+      }
     } catch (e) {
       log('error loading messages: $e');
-      return Stream.empty();
+      return asStream ? Stream.empty() : Future.value([]);
     }
   }
 
