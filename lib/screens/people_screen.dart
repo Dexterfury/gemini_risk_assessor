@@ -175,6 +175,8 @@ class _PeopleScreenState extends State<PeopleScreen> {
                       context: context,
                       message: 'Requests sent to added members',
                     );
+                    // pop the screen
+                    Navigator.pop(context);
                   });
                 },
                 icon: const Icon(FontAwesomeIcons.check),
