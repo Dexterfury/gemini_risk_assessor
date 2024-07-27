@@ -24,32 +24,34 @@ class _GeminiButtonState extends State<GeminiButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: widget.contanerColor,
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          border: Border.all(
-            width: 1,
-            color: Colors.grey,
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: widget.contanerColor,
+        borderRadius: BorderRadius.circular(widget.borderRadius),
+        border: Border.all(
+          width: 1,
+          color: Colors.grey,
+        ),
+      ),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(AssetsManager.geminiLogo1, height: 30, width: 40),
+              const SizedBox(
+                width: 8.0,
+              ),
+              Text(
+                widget.label,
+                style: textStyle18Bold,
+              ),
+            ],
           ),
         ),
-        child: GestureDetector(
-            onTap: widget.onTap,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(AssetsManager.geminiLogo1, height: 30, width: 40),
-                  const SizedBox(
-                    width: 8.0,
-                  ),
-                  Text(
-                    widget.label,
-                    style: textStyle18Bold,
-                  ),
-                ],
-              ),
-            )));
+      ),
+    );
   }
 }

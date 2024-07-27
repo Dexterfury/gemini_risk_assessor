@@ -5,9 +5,9 @@ import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
-import 'package:gemini_risk_assessor/models/near_miss_model.dart';
+import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/create_near_miss.dart';
-import 'package:gemini_risk_assessor/providers/near_miss_provider.dart';
+import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:provider/provider.dart';
@@ -156,8 +156,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                                       doc.data() as Map<String, dynamic>;
                                   final item = NearMissModel.fromJson(data);
                                   return ListTile(
-                                    title: Text(item.title),
-                                    subtitle: Text(item.description),
+                                    title: Text(item.description),
                                   );
                                 },
                                 childCount: results.length,

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/models/near_miss_model.dart';
+import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
+import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class NearMissProvider extends ChangeNotifier {
+  final GeminiModelManager _modelManager = GeminiModelManager();
   List<XFile>? _imagesFileList = [];
   bool _isLoading = false;
   int _maxImages = 10;
@@ -15,19 +17,42 @@ class NearMissProvider extends ChangeNotifier {
   int get maxImages => _maxImages;
   NearMissModel? get nearMiss => _nearMiss;
 
+  // create a near miss report
+  Future<void> createANearMissReport({
+    required String description,
+    required String dateTime,
+    required String location,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final content = await _modelManager.generateNearMissReport(description);
+
+      if (content.text == null) {
+        throw Exception('Failed to generate control measures');
+      }
+    } catch (e) {
+      print('Error near miss: $e');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // Initialize default empty model
   Future<void> initializeDefaultModel() async {
     final uuid = Uuid();
     _nearMiss = NearMissModel(
       id: uuid.v4(),
-      title: '',
+      location: '',
       description: '',
-      images: [],
+      nearMissDateTime: '',
       sharedWith: [],
       reactions: [],
+      controlMeasures: [],
       createdBy: '', // You might want to set this to the current user's ID
       groupID: '', // You might want to set this to the current group's ID
-      createdAt: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now(),
     );
     notifyListeners();
   }

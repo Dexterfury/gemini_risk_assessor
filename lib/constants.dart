@@ -87,6 +87,10 @@ class Constants {
   static const String description = 'description';
   static const String discussingAbout = 'discussingAbout';
 
+  static const String location = 'location';
+  static const String nearMissDateTime = 'nearMissDateTime';
+  static const String controlMeasures = 'controlMeasures';
+
   static const String people = 'People';
 
   // constants for promptDataModel
@@ -235,6 +239,11 @@ class Constants {
   // dialog content
   static const String loading = 'loading';
   static const String signature = 'signature';
+
+  // near miss data
+  static const String measure = 'measure';
+  static const String type = 'type';
+  static const String rationale = 'rationale';
 
   // default description
   static const String defaultDescription = 'Group Description';
