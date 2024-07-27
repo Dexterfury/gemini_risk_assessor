@@ -200,6 +200,8 @@ class AuthenticationProvider extends ChangeNotifier {
     required BuildContext context,
     required Function() onSuccess,
   }) async {
+    _isLoading = true;
+    notifyListeners();
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
@@ -211,6 +213,7 @@ class AuthenticationProvider extends ChangeNotifier {
         if (user != null) {
           _uid = user.uid;
           _phoneNumber = user.phoneNumber;
+          _isLoading = false;
           notifyListeners();
         }
       },
@@ -344,9 +347,8 @@ class AuthenticationProvider extends ChangeNotifier {
 
   void _handleVerificationFailed(
       FirebaseAuthException e, BuildContext context) {
-    // _isSuccessful = false;
-    // _isLoading = false;
-    // notifyListeners();
+    _isLoading = false;
+    notifyListeners();
     // showSnackBar(context: context, message: e.toString());
     // log('Error: ${e.toString()}');
   }
