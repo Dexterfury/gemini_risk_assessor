@@ -28,6 +28,7 @@ class NearMissDetailsScreen extends StatelessWidget {
       body: Consumer<NearMissProvider>(
         builder: (context, nearMissProvider, child) {
           final nearMiss = nearMissProvider.nearMiss;
+
           if (nearMiss == null) {
             return Center(child: CircularProgressIndicator());
           }
@@ -60,7 +61,7 @@ class NearMissDetailsScreen extends StatelessWidget {
       children: [
         Icon(FontAwesomeIcons.calendarDay, color: Colors.blue),
         Text(
-          nearMiss.nearMissDateTime,
+          nearMiss.dateTime,
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ],
@@ -129,6 +130,9 @@ class NearMissDetailsScreen extends StatelessWidget {
     BuildContext context,
     NearMissProvider provider,
   ) {
+    if (provider.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
     return Center(
       child: ElevatedButton(
         child: Text('Save Near Miss Report'),

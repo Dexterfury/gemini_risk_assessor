@@ -3,12 +3,12 @@ import 'package:gemini_risk_assessor/constants.dart';
 class ControlMeasure {
   final String measure;
   final String type;
-  final String rationale;
+  final String reason;
 
   ControlMeasure({
     required this.measure,
     required this.type,
-    required this.rationale,
+    required this.reason,
   });
 
   // Factory constructor to create a ControlMeasure from a Map
@@ -16,7 +16,7 @@ class ControlMeasure {
     return ControlMeasure(
       measure: data[Constants.measure] ?? '',
       type: data[Constants.type] ?? '',
-      rationale: data[Constants.rationale] ?? '',
+      reason: data[Constants.reason] ?? '',
     );
   }
 
@@ -25,7 +25,7 @@ class ControlMeasure {
     return {
       Constants.measure: measure,
       Constants.type: type,
-      Constants.rationale: rationale,
+      Constants.reason: reason,
     };
   }
 }

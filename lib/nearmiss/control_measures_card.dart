@@ -62,10 +62,10 @@ class ControlMeasureCard extends StatelessWidget {
             Text(controlMeasure.measure),
             SizedBox(height: 8),
             Text(
-              'Rationale:',
+              'Reason:',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
-            Text(controlMeasure.rationale),
+            Text(controlMeasure.reason),
           ],
         ),
       ),

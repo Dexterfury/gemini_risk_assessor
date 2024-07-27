@@ -110,11 +110,11 @@ class NearMissProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
+      log('NEAR MISS: ${nearMiss!.toJson()}');
       await FirebaseMethods.saveNearMiss(
         nearMiss: _nearMiss!,
       );
 
-      log('NEAR MISS: ${nearMiss!.toJson()}');
       _isLoading = false;
       // clear the model
       _nearMiss = null;
@@ -125,6 +125,7 @@ class NearMissProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       onError(e.toString());
+      log('error log: $e');
     }
   }
 
@@ -134,7 +135,7 @@ class NearMissProvider extends ChangeNotifier {
     _nearMiss = NearMissModel(
       id: uuid.v4(),
       description: '',
-      nearMissDateTime: '',
+      dateTime: '',
       sharedWith: [],
       reactions: [],
       controlMeasures: [],
@@ -146,7 +147,7 @@ class NearMissProvider extends ChangeNotifier {
   }
 
   // Method to update the model
-  void updateNearMiss(NearMissModel updatedModel) {
+  Future<void> updateNearMiss(NearMissModel updatedModel) async {
     _nearMiss = updatedModel;
     notifyListeners();
   }

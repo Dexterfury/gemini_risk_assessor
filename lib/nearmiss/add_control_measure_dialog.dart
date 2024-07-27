@@ -32,7 +32,7 @@ class _AddControlMeasureDialogState extends State<AddControlMeasureDialog>
     _typeController =
         TextEditingController(text: widget.initialMeasure?.type ?? '');
     _rationaleController =
-        TextEditingController(text: widget.initialMeasure?.rationale ?? '');
+        TextEditingController(text: widget.initialMeasure?.reason ?? '');
 
     _animationController = AnimationController(
       vsync: this,
@@ -84,7 +84,7 @@ class _AddControlMeasureDialogState extends State<AddControlMeasureDialog>
               SizedBox(height: 16),
               TextField(
                 controller: _rationaleController,
-                decoration: InputDecoration(labelText: 'Rationale'),
+                decoration: InputDecoration(labelText: 'Reason'),
                 maxLines: 3,
               ),
             ],
@@ -114,7 +114,7 @@ class _AddControlMeasureDialogState extends State<AddControlMeasureDialog>
               final newMeasure = ControlMeasure(
                 measure: _measureController.text,
                 type: _typeController.text,
-                rationale: _rationaleController.text,
+                reason: _rationaleController.text,
               );
               widget.onAdd(newMeasure);
             },

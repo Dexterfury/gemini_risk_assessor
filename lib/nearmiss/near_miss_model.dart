@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
@@ -8,7 +9,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 class NearMissModel {
   String id;
   String description;
-  String nearMissDateTime;
+  String dateTime;
   List<String> sharedWith;
   List<String> reactions;
   final List<ControlMeasure> controlMeasures;
@@ -20,7 +21,7 @@ class NearMissModel {
   NearMissModel({
     required this.id,
     required this.description,
-    required this.nearMissDateTime,
+    required this.dateTime,
     required this.sharedWith,
     required this.reactions,
     required this.controlMeasures,
@@ -33,7 +34,7 @@ class NearMissModel {
     GenerateContentResponse content,
     String id,
     String description,
-    String nearMissDateTime,
+    String dateTime,
     String creatorID,
     String groupID,
     DateTime createdAt,
@@ -47,7 +48,7 @@ class NearMissModel {
         .map((measure) => ControlMeasure(
               measure: measure[Constants.measure],
               type: measure[Constants.type],
-              rationale: measure[Constants.rationale],
+              reason: measure[Constants.reason],
             ))
         .toList();
 
@@ -55,7 +56,7 @@ class NearMissModel {
       return NearMissModel(
         id: id,
         description: description,
-        nearMissDateTime: nearMissDateTime,
+        dateTime: dateTime,
         sharedWith: [],
         reactions: [],
         controlMeasures: controlMeasures,
@@ -70,10 +71,11 @@ class NearMissModel {
 
   // fromJson method
   factory NearMissModel.fromJson(Map<String, dynamic> json) {
+    log('control messages DATA : ${(json[Constants.controlMeasures] as List<dynamic>?)?.map((measure) => ControlMeasure.fromMap(measure)).toList()}');
     return NearMissModel(
       id: json[Constants.id] ?? '',
       description: json[Constants.description] ?? '',
-      nearMissDateTime: json[Constants.nearMissDateTime] ?? '',
+      dateTime: json[Constants.dateTime] ?? '',
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       controlMeasures: (json[Constants.controlMeasures] as List<dynamic>?)
@@ -91,10 +93,10 @@ class NearMissModel {
     return {
       Constants.id: id,
       Constants.description: description,
-      Constants.nearMissDateTime: nearMissDateTime,
+      Constants.dateTime: dateTime,
       Constants.sharedWith: sharedWith,
       Constants.reactions: reactions,
-      Constants.control:
+      Constants.controlMeasures:
           controlMeasures.map((measure) => measure.toMap()).toList(),
       Constants.createdBy: createdBy,
       Constants.groupID: groupID,
