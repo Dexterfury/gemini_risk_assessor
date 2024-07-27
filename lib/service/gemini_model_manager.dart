@@ -322,4 +322,36 @@ all data should be of type List<String>
 
     return await generateContent(model, promptData);
   }
+
+  Future<GenerateContentResponse> generateNearMissReport(
+      String nearMissDescription) async {
+    final model = await getModel(isVision: false, isDocumentSpecific: true);
+
+    final prompt = PromptDataModel(
+      textInput: '''
+You are a Safety AI Advisor tasked with analyzing a near miss report and suggesting appropriate control measures to prevent similar incidents or accidents from occurring in the future.
+
+Near Miss Description:
+$nearMissDescription
+
+Based on this near miss report, generate a list of 3-5 practical and effective control measures. These measures should aim to eliminate or reduce the risk of similar incidents occurring in the future. Consider the hierarchy of controls (Elimination, Substitution, Engineering Controls, Administrative Controls, and Personal Protective Equipment) when suggesting measures.
+
+Format the response as a JSON object with the following structure:
+{
+  "controlMeasures": [
+    {
+      "measure": "Description of the control measure",
+      "type": "Type of control (e.g., Engineering, Administrative, PPE)",
+      "rationale": "Brief explanation of why this measure is effective"
+    },
+    // ... (2-4 more control measures)
+  ]
+}
+''',
+      additionalTextInputs: [],
+      images: [],
+    );
+
+    return await generateContent(model, prompt);
+  }
 }
