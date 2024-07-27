@@ -79,6 +79,5 @@ class DstiHelpDetails extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

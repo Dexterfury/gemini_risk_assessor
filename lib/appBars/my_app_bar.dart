@@ -33,11 +33,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-Size get preferredSize {
-  if (bottom != null) {
-    return Size.fromHeight(kToolbarHeight + bottom!.preferredSize.height);
-  } else {
-    return const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize {
+    if (bottom != null) {
+      return Size.fromHeight(kToolbarHeight + bottom!.preferredSize.height);
+    } else {
+      return const Size.fromHeight(kToolbarHeight);
+    }
   }
-}
 }
