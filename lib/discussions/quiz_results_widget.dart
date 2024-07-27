@@ -4,7 +4,6 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_reply_preview.dart';
-import 'package:gemini_risk_assessor/utilities/gradient_border_container.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 
 class QuizResultsWidget extends StatelessWidget {

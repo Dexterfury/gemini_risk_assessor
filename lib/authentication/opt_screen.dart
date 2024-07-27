@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:pinput/pinput.dart';
@@ -54,14 +54,17 @@ class _OTPScreenState extends State<OTPScreen> {
                 const Text(
                   'Enter the 6-digit code sent the number',
                   textAlign: TextAlign.center,
-                  style: textStyle18w500,
+                  style: AppTheme.textStyle18w500,
                 ),
 
                 const SizedBox(height: 10),
 
                 // phone number text
-                Text(phoneNumber,
-                    textAlign: TextAlign.center, style: textStyle18w500),
+                Text(
+                  phoneNumber,
+                  textAlign: TextAlign.center,
+                  style: AppTheme.textStyle18w500,
+                ),
 
                 const SizedBox(height: 30),
 
@@ -109,16 +112,20 @@ class _OTPScreenState extends State<OTPScreen> {
           ),
           const SizedBox(height: 10),
           TextButton(
-              onPressed: authProvider.secondsRemaining == 0
-                  ? () {
-                      // reset the code to send again
-                      authProvider.resendCode(
-                        context: context,
-                        phone: phoneNumber,
-                      );
-                    }
-                  : null,
-              child: const Text('Resend Code', style: textStyle18w500)),
+            onPressed: authProvider.secondsRemaining == 0
+                ? () {
+                    // reset the code to send again
+                    authProvider.resendCode(
+                      context: context,
+                      phone: phoneNumber,
+                    );
+                  }
+                : null,
+            child: const Text(
+              'Resend Code',
+              style: AppTheme.textStyle18w500,
+            ),
+          ),
         ],
       );
     }
@@ -131,7 +138,7 @@ class _OTPScreenState extends State<OTPScreen> {
         length: 6,
         controller: controller,
         focusNode: focusNode,
-        defaultPinTheme: defaultPinTheme,
+        defaultPinTheme: AppTheme.defaultPinTheme,
         onCompleted: (pin) {
           setState(() {
             otpCode = pin;
@@ -142,18 +149,16 @@ class _OTPScreenState extends State<OTPScreen> {
             otpCode: otpCode!,
           );
         },
-        focusedPinTheme: defaultPinTheme.copyWith(
+        focusedPinTheme: AppTheme.defaultPinTheme.copyWith(
           height: 68,
           width: 64,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             color: Colors.grey.shade200,
-            border: Border.all(
-              color: Colors.deepPurple,
-            ),
+            border: Border.all(),
           ),
         ),
-        errorPinTheme: defaultPinTheme.copyWith(
+        errorPinTheme: AppTheme.defaultPinTheme.copyWith(
           height: 68,
           width: 64,
           decoration: BoxDecoration(

@@ -46,6 +46,8 @@ class GroupHelpDetails extends StatelessWidget {
                 'Access shared DSTIs, Risk Assessments, and Tools',
                 'Contribute to Group-wide safety documentation',
                 'Participate in discussions and provide feedback',
+                'Participate in AI generated safety quizzes and gain points for participation',
+                'Repot near misses, accidents, or incidents',
                 'Report issues or suggest improvements to admins',
                 'Stay updated with Group announcements and changes'
               ]),

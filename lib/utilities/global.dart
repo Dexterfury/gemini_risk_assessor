@@ -5,11 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/groups/group_provider.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../tools/tool_provider.dart';
-import '../themes/my_themes.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -394,7 +393,7 @@ Widget previewImages({
                   Text(
                     "Click here to add images",
                     textAlign: TextAlign.center,
-                    style: textStyle18w500,
+                    style: AppTheme.textStyle18w500,
                   ),
                 ],
               ),

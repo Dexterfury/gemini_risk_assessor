@@ -9,7 +9,7 @@ import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/search/people_search_bar.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
@@ -91,7 +91,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
           child: Text(
             'No data found',
             textAlign: TextAlign.center,
-            style: textStyle18w500,
+            style: AppTheme.textStyle18w500,
           ),
         ),
       );
@@ -120,7 +120,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
           return const Center(
             child: Text(
               'Search for people',
-              style: textStyle18w500,
+              style: AppTheme.textStyle18w500,
             ),
           );
         }
@@ -129,7 +129,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
           return const Center(
             child: Text(
               'No matching results',
-              style: textStyle18w500,
+              style: AppTheme.textStyle18w500,
             ),
           );
         }

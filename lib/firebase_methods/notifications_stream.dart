@@ -10,8 +10,8 @@ import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
 import 'package:gemini_risk_assessor/groups/groups_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -47,8 +47,11 @@ class NotificationsStream extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('No Notifications',
-                  textAlign: TextAlign.center, style: textStyle18w500),
+              child: Text(
+                'No Notifications',
+                textAlign: TextAlign.center,
+                style: AppTheme.textStyle18w500,
+              ),
             ),
           );
         }

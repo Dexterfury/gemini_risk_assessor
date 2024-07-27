@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class PpeItem extends StatelessWidget {
   const PpeItem({
@@ -21,7 +21,7 @@ class PpeItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        elevation: cardElevation,
+        elevation: AppTheme.cardElevation,
         color: isAdded
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).cardColor,

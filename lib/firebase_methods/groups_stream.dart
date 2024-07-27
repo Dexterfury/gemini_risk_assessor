@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/groups/group_grid_item.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class GroupsStream extends StatelessWidget {
@@ -37,8 +37,11 @@ class GroupsStream extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(20.0),
-              child: Text('You are not part of \n any group yet!',
-                  textAlign: TextAlign.center, style: textStyle18w500),
+              child: Text(
+                'You are not part of \n any group yet!',
+                textAlign: TextAlign.center,
+                style: AppTheme.textStyle18w500,
+              ),
             ),
           );
         }

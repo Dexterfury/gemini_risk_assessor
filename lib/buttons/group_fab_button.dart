@@ -2,7 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class GroupFabButton extends StatelessWidget {
@@ -22,7 +22,6 @@ class GroupFabButton extends StatelessWidget {
                 backgroundColor: Theme.of(context).primaryColor,
                 label: const Text(
                   'Create Group',
-                  style: TextStyle(color: Colors.white),
                 ),
                 onPressed: action,
               );
@@ -36,7 +35,7 @@ class GroupFabButton extends StatelessWidget {
             closedColor: Theme.of(context).primaryColor,
             transitionType: ContainerTransitionType.fadeThrough,
             transitionDuration: const Duration(milliseconds: 500),
-            closedElevation: cardElevation,
+            closedElevation: AppTheme.cardElevation,
             openElevation: 4,
           );
 

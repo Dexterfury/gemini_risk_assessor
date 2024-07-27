@@ -27,7 +27,6 @@ class AiTipsHelpDetails extends StatelessWidget {
                 'Be specific and detailed in your descriptions',
                 'Use clear, concise language',
                 'Provide context about the task, environment, and industry',
-                'Specify the type of output you\'re looking for (e.g., list, paragraph)',
                 'Include relevant technical terms or jargon'
               ]),
               Constants.buildSection('Understanding AI Limitations', [

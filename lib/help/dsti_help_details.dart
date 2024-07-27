@@ -48,7 +48,7 @@ class DstiHelpDetails extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                '6. Generate Risk Assessment: Click the generate button to create an AI-powered risk assessment.',
+                '6. Generate s DSTI: Click the generate button to create an AI-powered DSTI',
                 style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 8),
@@ -58,7 +58,7 @@ class DstiHelpDetails extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                '8. Sign and Save: Sign the document and save it to Firestore.',
+                '8. Save the document to your secured Firestore datbase.',
                 style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 16),
@@ -71,7 +71,7 @@ class DstiHelpDetails extends StatelessWidget {
                 '• Provide clear, high-quality images\n'
                 '• Be specific and detailed in your task description\n'
                 '• Accurately select all relevant PPE items\n'
-                '• Double-check all information before generating the assessment',
+                '• Double-check all information before generating the DSTI',
                 style: TextStyle(fontSize: 16),
               ),
             ],

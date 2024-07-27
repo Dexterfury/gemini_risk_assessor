@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
-
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -71,7 +69,6 @@ class NearMissModel {
 
   // fromJson method
   factory NearMissModel.fromJson(Map<String, dynamic> json) {
-    log('control messages DATA : ${(json[Constants.controlMeasures] as List<dynamic>?)?.map((measure) => ControlMeasure.fromMap(measure)).toList()}');
     return NearMissModel(
       id: json[Constants.id] ?? '',
       description: json[Constants.description] ?? '',

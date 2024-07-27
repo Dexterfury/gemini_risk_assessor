@@ -26,7 +26,7 @@ class RiskAssessmentHelpDetails extends StatelessWidget {
                 'Specify environmental factors and personnel involved',
                 'Click "Generate" to create an AI-powered risk assessment',
                 'Review and edit the generated assessment',
-                'Sign and save the final document'
+                'Save the document to data storage'
               ]),
               Constants.buildSection('Interpreting AI-generated Risks', [
                 'Review each identified risk carefully',

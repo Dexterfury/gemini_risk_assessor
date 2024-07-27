@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/widgets/bottom_chat_field.dart';
 import 'package:gemini_risk_assessor/widgets/message_bubble.dart';
 import 'package:provider/provider.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -189,7 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ? const Center(
                             child: Text(
                               'No messages yet',
-                              style: textStyle18w500,
+                              style: AppTheme.textStyle18w500,
                             ),
                           )
                         : MessageBubble(

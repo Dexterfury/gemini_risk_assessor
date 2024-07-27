@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class ControlMeasureCard extends StatelessWidget {
   final ControlMeasure controlMeasure;
@@ -17,7 +17,7 @@ class ControlMeasureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: cardElevation,
+      elevation: AppTheme.cardElevation,
       margin: EdgeInsets.symmetric(vertical: 8),
       child: Padding(
         padding: EdgeInsets.all(16),

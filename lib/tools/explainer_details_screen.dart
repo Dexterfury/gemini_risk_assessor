@@ -4,13 +4,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:provider/provider.dart';
 import '../widgets/images_display.dart';
 import '../appBars/my_app_bar.dart';
@@ -138,7 +138,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
               // descpription
               Text(
                 description,
-                style: textStyle16w600,
+                style: AppTheme.textStyle16w600,
               ),
               const SizedBox(
                 height: 20,

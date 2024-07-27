@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class WeatherButton extends StatelessWidget {
   const WeatherButton({
@@ -27,7 +27,7 @@ class WeatherButton extends StatelessWidget {
         color: value
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).cardColor,
-        elevation: cardElevation,
+        elevation: AppTheme.cardElevation,
         child: GestureDetector(
           onTap: onChanged,
           child: Padding(

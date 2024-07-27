@@ -27,10 +27,6 @@ class FileUploadHandler {
       throw UnsupportedError('Unsupported file type: $extension');
     }
 
-    print("File to upload: ${fileToUpload.path}");
-    print("File exists: ${fileToUpload.existsSync()}");
-    print("File size: ${fileToUpload.lengthSync()} bytes");
-
     String downloadUrl = await storeFileToStorage(
       file: fileToUpload,
       reference: reference,

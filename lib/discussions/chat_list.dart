@@ -8,7 +8,7 @@ import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -62,7 +62,7 @@ class _ChatListState extends State<ChatList> {
             child: Text(
               'Something went wrong',
               textAlign: TextAlign.center,
-              style: textStyle18Bold,
+              style: AppTheme.textStyle18Bold,
             ),
           );
         }
@@ -77,7 +77,7 @@ class _ChatListState extends State<ChatList> {
             child: Text(
               'Send the first message',
               textAlign: TextAlign.center,
-              style: textStyle18Bold,
+              style: AppTheme.textStyle18Bold,
             ),
           );
         }
