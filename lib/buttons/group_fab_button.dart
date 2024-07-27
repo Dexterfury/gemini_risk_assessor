@@ -1,7 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:provider/provider.dart';
 
 class GroupFabButton extends StatelessWidget {
   const GroupFabButton({
@@ -10,29 +12,33 @@ class GroupFabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OpenContainer(
-      closedBuilder: (context, action) {
-        return FloatingActionButton.extended(
-          backgroundColor: Theme.of(context).primaryColor,
-          label: const Text(
-            'Create Group',
-            style: TextStyle(color: Colors.white),
-          ),
-          onPressed: action,
-        );
-      },
-      openBuilder: (context, action) {
-        // navigate to people screen
-        return const CreateGroupScreen();
-      },
-      closedShape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      closedColor: Theme.of(context).primaryColor,
-      transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 500),
-      closedElevation: cardElevation,
-      openElevation: 4,
-    );
+    final isAnonymous =
+        context.read<AuthenticationProvider>().isUserAnonymous();
+    return isAnonymous
+        ? const SizedBox()
+        : OpenContainer(
+            closedBuilder: (context, action) {
+              return FloatingActionButton.extended(
+                backgroundColor: Theme.of(context).primaryColor,
+                label: const Text(
+                  'Create Group',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: action,
+              );
+            },
+            openBuilder: (context, action) {
+              // navigate to people screen
+              return const CreateGroupScreen();
+            },
+            closedShape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            closedColor: Theme.of(context).primaryColor,
+            transitionType: ContainerTransitionType.fadeThrough,
+            transitionDuration: const Duration(milliseconds: 500),
+            closedElevation: cardElevation,
+            openElevation: 4,
+          );
 
     // OpenContainer(
     //   transitionType: ContainerTransitionType.fadeThrough,
