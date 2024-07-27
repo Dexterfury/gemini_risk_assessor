@@ -31,7 +31,7 @@ class _CreateNearMissState extends State<CreateNearMiss> {
     return Scaffold(
       appBar: MyAppBar(
         leading: const BackButton(),
-        title: 'Write a Near Miss',
+        title: 'Near Miss Report',
       ),
       body: SafeArea(
           child: Padding(

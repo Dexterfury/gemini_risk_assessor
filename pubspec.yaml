@@ -82,6 +82,7 @@ dependencies:
   cached_video_player: ^2.0.4
   audioplayers: ^6.0.0
   flutter_chat_reactions: ^0.1.0
+  board_datetime_picker: ^2.0.0
 
 
 dev_dependencies:
