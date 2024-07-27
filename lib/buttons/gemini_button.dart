@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 
 class GeminiButton extends StatefulWidget {
@@ -30,7 +30,6 @@ class _GeminiButtonState extends State<GeminiButton> {
         borderRadius: BorderRadius.circular(widget.borderRadius),
         border: Border.all(
           width: 1,
-          color: Colors.grey,
         ),
       ),
       child: GestureDetector(
@@ -40,13 +39,17 @@ class _GeminiButtonState extends State<GeminiButton> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(AssetsManager.geminiLogo1, height: 30, width: 40),
+              Image.asset(
+                AssetsManager.geminiLogo1,
+                height: 30,
+                width: 40,
+              ),
               const SizedBox(
                 width: 8.0,
               ),
               Text(
                 widget.label,
-                style: textStyle18Bold,
+                style: AppTheme.textStyle18Bold,
               ),
             ],
           ),

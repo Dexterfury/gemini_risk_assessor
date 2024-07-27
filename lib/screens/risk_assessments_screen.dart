@@ -8,7 +8,7 @@ import 'package:gemini_risk_assessor/authentication/authentication_provider.dart
 import 'package:gemini_risk_assessor/search/my_data_stream.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +67,8 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Text('No Risk Assessments Yet!',
-                        textAlign: TextAlign.center, style: textStyle18w500),
+                        textAlign: TextAlign.center,
+                        style: AppTheme.textStyle18w500),
                   ),
                 ),
               );

@@ -11,9 +11,10 @@ import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/providers/theme_provider.dart';
 import 'package:gemini_risk_assessor/screens/about_screen.dart';
 import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
@@ -68,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool canChangePassword = user != null &&
         user.providerData
             .any((userInfo) => userInfo.providerId == Constants.password);
-    bool isDarkMode = false;
+    final themeProvider = context.watch<ThemeProvider>();
     // get profile data from arguments
     final uid = ModalRoute.of(context)!.settings.arguments as String;
 
@@ -105,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Card(
                     color: Theme.of(context).cardColor,
-                    elevation: cardElevation,
+                    elevation: AppTheme.cardElevation,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Column(
@@ -139,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             userModel.phone.isNotEmpty
                                                 ? userModel.phone
                                                 : userModel.email,
-                                            style: textStyle16w600),
+                                            style: AppTheme.textStyle16w600),
                                       ),
 
                                     const SizedBox(height: 10),
@@ -185,13 +186,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: EdgeInsets.only(left: 8.0),
                               child: Text(
                                 'Settings',
-                                style: textStyle18w500,
+                                style: AppTheme.textStyle18w500,
                               ),
                             ),
                             const SizedBox(height: 10),
                             Card(
                               color: Theme.of(context).cardColor,
-                              elevation: cardElevation,
+                              elevation: AppTheme.cardElevation,
                               child: Column(
                                 children: [
                                   SettingsListTile(
@@ -253,33 +254,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ListTile(
                                     contentPadding: const EdgeInsets.only(
-                                      // added padding for the list tile
                                       left: 8.0,
                                       right: 8.0,
                                     ),
                                     leading: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.deepPurple,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Icon(
-                                          isDarkMode
-                                              ? Icons.nightlight_round
-                                              : Icons.wb_sunny_rounded,
-                                          color: isDarkMode
-                                              ? Colors.black
-                                              : Colors.white,
+                                          themeProvider.isDarkMode
+                                              ? Icons.wb_sunny
+                                              : Icons.nightlight_round,
                                         ),
                                       ),
                                     ),
                                     title: const Text('Change theme'),
                                     trailing: Switch(
-                                        value: isDarkMode,
-                                        onChanged: (value) {
-                                          // set the isDarkMode to the value
-                                        }),
+                                      value: themeProvider.isDarkMode,
+                                      onChanged: (value) {
+                                        themeProvider.toggleTheme();
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
@@ -287,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 10),
                             Card(
                               color: Theme.of(context).cardColor,
-                              elevation: cardElevation,
+                              elevation: AppTheme.cardElevation,
                               child: Column(
                                 children: [
                                   SettingsListTile(
@@ -420,7 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           userModel.name,
-          style: textStyle18Bold,
+          style: AppTheme.textStyle18Bold,
         ),
         const SizedBox(
           width: 10,

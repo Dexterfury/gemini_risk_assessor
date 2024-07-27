@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class AssessmentGridItems extends StatefulWidget {
@@ -230,7 +230,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
     return GestureDetector(
       onTap: () => _toggleCategory(title),
       child: Card(
-        elevation: cardElevation,
+        elevation: AppTheme.cardElevation,
         color: isSelected
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).cardColor,
@@ -253,7 +253,7 @@ class _AssessmentGridItemsState extends State<AssessmentGridItems>
                     title,
                     textAlign: TextAlign.center,
                     maxLines: 1,
-                    style: textStyle18w500.copyWith(
+                    style: AppTheme.textStyle18w500.copyWith(
                       color: isSelected
                           ? Theme.of(context).colorScheme.onPrimaryContainer
                           : Theme.of(context).textTheme.bodyLarge?.color,

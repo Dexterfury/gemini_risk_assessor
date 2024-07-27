@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/user_widget.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +24,7 @@ class MembersCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Theme.of(context).cardColor,
-      elevation: cardElevation,
+      elevation: AppTheme.cardElevation,
       child: FutureBuilder<List<UserModel>>(
         future: context.read<GroupProvider>().getMembersDataFromFirestore(
               groupID: groupModel.groupID,

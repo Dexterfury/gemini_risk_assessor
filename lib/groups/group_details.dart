@@ -4,7 +4,6 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/buttons_row.dart';
-import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -17,11 +16,10 @@ import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
-import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
@@ -264,7 +262,7 @@ class _GroupDetailsState extends State<GroupDetails>
                 ),
                 Card(
                   color: Theme.of(context).cardColor,
-                  elevation: cardElevation,
+                  elevation: AppTheme.cardElevation,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -326,7 +324,7 @@ class _GroupDetailsState extends State<GroupDetails>
   ) {
     return Card(
       color: Theme.of(context).cardColor,
-      elevation: cardElevation,
+      elevation: AppTheme.cardElevation,
       child: SettingsListTile(
         title: 'Exit Group',
         icon: FontAwesomeIcons.arrowRightFromBracket,
@@ -410,7 +408,7 @@ class _GroupDetailsState extends State<GroupDetails>
         Expanded(
           child: Text(
             groupProvider.groupModel.name,
-            style: textStyle18Bold,
+            style: AppTheme.textStyle18Bold,
             softWrap: true,
             overflow: TextOverflow.ellipsis,
           ),
@@ -476,7 +474,7 @@ class _GroupDetailsState extends State<GroupDetails>
           children: [
             Text(
               isAdmin && desc.isEmpty ? 'Add About Us' : 'About Us',
-              style: textStyle18Bold,
+              style: AppTheme.textStyle18Bold,
             ),
             if (isAdmin)
               GestureDetector(

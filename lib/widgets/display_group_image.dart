@@ -34,31 +34,4 @@ class DisplayGroupImage extends StatelessWidget {
       ),
     );
   }
-
-  // Widget showGroupImage(
-  //   File? fileImage,
-  //   String imageUrl,
-  // ) {
-  //   if (fileImage != null) {
-  //     return Image.file(
-  //       File(fileImage.path),
-  //       fit: BoxFit.cover,
-  //     );
-  //   } else if (imageUrl.isNotEmpty) {
-  //     return CachedNetworkImage(
-  //       imageUrl: imageUrl,
-  //       fit: BoxFit.cover,
-  //       placeholder: (context, url) =>
-  //           const Center(child: CircularProgressIndicator()),
-  //       errorWidget: (context, url, error) => const Center(
-  //           child: Icon(
-  //         Icons.error,
-  //         color: Colors.red,
-  //       )),
-  //       cacheManager: MyImageCacheManager.itemsCacheManager,
-  //     );
-  //   } else {
-  //     return
-  //   }
-  // }
 }

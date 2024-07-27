@@ -18,6 +18,7 @@ import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
+import 'package:gemini_risk_assessor/providers/theme_provider.dart';
 import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/tools/create_explainer_screen.dart';
@@ -25,7 +26,7 @@ import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -48,6 +49,7 @@ void main() async {
 
   runApp(
     MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
       ChangeNotifierProvider(create: (context) => AssessmentProvider()),
       ChangeNotifierProvider(create: (context) => ToolsProvider()),
@@ -67,29 +69,35 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: Constants.riskAssessments,
-        theme: lightTheme,
-        debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey,
-        initialRoute: Constants.landingRoute,
-        routes: {
-          Constants.landingRoute: (context) => const LandingScreen(),
-          Constants.logingRoute: (context) => const LoginScreen(),
-          Constants.homeRoute: (context) => const HomeScreen(),
-          Constants.screensControllerRoute: (context) =>
-              const ScreensController(),
-          Constants.optRoute: (context) => const OTPScreen(),
-          Constants.userInformationRoute: (context) =>
-              const UserInformationScreen(),
-          Constants.createAssessmentRoute: (context) =>
-              const CreateAssessmentScreen(),
-          Constants.createToolRoute: (context) => const CreateExplainerScreen(),
-          Constants.profileRoute: (context) => const ProfileScreen(),
-          Constants.createGroupRoute: (context) => const CreateGroupScreen(),
-          Constants.emailSignInRoute: (context) => const EmailLogin(),
-          Constants.emailSignUpRoute: (context) => const EmailSignUp(),
-          Constants.forgotPasswordRoute: (context) => const ForgotPassword(),
-        });
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: Constants.riskAssessments,
+          theme: themeProvider.currentTheme,
+          debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
+          initialRoute: Constants.landingRoute,
+          routes: {
+            Constants.landingRoute: (context) => const LandingScreen(),
+            Constants.logingRoute: (context) => const LoginScreen(),
+            Constants.homeRoute: (context) => const HomeScreen(),
+            Constants.screensControllerRoute: (context) =>
+                const ScreensController(),
+            Constants.optRoute: (context) => const OTPScreen(),
+            Constants.userInformationRoute: (context) =>
+                const UserInformationScreen(),
+            Constants.createAssessmentRoute: (context) =>
+                const CreateAssessmentScreen(),
+            Constants.createToolRoute: (context) =>
+                const CreateExplainerScreen(),
+            Constants.profileRoute: (context) => const ProfileScreen(),
+            Constants.createGroupRoute: (context) => const CreateGroupScreen(),
+            Constants.emailSignInRoute: (context) => const EmailLogin(),
+            Constants.emailSignUpRoute: (context) => const EmailSignUp(),
+            Constants.forgotPasswordRoute: (context) => const ForgotPassword(),
+          },
+        );
+      },
+    );
   }
 }

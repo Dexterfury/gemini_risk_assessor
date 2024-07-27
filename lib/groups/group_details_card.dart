@@ -94,7 +94,6 @@ class GroupDetailsCard extends StatelessWidget {
                       if (isAdmin && onChangeImage != null)
                         IconButton(
                           icon: const Icon(Icons.camera_alt),
-                          color: Colors.white,
                           onPressed: onChangeImage,
                         ),
                       Expanded(child: Container()), // Spacer
@@ -105,7 +104,6 @@ class GroupDetailsCard extends StatelessWidget {
                                 height: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
                                 ),
                               )
                             : acceptButton ?? Container(),

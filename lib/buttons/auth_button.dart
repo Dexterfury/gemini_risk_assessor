@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class AuthButton extends StatelessWidget {
   const AuthButton({
@@ -24,7 +24,7 @@ class AuthButton extends StatelessWidget {
     final btnColor = containerColor ?? Theme.of(context).primaryColor;
     return Card(
       color: btnColor,
-      elevation: cardElevation,
+      elevation: AppTheme.cardElevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
       ),
@@ -36,7 +36,6 @@ class AuthButton extends StatelessWidget {
               height: 50.0,
               width: 50.0,
               decoration: BoxDecoration(
-                color: Colors.white,
                 borderRadius: BorderRadius.circular(borderRadius),
               ),
               child: Padding(

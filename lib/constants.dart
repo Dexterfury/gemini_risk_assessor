@@ -335,11 +335,11 @@ class Constants {
       description: 'Get the most out of AI-generated content',
       detailScreen: const AiTipsHelpDetails(),
     ),
-    HelpItem(
-      title: 'App Navigation',
-      description: 'Learn how to navigate the app efficiently',
-      detailScreen: const NavigationHelpDetails(),
-    ),
+    // HelpItem(
+    //   title: 'App Navigation',
+    //   description: 'Learn how to navigate the app efficiently',
+    //   detailScreen: const NavigationHelpDetails(),
+    // ),
   ];
 
   // build section for helper classes

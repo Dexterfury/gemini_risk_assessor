@@ -23,7 +23,7 @@ class NmTextInputField extends StatelessWidget {
       textCapitalization: TextCapitalization.sentences,
       keyboardType: TextInputType.multiline,
       textInputAction: isLast ? TextInputAction.done : TextInputAction.next,
-      maxLength: 500,
+      maxLength: 800,
       minLines: 1,
       maxLines: maxLines,
       decoration: InputDecoration(

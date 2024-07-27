@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +9,7 @@ import 'package:gemini_risk_assessor/nearmiss/near_miss_item.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/create_near_miss.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
-import 'package:provider/provider.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class NearMissesScreen extends StatefulWidget {
   const NearMissesScreen({
@@ -72,7 +69,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                         const Text(
                           'No Near Misses Yet!',
                           textAlign: TextAlign.center,
-                          style: textStyle18w500,
+                          style: AppTheme.textStyle18w500,
                         ),
                         const SizedBox(
                           height: 10,
@@ -96,7 +93,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                               borderRadius: BorderRadius.circular(15)),
                           transitionType: ContainerTransitionType.fadeThrough,
                           transitionDuration: const Duration(milliseconds: 500),
-                          closedElevation: cardElevation,
+                          closedElevation: AppTheme.cardElevation,
                           openElevation: 4,
                         ),
                       ],
@@ -154,7 +151,6 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
                                   final doc = results.elementAt(index);
-                                  log('all data: ${doc.data()}');
                                   final data =
                                       doc.data() as Map<String, dynamic>;
                                   final nearMiss = NearMissModel.fromJson(data);

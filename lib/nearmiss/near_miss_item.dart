@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_details_screen.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class NearMissItem extends StatelessWidget {
@@ -20,7 +20,7 @@ class NearMissItem extends StatelessWidget {
     log('near miss: ${nearMiss.toJson()}');
     return Card(
       color: Theme.of(context).cardColor,
-      elevation: cardElevation,
+      elevation: AppTheme.cardElevation,
       child: OpenContainer(
         closedBuilder: (context, action) {
           return ListTile(

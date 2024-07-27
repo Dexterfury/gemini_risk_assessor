@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/gradient_border_container.dart';
 import 'package:provider/provider.dart';
 
@@ -49,7 +49,6 @@ class _QuizWidgetState extends State<QuizWidget> {
 
     return GradientBorderContainer(
       child: Card(
-        color: Colors.blueGrey[100],
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -58,7 +57,7 @@ class _QuizWidgetState extends State<QuizWidget> {
               FittedBox(
                 child: Text(
                   widget.quizData.title,
-                  style: textStyle18Bold,
+                  style: AppTheme.textStyle18Bold,
                 ),
               ),
               SizedBox(height: 16),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,7 @@ class GroupGridItem extends StatelessWidget {
 
     return Card(
       color: Theme.of(context).cardColor,
-      elevation: cardElevation,
+      elevation: AppTheme.cardElevation,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final imageHeight = constraints.maxHeight * 0.8;
@@ -64,7 +64,7 @@ class GroupGridItem extends StatelessWidget {
                       padding: const EdgeInsets.all(4.0),
                       child: Text(
                         title,
-                        style: textStyle16w600,
+                        style: AppTheme.textStyle16w600,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

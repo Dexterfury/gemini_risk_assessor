@@ -1,18 +1,13 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 import 'package:gemini_risk_assessor/appBars/discussion_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
-import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
-import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/service/gemini_actions.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
-import 'package:provider/provider.dart';
 
 class ChatDiscussionScreen extends StatefulWidget {
   const ChatDiscussionScreen({

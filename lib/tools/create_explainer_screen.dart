@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/tools/explainer_details_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -210,12 +210,12 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
         children: [
           Text(
             tool.title,
-            style: textStyle18w500,
+            style: AppTheme.textStyle18w500,
           ),
           const SizedBox(height: 10),
           Text(
             tool.description,
-            style: textStyle18w500,
+            style: AppTheme.textStyle18w500,
           ),
         ],
       ),

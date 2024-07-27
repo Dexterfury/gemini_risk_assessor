@@ -7,10 +7,10 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
@@ -149,8 +149,11 @@ class _ShareScreenState extends State<ShareScreen> {
                 body: Center(
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Text('No Groups Found!',
-                        textAlign: TextAlign.center, style: textStyle18w500),
+                    child: Text(
+                      'No Groups Found!',
+                      textAlign: TextAlign.center,
+                      style: AppTheme.textStyle18w500,
+                    ),
                   ),
                 ),
               );
@@ -272,7 +275,7 @@ class _ShareScreenState extends State<ShareScreen> {
                     padding: const EdgeInsets.all(4.0),
                     child: Text(
                       group.name,
-                      style: textStyle16w600,
+                      style: AppTheme.textStyle16w600,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

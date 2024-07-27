@@ -13,7 +13,7 @@ import 'package:gemini_risk_assessor/authentication/authentication_provider.dart
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
-import 'package:gemini_risk_assessor/themes/my_themes.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
@@ -150,7 +150,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           },
                           transitionType: ContainerTransitionType.fadeThrough,
                           transitionDuration: const Duration(milliseconds: 500),
-                          closedElevation: cardElevation,
+                          closedElevation: AppTheme.cardElevation,
                           openElevation: 4,
                         ),
                       ],
@@ -193,12 +193,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     final emptyName = _nameController.text.isEmpty;
                     final shortName = _nameController.text.length < 3;
 
-                    // check description
-                    // final emptyDescription = _descriptionController.text.isEmpty;
-                    // final shortDescription =
-                    //     _descriptionController.text.length < 10;
-                    // final desc = emptyDescription ? Constants.defaultDescription : _descriptionController.text;
-
                     // check name
                     if (emptyName || shortName) {
                       showSnackBar(
@@ -209,16 +203,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       );
                       return;
                     }
-                    // check description
-                    // if (emptyDescription || shortDescription) {
-                    //   showSnackBar(
-                    //     context: context,
-                    //     message: emptyDescription
-                    //         ? 'Please enter group description'
-                    //         : 'Group description must be at least 10 characters',
-                    //   );
-                    //   return;
-                    // }
 
                     log('Terms: ${_dataSettings.groupTerms}');
 
