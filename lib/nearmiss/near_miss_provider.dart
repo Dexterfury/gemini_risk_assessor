@@ -37,7 +37,7 @@ class NearMissProvider extends ChangeNotifier {
 
       final nearMissID = Uuid().v4();
 
-      final nearMiss = NearMissModel.fromGeneratedContent(
+      _nearMiss = NearMissModel.fromGeneratedContent(
         content,
         nearMissID,
         location,
@@ -47,8 +47,11 @@ class NearMissProvider extends ChangeNotifier {
         groupID,
         DateTime.now(),
       );
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
       print('Error near miss: $e');
+      _nearMiss = null;
       _isLoading = false;
       notifyListeners();
     }
