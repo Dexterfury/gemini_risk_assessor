@@ -19,6 +19,8 @@ class NearMissProvider extends ChangeNotifier {
 
   // create a near miss report
   Future<void> createANearMissReport({
+    required String creatorID,
+    required String groupID,
     required String description,
     required String dateTime,
     required String location,
@@ -32,6 +34,19 @@ class NearMissProvider extends ChangeNotifier {
       if (content.text == null) {
         throw Exception('Failed to generate control measures');
       }
+
+      final nearMissID = Uuid().v4();
+
+      final nearMiss = NearMissModel.fromGeneratedContent(
+        content,
+        nearMissID,
+        location,
+        description,
+        dateTime,
+        creatorID,
+        groupID,
+        DateTime.now(),
+      );
     } catch (e) {
       print('Error near miss: $e');
       _isLoading = false;

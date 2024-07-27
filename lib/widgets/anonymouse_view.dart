@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 
 class AnonymouseView extends StatelessWidget {
