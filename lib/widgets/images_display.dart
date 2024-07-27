@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
-import '../providers/tool_provider.dart';
+import '../tools/tool_provider.dart';
 
 class ImagesDisplay extends StatelessWidget {
   const ImagesDisplay({

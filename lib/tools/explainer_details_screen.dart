@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
-import 'package:gemini_risk_assessor/providers/tool_provider.dart';
+import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:gemini_risk_assessor/themes/my_themes.dart';

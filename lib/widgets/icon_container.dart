@@ -4,13 +4,13 @@ class IconContainer extends StatelessWidget {
   const IconContainer({
     super.key,
     required this.icon,
-    this.containerColor,
+    this.color,
     this.padding = 8.0,
     this.borderRadius = 10.0,
   });
 
   final Color?
-      containerColor; // You can use this to change the color of the icon container
+      color; // You can use this to change the color of the icon container
   final IconData
       icon; // This is the icon that will be displayed in the container
   final double padding; // padding of the icon
@@ -35,8 +35,8 @@ class IconContainer extends StatelessWidget {
   }
 
   Color getColor(BuildContext context) {
-    if (containerColor != null) {
-      return containerColor!; // use the provided color if it's not null
+    if (color != null) {
+      return color!; // use the provided color if it's not null
     } else {
       return Theme.of(context)
           .colorScheme

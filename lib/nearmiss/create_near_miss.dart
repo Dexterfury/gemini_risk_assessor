@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:animations/animations.dart';
 import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +17,9 @@ import 'package:provider/provider.dart';
 
 class CreateNearMiss extends StatefulWidget {
   const CreateNearMiss({
-    super.key,
+    Key? key,
     required this.groupID,
-  });
+  }) : super(key: key);
 
   final String groupID;
 
@@ -36,24 +34,21 @@ class _CreateNearMissState extends State<CreateNearMiss> {
   String _dateTime = '';
 
   @override
-  dispose() {
+  void dispose() {
     _descriptionController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    initializeDate();
     super.initState();
+    initializeDate();
   }
 
-  // set the current date to dateTime string
   void initializeDate() {
-    // wait for widget to be built
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      // set the current date to dateTime string
       _dateTime = formatDate(DateTime.now().toString());
-      log('date: $_dateTime');
+      setState(() {});
     });
   }
 
@@ -63,145 +58,164 @@ class _CreateNearMissState extends State<CreateNearMiss> {
     return formatter.format(dateTime);
   }
 
-  // final nearMissDescription =
-  //     "Employee slipped on a wet floor in the warehouse but managed to regain balance without falling.";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
         leading: const BackButton(),
-        title: 'Near Miss Report',
+        title: 'Create Near Miss Report',
       ),
       body: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconContainer(
-                    icon: FontAwesomeIcons.calendarDay,
-                    containerColor: Colors.orangeAccent,
-                  ),
-                  SizedBox(
-                    width: 150,
-                    child: BoardDateTimeInputField(
-                      controller: _dateTimeController,
-                      initialDate: DateTime.now(),
-                      pickerType: DateTimePickerType.datetime,
-                      options: const BoardDateTimeOptions(
-                        languages: BoardPickerLanguages.en(),
-                      ),
-                      textStyle: Theme.of(context).textTheme.bodyMedium,
-                      onChanged: (date) {
-                        //print('onchanged: $date');
-                      },
-                      onFocusChange: (val, date, text) {
-                        _dateTime = text;
-                        log('DateTime: $_dateTime');
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-
-              // description field
-              NmTextInputField(
-                labelText: 'Description of Near Miss',
-                hintText: 'Enter Near Description',
-                controller: _descriptionController,
-              ),
-
-              const SizedBox(
-                height: 30,
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: OpenContainer(
-                  closedBuilder: (context, action) {
-                    return GeminiButton(
-                      label: 'Generate',
-                      borderRadius: 15.0,
-                      onTap: () async {
-                        final nearMissProvider =
-                            context.read<NearMissProvider>();
-                        //final location = _locationController.text;
-                        final desc = _descriptionController.text;
-
-                        if (desc.isEmpty || desc.length < 10) {
-                          showSnackBar(
-                            context: context,
-                            message:
-                                'Please add a description of at least 10 characters',
-                          );
-                          return;
-                        }
-
-                        final authProvider =
-                            context.read<AuthenticationProvider>();
-                        final creatorID = authProvider.userModel!.uid;
-
-                        // show my alert dialog for loading
-                        MyDialogs.showMyAnimatedDialog(
-                          context: context,
-                          title: 'Generating',
-                          loadingIndicator: const SizedBox(
-                              height: 100,
-                              width: 100,
-                              child: LoadingPPEIcons()),
-                        );
-
-                        await nearMissProvider.submitPromptNearMiss(
-                          creatorID: creatorID,
-                          groupID: widget.groupID,
-                          description: desc,
-                          dateTime: _dateTime,
-                          onSuccess: () {
-                            // pop the loading dialog
-                            Navigator.pop(context);
-                            Future.delayed(const Duration(milliseconds: 500))
-                                .whenComplete(action);
-                          },
-                          onError: (error) {
-                            Navigator.pop(context);
-                            showSnackBar(
-                              context: context,
-                              message: error,
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  openBuilder: (context, action) {
-                    // navigate to screen depending on the clicked icon
-                    return NearMissDetailsScreen();
-                  },
-                  closedShape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  transitionType: ContainerTransitionType.fadeThrough,
-                  transitionDuration: const Duration(milliseconds: 500),
-                  closedElevation: cardElevation,
-                  openElevation: 4,
-                ),
-              ),
-
-              const SizedBox(
-                height: 20,
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeaderSection(),
+                const SizedBox(height: 32),
+                _buildDescriptionField(),
+                const SizedBox(height: 40),
+                _buildGenerateButton(context),
+              ],
+            ),
           ),
         ),
-      )),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          IconContainer(
+            icon: FontAwesomeIcons.calendarDay,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Date and Time',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                BoardDateTimeInputField(
+                  controller: _dateTimeController,
+                  initialDate: DateTime.now(),
+                  pickerType: DateTimePickerType.datetime,
+                  options: const BoardDateTimeOptions(
+                    languages: BoardPickerLanguages.en(),
+                  ),
+                  textStyle: Theme.of(context).textTheme.bodyMedium,
+                  onChanged: (date) {},
+                  onFocusChange: (val, date, text) {
+                    setState(() {
+                      _dateTime = text;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDescriptionField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Description of Near Miss',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 16),
+        NmTextInputField(
+          labelText: 'Describe what happened',
+          hintText: 'Enter a detailed description of the near miss incident',
+          controller: _descriptionController,
+          maxLines: 5,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenerateButton(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: OpenContainer(
+        closedBuilder: (context, action) {
+          return GeminiButton(
+            label: 'Generate Report',
+            borderRadius: 25.0,
+            onTap: () => _generateReport(context, action),
+          );
+        },
+        openBuilder: (context, action) {
+          return NearMissDetailsScreen();
+        },
+        closedShape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        transitionType: ContainerTransitionType.fadeThrough,
+        transitionDuration: const Duration(milliseconds: 500),
+        closedElevation: cardElevation,
+        openElevation: 4,
+      ),
+    );
+  }
+
+  void _generateReport(BuildContext context, VoidCallback action) async {
+    final nearMissProvider = context.read<NearMissProvider>();
+    final desc = _descriptionController.text;
+
+    if (desc.isEmpty || desc.length < 10) {
+      showSnackBar(
+        context: context,
+        message: 'Please add a description of at least 10 characters',
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthenticationProvider>();
+    final creatorID = authProvider.userModel!.uid;
+
+    MyDialogs.showMyAnimatedDialog(
+      context: context,
+      title: 'Generating Report',
+      loadingIndicator: const SizedBox(
+        height: 100,
+        width: 100,
+        child: LoadingPPEIcons(),
+      ),
+    );
+
+    await nearMissProvider.submitPromptNearMiss(
+      creatorID: creatorID,
+      groupID: widget.groupID,
+      description: desc,
+      dateTime: _dateTime,
+      onSuccess: () {
+        Navigator.pop(context);
+        Future.delayed(const Duration(milliseconds: 500)).whenComplete(action);
+      },
+      onError: (error) {
+        Navigator.pop(context);
+        showSnackBar(
+          context: context,
+          message: error,
+        );
+      },
     );
   }
 }

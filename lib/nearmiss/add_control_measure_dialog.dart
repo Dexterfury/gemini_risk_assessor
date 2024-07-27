@@ -97,6 +97,20 @@ class _AddControlMeasureDialogState extends State<AddControlMeasureDialog>
           ),
           ElevatedButton(
             onPressed: () {
+              // if his adding a new control measure, then we need to add it to the list of measures
+              // if no data is entered, then we need to do nothing
+              if (_measureController.text.isEmpty ||
+                  _typeController.text.isEmpty ||
+                  _rationaleController.text.isEmpty) {
+                return;
+              }
+              // data entere must be atleast 3 characters long
+              if (_measureController.text.length < 3 ||
+                  _typeController.text.length < 3 ||
+                  _rationaleController.text.length < 3) {
+                return;
+              }
+
               final newMeasure = ControlMeasure(
                 measure: _measureController.text,
                 type: _typeController.text,
