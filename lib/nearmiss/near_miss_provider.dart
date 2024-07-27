@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:developer';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
@@ -79,17 +81,29 @@ class NearMissProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       onSuccess();
-    } catch (e) {
-      print('Error near miss: $e');
+    } catch (error) {
+      print('Error near miss: $error');
       _isLoading = false;
       notifyListeners();
-      onError(e.toString());
+      if (error is SocketException) {
+        onError(
+            "Network error: Unable to connect to the server. Please check your internet connection and try again.");
+      } else if (error is TimeoutException) {
+        onError("Request timed out. Please try again later.");
+      } else if (error is HttpException) {
+        onError("HTTP error occurred: ${error.message}");
+      } else {
+        onError("An unexpected error occurred: ${error.toString()}");
+      }
+
+      if (kDebugMode) {
+        print('error### : $error');
+      }
     }
   }
 
   // save near miss to firestore
   Future<void> saveNearMiss({
-    required String groupID,
     required Function() onSuccess,
     required Function(String) onError,
   }) async {
@@ -98,8 +112,9 @@ class NearMissProvider extends ChangeNotifier {
     try {
       await FirebaseMethods.saveNearMiss(
         nearMiss: _nearMiss!,
-        groupID: groupID,
       );
+
+      log('NEAR MISS: ${nearMiss!.toJson()}');
       _isLoading = false;
       // clear the model
       _nearMiss = null;

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/nearmiss/add_control_measure_dialog.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measures_card.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 
 class NearMissDetailsScreen extends StatelessWidget {
@@ -123,16 +125,29 @@ class NearMissDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveButton(BuildContext context, NearMissProvider provider) {
+  Widget _buildSaveButton(
+    BuildContext context,
+    NearMissProvider provider,
+  ) {
     return Center(
       child: ElevatedButton(
         child: Text('Save Near Miss Report'),
-        onPressed: () {
-          // TODO: Implement save functionality
-          // This should call a method in your NearMissProvider to save the data to Firestore
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Near Miss Report Saved')),
+        onPressed: () async {
+          await context.read<NearMissProvider>().saveNearMiss(
+            onSuccess: () {
+              showSnackBar(
+                context: context,
+                message: 'Near Miss Report Saved',
+              );
+            },
+            onError: (error) {
+              showSnackBar(
+                context: context,
+                message: '$error',
+              );
+            },
           );
+
           Navigator.pop(context);
         },
       ),
@@ -140,7 +155,9 @@ class NearMissDetailsScreen extends StatelessWidget {
   }
 
   void _showAddControlMeasureDialog(
-      BuildContext context, NearMissProvider provider) {
+    BuildContext context,
+    NearMissProvider provider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AddControlMeasureDialog(
@@ -153,8 +170,35 @@ class NearMissDetailsScreen extends StatelessWidget {
   }
 
   void _deleteControlMeasure(
-      BuildContext context, NearMissProvider provider, int index) {
-    provider.deleteControlMeasure(index);
+    BuildContext context,
+    NearMissProvider provider,
+    int index,
+  ) {
+    MyDialogs.showMyAnimatedDialog(
+        context: context,
+        title: 'Delete',
+        content: 'Are you sure to Delete this item?',
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              provider.deleteControlMeasure(index);
+            },
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.deleteControlMeasure(index);
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Yes',
+            ),
+          ),
+        ]);
   }
 
   void _editControlMeasure(

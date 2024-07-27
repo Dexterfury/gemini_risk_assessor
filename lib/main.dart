@@ -18,7 +18,7 @@ import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
-import 'package:gemini_risk_assessor/providers/tool_provider.dart';
+import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/tools/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';

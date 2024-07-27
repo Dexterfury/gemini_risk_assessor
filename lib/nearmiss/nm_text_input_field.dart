@@ -6,12 +6,14 @@ class NmTextInputField extends StatelessWidget {
     required this.labelText,
     required this.hintText,
     required this.controller,
+    required this.maxLines,
     this.isLast = false,
   });
 
   final String labelText;
   final String hintText;
   final TextEditingController controller;
+  final int maxLines;
   final bool isLast;
 
   @override
@@ -23,7 +25,7 @@ class NmTextInputField extends StatelessWidget {
       textInputAction: isLast ? TextInputAction.done : TextInputAction.next,
       maxLength: 500,
       minLines: 1,
-      maxLines: 3,
+      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,

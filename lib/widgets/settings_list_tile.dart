@@ -30,7 +30,7 @@ class SettingsListTile extends StatelessWidget {
       ),
       leading: IconContainer(
         icon: icon,
-        containerColor: containerColor,
+        color: containerColor,
       ),
       title: Text(title),
       subtitle: subtitle != null

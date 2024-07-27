@@ -195,10 +195,9 @@ class FirebaseMethods {
   // save near miss to forestore
   static Future<void> saveNearMiss({
     required NearMissModel nearMiss,
-    required String groupID,
   }) async {
     await groupsCollection
-        .doc(groupID)
+        .doc(nearMiss.groupID)
         .collection(Constants.nearMissesCollection)
         .doc(nearMiss.id)
         .set(nearMiss.toJson());
