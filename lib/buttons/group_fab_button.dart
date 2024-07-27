@@ -22,6 +22,7 @@ class GroupFabButton extends StatelessWidget {
                 backgroundColor: Theme.of(context).primaryColor,
                 label: const Text(
                   'Create Group',
+                  style: TextStyle(color: Colors.white),
                 ),
                 onPressed: action,
               );
