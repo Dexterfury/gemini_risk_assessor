@@ -31,7 +31,6 @@ class CreateNearMiss extends StatefulWidget {
 
 class _CreateNearMissState extends State<CreateNearMiss> {
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
   final _dateTimeController = BoardDateTimeTextController();
 
   String _dateTime = '';
@@ -39,7 +38,6 @@ class _CreateNearMissState extends State<CreateNearMiss> {
   @override
   dispose() {
     _descriptionController.dispose();
-    _locationController.dispose();
     super.dispose();
   }
 
@@ -64,6 +62,9 @@ class _CreateNearMissState extends State<CreateNearMiss> {
     DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
     return formatter.format(dateTime);
   }
+
+  // final nearMissDescription =
+  //     "Employee slipped on a wet floor in the warehouse but managed to regain balance without falling.";
 
   @override
   Widget build(BuildContext context) {
@@ -113,16 +114,6 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                 height: 40,
               ),
 
-              // location field
-              NmTextInputField(
-                labelText: 'Location of Near Miss',
-                hintText: 'Enter Near Miss Location',
-                controller: _locationController,
-              ),
-
-              const SizedBox(
-                height: 20,
-              ),
               // description field
               NmTextInputField(
                 labelText: 'Description of Near Miss',
@@ -143,7 +134,7 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                       onTap: () async {
                         final nearMissProvider =
                             context.read<NearMissProvider>();
-                        final location = _locationController.text;
+                        //final location = _locationController.text;
                         final desc = _descriptionController.text;
 
                         if (desc.isEmpty || desc.length < 10) {
@@ -151,15 +142,6 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                             context: context,
                             message:
                                 'Please add a description of at least 10 characters',
-                          );
-                          return;
-                        }
-
-                        if (location.isEmpty || location.length < 3) {
-                          showSnackBar(
-                            context: context,
-                            message:
-                                'Please add a location of at least 10 characters',
                           );
                           return;
                         }
@@ -181,9 +163,8 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                         await nearMissProvider.submitPromptNearMiss(
                           creatorID: creatorID,
                           groupID: widget.groupID,
-                          description: _descriptionController.text,
+                          description: desc,
                           dateTime: _dateTime,
-                          location: location,
                           onSuccess: () {
                             // pop the loading dialog
                             Navigator.pop(context);
@@ -191,6 +172,7 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                                 .whenComplete(action);
                           },
                           onError: (error) {
+                            Navigator.pop(context);
                             showSnackBar(
                               context: context,
                               message: error,

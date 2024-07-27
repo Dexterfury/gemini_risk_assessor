@@ -8,6 +8,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
+import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
@@ -189,6 +190,18 @@ class FirebaseMethods {
           .orderBy(Constants.createdAt)
           .snapshots();
     }
+  }
+
+  // save near miss to forestore
+  static Future<void> saveNearMiss({
+    required NearMissModel nearMiss,
+    required String groupID,
+  }) async {
+    await groupsCollection
+        .doc(groupID)
+        .collection(Constants.nearMissesCollection)
+        .doc(nearMiss.id)
+        .set(nearMiss.toJson());
   }
 
   // update groupName

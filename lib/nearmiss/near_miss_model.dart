@@ -7,7 +7,6 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 class NearMissModel {
   String id;
-  String location;
   String description;
   String nearMissDateTime;
   List<String> sharedWith;
@@ -20,7 +19,6 @@ class NearMissModel {
   // constructor
   NearMissModel({
     required this.id,
-    required this.location,
     required this.description,
     required this.nearMissDateTime,
     required this.sharedWith,
@@ -34,7 +32,6 @@ class NearMissModel {
   factory NearMissModel.fromGeneratedContent(
     GenerateContentResponse content,
     String id,
-    String location,
     String description,
     String nearMissDateTime,
     String creatorID,
@@ -57,7 +54,6 @@ class NearMissModel {
     if (json is Map<String, dynamic>) {
       return NearMissModel(
         id: id,
-        location: location,
         description: description,
         nearMissDateTime: nearMissDateTime,
         sharedWith: [],
@@ -76,7 +72,6 @@ class NearMissModel {
   factory NearMissModel.fromJson(Map<String, dynamic> json) {
     return NearMissModel(
       id: json[Constants.id] ?? '',
-      location: json[Constants.location] ?? '',
       description: json[Constants.description] ?? '',
       nearMissDateTime: json[Constants.nearMissDateTime] ?? '',
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
@@ -95,7 +90,6 @@ class NearMissModel {
   Map<String, dynamic> toJson() {
     return {
       Constants.id: id,
-      Constants.location: location,
       Constants.description: description,
       Constants.nearMissDateTime: nearMissDateTime,
       Constants.sharedWith: sharedWith,
