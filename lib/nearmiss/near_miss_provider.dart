@@ -18,12 +18,14 @@ class NearMissProvider extends ChangeNotifier {
   NearMissModel? get nearMiss => _nearMiss;
 
   // create a near miss report
-  Future<void> createANearMissReport({
+  Future<void> submitPromptNearMiss({
     required String creatorID,
     required String groupID,
     required String description,
     required String dateTime,
     required String location,
+    required Function() onSuccess,
+    required Function(String) onError,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -49,11 +51,12 @@ class NearMissProvider extends ChangeNotifier {
       );
       _isLoading = false;
       notifyListeners();
+      onSuccess();
     } catch (e) {
       print('Error near miss: $e');
-      _nearMiss = null;
       _isLoading = false;
       notifyListeners();
+      onError(e.toString());
     }
   }
 
