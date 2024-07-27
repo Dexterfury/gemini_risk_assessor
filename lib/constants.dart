@@ -88,7 +88,7 @@ class Constants {
   static const String discussingAbout = 'discussingAbout';
 
   static const String location = 'location';
-  static const String nearMissDateTime = 'nearMissDateTime';
+  static const String dateTime = 'dateTime';
   static const String controlMeasures = 'controlMeasures';
 
   static const String people = 'People';
@@ -243,7 +243,7 @@ class Constants {
   // near miss data
   static const String measure = 'measure';
   static const String type = 'type';
-  static const String rationale = 'rationale';
+  static const String reason = 'reason';
 
   // default description
   static const String defaultDescription = 'Group Description';

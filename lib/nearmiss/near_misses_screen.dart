@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/nearmiss/near_miss_item.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/create_near_miss.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
@@ -106,7 +109,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
                 final results = snapshot.data!.docs.where(
-                  (element) => element[Constants.title]
+                  (element) => element[Constants.description]
                       .toString()
                       .toLowerCase()
                       .contains(
@@ -120,7 +123,7 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                       leading: const BackButton(),
                       title: const FittedBox(
                         child: Text(
-                          Constants.discussions,
+                          Constants.nearMisses,
                         ),
                       ),
                       pinned: true,
@@ -151,12 +154,11 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
                                   final doc = results.elementAt(index);
+                                  log('all data: ${doc.data()}');
                                   final data =
                                       doc.data() as Map<String, dynamic>;
-                                  final item = NearMissModel.fromJson(data);
-                                  return ListTile(
-                                    title: Text(item.description),
-                                  );
+                                  final nearMiss = NearMissModel.fromJson(data);
+                                  return NearMissItem(nearMiss: nearMiss);
                                 },
                                 childCount: results.length,
                               ),
