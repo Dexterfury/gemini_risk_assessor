@@ -25,7 +25,7 @@ class SocialAuthButtons extends StatelessWidget {
                   height: 80.0,
                   width: 80.0,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    //color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Padding(

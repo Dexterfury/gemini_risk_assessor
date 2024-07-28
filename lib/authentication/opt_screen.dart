@@ -71,7 +71,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 // pinPutField
                 pinPutField(verificationId),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 30), // loading indicator
 
                 // resend CodeField
                 resendCodeField(authProvider, phoneNumber),
@@ -138,7 +138,7 @@ class _OTPScreenState extends State<OTPScreen> {
         length: 6,
         controller: controller,
         focusNode: focusNode,
-        defaultPinTheme: AppTheme.defaultPinTheme,
+        defaultPinTheme: AppTheme.getDefaultPinTheme(context),
         onCompleted: (pin) {
           setState(() {
             otpCode = pin;
@@ -149,26 +149,8 @@ class _OTPScreenState extends State<OTPScreen> {
             otpCode: otpCode!,
           );
         },
-        focusedPinTheme: AppTheme.defaultPinTheme.copyWith(
-          height: 68,
-          width: 64,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.grey.shade200,
-            border: Border.all(),
-          ),
-        ),
-        errorPinTheme: AppTheme.defaultPinTheme.copyWith(
-          height: 68,
-          width: 64,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.grey.shade200,
-            border: Border.all(
-              color: Colors.red,
-            ),
-          ),
-        ),
+        focusedPinTheme: AppTheme.getFocusPinTheme(context),
+        errorPinTheme: AppTheme.getErrorPinTheme(context),
       ),
     );
   }

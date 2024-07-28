@@ -79,6 +79,7 @@ class GroupGridItem extends StatelessWidget {
             transitionDuration: const Duration(milliseconds: 500),
             closedElevation: 0,
             openElevation: 4,
+            closedColor: Theme.of(context).cardColor,
             closedShape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
             ),

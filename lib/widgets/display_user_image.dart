@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 
@@ -42,7 +43,7 @@ class DisplayUserImage extends StatelessWidget {
                   onTap: onPressed,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: AppTheme.getButtonColor(context),
                     child: const Icon(
                       Icons.camera_alt,
                       color: Colors.white,

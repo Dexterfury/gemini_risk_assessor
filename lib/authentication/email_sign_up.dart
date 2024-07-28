@@ -28,81 +28,6 @@ class _EmailSignUpState extends State<EmailSignUp> {
   bool obscureText = true;
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  // // signUp user
-  // void signUpUser() async {
-  //   final authProvider = context.read<AuthenticationProvider>();
-  //   if (formKey.currentState!.validate()) {
-  //     // save the form
-  //     formKey.currentState!.save();
-
-  //     try {
-  //       final userCredential =
-  //           await authProvider.createUserWithEmailAndPassword(
-  //         email: email,
-  //         password: password,
-  //       );
-
-  //       if (userCredential != null) {
-  //         // send email verification
-  //         await authProvider.sendEmailVerification();
-
-  //         // user has been created - now we save the user to firestore
-  //         log('user created: ${userCredential.user!.uid}');
-
-  //         UserModel userModel = UserModel(
-  //           uid: userCredential.user!.uid,
-  //           name: name,
-  //           phone: '',
-  //           email: email,
-  //           imageUrl: '',
-  //           token: '',
-  //           aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
-  //           isAnonymous: false,
-  //           createdAt: '',
-  //         );
-
-  //         // update data in firebase auth
-  //         // update the display name in firebase auth
-  //         await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
-
-  //         authProvider.saveUserDataToFireStore(
-  //           userModel: userModel,
-  //           fileImage: _finalFileImage,
-  //           onSuccess: () async {
-  //             formKey.currentState!.reset();
-  //             authProvider.setLoading(false);
-  //             // sign out the user and navigate to the login screen
-  //             // so that he may now sign In
-  //             showSnackBar(
-  //               context: context,
-  //               message:
-  //                   'Sign Up successful, Please verify your email and sign In',
-  //             );
-
-  //             await authProvider.signOut().whenComplete(() {
-  //               Navigator.pop(context);
-  //             });
-  //           },
-  //         );
-  //       }
-  //     } on FirebaseAuthException catch (e) {
-  //       Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
-  //         FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
-  //       });
-  //     } catch (e) {
-  //       log('error signUP: ${e.toString()}');
-  //       Future.delayed(const Duration(milliseconds: 200), () {
-  //         showSnackBar(
-  //             context: context, message: 'An unexpected error occurred: $e');
-  //       });
-  //     } finally {
-  //       authProvider.setLoading(false);
-  //     }
-  //   } else {
-  //     showSnackBar(context: context, message: 'Please fill all fields');
-  //   }
-  // }
   void signUpUser() async {
     final authProvider = context.read<AuthenticationProvider>();
     if (formKey.currentState!.validate()) {
@@ -194,7 +119,6 @@ class _EmailSignUpState extends State<EmailSignUp> {
           vertical: 15,
         ),
         child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: formKey,
             child: Column(

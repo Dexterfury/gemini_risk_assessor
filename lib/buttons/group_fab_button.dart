@@ -19,7 +19,7 @@ class GroupFabButton extends StatelessWidget {
         : OpenContainer(
             closedBuilder: (context, action) {
               return FloatingActionButton.extended(
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: AppTheme.getFabBtnTheme(context),
                 label: const Text(
                   'Create Group',
                   style: TextStyle(color: Colors.white),
