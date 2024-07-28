@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PageIndicator extends StatelessWidget {
@@ -24,7 +25,7 @@ class PageIndicator extends StatelessWidget {
               controller: _pageController,
               count: images.length,
               effect: WormEffect(
-                activeDotColor: Theme.of(context).primaryColor,
+                activeDotColor: AppTheme.getButtonColor(context),
                 dotHeight: 16,
                 dotWidth: 16,
                 type: WormType.normal,

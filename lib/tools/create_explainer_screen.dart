@@ -142,7 +142,6 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             hintText: 'Description',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[200],
           ),
           maxLines: 3,
         ),
