@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:animations/animations.dart';
 import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
@@ -90,7 +91,7 @@ class _CreateNearMissState extends State<CreateNearMiss> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -117,11 +118,17 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                     languages: BoardPickerLanguages.en(),
                   ),
                   textStyle: Theme.of(context).textTheme.bodyMedium,
-                  onChanged: (date) {},
+                  onChanged: (date) {
+                    setState(() {
+                      _dateTime = formatDate(date.toString());
+                    });
+                    log('date: $_dateTime');
+                  },
                   onFocusChange: (val, date, text) {
                     setState(() {
                       _dateTime = text;
                     });
+                    log('text: $_dateTime');
                   },
                 ),
               ],

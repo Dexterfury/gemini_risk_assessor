@@ -307,12 +307,7 @@ Widget previewImages({
                     children: [
                       Positioned.fill(
                         child: isViewOnly
-                            ?
-                            // Image.network(
-                            //     image,
-                            //     fit: BoxFit.cover,
-                            //   )
-                            Image.file(
+                            ? Image.file(
                                 File(image),
                                 fit: BoxFit.cover,
                               )
@@ -372,7 +367,7 @@ Widget previewImages({
         child: Container(
           height: MediaQuery.of(context).size.height * 0.60,
           width: MediaQuery.of(context).size.width,
-          color: Colors.grey.shade200,
+          color: AppTheme.getDefaultImageTheme(context),
           child: Center(
             child: GestureDetector(
               onTap: () {

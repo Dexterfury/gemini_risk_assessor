@@ -150,6 +150,14 @@ class AppTheme {
   static Color getDefaultImageTheme(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return isDarkMode ? Colors.blueGrey.shade500 : Colors.blueGrey.shade100;
+    return isDarkMode ? Colors.grey.shade600 : Colors.grey.shade200;
+  }
+
+  static Color getBoxShadowTheme(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return isDarkMode
+        ? Colors.white.withOpacity(0.1)
+        : Colors.black.withOpacity(0.1);
   }
 }
