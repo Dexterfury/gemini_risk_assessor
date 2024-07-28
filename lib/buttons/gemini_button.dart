@@ -49,7 +49,11 @@ class _GeminiButtonState extends State<GeminiButton> {
               ),
               Text(
                 widget.label,
-                style: AppTheme.textStyle18Bold,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
             ],
           ),

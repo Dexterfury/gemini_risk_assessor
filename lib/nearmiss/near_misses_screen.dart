@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -140,6 +141,20 @@ class _DiscussionScreenState extends State<NearMissesScreen> {
                           ),
                         ),
                       ),
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CreateNearMiss(groupID: widget.groupID),
+                              ),
+                            );
+                          },
+                          icon: Icon(FontAwesomeIcons.plus),
+                        )
+                      ],
                     ),
                     SliverPadding(
                       padding: const EdgeInsets.all(8.0),
