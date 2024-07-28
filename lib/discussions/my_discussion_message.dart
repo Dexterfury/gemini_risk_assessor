@@ -6,6 +6,7 @@ import 'package:gemini_risk_assessor/discussions/message_reply_preview.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class MyDiscussionMessage extends StatelessWidget {
@@ -54,7 +55,7 @@ class MyDiscussionMessage extends StatelessWidget {
             Padding(
               padding: padding,
               child: Card(
-                elevation: 5,
+                elevation: AppTheme.cardElevation,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(15),
@@ -62,7 +63,7 @@ class MyDiscussionMessage extends StatelessWidget {
                     bottomLeft: Radius.circular(15),
                   ),
                 ),
-                color: Theme.of(context).primaryColor,
+                color: AppTheme.getButtonColor(context),
                 child: Padding(
                   padding: message.messageType == MessageType.text
                       ? const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 10.0)

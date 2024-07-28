@@ -16,6 +16,7 @@ import 'package:gemini_risk_assessor/authentication/authentication_provider.dart
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/assessment_grid_items.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
@@ -277,8 +278,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
       children: [
         // pdf icon
         Card(
-          elevation: 4,
-          color: Colors.white,
+          elevation: AppTheme.cardElevation,
+          color: Theme.of(context).cardColor,
           child: IconButton(
             onPressed: () async {
               // // show my alert dialog for loading
@@ -338,7 +339,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
                 transitionDuration: const Duration(milliseconds: 500),
                 closedShape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-                closedElevation: 4,
+                closedElevation: AppTheme.cardElevation,
+                closedColor: Theme.of(context).cardColor,
                 openElevation: 4,
               ),
       ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/widgets/preview_images.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -86,12 +87,11 @@ class _BottomChatFieldState extends State<BottomChatField> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: Theme.of(context).textTheme.titleLarge!.color!,
-        ),
-      ),
+          borderRadius: BorderRadius.circular(30),
+          color: Theme.of(context).cardColor,
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary,
+          )),
       child: Column(
         children: [
           if (hasImages) const PreviewImages(),
@@ -140,7 +140,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
                       },
                 child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: AppTheme.getButtonColor(context),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     margin: const EdgeInsets.all(5.0),
