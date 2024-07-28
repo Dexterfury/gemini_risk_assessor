@@ -4,6 +4,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:provider/provider.dart';
 
@@ -159,7 +160,7 @@ class _BottomChatFieldState extends State<DiscussionChatField> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(30),
-                                      color: Theme.of(context).primaryColor,
+                                      color: AppTheme.getButtonColor(context),
                                     ),
                                     margin: const EdgeInsets.all(5),
                                     child: Padding(

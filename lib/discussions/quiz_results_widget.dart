@@ -19,8 +19,12 @@ class QuizResultsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic> quizResults = message.quizResults;
     final isReplying = message.repliedTo.isNotEmpty;
-    return Card(
-      color: Colors.blueGrey[100],
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.orangeAccent, width: 2),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

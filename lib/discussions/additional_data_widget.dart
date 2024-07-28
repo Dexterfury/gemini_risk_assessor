@@ -40,7 +40,6 @@ class AdditionalDataWidget extends StatelessWidget {
           )
         : GradientBorderContainer(
             child: Card(
-              color: Colors.blueGrey[100],
               elevation:
                   0, // Remove shadow as it's now inside another container
               shape: RoundedRectangleBorder(
