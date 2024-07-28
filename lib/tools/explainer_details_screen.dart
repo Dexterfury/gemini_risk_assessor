@@ -51,7 +51,6 @@ class ExplainerDetailsScreen extends StatelessWidget {
                   child: GeminiFloatingChatButton(
                     onPressed: () async {
                       // Open chat or navigate to chat screen
-                      // Open chat or navigate to chat screen
                       final uid =
                           context.read<AuthenticationProvider>().userModel!.uid;
                       final chatProvider = context.read<ChatProvider>();
@@ -164,6 +163,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
                         },
                         transitionType: ContainerTransitionType.fadeThrough,
                         transitionDuration: const Duration(milliseconds: 500),
+                        closedColor: Theme.of(context).cardColor,
                         closedShape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         closedElevation: 4,
