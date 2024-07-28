@@ -140,4 +140,10 @@ class AppTheme {
 
     return isDarkMode ? Colors.grey.shade800 : Theme.of(context).primaryColor;
   }
+
+  static Color getSearchFillTheme(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return isDarkMode ? Colors.grey.shade800 : Colors.white;
+  }
 }

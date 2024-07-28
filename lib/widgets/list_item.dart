@@ -103,6 +103,7 @@ class ListItem extends StatelessWidget {
         transitionDuration: const Duration(milliseconds: 500),
         closedElevation: 0,
         openElevation: 4,
+        closedColor: Theme.of(context).cardColor,
         closedShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
