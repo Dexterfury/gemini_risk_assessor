@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class AnimatedSearchBar extends StatefulWidget {
@@ -67,7 +68,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar>
               _animation.value * 200 + 48, // Expand to 200 pixels + icon size
           height: 48,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.getSearchBtnTheme(context),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(

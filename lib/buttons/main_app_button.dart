@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class MainAppButton extends StatelessWidget {
   const MainAppButton({
@@ -20,7 +21,7 @@ class MainAppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btnColor = contanerColor ?? Theme.of(context).primaryColor;
+    final btnColor = contanerColor ?? AppTheme.getButtonColor(context);
     return Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(

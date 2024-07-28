@@ -129,7 +129,6 @@ class _LoginScreenState extends State<EmailLogin> {
           vertical: 15,
         ),
         child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: formKey,
             child: Column(

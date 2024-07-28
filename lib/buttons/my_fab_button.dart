@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/custom_floating_action_button.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
@@ -24,7 +25,7 @@ class MyFabButton extends StatelessWidget {
         Bubble(
           title: "Tools Explainer",
           iconColor: Colors.white,
-          bubbleColor: Theme.of(context).colorScheme.primary,
+          bubbleColor: AppTheme.getFabBtnTheme(context),
           icon: Icons.handyman,
           titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
           onPress: () {
@@ -40,7 +41,7 @@ class MyFabButton extends StatelessWidget {
         Bubble(
           title: "Risk Assessment",
           iconColor: Colors.white,
-          bubbleColor: Theme.of(context).colorScheme.primary,
+          bubbleColor: AppTheme.getFabBtnTheme(context),
           icon: Icons.assignment_late_outlined,
           titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
           onPress: () {
@@ -56,7 +57,7 @@ class MyFabButton extends StatelessWidget {
         Bubble(
           title: "Daily Safety Tasks Instructions",
           iconColor: Colors.white,
-          bubbleColor: Theme.of(context).colorScheme.primary,
+          bubbleColor: AppTheme.getFabBtnTheme(context),
           icon: Icons.assignment_add,
           titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
           onPress: () {

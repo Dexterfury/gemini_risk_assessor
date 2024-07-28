@@ -89,6 +89,7 @@ Widget buildButton(
         height: 60,
         width: MediaQuery.of(context).size.width / 4,
         child: MaterialButton(
+          color: Theme.of(context).cardColor,
           padding: const EdgeInsets.symmetric(
             vertical: 4,
           ),

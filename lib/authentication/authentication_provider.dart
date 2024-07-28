@@ -63,6 +63,7 @@ class AuthenticationProvider extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 2));
     if (_auth.currentUser != null) {
       _uid = _auth.currentUser!.uid;
+
       // Check if user exists in Firestore
       if (await checkUserExistsInFirestore()) {
         // Get user data from Firestore
@@ -92,6 +93,8 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // save user data to shared preferences
   Future<void> saveUserDataToSharedPreferences() async {
+    // if is anonymous user, dont save to shared preferences
+    if (_auth.currentUser!.isAnonymous) return;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(
         Constants.userModel, jsonEncode(userModel!.toJson()));
@@ -99,6 +102,8 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // get data from shared preferences
   Future<void> getUserDataFromSharedPreferences() async {
+    // if his anonymous user, dont get from shared preferences
+    if (_auth.currentUser!.isAnonymous) return;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String userModelString =
         sharedPreferences.getString(Constants.userModel) ?? '';
@@ -140,6 +145,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // check if user exists in firestore
   Future<bool> checkUserExistsInFirestore() async {
+    log('userID: $_uid');
     try {
       final DocumentSnapshot documentSnapshot =
           await _usersCollection.doc(_uid).get();
@@ -309,6 +315,8 @@ class AuthenticationProvider extends ChangeNotifier {
     required BuildContext context,
     required Function() onSuccess,
   }) async {
+    _isLoading = true;
+    notifyListeners();
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
@@ -325,6 +333,8 @@ class AuthenticationProvider extends ChangeNotifier {
         notifyListeners();
       }
       if (wasAnonymous) {
+        _isLoading = false;
+        notifyListeners();
         // if user was anonymouse, navigate to user information screen
         await Future.delayed(const Duration(milliseconds: 200))
             .whenComplete(() {
@@ -736,6 +746,7 @@ class AuthenticationProvider extends ChangeNotifier {
       case SignInType.anonymous:
         userCredential = await _auth.signInAnonymously();
         isAnonymous = true;
+        notifyListeners();
         break;
       default:
         throw Exception('Invalid sign-in type');

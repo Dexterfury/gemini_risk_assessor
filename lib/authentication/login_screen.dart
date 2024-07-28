@@ -160,9 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
         vertical: 40.0,
       ),
       child: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
-          //mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
             SizedBox(
@@ -170,9 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 150,
                 child: Image.asset(
                   AssetsManager.appLogo,
-                )
-                //Lottie.asset(AssetsManager.clipboardAnimation),
-                ),
+                )),
             const Text(
               'Gemini Risk Assessor',
               style: TextStyle(
