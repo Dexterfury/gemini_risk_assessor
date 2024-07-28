@@ -25,7 +25,9 @@ class MyDialogs {
       },
       transitionBuilder: (context, animation1, animation2, child) {
         return ScaleTransition(
-            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            scale: Tween<double>(begin: 0.5, end: 1.0).animate(
+              CurvedAnimation(parent: animation1, curve: Curves.easeOutBack),
+            ),
             child: FadeTransition(
               opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
               child: AlertDialog(
@@ -61,7 +63,9 @@ class MyDialogs {
       },
       transitionBuilder: (context, animation1, animation2, child) {
         return ScaleTransition(
-          scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+          scale: Tween<double>(begin: 0.5, end: 1.0).animate(
+            CurvedAnimation(parent: animation1, curve: Curves.easeOutBack),
+          ),
           child: FadeTransition(
             opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
             child: AlertDialog(
@@ -102,7 +106,9 @@ class MyDialogs {
       },
       transitionBuilder: (context, animation1, animation2, child) {
         return ScaleTransition(
-            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            scale: Tween<double>(begin: 0.5, end: 1.0).animate(
+              CurvedAnimation(parent: animation1, curve: Curves.easeOutBack),
+            ),
             child: FadeTransition(
               opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
               child: AlertDialog(
@@ -243,7 +249,9 @@ class MyDialogs {
                   ];
 
             return ScaleTransition(
-              scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+              scale: Tween<double>(begin: 0.5, end: 1.0).animate(
+                CurvedAnimation(parent: animation1, curve: Curves.easeOutBack),
+              ),
               child: FadeTransition(
                 opacity:
                     Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
@@ -286,19 +294,23 @@ class MyDialogs {
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (context, animation1, animation2) {
-        return Container();
-      },
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation1, animation2) => Container(),
       transitionBuilder: (context, animation1, animation2, child) {
         return ScaleTransition(
-          scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+          scale: CurvedAnimation(parent: animation1, curve: Curves.easeOutBack)
+              .drive(Tween<double>(begin: 0.5, end: 1.0)),
           child: FadeTransition(
-            opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            opacity: CurvedAnimation(parent: animation1, curve: Curves.easeIn)
+                .drive(Tween<double>(begin: 0.5, end: 1.0)),
             child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               title: const Text(
                 'Terms and Conditions',
                 textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               content: SizedBox(
                 width: double.maxFinite,
@@ -308,35 +320,48 @@ class MyDialogs {
                   maxLines: 10,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     labelText: 'Terms and conditions',
                     hintText: 'Enter terms and conditions',
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.5)),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).primaryColor, width: 2),
+                    ),
+                    filled: true,
+                    //fillColor: Colors.grey[50],
                   ),
                 ),
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel',
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold)),
                 ),
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
                     action(textController.text);
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Save'),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Save',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
+              backgroundColor: Theme.of(context).cardColor,
+              elevation: 8,
             ),
           ),
         );
@@ -353,68 +378,83 @@ class MyDialogs {
     required String textAction,
     required Function(bool, String) onActionTap,
   }) {
-    TextEditingController controller = TextEditingController();
+    final controller = TextEditingController();
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (context, animation1, animation2) {
-        return Container();
-      },
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation1, animation2) => Container(),
       transitionBuilder: (context, animation1, animation2, child) {
         return ScaleTransition(
-            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
-            child: FadeTransition(
-              opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
-              child: AlertDialog(
-                title: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                ),
-                content: TextField(
-                  controller: controller,
-                  maxLength: maxLength,
-                  minLines: 1,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: hintText,
-                    counterText: '',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      onActionTap(
-                        false,
-                        controller.text,
-                      );
-                    },
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      onActionTap(
-                        true,
-                        controller.text,
-                      );
-                    },
-                    child: Text(textAction),
-                  ),
-                ],
+          scale: CurvedAnimation(parent: animation1, curve: Curves.easeOutBack)
+              .drive(Tween<double>(begin: 0.5, end: 1.0)),
+          child: FadeTransition(
+            opacity: CurvedAnimation(parent: animation1, curve: Curves.easeIn)
+                .drive(Tween<double>(begin: 0.5, end: 1.0)),
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
-            ));
+              content: TextField(
+                controller: controller,
+                maxLength: maxLength,
+                minLines: 1,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  hintText: hintText,
+                  counterText: '',
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor.withOpacity(0.5)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor, width: 2),
+                  ),
+                  filled: true,
+                  //fillColor: Colors.grey[50],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onActionTap(false, controller.text);
+                  },
+                  child: const Text('Cancel',
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onActionTap(true, controller.text);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: Text(textAction,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+              backgroundColor: Theme.of(context).cardColor,
+              elevation: 8,
+            ),
+          ),
+        );
       },
     );
   }

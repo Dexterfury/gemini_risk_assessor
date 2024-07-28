@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class PeopleSearchBar extends StatefulWidget {
   const PeopleSearchBar({
@@ -53,7 +54,7 @@ class _PeopleSearchBarState extends State<PeopleSearchBar> {
             onChanged: widget.onChanged,
             decoration: InputDecoration(
               hintText: 'Search...',
-              fillColor: Colors.white,
+              fillColor: AppTheme.getSearchFillTheme(context),
               filled: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),

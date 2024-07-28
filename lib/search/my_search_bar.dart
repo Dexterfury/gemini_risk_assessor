@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class MySearchBar extends StatelessWidget {
   const MySearchBar({
@@ -19,7 +20,7 @@ class MySearchBar extends StatelessWidget {
         onChanged: onChanged,
         decoration: InputDecoration(
           hintText: 'Search...',
-          fillColor: Colors.white,
+          fillColor: AppTheme.getSearchFillTheme(context),
           filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),

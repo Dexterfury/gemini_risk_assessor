@@ -87,59 +87,69 @@ class ImagePickerHandler {
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      transitionDuration: const Duration(milliseconds: 200),
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation1, animation2) {
         return Container();
       },
       transitionBuilder: (context, animation1, animation2, child) {
         return ScaleTransition(
-            scale: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
-            child: FadeTransition(
-              opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
-              child: AlertDialog(
-                title: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                ),
-                content: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      content,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ImagePickerItem(
-                          label: 'Camera',
-                          iconData: Icons.camera_alt,
-                          onPressed: () {
-                            Navigator.pop(context);
-                            onPressed(true);
-                          },
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        ImagePickerItem(
-                          label: 'Gallery',
-                          iconData: Icons.image,
-                          onPressed: () {
-                            Navigator.pop(context);
-                            onPressed(false);
-                          },
-                        ),
-                      ],
-                    )
-                  ],
+          scale: Tween<double>(begin: 0.5, end: 1.0).animate(
+            CurvedAnimation(parent: animation1, curve: Curves.easeOutBack),
+          ),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.5, end: 1.0).animate(animation1),
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
                 ),
               ),
-            ));
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    content,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ImagePickerItem(
+                        label: 'Camera',
+                        iconData: Icons.camera_alt,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onPressed(true);
+                        },
+                      ),
+                      const SizedBox(width: 24),
+                      ImagePickerItem(
+                        label: 'Gallery',
+                        iconData: Icons.image,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onPressed(false);
+                        },
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              backgroundColor: Theme.of(context).cardColor,
+              elevation: 8,
+            ),
+          ),
+        );
       },
     );
   }

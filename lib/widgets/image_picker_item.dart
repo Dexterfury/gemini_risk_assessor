@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/themes/app_theme.dart';
 
 class ImagePickerItem extends StatelessWidget {
   const ImagePickerItem({
-    super.key,
+    Key? key,
     required this.label,
     required this.iconData,
     required this.onPressed,
-  });
+  }) : super(key: key);
 
   final String label;
   final IconData iconData;
@@ -18,28 +19,35 @@ class ImagePickerItem extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(),
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
+          color: AppTheme.getSearchBtnTheme(context),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
               blurRadius: 5,
-              offset: const Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(iconData),
-              const SizedBox(
-                height: 5,
+              Icon(
+                iconData,
+                size: 32,
+                color: Theme.of(context).primaryColor,
               ),
-              Text(label),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
             ],
           ),
         ),
