@@ -53,10 +53,10 @@ class MyImageCacheManager {
             width: 100,
             height: 100,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(15.0),
+              borderRadius: BorderRadius.circular(12.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.blueGrey[100],
+                  color: Colors.blueGrey[200],
                 ),
                 child: const Center(
                   child: Icon(

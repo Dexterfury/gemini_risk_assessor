@@ -54,20 +54,20 @@ class GroupProvider extends ChangeNotifier {
     );
   }
 
-  ValueNotifier<bool> getAwaitingApprovalValueNotifier(String uid) {
-    return _awaitingApprovalValueNotifiers.putIfAbsent(
-      uid,
-      () => ValueNotifier(_awaitApprovalList.contains(uid)),
-    );
-  }
+  // ValueNotifier<bool> getAwaitingApprovalValueNotifier(String uid) {
+  //   return _awaitingApprovalValueNotifiers.putIfAbsent(
+  //     uid,
+  //     () => ValueNotifier(_awaitApprovalList.contains(uid)),
+  //   );
+  // }
 
-  ValueNotifier<bool> getTempMemberValueNotifier(String uid) {
-    return _tempMemberValueNotifiers.putIfAbsent(
-      uid,
-      () => ValueNotifier(_tempGroupMemberUIDs.contains(uid) ||
-          _awaitApprovalList.contains(uid)),
-    );
-  }
+  // ValueNotifier<bool> getTempMemberValueNotifier(String uid) {
+  //   return _tempMemberValueNotifiers.putIfAbsent(
+  //     uid,
+  //     () => ValueNotifier(_tempGroupMemberUIDs.contains(uid) ||
+  //         _awaitApprovalList.contains(uid)),
+  //   );
+  // }
 
   ValueNotifier<bool> getMemberValueNotifier(String uid) {
     return _memberValueNotifiers.putIfAbsent(
@@ -177,8 +177,8 @@ class GroupProvider extends ChangeNotifier {
   }
 
   // clear awaiting approval list
-  void clearAwaitingApprovalList() {
-    _awaitApprovalList.clear();
+  Future<void> clearAwaitingApprovalList() async {
+    _awaitApprovalList = [];
     notifyListeners();
   }
 
