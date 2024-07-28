@@ -17,7 +17,6 @@ class NearMissItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('near miss: ${nearMiss.toJson()}');
     return Card(
       color: Theme.of(context).cardColor,
       elevation: AppTheme.cardElevation,

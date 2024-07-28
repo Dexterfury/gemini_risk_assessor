@@ -146,4 +146,10 @@ class AppTheme {
 
     return isDarkMode ? Colors.grey.shade800 : Colors.white;
   }
+
+  static Color getDefaultImageTheme(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return isDarkMode ? Colors.blueGrey.shade500 : Colors.blueGrey.shade100;
+  }
 }
