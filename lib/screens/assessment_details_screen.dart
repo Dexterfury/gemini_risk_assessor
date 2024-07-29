@@ -22,7 +22,6 @@ import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/images_display.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/widgets/ppe_items_widget.dart';
-import 'package:gemini_risk_assessor/widgets/weather_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -69,14 +68,8 @@ class AssessmentDetailsScreen extends StatelessWidget {
     final control = assessmentModel.control;
     // summary
     final summary = assessmentModel.summary;
-    // pdf
-    final pdfUrl = assessmentModel.pdfUrl;
     // id
     final id = assessmentModel.id;
-
-    final capitalizedWeather = weather.isNotEmpty
-        ? weather[0].toUpperCase() + weather.substring(1)
-        : 'Unknown';
 
     // get generationType
     final generationType = getGenerationType(appBarTitle);

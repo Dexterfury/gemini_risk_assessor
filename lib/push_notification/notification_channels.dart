@@ -14,8 +14,17 @@ class NotificationChennels {
   static const AndroidNotificationChannel lowInportanceChannel =
       AndroidNotificationChannel(
     'low_importance_channel', // id
-    'Request Notification', // title
+    'Notifications', // title
     importance: Importance.min,
-    description: 'Show request notifications',
+    description: 'Show notifications',
   );
+
+  // low importance channel
+  // static const AndroidNotificationChannel mediumInportanceChannel =
+  //     AndroidNotificationChannel(
+  //   'medium_importance_channel', // id
+  //   'Chat Notification', // title
+  //   importance: Importance.min,
+  //   description: 'Show chat notifications',
+  // );
 }

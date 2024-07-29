@@ -279,80 +279,90 @@ exports.onCreateTool = createNotificationFunction("Near Miss", "nearMisses");
 
 
 exports.onCreateChatMessage = functions.firestore
-    .document('groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}')
+    .document("groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}")
     .onCreate(async (snapshot, context) => {
-        const messageData = snapshot.data();
-        const groupID = context.params.groupID;
-        const itemID = context.params.itemID;
-        const senderUID = messageData.senderUID;
+      const messageData = snapshot.data();
+      const groupID = context.params.groupID;
+      const senderUID = messageData.senderUID;
 
-        // Get group members
-        const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
-        const groupData = groupDoc.data();
-        const membersUIDs = groupData.membersUIDs || [];
+      // Get group members
+      const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
+      const groupData = groupDoc.data();
+      const membersUIDs = groupData.membersUIDs || [];
 
-        // Function to send notifications
-        const sendNotification = async (title, body, data) => {
-            const userRefs = membersUIDs
-                .filter(uid => uid !== senderUID)
-                .map(uid => admin.firestore().doc(`users/${uid}`));
-            const userDocs = await admin.firestore().getAll(...userRefs);
+      // Function to send notifications
+      const sendNotification = async (title, body, data) => {
+        const userRefs = membersUIDs
+            .filter((uid) => uid !== senderUID)
+            .map((uid) => admin.firestore().doc(`users/${uid}`));
+        const userDocs = await admin.firestore().getAll(...userRefs);
 
-            const notificationPromises = userDocs
-                .filter(userDoc => userDoc.exists && userDoc.data().token)
-                .map(userDoc => {
-                    const userData = userDoc.data();
-                    const notificationMessage = {
-                        notification: { title, body },
-                        android: { notification: { channel_id: "low_importance_channel" } },
-                        data: { ...data, groupID, notificationType: 'CHAT_NOTIFICATION' },
-                        token: userData.token,
-                    };
-                    return admin.messaging().send(notificationMessage);
-                });
+        const notificationPromises = userDocs
+            .filter((userDoc) => userDoc.exists && userDoc.data().token)
+            .map((userDoc) => {
+              const userData = userDoc.data();
+              const notificationMessage = {
+                notification: {title, body},
+                android: {notification: {channel_id: "high_importance_channel"}},
+                data: {
+                  ...data,
+                  collectionPath: context.params.collectionPath,
+                  groupID: context.params.groupID,
+                  itemID: context.params.itemID,
+                  notificationType: "CHAT_NOTIFICATION",
+                },
+                token: userData.token,
+              };
+              return admin.messaging().send(notificationMessage);
+            });
 
-            await Promise.all(notificationPromises);
-        };
+        await Promise.all(notificationPromises);
+      };
 
-        // Handle different message types
-        if (messageData.isAIMessage) {
-            if (messageData.messageType === 'quiz') {
-                await sendNotification('New Quiz Available', 'A new quiz has been posted in the group chat.', { messageType: 'quiz' });
-            } else if (messageData.messageType === 'additional') {
-                await sendNotification('New Additional Data', 'New additional data has been posted in the group chat.', { messageType: 'additional' });
-            }
-        } else if (messageData.messageType === 'quizAnswer') {
-            await sendNotification('Quiz Answer Submitted', `${messageData.senderName} has submitted their quiz answers.`, { messageType: 'quizAnswer' });
-            
-            // Handle points system for quiz answers
-            await handleQuizPoints(senderUID, messageData.quizResults);
-        } else {
-            // Normal chat message
-            await sendNotification('New Chat Message', `${messageData.senderName} sent a message in the group chat.`, { messageType: 'chat' });
+      // Handle different message types
+      if (messageData.isAIMessage) {
+        if (messageData.messageType === "quiz") {
+          await sendNotification("New Quiz Available", "A new quiz has been posted in the group chat.", {messageType: "quiz"});
+        } else if (messageData.messageType === "additional") {
+          await sendNotification("New Additional Data", "New additional data has been posted in the group chat.", {messageType: "additional"});
         }
+      } else if (messageData.messageType === "quizAnswer") {
+        await sendNotification("Quiz Answer Submitted", `${messageData.senderName} has submitted their quiz answers.`, {messageType: "quizAnswer"});
+
+        // Handle points system for quiz answers
+        await handleQuizPoints(senderUID, messageData.quizResults);
+      } else {
+        // Normal chat message
+        await sendNotification("New Chat Message", `${messageData.senderName} sent a message in the group chat.`, {messageType: "chat"});
+      }
     });
 
+/**
+     * Sends a notification to all users in the group chat with the given title and body.
+     * @param {*} userUID The UID of the sender.
+     * @param {*} quizResults The results of the quiz.
+     */
 async function handleQuizPoints(userUID, quizResults) {
-    const userRef = admin.firestore().doc(`users/${userUID}`);
-    
-    // Calculate points
-    const correctAnswers = Object.values(quizResults).filter(result => result === true).length;
-    let pointsEarned = correctAnswers * 10; // 10 points per correct answer
-    
-    // Bonus points for all correct
-    if (correctAnswers === 3) {
-        pointsEarned += 20; // 20 bonus points for all correct
-    }
+  const userRef = admin.firestore().doc(`users/${userUID}`);
 
-    // Update user's safety points
-    await admin.firestore().runTransaction(async (transaction) => {
-        const userDoc = await transaction.get(userRef);
-        const userData = userDoc.data();
-        const currentPoints = userData.safetyPoints || 0;
-        const newPoints = currentPoints + pointsEarned;
+  // Calculate points
+  const correctAnswers = Object.values(quizResults).filter((result) => result === true).length;
+  let pointsEarned = correctAnswers * 10; // 10 points per correct answer
 
-        transaction.update(userRef, { safetyPoints: newPoints });
-    });
+  // Bonus points for all correct
+  if (correctAnswers === 3) {
+    pointsEarned += 20; // 20 bonus points for all correct
+  }
 
-    console.log(`User ${userUID} earned ${pointsEarned} safety points.`);
+  // Update user's safety points
+  await admin.firestore().runTransaction(async (transaction) => {
+    const userDoc = await transaction.get(userRef);
+    const userData = userDoc.data();
+    const currentPoints = userData.safetyPoints || 0;
+    const newPoints = currentPoints + pointsEarned;
+
+    transaction.update(userRef, {safetyPoints: newPoints});
+  });
+
+  console.log(`User ${userUID} earned ${pointsEarned} safety points.`);
 }

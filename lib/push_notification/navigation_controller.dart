@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/chat_discussion_screen.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
@@ -35,61 +37,60 @@ navigationControler({
       });
       break;
     case Constants.dstiNotification:
-      // navigate to groups dsti tab
-      // Navigator.pushNamed(
-      //   context,
-      //   Constants.friendRequestsScreen,
-      // );
       break;
     case Constants.assessmentNotification:
       // navigate to friend requests screen
 
       break;
     case Constants.toolsNotification:
-      // navigate to friend requests screen
-      // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      //   return FriendRequestScreen(
-      //     groupId: message.data[Constants.groupId],
-      //   );
-      // }));
       break;
 
-    case Constants.descussNotification:
-      // parse the JSON string to a map
-      // Map<String, dynamic> jsonMap =
-      //     jsonDecode(message.data[Constants.groupModel]);
-      // // transform the map to a simple GroupModel object
-      // final Map<String, dynamic> flatGroupModelMap =
-      //     flattenGroupModelMap(jsonMap);
+    case Constants.chatNotification:
+      final String groupID = message.data[Constants.groupID];
+      final String itemID = message.data[Constants.itemID];
+      final String collectionPath = message.data[Constants.collectionPath];
 
-      // final groupModel = GroupModel.fromMap(flatGroupModelMap);
-      // log('JSON: $jsonMap');
-      // log('Flat Map: $flatGroupModelMap');
-      // log('Group Model: $groupModel');
-      // // navigate to group screen
-      // context
-      //     .read<GroupProvider>()
-      //     .setGroupModel(groupModel: groupModel)
-      //     .whenComplete(() {
-      //   Navigator.pushNamed(
-      //     context,
-      //     Constants.chatScreen,
-      //     arguments: {
-      //       Constants.contactUID: groupModel.groupId,
-      //       Constants.contactName: groupModel.groupName,
-      //       Constants.contactImage: groupModel.groupImage,
-      //       Constants.groupId: groupModel.groupId,
-      //     },
-      //   );
-      // });
+      switch (collectionPath) {
+        case Constants.assessmentCollection:
+        case Constants.dstiCollections:
+          FirebaseMethods.getAssessmentData(
+            groupID: groupID,
+            assessmentID: itemID,
+          ).then((assessmentModel) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatDiscussionScreen(
+                  groupID: groupID,
+                  assessment: assessmentModel,
+                  generationType: getGenerationTypeFromString(collectionPath),
+                ),
+              ),
+            );
+          });
+          break;
+        case Constants.toolsCollection:
+          FirebaseMethods.getToolData(
+            groupID: groupID,
+            toolID: itemID,
+          ).then((toolModel) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatDiscussionScreen(
+                  groupID: groupID,
+                  tool: toolModel,
+                  generationType: GenerationType.tool,
+                ),
+              ),
+            );
+          });
+          break;
+        default:
+          print('Unknown collection path: $collectionPath');
+      }
+
       break;
-    // case Constants.friendRequestNotification:
-    //   // navigate to friend requests screen
-    //         Navigator.pushNamed(
-    //           context,
-    //           Constants.friendRequestsScreen,
-    //         );
-    // break;
     default:
       print('No Notification');
   }
