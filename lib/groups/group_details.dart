@@ -690,7 +690,8 @@ class _GroupDetailsState extends State<GroupDetails>
                     .whenComplete(() {
                   showSnackBar(
                     context: context,
-                    message: 'You are a member of this Group',
+                    message:
+                        'You are now a member of this Group, refresh to see changes',
                   );
                 });
               }
@@ -703,7 +704,8 @@ class _GroupDetailsState extends State<GroupDetails>
                   .whenComplete(() {
                 showSnackBar(
                   context: context,
-                  message: 'You are a member of this Group',
+                  message:
+                      'You are now a member of this Group, refresh to see changes',
                 );
               });
             }
