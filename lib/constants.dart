@@ -140,6 +140,7 @@ class Constants {
   static const String adminsUIDs = 'adminsUIDs';
   static const String requestToReadTerms = 'requestToReadTerms';
   static const String allowSharing = 'allowSharing';
+  static const String allowCreate = 'allowCreate';
 
   static const String additionalID = 'additionalID';
   static const String additionalData = 'additionalData';

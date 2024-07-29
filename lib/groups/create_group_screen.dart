@@ -13,11 +13,9 @@ import 'package:gemini_risk_assessor/authentication/authentication_provider.dart
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
-import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
-import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -226,6 +224,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       groupTerms: _dataSettings.groupTerms,
       requestToReadTerms: _dataSettings.requestToReadTerms,
       allowSharing: _dataSettings.allowSharing,
+      allowCreate: _dataSettings.allowCreate,
     );
 
     _showLoadingDialog(context);
