@@ -74,8 +74,6 @@ class _AboutScreenState extends State<AboutScreen> {
                     '• Collaborative Group Features with AI'),
             _buildInfoSection('Developed by Raphael Daka',
                 'I am passionate about leveraging technology to solve real-world problems. I believe in the potential of AI to significantly improve safety measures and risk management.'),
-<<<<<<< HEAD
-=======
             const SizedBox(height: 20),
             //Optional: Add social media links if you have
             ElevatedButton(
@@ -88,19 +86,7 @@ class _AboutScreenState extends State<AboutScreen> {
             //   onPressed: () => _launchURL('https://twitter.com/yourusername'),
             //   child: const Text('Follow me on Twitter'),
             // ),
->>>>>>> authentication_2
             const SizedBox(height: 20),
-            // Optional: Add social media links if you have
-            // ElevatedButton(
-            //   onPressed: () => _launchURL('https://yourwebsite.com'), // Replace with your website
-            //   child: const Text('Visit My Website'),
-            // ),
-            // const SizedBox(height: 10),
-            // ElevatedButton(
-            //   onPressed: () => _launchURL('https://twitter.com/yourusername'),
-            //   child: const Text('Follow me on Twitter'),
-            // ),
-            // const SizedBox(height: 20),
             Text(
               '© ${DateTime.now().year} Raphael Daka. All rights reserved.',
               style: Theme.of(context).textTheme.bodySmall,
@@ -133,21 +119,12 @@ class _AboutScreenState extends State<AboutScreen> {
   }
 
 // Uncomment this section if you add social media links
-<<<<<<< HEAD
-//   Future<void> _launchURL(String url) async {
-//     final Uri uri = Uri.parse(url);
-//     if (!await launchUrl(uri)) {
-//       throw Exception('Could not launch $uri');
-//     }
-//   }
-=======
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri)) {
       throw Exception('Could not launch $uri');
     }
   }
->>>>>>> authentication_2
 }
 
 // class AboutScreen extends StatefulWidget {

@@ -260,25 +260,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       left: 8.0,
                                       right: 8.0,
                                     ),
-<<<<<<< HEAD
-                                    leading: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Icon(
-                                          themeProvider.isDarkMode
-                                              ? Icons.wb_sunny
-                                              : Icons.nightlight_round,
-                                        ),
-                                      ),
-=======
                                     leading: IconContainer(
                                       icon: themeProvider.isDarkMode
                                           ? Icons.wb_sunny
                                           : Icons.nightlight_round,
->>>>>>> authentication_2
                                     ),
                                     title: const Text('Change theme'),
                                     trailing: Switch(
