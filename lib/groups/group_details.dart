@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:animations/animations.dart';
@@ -124,6 +125,7 @@ class _GroupDetailsState extends State<GroupDetails>
       String groupTerms = groupModel.groupTerms;
       bool requestToReadTerms = groupProvider.groupModel.requestToReadTerms;
       bool allowSharing = groupProvider.groupModel.allowSharing;
+      bool allowCreate = groupProvider.groupModel.allowCreate;
 
       //String membersCount = getMembersCount(groupProvider.groupModel);
       bool showAcceptBtn =
@@ -307,13 +309,29 @@ class _GroupDetailsState extends State<GroupDetails>
             ),
           ),
         ),
-        floatingActionButton: MyFabButton(
-          animationController: _animationController,
-          animation: _animation,
-          groupID: groupProvider.groupModel.groupID,
+        floatingActionButton: getCreateBtn(
+          isAdmin,
+          allowCreate,
+          groupID,
         ),
       );
     });
+  }
+
+  Widget? getCreateBtn(
+    bool isAdmin,
+    bool allowCreate,
+    String groupID,
+  ) {
+    if (isAdmin || allowCreate) {
+      return MyFabButton(
+        animationController: _animationController,
+        animation: _animation,
+        groupID: groupID,
+      );
+    } else {
+      return null;
+    }
   }
 
   buildExitCard(
@@ -672,7 +690,8 @@ class _GroupDetailsState extends State<GroupDetails>
                     .whenComplete(() {
                   showSnackBar(
                     context: context,
-                    message: 'You are a member of this Group',
+                    message:
+                        'You are now a member of this Group, refresh to see changes',
                   );
                 });
               }
@@ -685,7 +704,8 @@ class _GroupDetailsState extends State<GroupDetails>
                   .whenComplete(() {
                 showSnackBar(
                   context: context,
-                  message: 'You are a member of this Group',
+                  message:
+                      'You are now a member of this Group, refresh to see changes',
                 );
               });
             }

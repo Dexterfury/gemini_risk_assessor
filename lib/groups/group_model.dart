@@ -16,6 +16,7 @@ class GroupModel {
   List<String> adminsUIDs;
   bool requestToReadTerms;
   bool allowSharing;
+  bool allowCreate;
   DateTime createdAt;
 
   // Constructor with default values
@@ -35,6 +36,7 @@ class GroupModel {
     List<String>? adminsUIDs,
     this.requestToReadTerms = false,
     this.allowSharing = false,
+    this.allowCreate = false,
     DateTime? createdAt,
   })  : awaitingApprovalUIDs = awaitingApprovalUIDs ?? [],
         membersUIDs = membersUIDs ?? [],
@@ -60,6 +62,7 @@ class GroupModel {
       adminsUIDs: List<String>.from(json[Constants.adminsUIDs] ?? []),
       requestToReadTerms: json[Constants.requestToReadTerms] ?? false,
       allowSharing: json[Constants.allowSharing] ?? false,
+      allowCreate: json[Constants.allowCreate] ?? false,
       createdAt: json[Constants.createdAt] != null
           ? DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt])
           : null,
@@ -84,6 +87,7 @@ class GroupModel {
       Constants.adminsUIDs: adminsUIDs,
       Constants.requestToReadTerms: requestToReadTerms,
       Constants.allowSharing: allowSharing,
+      Constants.allowCreate: allowCreate,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

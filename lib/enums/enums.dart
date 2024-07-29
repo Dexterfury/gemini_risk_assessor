@@ -37,6 +37,15 @@ enum GenerationType {
   riskAssessment,
 }
 
+GenerationType getGenerationTypeFromString(String typeString) {
+  final typeMap = {
+    'assessments': GenerationType.riskAssessment,
+    'dsti': GenerationType.dsti,
+  };
+  return typeMap[typeString] ??
+      GenerationType.tool; // Default to tool if not found
+}
+
 // user Type enum
 enum UserViewType {
   admin,

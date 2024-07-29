@@ -31,6 +31,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     _currentSettings = DataSettings(
       requestToReadTerms: widget.initialSettings.requestToReadTerms,
       allowSharing: widget.initialSettings.allowSharing,
+      allowCreate: widget.initialSettings.allowCreate,
       groupTerms: widget.initialSettings.groupTerms,
     );
   }
@@ -107,7 +108,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                   subtitle:
                       'Request new members to read the team\'s information before they can join',
                   icon: FontAwesomeIcons.readme,
-                  containerColor: Colors.green,
+                  containerColor: Colors.purple,
                   value: _currentSettings.requestToReadTerms,
                   onChanged: _handleRequestToReadChange,
                 ),
@@ -122,6 +123,20 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                   onChanged: (value) {
                     setState(() {
                       _currentSettings.allowSharing = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                SettingsSwitchListTile(
+                  title: 'Allow creating',
+                  subtitle:
+                      'Allow members to create new DSTIs, RiskAssessments, and Tools',
+                  icon: FontAwesomeIcons.key,
+                  containerColor: Colors.green,
+                  value: _currentSettings.allowCreate,
+                  onChanged: (value) {
+                    setState(() {
+                      _currentSettings.allowCreate = value;
                     });
                   },
                 ),

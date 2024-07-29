@@ -8,7 +8,6 @@ class ToolModel {
   String title;
   String description;
   String summary;
-  String toolPdf;
   List<String> images;
   List<String> reactions;
   List<String> sharedWith;
@@ -23,7 +22,6 @@ class ToolModel {
     required this.title,
     required this.description,
     required this.summary,
-    required this.toolPdf,
     required this.images,
     required this.reactions,
     required this.sharedWith,
@@ -52,7 +50,6 @@ class ToolModel {
         title: json[Constants.title] ?? '',
         description: json[Constants.description] ?? '',
         summary: json[Constants.summary] ?? '',
-        toolPdf: json[Constants.toolPdf] ?? '',
         images: images,
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
@@ -73,7 +70,6 @@ class ToolModel {
       title: json[Constants.title] ?? '',
       description: json[Constants.description] ?? '',
       summary: json[Constants.summary] ?? '',
-      toolPdf: json[Constants.toolPdf] ?? '',
       images: List<String>.from(json[Constants.images] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
@@ -91,7 +87,6 @@ class ToolModel {
       Constants.title: title,
       Constants.description: description,
       Constants.summary: summary,
-      Constants.toolPdf: toolPdf,
       Constants.images: images,
       Constants.reactions: reactions,
       Constants.sharedWith: sharedWith,
@@ -108,7 +103,6 @@ class ToolModel {
     String? title,
     String? description,
     String? summary,
-    String? toolPdf,
     List<String>? images,
     List<String>? reactions,
     List<String>? sharedWith,
@@ -122,7 +116,6 @@ class ToolModel {
       title: title ?? this.title,
       description: description ?? this.description,
       summary: summary ?? this.summary,
-      toolPdf: toolPdf ?? this.toolPdf,
       images: images ?? this.images,
       reactions: reactions ?? this.reactions,
       sharedWith: sharedWith ?? this.sharedWith,

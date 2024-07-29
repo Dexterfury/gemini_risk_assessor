@@ -140,6 +140,7 @@ class Constants {
   static const String adminsUIDs = 'adminsUIDs';
   static const String requestToReadTerms = 'requestToReadTerms';
   static const String allowSharing = 'allowSharing';
+  static const String allowCreate = 'allowCreate';
 
   static const String additionalID = 'additionalID';
   static const String additionalData = 'additionalData';
@@ -208,6 +209,7 @@ class Constants {
   static const String answers = 'answers';
   static const String quizID = 'quizID';
   static const String itemID = 'itemID';
+  static const String collectionPath = 'collectionPath';
 
   static const String quizTitle = 'quizTitle';
 
@@ -234,7 +236,7 @@ class Constants {
   static const String toolsNotification = 'TOOLS_NOTIFICATION';
   static const String groupInvitation = 'GROUP_INVITATION';
   static const String requestNotification = 'REQUEST_NOTIFICATION';
-  static const String descussNotification = 'DESCUSS_NOTIFICATION';
+  static const String chatNotification = 'CHAT_NOTIFICATION';
 
   // dialog content
   static const String loading = 'loading';

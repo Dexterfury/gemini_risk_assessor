@@ -11,18 +11,14 @@ class AssessmentModel {
   List<String> equipments;
   List<String> hazards;
   List<String> risks;
-  List<String> signatures;
-  List<String> approvers;
   List<String> ppe;
   List<String> control;
   List<String> reactions;
   List<String> sharedWith;
-  int discussions;
   String weather;
   String summary;
   String createdBy;
   String groupID;
-  String pdfUrl;
   DateTime createdAt;
 
   AssessmentModel({
@@ -33,18 +29,14 @@ class AssessmentModel {
     required this.equipments,
     required this.hazards,
     required this.risks,
-    required this.signatures,
-    required this.approvers,
     required this.ppe,
     required this.control,
     required this.reactions,
     required this.sharedWith,
-    required this.discussions,
     required this.weather,
     required this.summary,
     required this.createdBy,
     required this.groupID,
-    required this.pdfUrl,
     required this.createdAt,
   });
 
@@ -70,18 +62,14 @@ class AssessmentModel {
         equipments: List<String>.from(json[Constants.equipments] ?? []),
         hazards: List<String>.from(json[Constants.hazards] ?? []),
         risks: List<String>.from(json[Constants.risks] ?? []),
-        signatures: List<String>.from(json[Constants.signatures] ?? []),
-        approvers: List<String>.from(json[Constants.approvers] ?? []),
         ppe: testppe,
         control: List<String>.from(json[Constants.control] ?? []),
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
-        discussions: json[Constants.discussions] ?? 0,
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
         groupID: groupID,
-        pdfUrl: json[Constants.pdfFiles] ?? '',
         createdAt: createdAt,
       );
     }
@@ -113,18 +101,14 @@ class AssessmentModel {
         equipments: List<String>.from(json[Constants.equipments] ?? []),
         hazards: List<String>.from(json[Constants.hazards] ?? []),
         risks: List<String>.from(json[Constants.risks] ?? []),
-        signatures: List<String>.from(json[Constants.signatures] ?? []),
-        approvers: List<String>.from(json[Constants.approvers] ?? []),
         ppe: ppe,
         control: List<String>.from(json[Constants.control] ?? []),
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
-        discussions: json[Constants.discussions] ?? 0,
         weather: weather,
         summary: json[Constants.summary] ?? '',
         createdBy: creatorID,
         groupID: groupID,
-        pdfUrl: json[Constants.pdfUrl] ?? '',
         createdAt: createdAt,
       );
     }
@@ -141,18 +125,14 @@ class AssessmentModel {
       equipments: List<String>.from(json[Constants.equipments] ?? []),
       hazards: List<String>.from(json[Constants.hazards] ?? []),
       risks: List<String>.from(json[Constants.risks] ?? []),
-      signatures: List<String>.from(json[Constants.signatures] ?? []),
-      approvers: List<String>.from(json[Constants.approvers] ?? []),
       ppe: List<String>.from(json[Constants.ppe] ?? []),
       control: List<String>.from(json[Constants.control] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
-      discussions: json[Constants.discussions] ?? 0,
       weather: json[Constants.weather] ?? '',
       summary: json[Constants.summary] ?? '',
       createdBy: json[Constants.createdBy] ?? '',
       groupID: json[Constants.groupID] ?? '',
-      pdfUrl: json[Constants.pdfUrl] ?? '',
       createdAt:
           DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt] ?? 0),
     );
@@ -167,18 +147,14 @@ class AssessmentModel {
       Constants.equipments: equipments,
       Constants.hazards: hazards,
       Constants.risks: risks,
-      Constants.signatures: signatures,
-      Constants.approvers: approvers,
       Constants.ppe: ppe,
       Constants.control: control,
       Constants.reactions: reactions,
       Constants.sharedWith: sharedWith,
-      Constants.discussions: discussions,
       Constants.weather: weather,
       Constants.summary: summary,
       Constants.createdBy: createdBy,
       Constants.groupID: groupID,
-      Constants.pdfUrl: pdfUrl,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }
@@ -192,8 +168,6 @@ class AssessmentModel {
     List<String>? equipments,
     List<String>? hazards,
     List<String>? risks,
-    List<String>? signatures,
-    List<String>? approvers,
     List<String>? ppe,
     List<String>? control,
     List<String>? reactions,
@@ -203,7 +177,6 @@ class AssessmentModel {
     String? summary,
     String? createdBy,
     String? groupID,
-    String? pdfUrl,
     DateTime? createdAt,
   }) {
     return AssessmentModel(
@@ -214,18 +187,14 @@ class AssessmentModel {
       equipments: equipments ?? this.equipments,
       hazards: hazards ?? this.hazards,
       risks: risks ?? this.risks,
-      signatures: signatures ?? this.signatures,
-      approvers: approvers ?? this.approvers,
       ppe: ppe ?? this.ppe,
       control: control ?? this.control,
       reactions: reactions ?? this.reactions,
       sharedWith: sharedWith ?? this.sharedWith,
-      discussions: discussions ?? this.discussions,
       weather: weather ?? this.weather,
       summary: summary ?? this.summary,
       createdBy: createdBy ?? this.createdBy,
       groupID: groupID ?? this.groupID,
-      pdfUrl: pdfUrl ?? this.pdfUrl,
       createdAt: createdAt ?? this.createdAt,
     );
   }

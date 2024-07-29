@@ -13,11 +13,10 @@ import 'package:gemini_risk_assessor/authentication/authentication_provider.dart
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
-import 'package:gemini_risk_assessor/themes/app_theme.dart';
+import 'package:gemini_risk_assessor/themes/my_themes.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
-import 'package:gemini_risk_assessor/widgets/input_field.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -218,47 +217,63 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       return;
     }
 
-    final groupModel = GroupModel(
-      creatorUID: context.read<AuthenticationProvider>().userModel!.uid,
-      name: _nameController.text,
-      aboutGroup: _descriptionController.text,
-      groupID: '',
-      groupTerms: _dataSettings.groupTerms,
-      requestToReadTerms: _dataSettings.requestToReadTerms,
-      allowSharing: _dataSettings.allowSharing,
-    );
+                    final groupModel = GroupModel(
+                      creatorUID:
+                          context.read<AuthenticationProvider>().userModel!.uid,
+                      name: _nameController.text,
+                      aboutGroup: _descriptionController.text,
+                      groupID: '',
+                      groupTerms: _dataSettings.groupTerms,
+                      requestToReadTerms: _dataSettings.requestToReadTerms,
+                      allowSharing: _dataSettings.allowSharing,
+                    );
 
-    _showLoadingDialog(context);
+                    // show loading dialog
+                    // show my alert dialog for loading
+                    MyDialogs.showMyAnimatedDialog(
+                      context: context,
+                      title: 'Creating group',
+                      loadingIndicator: const SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: LoadingPPEIcons(),
+                      ),
+                    );
 
-    groupProvider.createGroup(
-      fileImage: _finalFileImage,
-      newgroupModel: groupModel,
-      onSuccess: () => _handleCreateSuccess(context),
-      onError: (error) => _handleCreateError(context, error),
-    );
-  }
-
-  void _showErrorSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_nameController.text.isEmpty
-            ? 'Please enter group name'
-            : 'Group name must be at least 3 characters'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _showLoadingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Creating group'),
-        content: SizedBox(
-          height: 100,
-          width: 100,
-          child: Center(child: LoadingPPEIcons()),
+                    // save group data to firestore
+                    groupProvider.createGroup(
+                      fileImage: _finalFileImage,
+                      newgroupModel: groupModel,
+                      onSuccess: () {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        // clear data
+                        setState(() {
+                          _nameController.text = '';
+                          _descriptionController.text = '';
+                          _finalFileImage = null;
+                          setState(() {
+                            // reset data settings
+                            _dataSettings = DataSettings();
+                          });
+                        });
+                        showSnackBar(
+                            context: context, message: 'Group created');
+                        // pop to previous screen
+                        Navigator.pop(context);
+                      },
+                      onError: (error) {
+                        // pop the loading dialog
+                        Navigator.pop(context);
+                        showSnackBar(
+                            context: context, message: error.toString());
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

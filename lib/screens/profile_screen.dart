@@ -21,6 +21,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/widgets/icon_container.dart';
 import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -134,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isAnonymous,
                                     ),
                                     // display phone number
-                                    if (isMyProfile)
+                                    if (isMyProfile && !isAnonymous)
                                       FittedBox(
                                         child: Text(
                                             userModel.phone.isNotEmpty
@@ -144,6 +145,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
 
                                     const SizedBox(height: 10),
+
+                                    // show safety points here
                                   ],
                                 ),
                               )
@@ -257,6 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       left: 8.0,
                                       right: 8.0,
                                     ),
+<<<<<<< HEAD
                                     leading: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
@@ -269,6 +273,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               : Icons.nightlight_round,
                                         ),
                                       ),
+=======
+                                    leading: IconContainer(
+                                      icon: themeProvider.isDarkMode
+                                          ? Icons.wb_sunny
+                                          : Icons.nightlight_round,
+>>>>>>> authentication_2
                                     ),
                                     title: const Text('Change theme'),
                                     trailing: Switch(
@@ -376,7 +386,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onTap: () {
               MyDialogs.showMyEditAnimatedDialog(
                 context: context,
-                title: Constants.aboutMe,
+                title: 'About Me',
                 maxLength: 500,
                 hintText: userModel.aboutMe,
                 textAction: "Change",

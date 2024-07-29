@@ -266,9 +266,10 @@ class FirebaseMethods {
     final userRef =
         usersCollection.doc(uid).collection(collectionName).doc(itemModel.id);
 
-    // we create a new assessment object with updated sharedWith list
+    // we create a new assessment object with updated sharedWith list and group ID
     final updatedAssessment = itemModel.copyWith(
       sharedWith: [...itemModel.sharedWith, groupID],
+      groupID: groupID,
     );
 
     // we perform both operations in parallel
@@ -297,6 +298,7 @@ class FirebaseMethods {
     // we create a new assessment object with updated sharedWith list
     final updatedTool = toolModel.copyWith(
       sharedWith: [...toolModel.sharedWith, groupID],
+      groupID: groupID,
     );
 
     // we perform both operations in parallel
@@ -306,6 +308,52 @@ class FirebaseMethods {
         Constants.sharedWith: FieldValue.arrayUnion([groupID])
       }),
     ]);
+  }
+
+  // get assessment data
+  static Future<AssessmentModel> getAssessmentData({
+    required String groupID,
+    required String assessmentID,
+  }) async {
+    try {
+      DocumentSnapshot docSnapshot = await groupsCollection
+          .doc(groupID)
+          .collection(Constants.assessmentCollection)
+          .doc(assessmentID)
+          .get();
+
+      if (docSnapshot.exists) {
+        return AssessmentModel.fromJson(
+            docSnapshot.data() as Map<String, dynamic>);
+      } else {
+        throw Exception('Document does not exist');
+      }
+    } catch (e) {
+      print('Error fetching item data: $e');
+      rethrow;
+    }
+  }
+
+  // get tool data
+  static Future<ToolModel> getToolData({
+    required String groupID,
+    required String toolID,
+  }) async {
+    try {
+      DocumentSnapshot docSnapshot = await groupsCollection
+          .doc(groupID)
+          .collection(Constants.tools)
+          .doc(toolID)
+          .get();
+      if (docSnapshot.exists) {
+        return ToolModel.fromJson(docSnapshot.data() as Map<String, dynamic>);
+      } else {
+        throw Exception('Document does not exist');
+      }
+    } catch (e) {
+      print('Error fetching item data: $e');
+      rethrow;
+    }
   }
 
   static Future<void> deleteAssessment({
