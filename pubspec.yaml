@@ -83,6 +83,7 @@ dependencies:
   audioplayers: ^6.0.0
   flutter_chat_reactions: ^0.1.0
   board_datetime_picker: ^2.0.0
+  url_launcher: ^6.3.0
 
 
 dev_dependencies:
