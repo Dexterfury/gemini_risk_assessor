@@ -135,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isAnonymous,
                                     ),
                                     // display phone number
-                                    if (isMyProfile)
+                                    if (isMyProfile && !isAnonymous)
                                       FittedBox(
                                         child: Text(
                                             userModel.phone.isNotEmpty
