@@ -31,9 +31,14 @@ class ToolItem extends StatelessWidget {
     String summary = toolModel.summary;
     String imageUrl = toolModel.images[0];
 
-    return Card(
-      color: Theme.of(context).cardColor,
-      elevation: AppTheme.cardElevation,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 0.5,
+          ),
+        ),
+      ),
       child: OpenContainer(
         closedBuilder: (context, action) {
           return groupID.isEmpty

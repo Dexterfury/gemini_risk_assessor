@@ -137,12 +137,12 @@ class _GroupDetailsState extends State<GroupDetails>
           title: 'Group Details',
           leading: const BackButton(),
           actions: [
-            IconButton(
-                onPressed: () async {
-                  await FirebaseMethods.generateAndSaveDummyGroupTool(
-                      groupID, uid, Constants.toolsCollection);
-                },
-                icon: Icon(Icons.add)),
+            // IconButton(
+            //     onPressed: () async {
+            //       await FirebaseMethods.generateAndSaveDummyGroupTool(
+            //           groupID, uid, Constants.toolsCollection);
+            //     },
+            //     icon: Icon(Icons.add)),
             if (isAdmin)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),

@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
     required String phoneNumber,
     required AuthenticationProvider authProvider,
   }) async {
-    Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+    Future.delayed(const Duration(milliseconds: 500)).whenComplete(() {
       // show loading Dialog
       // show my alert dialog for loading
       MyDialogs.showMyAnimatedDialog(

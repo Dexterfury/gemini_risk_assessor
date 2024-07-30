@@ -31,9 +31,14 @@ class ListItem extends StatelessWidget {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final chatProvider = context.read<ChatProvider>();
     final image = data.images.isNotEmpty ? data.images.first : '';
-    return Card(
-      color: Theme.of(context).cardColor,
-      elevation: AppTheme.cardElevation,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 0.5,
+          ),
+        ),
+      ),
       child: OpenContainer(
         closedBuilder: (context, action) {
           return groupID.isEmpty
@@ -104,9 +109,9 @@ class ListItem extends StatelessWidget {
         closedElevation: 0,
         openElevation: 4,
         closedColor: Theme.of(context).cardColor,
-        closedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        // closedShape: RoundedRectangleBorder(
+        //   //borderRadius: BorderRadius.circular(10),
+        // ),
       ),
     );
   }
