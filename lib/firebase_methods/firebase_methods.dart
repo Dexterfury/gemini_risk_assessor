@@ -489,7 +489,7 @@ class FirebaseMethods {
   }
 
   // get group data from firestore
-  static Future<GroupModel> getGroupData({
+  static Future<GroupModel?> getGroupData({
     required String groupID,
   }) async {
     try {
@@ -497,7 +497,7 @@ class FirebaseMethods {
       return GroupModel.fromJson(groupDoc.data()! as Map<String, dynamic>);
     } catch (e) {
       print('Error fetching group data: $e');
-      return GroupModel();
+      return null;
     }
   }
 

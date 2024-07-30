@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ import 'package:gemini_risk_assessor/groups/groups_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -178,12 +181,15 @@ class NotificationItem extends StatelessWidget {
         break;
       case Constants.groupInvitation:
         // get group model and navigate to group details page
-        FirebaseMethods.getGroupData(
+
+        final groupModel = await FirebaseMethods.getGroupData(
           groupID: notification.groupID,
-        ).then((orgModel) {
+        );
+
+        if (groupModel != null) {
           context
               .read<GroupProvider>()
-              .setGroupModel(groupModel: orgModel)
+              .setGroupModel(groupModel: groupModel)
               .whenComplete(() {
             Navigator.push(
               context,
@@ -192,7 +198,9 @@ class NotificationItem extends StatelessWidget {
               ),
             );
           });
-        });
+        } else {
+          showSnackBar(context: context, message: 'This group was deleted');
+        }
 
         break;
       default:

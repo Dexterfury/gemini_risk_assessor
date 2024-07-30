@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -12,17 +11,18 @@ import 'package:provider/provider.dart';
 navigationControler({
   required BuildContext context,
   required RemoteMessage message,
-}) {
+}) async {
   //if (context == null) return;
 
   switch (message.data[Constants.notificationType]) {
     case Constants.groupInvitation:
-      log('getting data for: ${message.data[Constants.groupID]}');
       // navigate to groups tab
       // get group model and navigate to group details page
-      FirebaseMethods.getGroupData(
+      final groupModel = await FirebaseMethods.getGroupData(
         groupID: message.data[Constants.groupID],
-      ).then((groupModel) {
+      );
+
+      if (groupModel != null) {
         context
             .read<GroupProvider>()
             .setGroupModel(groupModel: groupModel)
@@ -34,7 +34,7 @@ navigationControler({
             ),
           );
         });
-      });
+      }
       break;
     case Constants.dstiNotification:
       break;
