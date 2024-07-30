@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,65 +10,169 @@ import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
 import 'package:gemini_risk_assessor/groups/groups_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
-import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class NotificationsStream extends StatelessWidget {
-  const NotificationsStream({
-    super.key,
+class PaginatedNotificationsStream extends StatefulWidget {
+  const PaginatedNotificationsStream({
+    Key? key,
     required this.isAll,
-  });
+  }) : super(key: key);
 
   final bool isAll;
 
   @override
-  Widget build(BuildContext context) {
-    final uid = context.read<AuthenticationProvider>().userModel!.uid;
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseMethods.notificationsStream(
-        userId: uid,
-        isAll: isAll,
-      ),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<QuerySnapshot> snapshot,
-      ) {
-        if (snapshot.hasError) {
-          return const Center(child: Text('Something went wrong'));
-        }
+  _PaginatedNotificationsStreamState createState() =>
+      _PaginatedNotificationsStreamState();
+}
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+class _PaginatedNotificationsStreamState
+    extends State<PaginatedNotificationsStream> {
+  final int _limit = 20;
+  bool _hasMore = true;
+  bool _isLoading = false;
+  List<DocumentSnapshot> _notifications = [];
+  DocumentSnapshot? _lastDocument;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  int _retryCount = 0;
+  static const int _maxRetries = 3;
 
-        if (snapshot.data!.docs.isEmpty) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                'No Notifications',
-                textAlign: TextAlign.center,
-                style: AppTheme.textStyle18w500,
-              ),
-            ),
-          );
+  @override
+  void initState() {
+    super.initState();
+    _getNotifications();
+  }
+
+  Future<void> _getNotifications({bool isRefresh = false}) async {
+    if (!_hasMore && !isRefresh) return;
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final uid = context.read<AuthenticationProvider>().userModel!.uid;
+      QuerySnapshot querySnapshot;
+
+      if (isRefresh) {
+        querySnapshot = await _getQuery(uid).limit(_limit).get();
+        _notifications.clear();
+        _lastDocument = null;
+        _hasMore = true;
+      } else {
+        if (_lastDocument == null) {
+          querySnapshot = await _getQuery(uid).limit(_limit).get();
+        } else {
+          querySnapshot = await _getQuery(uid)
+              .startAfterDocument(_lastDocument!)
+              .limit(_limit)
+              .get();
         }
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            final doc = snapshot.data!.docs[index];
-            final data = doc.data() as Map<String, dynamic>;
-            final notification = NotificationModel.fromJson(data);
-            return NotificationItem(
-              uid: uid,
-              notification: notification,
-            );
-          },
+      }
+
+      if (querySnapshot.docs.length < _limit) {
+        _hasMore = false;
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        _lastDocument = querySnapshot.docs.last;
+        _notifications.addAll(querySnapshot.docs);
+      }
+
+      _retryCount = 0; // Reset retry count on successful fetch
+    } catch (e) {
+      if (_retryCount < _maxRetries) {
+        _retryCount++;
+        await Future.delayed(Duration(seconds: 2 * _retryCount));
+        return _getNotifications(isRefresh: isRefresh);
+      } else {
+        // Show error to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Failed to load notifications. Please try again later.')),
         );
-      },
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        _refreshController.refreshCompleted();
+        _refreshController.loadComplete();
+      }
+    }
+  }
+
+  Query _getQuery(String uid) {
+    if (widget.isAll) {
+      return FirebaseMethods.usersCollection
+          .doc(uid)
+          .collection(Constants.notificationsCollection)
+          .orderBy(Constants.createdAt, descending: true);
+    } else {
+      return FirebaseMethods.usersCollection
+          .doc(uid)
+          .collection(Constants.notificationsCollection)
+          .where(Constants.wasClicked, isEqualTo: false)
+          .orderBy(Constants.createdAt, descending: true);
+    }
+  }
+
+  void _onRefresh() async {
+    await _getNotifications(isRefresh: true);
+  }
+
+  void _onLoading() async {
+    await _getNotifications();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartRefresher(
+      enablePullDown: true,
+      enablePullUp: _hasMore,
+      header: WaterDropHeader(),
+      footer: CustomFooter(
+        builder: (BuildContext context, LoadStatus? mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("pull up load");
+          } else if (mode == LoadStatus.loading) {
+            body = CircularProgressIndicator();
+          } else if (mode == LoadStatus.failed) {
+            body = Text("Load Failed! Click retry!");
+          } else if (mode == LoadStatus.canLoading) {
+            body = Text("release to load more");
+          } else {
+            body = Text("No more Data");
+          }
+          return Container(
+            height: 55.0,
+            child: Center(child: body),
+          );
+        },
+      ),
+      controller: _refreshController,
+      onRefresh: _onRefresh,
+      onLoading: _onLoading,
+      child: ListView.builder(
+        itemCount: _notifications.length,
+        itemBuilder: (context, index) {
+          final doc = _notifications[index];
+          final data = doc.data() as Map<String, dynamic>;
+          final notification = NotificationModel.fromJson(data);
+          return NotificationItem(
+            uid: context.read<AuthenticationProvider>().userModel!.uid,
+            notification: notification,
+          );
+        },
+      ),
     );
   }
 }

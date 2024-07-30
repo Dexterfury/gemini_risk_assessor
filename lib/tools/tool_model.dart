@@ -11,7 +11,6 @@ class ToolModel {
   List<String> images;
   List<String> reactions;
   List<String> sharedWith;
-  int discussions;
   String createdBy;
   String groupID;
   DateTime createdAt;
@@ -25,7 +24,6 @@ class ToolModel {
     required this.images,
     required this.reactions,
     required this.sharedWith,
-    required this.discussions,
     required this.createdBy,
     required this.groupID,
     required this.createdAt,
@@ -53,7 +51,6 @@ class ToolModel {
         images: images,
         reactions: List<String>.from(json[Constants.reactions] ?? []),
         sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
-        discussions: json[Constants.discussions] ?? 0,
         createdBy: creatorID,
         groupID: groupID,
         createdAt: createdAt,
@@ -73,7 +70,6 @@ class ToolModel {
       images: List<String>.from(json[Constants.images] ?? []),
       reactions: List<String>.from(json[Constants.reactions] ?? []),
       sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
-      discussions: json[Constants.discussions] ?? 0,
       createdBy: json[Constants.createdBy] ?? '',
       groupID: json[Constants.groupID] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt]),
@@ -90,7 +86,6 @@ class ToolModel {
       Constants.images: images,
       Constants.reactions: reactions,
       Constants.sharedWith: sharedWith,
-      Constants.discussions: discussions,
       Constants.createdBy: createdBy,
       Constants.groupID: groupID,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
@@ -119,7 +114,6 @@ class ToolModel {
       images: images ?? this.images,
       reactions: reactions ?? this.reactions,
       sharedWith: sharedWith ?? this.sharedWith,
-      discussions: discussions ?? this.discussions,
       createdBy: createdBy ?? this.createdBy,
       groupID: groupID ?? this.groupID,
       createdAt: createdAt ?? this.createdAt,

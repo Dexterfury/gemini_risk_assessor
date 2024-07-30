@@ -217,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     title: 'Help',
                                     icon: Icons.help,
                                     iconContainerColor: Colors.yellow,
-                                    onTap: () {
+                                    onTap: () async {
                                       // navigate to help center
                                       Navigator.push(
                                           context,
@@ -286,7 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     title: isAnonymous ? 'Sign In' : 'Log Out',
                                     icon: Icons.logout_outlined,
                                     iconContainerColor: Colors.red,
-                                    onTap: () {
+                                    onTap: () async {
                                       if (isAnonymous) {
                                         navigationController(
                                           context: context,

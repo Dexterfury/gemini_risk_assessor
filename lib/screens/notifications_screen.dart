@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/firebase_methods/notifications_stream.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({super.key});
+  const NotificationsScreen({Key? key}) : super(key: key);
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -11,6 +11,13 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _isAll = true;
+  Key _paginatedStreamKey = UniqueKey();
+
+  void _resetStream() {
+    setState(() {
+      _paginatedStreamKey = UniqueKey();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +34,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    _isAll
-                        ? null
-                        : setState(() {
-                            _isAll = true;
-                          });
+                    if (!_isAll) {
+                      setState(() {
+                        _isAll = true;
+                      });
+                      _resetStream();
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
@@ -43,11 +51,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    !_isAll
-                        ? null
-                        : setState(() {
-                            _isAll = false;
-                          });
+                    if (_isAll) {
+                      setState(() {
+                        _isAll = false;
+                      });
+                      _resetStream();
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
@@ -61,7 +70,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
       ),
-      body: NotificationsStream(isAll: _isAll),
+      body: PaginatedNotificationsStream(
+        key: _paginatedStreamKey,
+        isAll: _isAll,
+      ),
     );
   }
 }

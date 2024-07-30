@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:animations/animations.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/buttons_row.dart';
@@ -9,6 +10,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/buttons/my_fab_button.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/groups/group_details_card.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
@@ -135,6 +137,12 @@ class _GroupDetailsState extends State<GroupDetails>
           title: 'Group Details',
           leading: const BackButton(),
           actions: [
+            IconButton(
+                onPressed: () async {
+                  await FirebaseMethods.generateAndSaveDummyGroupTool(
+                      groupID, uid, Constants.toolsCollection);
+                },
+                icon: Icon(Icons.add)),
             if (isAdmin)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
