@@ -95,8 +95,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     return FittedBox(
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
             ),
       ),
     );
