@@ -12,12 +12,10 @@ class PpeItem extends StatelessWidget {
 
   final PpeModel ppeItem;
   final bool isAdded;
-  final Function() onTap;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
-    // ? Theme.of(context).colorScheme.primaryContainer
-    //           : Colors.grey[300],
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -26,10 +24,7 @@ class PpeItem extends StatelessWidget {
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).cardColor,
         child: Padding(
-          padding: const EdgeInsets.only(
-            left: 4.0,
-            right: 4.0,
-          ),
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
           child: Stack(
             children: [
               Center(
@@ -40,24 +35,18 @@ class PpeItem extends StatelessWidget {
                     FittedBox(
                       child: Text(
                         ppeItem.label,
-                        style: const TextStyle(
-                          fontSize: 12,
-                        ),
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
                 ),
               ),
-              isAdded
-                  ? const Positioned(
-                      top: 5.0,
-                      right: 5.0,
-                      child: Icon(
-                        Icons.check,
-                        size: 16,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+              if (isAdded && onTap != null)
+                const Positioned(
+                  top: 5.0,
+                  right: 5.0,
+                  child: Icon(Icons.check, size: 16),
+                ),
             ],
           ),
         ),

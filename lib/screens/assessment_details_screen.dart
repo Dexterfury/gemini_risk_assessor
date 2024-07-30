@@ -179,6 +179,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   ? PpeItemsWidget(
                       label: ListHeader.ppe,
                       ppeModelList: ppeList,
+                      isInteractable: currentModel == null,
                     )
                   : const SizedBox.shrink(),
               const SizedBox(height: 10),
@@ -411,36 +412,48 @@ class AssessmentDetailsScreen extends StatelessWidget {
 
   List<PpeModel> getPPEList(
       BuildContext context, AssessmentModel? currentModel) {
-    // Check if we have a current assessment model
     if (currentModel != null) {
-      // Get the full list of PPE icons
       List<PpeModel> allPpeIcons = Constants.getPPEIcons();
-      // Initialize an empty list to store selected PPE items
-      List<PpeModel> selectedPpeList = [];
-
-      // Iterate through each selected PPE label in the current model
-      for (var selectedLabel in currentModel.ppe) {
-        // Find the matching PpeModel in the full list of PPE icons
-        var matchingPpe = allPpeIcons.firstWhere(
-          (ppe) => ppe.label == selectedLabel,
-          // If no match is found, return a default PpeModel
-          orElse: () =>
-              PpeModel(id: 0, label: 'Not Found', icon: const CircleAvatar()),
-        );
-
-        // If a matching PPE item was found (id != 0), add it to the selected list
-        if (matchingPpe.id != 0) {
-          selectedPpeList.add(matchingPpe);
-        }
-      }
-
-      // Return the list of selected PPE items
-      return selectedPpeList;
+      return allPpeIcons
+          .where((ppe) => currentModel.ppe.contains(ppe.label))
+          .toList();
     } else {
-      // If no current model is available, return the default PPE list from the provider
       return context.watch<AssessmentProvider>().ppeModelList;
     }
   }
+
+  // List<PpeModel> getPPEList(
+  //     BuildContext context, AssessmentModel? currentModel) {
+  //   // Check if we have a current assessment model
+  //   if (currentModel != null) {
+  //     // Get the full list of PPE icons
+  //     List<PpeModel> allPpeIcons = Constants.getPPEIcons();
+  //     // Initialize an empty list to store selected PPE items
+  //     List<PpeModel> selectedPpeList = [];
+
+  //     // Iterate through each selected PPE label in the current model
+  //     for (var selectedLabel in currentModel.ppe) {
+  //       // Find the matching PpeModel in the full list of PPE icons
+  //       var matchingPpe = allPpeIcons.firstWhere(
+  //         (ppe) => ppe.label == selectedLabel,
+  //         // If no match is found, return a default PpeModel
+  //         orElse: () =>
+  //             PpeModel(id: 0, label: 'Not Found', icon: const CircleAvatar()),
+  //       );
+
+  //       // If a matching PPE item was found (id != 0), add it to the selected list
+  //       if (matchingPpe.id != 0) {
+  //         selectedPpeList.add(matchingPpe);
+  //       }
+  //     }
+
+  //     // Return the list of selected PPE items
+  //     return selectedPpeList;
+  //   } else {
+  //     // If no current model is available, return the default PPE list from the provider
+  //     return context.watch<AssessmentProvider>().ppeModelList;
+  //   }
+  // }
 }
 
 class DeleteButton extends StatelessWidget {

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_format/date_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -389,6 +390,7 @@ class FirebaseMethods {
     final updatedAssessment = itemModel.copyWith(
       sharedWith: [...itemModel.sharedWith, groupID],
       groupID: groupID,
+      createdAt: DateTime.now(),
     );
 
     // we perform both operations in parallel
@@ -418,6 +420,7 @@ class FirebaseMethods {
     final updatedTool = toolModel.copyWith(
       sharedWith: [...toolModel.sharedWith, groupID],
       groupID: groupID,
+      createdAt: DateTime.now(),
     );
 
     // we perform both operations in parallel
