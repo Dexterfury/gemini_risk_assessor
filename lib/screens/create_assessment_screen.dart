@@ -215,6 +215,8 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
         Future.delayed(const Duration(milliseconds: 500)).whenComplete(action);
       },
       onError: (error) {
+        // pop the loading dialog
+        Navigator.pop(context);
         showSnackBar(
           context: context,
           message: error,

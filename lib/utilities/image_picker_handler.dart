@@ -41,7 +41,6 @@ class ImagePickerHandler {
             completer.complete(null);
           }
         } catch (e) {
-          Navigator.of(context).pop(); // Dismiss loading dialog
           completer.completeError(e);
           log('message: $e');
         }
@@ -62,8 +61,6 @@ class ImagePickerHandler {
         onFail: (String message) {
           onError(message);
         });
-
-    Navigator.of(context).pop(); // Dismiss loading dialog
 
     return filePicked;
   }

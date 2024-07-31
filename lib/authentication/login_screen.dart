@@ -168,6 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
         vertical: 40.0,
       ),
       child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             const SizedBox(height: 50),

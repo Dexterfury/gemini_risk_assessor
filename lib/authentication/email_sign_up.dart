@@ -119,6 +119,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
           vertical: 15,
         ),
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: formKey,
             child: Column(
