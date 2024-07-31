@@ -242,7 +242,7 @@ class ToolsProvider extends ChangeNotifier {
           fromCamera: value,
           onError: (String error) {
             if (context.mounted) {
-              showSnackBar(context: context, message: error);
+              //showSnackBar(context: context, message: error);
             }
           },
         );

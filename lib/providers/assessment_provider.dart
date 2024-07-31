@@ -433,15 +433,18 @@ class AssessmentProvider extends ChangeNotifier {
     required bool fromCamera,
     required Function(String) onError,
   }) async {
+    ImagePickerHandler.showLoadingDialog(context, 'Selecting image...');
     final returnedFiles = await ImagePickerHandler.pickPromptImages(
       fromCamera: fromCamera,
       maxImages: _maxImages,
       onError: (error) {
-        // Dismiss loading dialog
         // return error to onError
         onError(error.toString());
       },
     );
+
+    // pop the loading dialog
+    Navigator.of(context).pop();
     // check if files were selected
     if (returnedFiles != null) {
       // check if taken from camera
@@ -508,7 +511,7 @@ class AssessmentProvider extends ChangeNotifier {
           onError: (String error) {
             log('err $error ');
             if (context.mounted) {
-              showSnackBar(context: context, message: error);
+              //showSnackBar(context: context, message: error);
             }
           },
         );
