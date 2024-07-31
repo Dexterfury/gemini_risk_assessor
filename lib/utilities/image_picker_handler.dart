@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/widgets/image_picker_item.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ImagePickerHandler {
   static Future<File?> showImagePickerDialog({
@@ -19,13 +20,28 @@ class ImagePickerHandler {
       onPressed: (value) async {
         try {
           File? result = await selectImage(
+            context: context,
             fromCamera: value,
             onError: (String error) {
               showSnackBar(context: context, message: error);
             },
           );
-          completer.complete(result);
+
+          if (result != null) {
+            // Show loading dialog before cropping
+            showLoadingDialog(context, 'Preparing to crop...');
+
+            File? croppedFile = await cropImage(
+              context: context,
+              filePath: result.path,
+            );
+
+            completer.complete(croppedFile);
+          } else {
+            completer.complete(null);
+          }
         } catch (e) {
+          Navigator.of(context).pop(); // Dismiss loading dialog
           completer.completeError(e);
           log('message: $e');
         }
@@ -37,6 +53,7 @@ class ImagePickerHandler {
   }
 
   static Future<File?> selectImage({
+    required BuildContext context,
     required bool fromCamera,
     required Function(String) onError,
   }) async {
@@ -46,22 +63,18 @@ class ImagePickerHandler {
           onError(message);
         });
 
-    if (filePicked == null) {
-      return null;
-    }
+    Navigator.of(context).pop(); // Dismiss loading dialog
 
-    // crop image
-    final croppedFile = await cropImage(
-      filePath: filePicked.path,
-    );
-
-    return croppedFile;
+    return filePicked;
   }
 
   static Future<File?> cropImage({
+    required BuildContext context,
     required String filePath,
   }) async {
-    //setfinalFileImage(File(filePath));
+    Navigator.of(context).pop(); // Dismiss previous loading dialog
+    showLoadingDialog(context, 'Cropping image...');
+
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: filePath,
       maxHeight: 800,
@@ -69,10 +82,67 @@ class ImagePickerHandler {
       compressQuality: 90,
     );
 
+    Navigator.of(context).pop(); // Dismiss cropping loading dialog
+
     if (croppedFile != null) {
       return File(croppedFile.path);
     } else {
       return null;
+    }
+  }
+
+  static void showLoadingDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text(message),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<List<XFile>?> pickPromptImages({
+    required bool fromCamera,
+    required int maxImages,
+    required Function(String) onError,
+  }) async {
+    try {
+      // pick image from camera
+      if (fromCamera) {
+        List<XFile> fileImages = [];
+        final takeImage =
+            await ImagePicker().pickImage(source: ImageSource.camera);
+        if (takeImage != null) {
+          fileImages.add(takeImage);
+          return fileImages;
+        } else {
+          return onError('No image taken');
+        }
+      } else {
+        final pickedImages = await ImagePicker().pickMultiImage(
+          maxHeight: 800,
+          maxWidth: 800,
+          imageQuality: 95,
+          limit: maxImages,
+        );
+        if (pickedImages.isNotEmpty) {
+          return pickedImages;
+        } else {
+          onError('No images selected');
+          return [];
+        }
+      }
+    } catch (e) {
+      onError(e.toString());
+      return [];
     }
   }
 

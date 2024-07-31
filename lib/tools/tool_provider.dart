@@ -165,10 +165,11 @@ class ToolsProvider extends ChangeNotifier {
   }
 
   Future<void> selectImages({
+    required BuildContext context,
     required bool fromCamera,
     required Function(String) onError,
   }) async {
-    final returnedFiles = await pickPromptImages(
+    final returnedFiles = await ImagePickerHandler.pickPromptImages(
       fromCamera: fromCamera,
       maxImages: _maxImages,
       onError: (error) {
@@ -180,8 +181,11 @@ class ToolsProvider extends ChangeNotifier {
     if (returnedFiles != null) {
       // check if taken from camera
       if (fromCamera) {
+        // Show loading dialog before cropping image
+        ImagePickerHandler.showLoadingDialog(context, 'Preparing to crop...');
         // this is only one image so crop it
         await cropImage(
+          context: context,
           path: returnedFiles.first.path,
         );
       } else {
@@ -199,14 +203,22 @@ class ToolsProvider extends ChangeNotifier {
 
   // crop image
   Future<void> cropImage({
+    required BuildContext context,
     required String path,
   }) async {
+    // Dismiss the preparing to crop loading dialog
+    Navigator.of(context).pop();
+
+    // show loading dialog before cropping image
+    ImagePickerHandler.showLoadingDialog(context, 'Cropping image...');
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
       compressFormat: ImageCompressFormat.jpg,
       compressQuality: 100,
     );
+
+    Navigator.of(context).pop(); // Dismiss cropping loading dialog
 
     if (croppedFile != null) {
       // add the cropped image into imagesFileList as XFile
@@ -226,6 +238,7 @@ class ToolsProvider extends ChangeNotifier {
       content: 'Choose an Option',
       onPressed: (value) {
         selectImages(
+          context: context,
           fromCamera: value,
           onError: (String error) {
             if (context.mounted) {

@@ -574,9 +574,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<UserCredential?> _signInWithApple({bool link = false}) async {
-    print("Starting _signInWithApple function");
     try {
-      print("Attempting to get Apple ID credential");
       final appleIdCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
@@ -591,27 +589,20 @@ class AuthenticationProvider extends ChangeNotifier {
               )
             : null,
       );
-      print("Successfully obtained Apple ID credential");
-
-      print("Creating OAuth credential");
       final oAuthCredential = OAuthProvider('apple.com');
       final credential = oAuthCredential.credential(
         idToken: appleIdCredential.identityToken,
         accessToken: appleIdCredential.authorizationCode,
       );
-      print("OAuth credential created");
 
       UserCredential userCredential;
       if (link && isUserAnonymous() == true) {
-        print("Linking credential to anonymous user");
         userCredential = await FirebaseAuth.instance.currentUser!
             .linkWithCredential(credential);
       } else {
-        print("Signing in with credential");
         userCredential =
             await FirebaseAuth.instance.signInWithCredential(credential);
       }
-      print("Sign in/link successful");
 
       // Determine the display name
       String displayName;
@@ -622,17 +613,13 @@ class AuthenticationProvider extends ChangeNotifier {
       } else {
         displayName = 'Apple User';
       }
-      print("Display name set to: $displayName");
 
       // Update the user's display name
-      print("Updating user's display name");
       await userCredential.user?.updateDisplayName(displayName);
 
       // Fetch the user again to ensure we have the updated information
-      print("Reloading user data");
       await userCredential.user?.reload();
 
-      print("_signInWithApple function completed successfully");
       return userCredential;
     } on SignInWithAppleAuthorizationException catch (e) {
       log('User cancelled the authorization flow: $e');
@@ -731,8 +718,6 @@ class AuthenticationProvider extends ChangeNotifier {
     required BuildContext context,
     required SignInType signInType,
   }) async {
-    _isLoading = true;
-    notifyListeners();
     bool isAnonymous = isUserAnonymous();
     UserCredential? userCredential;
 

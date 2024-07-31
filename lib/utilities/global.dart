@@ -58,43 +58,6 @@ Future<File?> pickUserImage({
   return fileImage;
 }
 
-Future<List<XFile>?> pickPromptImages({
-  required bool fromCamera,
-  required int maxImages,
-  required Function(String) onError,
-}) async {
-  try {
-    // pick image from camera
-    if (fromCamera) {
-      List<XFile> fileImages = [];
-      final takeImage =
-          await ImagePicker().pickImage(source: ImageSource.camera);
-      if (takeImage != null) {
-        fileImages.add(takeImage);
-        return fileImages;
-      } else {
-        return onError('No image taken');
-      }
-    } else {
-      final pickedImages = await ImagePicker().pickMultiImage(
-        maxHeight: 800,
-        maxWidth: 800,
-        imageQuality: 95,
-        limit: maxImages,
-      );
-      if (pickedImages.isNotEmpty) {
-        return pickedImages;
-      } else {
-        onError('No images selected');
-        return [];
-      }
-    }
-  } catch (e) {
-    onError(e.toString());
-    return [];
-  }
-}
-
 getCollectionRef(GenerationType generationType) {
   if (generationType == GenerationType.tool) {
     return Constants.toolsCollection;

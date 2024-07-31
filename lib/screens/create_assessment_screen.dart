@@ -122,7 +122,12 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
           content: const Text('Are you sure you want to clear all data?'),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(

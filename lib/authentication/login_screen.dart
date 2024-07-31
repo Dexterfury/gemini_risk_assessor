@@ -66,6 +66,16 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (userCredential != null) {
+        // show my alert dialog for loading
+        MyDialogs.showMyAnimatedDialog(
+          context: context,
+          title: 'Authenticating...',
+          loadingIndicator: const SizedBox(
+            height: 100,
+            width: 100,
+            child: LoadingPPEIcons(),
+          ),
+        );
         // Handle successful authentication
         bool userExists = await authProvider.checkUserExistsInFirestore();
         bool wasAnonymous = authProvider.isUserAnonymous();
@@ -78,12 +88,14 @@ class _LoginScreenState extends State<LoginScreen> {
           await userCredential.user?.reload();
           final updatedUser = FirebaseAuth.instance.currentUser;
 
-          log('displayName: ${updatedUser?.displayName}');
           await authProvider.createAndSaveNewUser(
             updatedUser!,
             wasAnonymous,
           );
         }
+
+        // pop the loading dialog
+        Navigator.pop(context);
         Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
           // Navigate to the main screen
           Navigator.pushNamedAndRemoveUntil(
@@ -94,14 +106,10 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } on FirebaseAuthException catch (e) {
-      authProvider.setLoading(false);
-      log('FirebaseAuthException: ${e.code} - ${e.message}');
       Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
         FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
       });
     } catch (e) {
-      authProvider.setLoading(false);
-      log('error signing: ${e.toString()}');
       Future.delayed(const Duration(milliseconds: 200), () {
         showSnackBar(
             context: context, message: 'An unexpected error occurred: $e');
