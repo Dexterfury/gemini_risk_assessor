@@ -1,4 +1,6 @@
 // weather enum
+import 'package:gemini_risk_assessor/constants.dart';
+
 enum Weather {
   sunny,
   rain,
@@ -33,17 +35,15 @@ enum ListHeader {
 // generationType
 enum GenerationType {
   tool,
-  dsti,
   riskAssessment,
 }
 
 GenerationType getGenerationTypeFromString(String typeString) {
-  final typeMap = {
-    'assessments': GenerationType.riskAssessment,
-    'dsti': GenerationType.dsti,
-  };
-  return typeMap[typeString] ??
-      GenerationType.tool; // Default to tool if not found
+  if (typeString == Constants.assessmentCollection) {
+    return GenerationType.riskAssessment;
+  } else {
+    return GenerationType.tool;
+  }
 }
 
 // user Type enum

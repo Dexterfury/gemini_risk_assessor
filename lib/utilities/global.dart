@@ -61,10 +61,8 @@ Future<File?> pickUserImage({
 getCollectionRef(GenerationType generationType) {
   if (generationType == GenerationType.tool) {
     return Constants.toolsCollection;
-  } else if (generationType == GenerationType.riskAssessment) {
+  } else {
     return Constants.assessmentCollection;
-  } else if (generationType == GenerationType.dsti) {
-    return Constants.dstiCollections;
   }
 }
 
@@ -81,14 +79,6 @@ Center buildDateTime(groupedByValue) {
       ),
     ),
   );
-}
-
-getGenerationType(String appBarTitle) {
-  if (appBarTitle == Constants.dailySafetyTaskInstructions) {
-    return GenerationType.dsti;
-  } else {
-    return GenerationType.riskAssessment;
-  }
 }
 
 Widget messageToShow({

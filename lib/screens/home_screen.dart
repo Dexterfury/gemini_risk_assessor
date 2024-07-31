@@ -6,7 +6,6 @@ import 'package:gemini_risk_assessor/authentication/authentication_provider.dart
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
-import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
@@ -28,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChange);
     requestNotificationPermissions();
     NotificationServices.createNotificationChannelAndInitialize();
@@ -83,16 +82,12 @@ class _HomeScreenState extends State<HomeScreen>
   List<Tab> _buildTabs() {
     return const [
       Tab(
-        icon: Icon(Icons.assignment_add),
-        text: Constants.dailyTaskInstructions,
-      ),
-      Tab(
         icon: Icon(Icons.assignment_late_outlined),
         text: Constants.riskAssessments,
       ),
       Tab(
         icon: Icon(Icons.handyman),
-        text: Constants.tools,
+        text: Constants.toolsExplainer,
       ),
     ];
   }
@@ -194,9 +189,8 @@ class _HomeScreenState extends State<HomeScreen>
           body: TabBarView(
             controller: _tabController,
             children: [
-              _buildTabContent(tabProvider, 0, const DSTIScreen()),
-              _buildTabContent(tabProvider, 1, const RiskAssessmentsScreen()),
-              _buildTabContent(tabProvider, 2, const ToolsScreen()),
+              _buildTabContent(tabProvider, 0, const RiskAssessmentsScreen()),
+              _buildTabContent(tabProvider, 1, const ToolsScreen()),
             ],
           ),
         );

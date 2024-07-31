@@ -98,7 +98,7 @@ class AssessmentProvider extends ChangeNotifier {
       final creatorName = await getCreatorName(assessment.createdBy);
 
       // Check if the PDF already exists
-      final folderName = Constants.getFolderName(pdfHeading);
+      final folderName = 'RiskAssessments';
       final directory = await getApplicationDocumentsDirectory();
       final dirPath = path.join(directory.path, folderName);
       final fileName = '${assessment.id}.pdf';
@@ -165,7 +165,7 @@ class AssessmentProvider extends ChangeNotifier {
   Future<void> saveDataToFirestore() async {
     final id = _groupID.isNotEmpty ? _groupID : _uid;
     // get folder directory
-    final folderName = Constants.getFolderName(_pdfHeading);
+    final folderName = 'RiskAssessments';
 
     if (_assessmentModel.images.isNotEmpty) {
       List<String> imagesUrls = [];
@@ -182,42 +182,22 @@ class AssessmentProvider extends ChangeNotifier {
     }
 
     if (_groupID.isEmpty) {
-      if (_pdfHeading == Constants.riskAssessment) {
-        // save to user's database
-        await _usersCollection
-            .doc(id)
-            .collection(Constants.assessmentCollection)
-            .doc(assessmentModel.id)
-            .set(assessmentModel.toJson());
-        // save to user's database end.
-      } else {
-        // save to user's database
-        await _usersCollection
-            .doc(id)
-            .collection(Constants.dstiCollections)
-            .doc(assessmentModel.id)
-            .set(assessmentModel.toJson());
-        // save to user's database end.
-      }
+      // save to user's database
+      await _usersCollection
+          .doc(id)
+          .collection(Constants.assessmentCollection)
+          .doc(assessmentModel.id)
+          .set(assessmentModel.toJson());
     } else {
       // add groupID
       assessmentModel.groupID = _groupID;
 
-      if (_pdfHeading == Constants.riskAssessment) {
-        // save to group's database
-        await _groupsCollection
-            .doc(_groupID)
-            .collection(Constants.assessmentCollection)
-            .doc(assessmentModel.id)
-            .set(assessmentModel.toJson());
-      } else {
-        // save to group's database
-        await _groupsCollection
-            .doc(_groupID)
-            .collection(Constants.dstiCollections)
-            .doc(assessmentModel.id)
-            .set(assessmentModel.toJson());
-      }
+      // save to group's database
+      await _groupsCollection
+          .doc(_groupID)
+          .collection(Constants.assessmentCollection)
+          .doc(assessmentModel.id)
+          .set(assessmentModel.toJson());
     }
 
     notifyListeners();

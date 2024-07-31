@@ -23,22 +23,6 @@ class MyFabButton extends StatelessWidget {
     return CustomFloatingActionBubble(
       items: [
         Bubble(
-          title: "Tools Explainer",
-          iconColor: Colors.white,
-          bubbleColor: AppTheme.getFabBtnTheme(context),
-          icon: Icons.handyman,
-          titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
-          onPress: () {
-            _animationController.reverse();
-            navigationController(
-              context: context,
-              route: Constants.createToolRoute,
-              titleArg: Constants.toolExplainer,
-              groupArg: groupID,
-            );
-          },
-        ),
-        Bubble(
           title: "Risk Assessment",
           iconColor: Colors.white,
           bubbleColor: AppTheme.getFabBtnTheme(context),
@@ -55,18 +39,17 @@ class MyFabButton extends StatelessWidget {
           },
         ),
         Bubble(
-          title: "Daily Safety Tasks Instructions",
+          title: "Tools Explainer",
           iconColor: Colors.white,
           bubbleColor: AppTheme.getFabBtnTheme(context),
-          icon: Icons.assignment_add,
+          icon: Icons.handyman,
           titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
           onPress: () {
             _animationController.reverse();
-            //context.read<AssessmentProvider>().emptyAssessmentModel();
             navigationController(
               context: context,
-              route: Constants.createAssessmentRoute,
-              titleArg: Constants.createDsti,
+              route: Constants.createToolRoute,
+              titleArg: Constants.toolsExplainer,
               groupArg: groupID,
             );
           },

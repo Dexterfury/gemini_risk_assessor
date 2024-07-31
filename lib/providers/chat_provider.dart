@@ -331,10 +331,7 @@ class ChatProvider extends ChangeNotifier {
 
   String _getAIFirstMessage(GenerationType generationType) {
     if (_currentAssessment != null) {
-      final docType = generationType == GenerationType.dsti
-          ? 'daily safety task instruction'
-          : 'risk assessment';
-      return "Hello! I'm here to discuss the $docType titled '${_currentAssessment!.title}'. I have information about the task, equipment, hazards, risks, control measures, and more. Feel free to ask any questions related to this specific $docType.";
+      return "Hello! I'm here to discuss the risk assessment titled '${_currentAssessment!.title}'. I have information about the task, equipment, hazards, risks, control measures, and more. Feel free to ask any questions related to this specific risk assessment.";
     } else if (_toolModel != null) {
       return "Hello! I'm here to discuss the tool '${_toolModel!.title}'. I can provide information on how to use this tool, give practical use case examples, and offer guidance on its safe and effective use. Please feel free to ask any questions related to this specific tool.";
     } else {
@@ -689,14 +686,11 @@ class ChatProvider extends ChangeNotifier {
     GenerationType? generationType,
   }) async {
     if (assessment != null) {
-      String docType = generationType == GenerationType.dsti
-          ? 'daily safety task instruction'
-          : 'risk assessment';
       _currentAssessment = assessment;
       _toolModel = null;
 
       final contextPrompt = '''
-You are a Safety officer discussing a specific $docType. Here are the details:
+You are a Safety officer discussing a specific 'risk assessment'. Here are the details:
 
 Title: ${assessment.title}
 Task to Achieve: ${assessment.taskToAchieve}
@@ -708,7 +702,7 @@ PPE: ${assessment.ppe.join(', ')}
 Weather: ${assessment.weather}
 Summary: ${assessment.summary}
 
-Only answer questions related to this specific $docType. If asked about something unrelated, politely remind the user that you can only discuss this particular $docType.
+Only answer questions related to this specific 'risk assessment'. If asked about something unrelated, politely remind the user that you can only discuss this particular 'risk assessment'.
 ''';
 
       _historyMessages = [Content.text(contextPrompt)];

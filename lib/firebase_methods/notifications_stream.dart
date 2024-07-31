@@ -6,7 +6,6 @@ import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/notification_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
-import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
 import 'package:gemini_risk_assessor/groups/groups_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
@@ -251,16 +250,6 @@ class NotificationItem extends StatelessWidget {
     NotificationModel notification,
   ) async {
     switch (notification.notificationType) {
-      case Constants.dstiCollections:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DSTIScreen(
-              groupID: notification.groupID,
-            ),
-          ),
-        );
-        break;
       case Constants.assessmentNotification:
         Navigator.push(
           context,

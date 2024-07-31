@@ -1,7 +1,5 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:date_format/date_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_risk_assessor/constants.dart';
@@ -9,11 +7,9 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
-import 'package:gemini_risk_assessor/models/notification_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:uuid/uuid.dart';
 
 class FirebaseMethods {
   static final FirebaseAuth auth = FirebaseAuth.instance;
@@ -86,71 +82,6 @@ class FirebaseMethods {
       return usersCollection
           .doc(userId)
           .collection(Constants.toolsCollection)
-          .orderBy(Constants.createdAt, descending: true);
-    }
-  }
-
-  // stream dsti's from firestore
-  static Stream<QuerySnapshot> dstiStream({
-    required String userId,
-    required String groupID,
-  }) {
-    if (groupID.isNotEmpty) {
-      return groupsCollection
-          .doc(groupID)
-          .collection(Constants.dstiCollections)
-          .orderBy(
-            Constants.createdAt,
-            descending: true,
-          )
-          .snapshots();
-    } else {
-      return usersCollection
-          .doc(userId)
-          .collection(Constants.dstiCollections)
-          .orderBy(
-            Constants.createdAt,
-            descending: true,
-          )
-          .snapshots();
-    }
-  }
-
-  static Stream<QuerySnapshot> paginatedDstiStream({
-    required String userId,
-    required String groupID,
-    required int limit,
-  }) {
-    if (groupID.isNotEmpty) {
-      return groupsCollection
-          .doc(groupID)
-          .collection(Constants.dstiCollections)
-          .orderBy(Constants.createdAt, descending: true)
-          .limit(limit)
-          .snapshots();
-    } else {
-      return usersCollection
-          .doc(userId)
-          .collection(Constants.dstiCollections)
-          .orderBy(Constants.createdAt, descending: true)
-          .limit(limit)
-          .snapshots();
-    }
-  }
-
-  static Query dstiQuery({
-    required String userId,
-    required String groupID,
-  }) {
-    if (groupID.isNotEmpty) {
-      return groupsCollection
-          .doc(groupID)
-          .collection(Constants.dstiCollections)
-          .orderBy(Constants.createdAt, descending: true);
-    } else {
-      return usersCollection
-          .doc(userId)
-          .collection(Constants.dstiCollections)
           .orderBy(Constants.createdAt, descending: true);
     }
   }
@@ -262,35 +193,6 @@ class FirebaseMethods {
     }
   }
 
-  // check if the group has any assessments, dsti or tools saved in firestore
-  static Future<Map<String, bool>> checkGroupData(
-      {required String groupID}) async {
-    final orgRef = groupsCollection.doc(groupID);
-
-    Map<String, bool> results = {
-      Constants.hasAssessments: false,
-      Constants.hasDSTI: false,
-      Constants.hasTools: false,
-    };
-
-    // Check for assessments
-    final assessmentsQuery =
-        await orgRef.collection(Constants.assessmentCollection).limit(1).get();
-    results[Constants.hasAssessments] = assessmentsQuery.docs.isNotEmpty;
-
-    // Check for DSTI
-    final dstiQuery =
-        await orgRef.collection(Constants.dstiCollections).limit(1).get();
-    results[Constants.hasDSTI] = dstiQuery.docs.isNotEmpty;
-
-    // Check for tools
-    final toolsQuery =
-        await orgRef.collection(Constants.toolsCollection).limit(1).get();
-    results[Constants.hasTools] = toolsQuery.docs.isNotEmpty;
-
-    return results;
-  }
-
   // stream notifications from firestore
   static Stream<QuerySnapshot> notificationsStream({
     required String userId,
@@ -374,17 +276,15 @@ class FirebaseMethods {
     required String uid,
     required AssessmentModel itemModel,
     required String groupID,
-    required bool isDSTI,
   }) async {
-    // we get the database referrence for the group and the user
-    final String collectionName =
-        isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
     final orgRef = groupsCollection
         .doc(groupID)
-        .collection(collectionName)
+        .collection(Constants.assessmentCollection)
         .doc(itemModel.id);
-    final userRef =
-        usersCollection.doc(uid).collection(collectionName).doc(itemModel.id);
+    final userRef = usersCollection
+        .doc(uid)
+        .collection(Constants.assessmentCollection)
+        .doc(itemModel.id);
 
     // we create a new assessment object with updated sharedWith list and group ID
     final updatedAssessment = itemModel.copyWith(
@@ -411,10 +311,12 @@ class FirebaseMethods {
     // we get the database referrence for the group and the user
     final orgRef = groupsCollection
         .doc(groupID)
-        .collection(Constants.tools)
+        .collection(Constants.toolsCollection)
         .doc(toolModel.id);
-    final userRef =
-        usersCollection.doc(uid).collection(Constants.tools).doc(toolModel.id);
+    final userRef = usersCollection
+        .doc(uid)
+        .collection(Constants.toolsCollection)
+        .doc(toolModel.id);
 
     // we create a new assessment object with updated sharedWith list
     final updatedTool = toolModel.copyWith(
@@ -464,7 +366,7 @@ class FirebaseMethods {
     try {
       DocumentSnapshot docSnapshot = await groupsCollection
           .doc(groupID)
-          .collection(Constants.tools)
+          .collection(Constants.toolsCollection)
           .doc(toolID)
           .get();
       if (docSnapshot.exists) {
@@ -480,15 +382,12 @@ class FirebaseMethods {
 
   static Future<void> deleteAssessment({
     required String docID,
-    required bool isDSTI,
     required String ownerID,
     required String groupID,
     required AssessmentModel assessment,
     required Function() onSuccess,
     required Function(String) onError,
   }) async {
-    final String collectionName =
-        isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
     final String rootCollection = groupID.isNotEmpty
         ? Constants.groupsCollection
         : Constants.usersCollection;
@@ -497,7 +396,7 @@ class FirebaseMethods {
       final docRef = firestore
           .collection(rootCollection)
           .doc(ownerID)
-          .collection(collectionName)
+          .collection(Constants.assessmentCollection)
           .doc(docID);
 
       // Start a batch write
@@ -508,7 +407,7 @@ class FirebaseMethods {
         if (assessment.sharedWith.contains(ownerID)) {
           final userRef = usersCollection
               .doc(assessment.createdBy)
-              .collection(collectionName)
+              .collection(Constants.assessmentCollection)
               .doc(groupID);
           batch.update(userRef, {
             Constants.sharedWith: FieldValue.arrayRemove([groupID])
@@ -709,160 +608,5 @@ class FirebaseMethods {
         .collection(Constants.chatMessagesCollection)
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
-  }
-
-  // generate and save dummy data
-  static Future<void> generateAndSaveDummyData(String userID) async {
-    // Generate 30 dummy notifications
-    for (int index = 0; index < 30; index++) {
-      NotificationModel notification = NotificationModel(
-        creatorUID: 'creatorUID_$index',
-        recieverUID: userID,
-        groupID: 'groupID_$index',
-        notificationID: '', // This will be set after adding to Firestore
-        title: 'Notification Title $index',
-        description: 'This is the description for notification $index.',
-        imageUrl: '',
-        aboutGroup: 'This is about group $index.',
-        notificationType: 'type_$index',
-        groupTerms: 'Group terms $index',
-        wasClicked: false,
-        createdAt: DateTime.now().subtract(Duration(days: index)),
-        notificationDate: DateTime.now().add(Duration(days: index)),
-      );
-
-      // Add the notification to Firestore and get the generated ID
-      DocumentReference docRef = await usersCollection
-          .doc(userID)
-          .collection(Constants.notificationsCollection)
-          .add(notification.toJson());
-
-      // Set the notificationID with the generated ID
-      await docRef.update({
-        Constants.notificationID: docRef.id,
-        Constants.createdAt: FieldValue.serverTimestamp(),
-        Constants.notificationDate: FieldValue.serverTimestamp(),
-      });
-    }
-  }
-
-  static Future<void> generateAndSaveDummyAssessments(
-      String userID, String collection) async {
-    const String dummyImageUrl =
-        'https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FDstis%2F83ungGQsAdMMMbyyBq5ep7Z3a4O2%2F2024-07-15T16:18:55.171771.jpg?alt=media&token=8cec7552-a3ee-4bec-980a-0ff6eea2cd2c';
-
-    // Create an instance of Uuid
-    var uuid = Uuid();
-
-    // Generate 30 dummy assessments
-    for (int index = 0; index < 30; index++) {
-      String dstiID = uuid.v4(); // Generate unique ID for each assessment
-
-      AssessmentModel assessment = AssessmentModel(
-        id: dstiID,
-        title: 'Assessment Title $index',
-        taskToAchieve: 'Task to achieve $index',
-        images: [dummyImageUrl],
-        equipments: ['Equipment 1', 'Equipment 2'],
-        hazards: ['Hazard 1', 'Hazard 2'],
-        risks: ['Risk 1', 'Risk 2'],
-        ppe: ['PPE 1', 'PPE 2'],
-        control: ['Control 1', 'Control 2'],
-        reactions: ['Reaction 1', 'Reaction 2'],
-        sharedWith: ['user1', 'user2'],
-        weather: 'Sunny',
-        summary: 'This is the summary of assessment $index',
-        createdBy: userID,
-        groupID: '',
-        createdAt: DateTime.now(),
-      );
-
-      // Add the assessment to Firestore
-      await usersCollection
-          .doc(userID)
-          .collection(collection)
-          .doc(dstiID)
-          .set(assessment.toJson());
-    }
-  }
-
-  static Future<void> generateAndSaveDummyGroupAssessments(
-    String groupID,
-    String userID,
-    String collection,
-  ) async {
-    const String dummyImageUrl =
-        'https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FDstis%2F83ungGQsAdMMMbyyBq5ep7Z3a4O2%2F2024-07-15T16:18:55.171771.jpg?alt=media&token=8cec7552-a3ee-4bec-980a-0ff6eea2cd2c';
-
-    // Create an instance of Uuid
-    var uuid = Uuid();
-
-    // Generate 30 dummy assessments
-    for (int index = 0; index < 30; index++) {
-      String dstiID = uuid.v4(); // Generate unique ID for each assessment
-
-      AssessmentModel assessment = AssessmentModel(
-        id: dstiID,
-        title: 'Assessment Title $index',
-        taskToAchieve: 'Task to achieve $index',
-        images: [dummyImageUrl],
-        equipments: ['Equipment 1', 'Equipment 2'],
-        hazards: ['Hazard 1', 'Hazard 2'],
-        risks: ['Risk 1', 'Risk 2'],
-        ppe: ['PPE 1', 'PPE 2'],
-        control: ['Control 1', 'Control 2'],
-        reactions: ['Reaction 1', 'Reaction 2'],
-        sharedWith: ['user1', 'user2'],
-        weather: 'Sunny',
-        summary: 'This is the summary of assessment $index',
-        createdBy: userID,
-        groupID: groupID,
-        createdAt: DateTime.now(),
-      );
-
-      // Add the assessment to Firestore
-      await groupsCollection
-          .doc(groupID)
-          .collection(collection)
-          .doc(dstiID)
-          .set(assessment.toJson());
-    }
-  }
-
-  static Future<void> generateAndSaveDummyGroupTool(
-    String groupID,
-    String userID,
-    String collection,
-  ) async {
-    const String dummyImageUrl =
-        'https://firebasestorage.googleapis.com/v0/b/gemini-risk-assessor.appspot.com/o/images%2FDstis%2F83ungGQsAdMMMbyyBq5ep7Z3a4O2%2F2024-07-15T16:18:55.171771.jpg?alt=media&token=8cec7552-a3ee-4bec-980a-0ff6eea2cd2c';
-
-    // Create an instance of Uuid
-    var uuid = Uuid();
-
-    // Generate 30 dummy assessments
-    for (int index = 0; index < 30; index++) {
-      String toolID = uuid.v4(); // Generate unique ID for each assessment
-
-      ToolModel tool = ToolModel(
-        id: toolID,
-        title: 'Tool Title $index',
-        description: 'Tool Description $index',
-        summary: 'Tool summary $index',
-        images: [dummyImageUrl],
-        reactions: [],
-        sharedWith: [],
-        createdBy: userID,
-        groupID: groupID,
-        createdAt: DateTime.now(),
-      );
-
-      // Add the assessment to Firestore
-      await groupsCollection
-          .doc(groupID)
-          .collection(collection)
-          .doc(toolID)
-          .set(tool.toJson());
-    }
   }
 }

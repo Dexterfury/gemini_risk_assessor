@@ -217,8 +217,7 @@ class _ChatScreenState extends State<ChatScreen> {
     AssessmentModel? assesmentModel,
     ToolModel? toolModel,
   ) {
-    if (generationType == GenerationType.riskAssessment ||
-        generationType == GenerationType.dsti) {
+    if (generationType == GenerationType.riskAssessment) {
       return assesmentModel!.id;
     } else {
       return toolModel!.id;

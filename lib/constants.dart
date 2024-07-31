@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/help/ai_tips_help_details.dart';
-import 'package:gemini_risk_assessor/help/dsti_help_details.dart';
 import 'package:gemini_risk_assessor/help/help_item.dart';
-import 'package:gemini_risk_assessor/help/navigation_help_details.dart';
 import 'package:gemini_risk_assessor/help/group_help_details.dart';
 import 'package:gemini_risk_assessor/help/risk_assessment_help_details.dart';
 import 'package:gemini_risk_assessor/help/tools_help_details.dart';
@@ -19,29 +17,18 @@ class Constants {
   // risk assessment
   static const String riskAssessment = 'Risk Assessment';
 
-  // daily safety task instructions
-  static const String dailySafetyTaskInstructions =
-      'Daily Safety Task Instructions';
-
-  // tools
-  static const String tools = 'Tools';
-
   static const String nearMisses = 'Near Misses';
-
-  // daily task instructions
-  static const String dailyTaskInstructions = 'Daily Safety Task Instructions';
 
   // search
   static const String search = 'Search';
 
   // create assessment
   static const String createAssessment = 'New Assessment';
-  static const String createDsti = 'New DSTI';
-  static const String toolExplainer = 'Tool Explainer';
+  static const String toolsExplainer = 'Tools Explainer';
 
-  static getFolderName(String heading) {
-    return heading == riskAssessment ? 'RiskAssessments' : 'Dstis';
-  }
+  // static getFolderName(String heading) {
+  //   return heading == riskAssessment ? 'RiskAssessments' : 'Dstis';
+  // }
 
   // image cache manager keys
   static const String userImageKey = 'userImageKey';
@@ -163,7 +150,6 @@ class Constants {
   static const String assessmentCollection = 'assessments';
   static const String groupsCollection = 'groups';
   static const String toolsCollection = 'tools';
-  static const String dstiCollections = 'dsti';
   static const String chatMessagesCollection = 'chatMessages';
   static const String notificationsCollection = 'notifications';
   static const String nearMissesCollection = 'nearMisses';
@@ -220,7 +206,6 @@ class Constants {
   static const String shouldSpeak = 'ShouldSpeak';
 
   static const String hasAssessments = 'hasAssessments';
-  static const String hasDSTI = 'hasDSTI';
   static const String hasTools = 'hasTools';
 
   // notification constants
@@ -231,7 +216,6 @@ class Constants {
 
   // notification types
   static const String notificationID = 'notificationID';
-  static const String dstiNotification = 'DSTI_NOTIFICATION';
   static const String assessmentNotification = 'ASSESSMENT_NOTIFICATION';
   static const String toolsNotification = 'TOOLS_NOTIFICATION';
   static const String groupInvitation = 'GROUP_INVITATION';
@@ -250,13 +234,13 @@ class Constants {
   // default description
   static const String defaultDescription = 'Group Description';
 
-  static String getDoctTitle(String docTitle) {
-    if (docTitle == createAssessment) {
-      return riskAssessment;
-    } else {
-      return dailySafetyTaskInstructions;
-    }
-  }
+  // static String getDoctTitle(String docTitle) {
+  //   if (docTitle == createAssessment) {
+  //     return riskAssessment;
+  //   } else {
+  //     return dailySafetyTaskInstructions;
+  //   }
+  // }
 
   // list of ppe icons
   static List<PpeModel> getPPEIcons({
@@ -312,11 +296,6 @@ class Constants {
 
   // helper items
   static final List<HelpItem> helpItems = [
-    HelpItem(
-      title: 'Creating a DSTI',
-      description: 'Learn how to create a Daily Safety Task Instruction',
-      detailScreen: const DstiHelpDetails(),
-    ),
     HelpItem(
       title: 'Risk Assessments',
       description: 'Understanding and creating Risk Assessments',

@@ -272,7 +272,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
       appBar: widget.groupID.isNotEmpty
           ? const MyAppBar(
               leading: BackButton(),
-              title: Constants.tools,
+              title: Constants.toolsExplainer,
             )
           : null,
       body: const Center(
@@ -325,7 +325,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
       leading: const BackButton(),
       title: const FittedBox(
         child: Text(
-          Constants.tools,
+          Constants.toolsExplainer,
         ),
       ),
       pinned: true,

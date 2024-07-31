@@ -38,7 +38,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     final groupID = args[Constants.groupArg] as String;
     final assessmentProvider = context.watch<AssessmentProvider>();
 
-    final String docTitle = Constants.getDoctTitle(title);
+    final String docTitle = Constants.riskAssessment;
 
     return Scaffold(
       appBar: AppBar(

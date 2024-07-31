@@ -1,14 +1,13 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/chat_discussion_screen.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
-import 'package:gemini_risk_assessor/themes/app_theme.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/groups/group_list_tile.dart';
 import 'package:gemini_risk_assessor/widgets/my_list_tile.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +26,8 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // get generationType
-    final generationType = getGenerationType(docTitle);
+    final generationType = GenerationType.riskAssessment;
+    ;
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final chatProvider = context.read<ChatProvider>();
     final image = data.images.isNotEmpty ? data.images.first : '';

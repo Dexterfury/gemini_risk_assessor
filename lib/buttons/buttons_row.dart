@@ -2,7 +2,6 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/screens/dsti_screen.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_misses_screen.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
@@ -26,49 +25,37 @@ class ButtonsRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: IntrinsicHeight(
-        child: FittedBox(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              buildButton(
-                Icons.assignment_add,
-                groupID,
-                'DSTI',
-                isAdmin,
-                isMember,
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              buildButton(
-                Icons.assignment_late_outlined,
-                groupID,
-                'Assessments',
-                isAdmin,
-                isMember,
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              buildButton(
-                Icons.handyman,
-                groupID,
-                Constants.tools,
-                isAdmin,
-                isMember,
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              buildButton(
-                FontAwesomeIcons.circleExclamation,
-                groupID,
-                Constants.nearMisses,
-                isAdmin,
-                isMember,
-              ),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            buildButton(
+              Icons.assignment_late_outlined,
+              groupID,
+              'Assessments',
+              isAdmin,
+              isMember,
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            buildButton(
+              Icons.handyman,
+              groupID,
+              Constants.toolsExplainer,
+              isAdmin,
+              isMember,
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            buildButton(
+              FontAwesomeIcons.circleExclamation,
+              groupID,
+              Constants.nearMisses,
+              isAdmin,
+              isMember,
+            ),
+          ],
         ),
       ),
     );
@@ -137,8 +124,7 @@ Widget buildButton(
     },
     transitionType: ContainerTransitionType.fadeThrough,
     transitionDuration: const Duration(milliseconds: 500),
-    closedShape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
     closedElevation: AppTheme.cardElevation,
     openElevation: 4,
   );
@@ -150,10 +136,6 @@ Widget _navigateToScreen(
   bool isAdmin,
 ) {
   switch (icon) {
-    case Icons.assignment_add:
-      return DSTIScreen(
-        groupID: orgID,
-      );
     case Icons.assignment_late_outlined:
       return RiskAssessmentsScreen(groupID: orgID);
     case Icons.handyman:

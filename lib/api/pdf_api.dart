@@ -660,7 +660,7 @@ class PdfApi {
     String heading,
     String pdfName,
   ) async {
-    final folderName = Constants.getFolderName(heading);
+    final folderName = 'RiskAssessments';
     // Get the path to the document directory
     final path = await getApplicationDocumentsDirectory();
     final dirPath = '${path.path}/$folderName';

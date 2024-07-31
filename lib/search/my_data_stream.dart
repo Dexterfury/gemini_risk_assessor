@@ -145,11 +145,6 @@ class MyDataStream extends StatelessWidget {
     GenerationType generationType,
   ) {
     switch (generationType) {
-      case GenerationType.dsti:
-        return FirebaseMethods.dstiStream(
-          userId: uid,
-          groupID: groupID,
-        );
       case GenerationType.riskAssessment:
         return FirebaseMethods.ristAssessmentsStream(
           userId: uid,
@@ -161,7 +156,7 @@ class MyDataStream extends StatelessWidget {
           groupID: groupID,
         );
       default:
-        return FirebaseMethods.dstiStream(
+        return FirebaseMethods.ristAssessmentsStream(
           userId: uid,
           groupID: groupID,
         );
@@ -173,26 +168,20 @@ class MyDataStream extends StatelessWidget {
     GenerationType generationType,
   ) {
     switch (generationType) {
-      case GenerationType.dsti:
-        return tabProvider.dstiSearchQuery;
       case GenerationType.riskAssessment:
         return tabProvider.assessmentSearchQuery;
       case GenerationType.tool:
         return tabProvider.toolsSearchQuery;
       default:
-        return tabProvider.dstiSearchQuery;
+        return tabProvider.assessmentSearchQuery;
     }
   }
 
   getAppBarTitle(GenerationType generationType) {
-    if (generationType == GenerationType.dsti) {
-      return Constants.dailySafetyTaskInstructions;
-    }
     if (generationType == GenerationType.riskAssessment) {
       return Constants.riskAssessment;
-    }
-    if (generationType == GenerationType.tool) {
-      return Constants.tools;
+    } else {
+      return Constants.toolsExplainer;
     }
   }
 }

@@ -109,7 +109,6 @@ class _ShareScreenState extends State<ShareScreen> {
         uid: uid,
         itemModel: widget.itemModel!,
         groupID: groupModel.groupID,
-        isDSTI: widget.generationType == GenerationType.dsti,
       ).whenComplete(() {
         showSnackBar(
           context: context,

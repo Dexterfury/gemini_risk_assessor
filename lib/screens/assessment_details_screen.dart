@@ -72,7 +72,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
     final id = assessmentModel.id;
 
     // get generationType
-    final generationType = getGenerationType(appBarTitle);
+    final generationType = GenerationType.riskAssessment;
 
     // ppe list
     final ppeList = getPPEList(
@@ -472,7 +472,6 @@ class DeleteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDSTI = generationType == GenerationType.dsti;
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     Widget buttonWidget() {
       if (groupID.isEmpty) {
@@ -495,7 +494,6 @@ class DeleteButton extends StatelessWidget {
 
             await FirebaseMethods.deleteAssessment(
               docID: assessment.id,
-              isDSTI: isDSTI,
               ownerID: uid,
               groupID: groupID,
               assessment: assessment,
@@ -561,7 +559,6 @@ class DeleteButton extends StatelessWidget {
 
                         await FirebaseMethods.deleteAssessment(
                           docID: assessment.id,
-                          isDSTI: isDSTI,
                           ownerID: assessment.createdBy,
                           groupID: groupID,
                           assessment: assessment,

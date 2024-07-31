@@ -36,8 +36,6 @@ navigationControler({
         });
       }
       break;
-    case Constants.dstiNotification:
-      break;
     case Constants.assessmentNotification:
       // navigate to friend requests screen
 
@@ -52,7 +50,6 @@ navigationControler({
 
       switch (collectionPath) {
         case Constants.assessmentCollection:
-        case Constants.dstiCollections:
           FirebaseMethods.getAssessmentData(
             groupID: groupID,
             assessmentID: itemID,
