@@ -27,13 +27,16 @@ class MessageWidget extends StatelessWidget {
   Widget _buildMessageWidget() {
     switch (message.messageType) {
       case MessageType.quiz:
-        return QuizWidget(
-          quizData: message.quizData,
-          userUID: currentUserUID,
-          onSubmit: (result) {
-            onSubmitQuizResult(message.messageID, result);
-          },
-          quizResults: message.quizResults,
+        return Container(
+          margin: EdgeInsets.only(top: 8.0),
+          child: QuizWidget(
+            quizData: message.quizData,
+            userUID: currentUserUID,
+            onSubmit: (result) {
+              onSubmitQuizResult(message.messageID, result);
+            },
+            quizResults: message.quizResults,
+          ),
         );
       case MessageType.quizAnswer:
         return QuizResultsWidget(
