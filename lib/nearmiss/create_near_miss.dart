@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:animations/animations.dart';
 import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
@@ -31,12 +30,15 @@ class CreateNearMiss extends StatefulWidget {
 class _CreateNearMissState extends State<CreateNearMiss> {
   final TextEditingController _descriptionController = TextEditingController();
   final _dateTimeController = BoardDateTimeTextController();
+  final BoardDateTimeInputFocusNode _dateTimeFocusNode =
+      BoardDateTimeInputFocusNode(); // Create a FocusNode
 
   String _dateTime = '';
 
   @override
   void dispose() {
     _descriptionController.dispose();
+    _dateTimeFocusNode.dispose();
     super.dispose();
   }
 
@@ -48,6 +50,8 @@ class _CreateNearMissState extends State<CreateNearMiss> {
 
   void initializeDate() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // remove focus from decription textfield
+      FocusScope.of(context).unfocus();
       _dateTime = formatDate(DateTime.now().toString());
       setState(() {});
     });
@@ -122,14 +126,13 @@ class _CreateNearMissState extends State<CreateNearMiss> {
                     setState(() {
                       _dateTime = formatDate(date.toString());
                     });
-                    log('date: $_dateTime');
                   },
                   onFocusChange: (val, date, text) {
                     setState(() {
                       _dateTime = text;
                     });
-                    log('text: $_dateTime');
                   },
+                  focusNode: _dateTimeFocusNode, // Attach the FocusNode
                 ),
               ],
             ),
@@ -214,7 +217,11 @@ class _CreateNearMissState extends State<CreateNearMiss> {
       dateTime: _dateTime,
       onSuccess: () {
         Navigator.pop(context);
-        Future.delayed(const Duration(milliseconds: 500)).whenComplete(action);
+        Future.delayed(const Duration(milliseconds: 500)).whenComplete(() {
+          action();
+          _dateTimeFocusNode
+              .unfocus(); // Unfocus the DateTime field after generating the report
+        });
       },
       onError: (error) {
         Navigator.pop(context);

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 
 class GeminiButton extends StatefulWidget {

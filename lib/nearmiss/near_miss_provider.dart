@@ -61,8 +61,6 @@ class NearMissProvider extends ChangeNotifier {
     try {
       final content = await _modelManager.generateNearMissReport(description);
 
-      log('content: $content');
-
       if (content.text == null) {
         throw Exception('Failed to generate control measures');
       }

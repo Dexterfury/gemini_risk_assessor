@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
@@ -342,7 +344,7 @@ Format the response as a JSON object with the following structure:
     {
       "measure": "Description of the control measure",
       "type": "Type of control (e.g., Engineering, Administrative, PPE)",
-      "rationale": "Brief explanation of why this measure is effective"
+      "reason": "Brief explanation of why this measure is effective"
     },
     // ... (2-4 more control measures)
   ]

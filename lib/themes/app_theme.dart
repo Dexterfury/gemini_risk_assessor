@@ -160,4 +160,9 @@ class AppTheme {
         ? Colors.white.withOpacity(0.1)
         : Colors.black.withOpacity(0.1);
   }
+
+  static Color getCaptionColor(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+  }
 }
