@@ -108,7 +108,6 @@ class NearMissProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      log('NEAR MISS: ${nearMiss!.toJson()}');
       await FirebaseMethods.saveNearMiss(
         nearMiss: _nearMiss!,
       );

@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -14,12 +17,18 @@ class NearMissDetailsScreen extends StatelessWidget {
   const NearMissDetailsScreen({
     Key? key,
     this.isViewOnly = false,
+    this.dateTimeFocusNode,
   }) : super(key: key);
 
   final bool isViewOnly;
+  final BoardDateTimeInputFocusNode? dateTimeFocusNode;
 
   @override
   Widget build(BuildContext context) {
+    if (dateTimeFocusNode != null) {
+      log('pop the date time focus node');
+      dateTimeFocusNode!.unfocus();
+    }
     return Scaffold(
       appBar: MyAppBar(
         leading: BackButton(),
