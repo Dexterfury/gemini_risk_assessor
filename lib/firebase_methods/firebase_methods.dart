@@ -530,7 +530,7 @@ class FirebaseMethods {
     return groupsCollection
         .doc(groupID)
         .collection(Constants.nearMissesCollection)
-        .orderBy(Constants.createdAt)
+        .orderBy(Constants.createdAt, descending: true)
         .snapshots();
   }
 
