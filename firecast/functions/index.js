@@ -275,7 +275,7 @@ function createNotificationFunction(itemType, collectionPath) {
 exports.onCreateAssessment = createNotificationFunction("Assessment", "assessments");
 exports.onCreateDsti = createNotificationFunction("DSTI", "dsti");
 exports.onCreateTool = createNotificationFunction("Tool", "tools");
-exports.onCreateTool = createNotificationFunction("Near Miss", "nearMisses");
+exports.onCreateNearMiss = createNotificationFunction("Near Miss", "nearMisses");
 
 
 exports.onCreateChatMessage = functions.firestore
@@ -330,7 +330,7 @@ exports.onCreateChatMessage = functions.firestore
         await sendNotification("Quiz Answer Submitted", `${messageData.senderName} has submitted their quiz answers.`, {messageType: "quizAnswer"});
 
         // Handle points system for quiz answers
-        await handleQuizPoints(senderUID, messageData.quizResults);
+  await handleQuizPoints(senderUID, messageData.quizData, messageData.quizResults);
       } else {
         // Normal chat message
         await sendNotification("New Chat Message", `${messageData.senderName} sent a message in the group chat.`, {messageType: "chat"});
@@ -340,17 +340,29 @@ exports.onCreateChatMessage = functions.firestore
 /**
      * Sends a notification to all users in the group chat with the given title and body.
      * @param {*} userUID The UID of the sender.
+     * @param {*} quizData The quiz data.
      * @param {*} quizResults The results of the quiz.
      */
-async function handleQuizPoints(userUID, quizResults) {
+async function handleQuizPoints(userUID, quizData, quizResults) {
   const userRef = admin.firestore().doc(`users/${userUID}`);
 
+  // Get the user's answers and the correct answers
+  const userAnswers = quizResults[userUID].answers;
+  const correctAnswers = quizData.questions.map(q => q.correctAnswer);
+
   // Calculate points
-  const correctAnswers = Object.values(quizResults).filter((result) => result === true).length;
-  let pointsEarned = correctAnswers * 10; // 10 points per correct answer
+  let pointsEarned = 0;
+  let correctCount = 0;
+
+  for (let i = 0; i < correctAnswers.length; i++) {
+    if (userAnswers[i] === correctAnswers[i]) {
+      pointsEarned += 10; // 10 points per correct answer
+      correctCount++;
+    }
+  }
 
   // Bonus points for all correct
-  if (correctAnswers === 3) {
+  if (correctCount === correctAnswers.length) {
     pointsEarned += 20; // 20 bonus points for all correct
   }
 
@@ -366,3 +378,43 @@ async function handleQuizPoints(userUID, quizResults) {
 
   console.log(`User ${userUID} earned ${pointsEarned} safety points.`);
 }
+
+exports.cleanupQuizResults = functions.firestore
+    .document('groups/{groupId}/{collectionName}/{itemId}/chatMessages/{messageId}')
+    .onCreate(async (snap, context) => {
+        const newMessage = snap.data();
+        const { groupId, collectionName, itemId } = context.params;
+
+        // Check if the new message is a quiz result
+        if (newMessage.messageType !== 'quizAnswer') {
+            return null; // Exit if not a quiz result
+        }
+
+        try {
+            const chatMessagesRef = db.collection('groups').doc(groupId)
+                .collection(collectionName).doc(itemId)
+                .collection('chatMessages');
+
+            // Query for previous quiz results with the same title
+            const query = chatMessagesRef
+                .where('messageType', '==', 'quizAnswer')
+                .where('quizData.title', '==', newMessage.quizData.title)
+                .where('messageID', '!=', snap.id)
+                .orderBy('messageID')
+                .orderBy('timeSent', 'desc');
+
+            const querySnapshot = await query.get();
+
+            // Delete all but the most recent (which is the one we just added)
+            const deletePromises = querySnapshot.docs.map(doc => doc.ref.delete());
+            await Promise.all(deletePromises);
+
+            log(`Deleted ${deletePromises.length} outdated quiz results for quiz: ${newMessage.quizData.title}`);
+            return null;
+        } catch (error) {
+            log('Error cleaning up quiz results:', error);
+            return null;
+        }
+    });
+
+
