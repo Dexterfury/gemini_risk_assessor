@@ -46,7 +46,7 @@ class QuizReplyPreview extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            buildTitleAndMessage(message),
+            FittedBox(child: buildTitleAndMessage(message)),
           ],
         ),
       ),

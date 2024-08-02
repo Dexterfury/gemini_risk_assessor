@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
@@ -155,7 +153,9 @@ Respond in a helpful, safety-focused manner, providing practical advice or clari
 
 // generate safety quiz using the generated content
   Future<GenerateContentResponse> generateSafetyQuiz(
-      AssessmentModel assessment) async {
+    AssessmentModel assessment,
+    int numberOfQuestions,
+  ) async {
     final model = await getModel(isVision: false, isDocumentSpecific: true);
 
     final prompt = PromptDataModel(
@@ -168,10 +168,10 @@ Hazards: ${assessment.hazards.join(', ')}
 Risks: ${assessment.risks.join(', ')}
 Control Measures: ${assessment.control.join(', ')}
 
-Create 3 multiple-choice questions related to the safety aspects of this assessment. 
+Create $numberOfQuestions multiple-choice questions related to the safety aspects of this assessment. 
 Format the response as a JSON object with the following structure:
 {
-  "title": "Generated quiz title related to the assessment topic followed by a space and a random 4-digit number",
+  "title": \$quizTitle,
   "questions": [
     {
       "question": "Question text",

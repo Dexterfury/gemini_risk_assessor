@@ -460,6 +460,23 @@ class FirebaseMethods {
     }
   }
 
+  // get quiz cout
+  static Future<int> getQuizCount({
+    required String groupID,
+    required String itemID,
+    required String collection,
+  }) async {
+    // count the message where message type is quiz
+    final snapshot = await groupsCollection
+        .doc(groupID)
+        .collection(collection)
+        .doc(itemID)
+        .collection(Constants.chatMessagesCollection)
+        .where(Constants.messageType, isEqualTo: MessageType.quiz.name)
+        .get();
+    return snapshot.docs.length;
+  }
+
   // // delete assessment from o rganization and user
   // static Future<void> deleteAssessment({
   //   required String uid,

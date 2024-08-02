@@ -277,7 +277,6 @@ exports.onCreateDsti = createNotificationFunction("DSTI", "dsti");
 exports.onCreateTool = createNotificationFunction("Tool", "tools");
 exports.onCreateNearMiss = createNotificationFunction("Near Miss", "nearMisses");
 
-
 exports.onCreateChatMessage = functions.firestore
     .document("groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}")
     .onCreate(async (snapshot, context) => {
@@ -290,52 +289,113 @@ exports.onCreateChatMessage = functions.firestore
       const groupData = groupDoc.data();
       const membersUIDs = groupData.membersUIDs || [];
 
-      // Function to send notifications
-      const sendNotification = async (title, body, data) => {
-        const userRefs = membersUIDs
-            .filter((uid) => uid !== senderUID)
-            .map((uid) => admin.firestore().doc(`users/${uid}`));
-        const userDocs = await admin.firestore().getAll(...userRefs);
-
-        const notificationPromises = userDocs
-            .filter((userDoc) => userDoc.exists && userDoc.data().token)
-            .map((userDoc) => {
-              const userData = userDoc.data();
-              const notificationMessage = {
-                notification: {title, body},
-                android: {notification: {channel_id: "high_importance_channel"}},
-                data: {
-                  ...data,
-                  collectionPath: context.params.collectionPath,
-                  groupID: context.params.groupID,
-                  itemID: context.params.itemID,
-                  notificationType: "CHAT_NOTIFICATION",
-                },
-                token: userData.token,
-              };
-              return admin.messaging().send(notificationMessage);
-            });
-
-        await Promise.all(notificationPromises);
-      };
-
       // Handle different message types
       if (messageData.isAIMessage) {
         if (messageData.messageType === "quiz") {
-          await sendNotification("New Quiz Available", "A new quiz has been posted in the group chat.", {messageType: "quiz"});
+          await sendNotifications(
+              "New Quiz Available",
+              "A new quiz has been posted in the group chat.",
+              {messageType: "quiz", ...context.params},
+              membersUIDs,
+              senderUID,
+          );
         } else if (messageData.messageType === "additional") {
-          await sendNotification("New Additional Data", "New additional data has been posted in the group chat.", {messageType: "additional"});
+          await sendNotifications(
+              "New Additional Data",
+              "New additional data has been posted in the group chat.",
+              {messageType: "additional", ...context.params},
+              membersUIDs,
+              senderUID,
+          );
         }
       } else if (messageData.messageType === "quizAnswer") {
-        await sendNotification("Quiz Answer Submitted", `${messageData.senderName} has submitted their quiz answers.`, {messageType: "quizAnswer"});
+        await sendNotifications(
+            "Quiz Answer Submitted",
+            `${messageData.senderName} has submitted their quiz answers.`,
+            {messageType: "quizAnswer", ...context.params},
+            membersUIDs,
+            senderUID,
+        );
 
         // Handle points system for quiz answers
-  await handleQuizPoints(senderUID, messageData.quizData, messageData.quizResults);
+        await handleQuizPoints(senderUID, messageData.quizData, messageData.quizResults);
+
+        // Clean up old quiz results
+        await cleanupQuizResults(snapshot, context);
       } else {
-        // Normal chat message
-        await sendNotification("New Chat Message", `${messageData.senderName} sent a message in the group chat.`, {messageType: "chat"});
+      // Normal chat message
+        await sendNotifications(
+            "New Chat Message",
+            `${messageData.senderName} sent a message in the group chat.`,
+            {messageType: "chat", ...context.params},
+            membersUIDs,
+            senderUID,
+        );
       }
     });
+
+
+// exports.onCreateChatMessage = functions.firestore
+//     .document("groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}")
+//     .onCreate(async (snapshot, context) => {
+//       const messageData = snapshot.data();
+//       const groupID = context.params.groupID;
+//       const senderUID = messageData.senderUID;
+
+//       // Get group members
+//       const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
+//       const groupData = groupDoc.data();
+//       const membersUIDs = groupData.membersUIDs || [];
+
+//       // Function to send notifications
+//       const sendNotification = async (title, body, data) => {
+//         const userRefs = membersUIDs
+//             .filter((uid) => uid !== senderUID)
+//             .map((uid) => admin.firestore().doc(`users/${uid}`));
+//         const userDocs = await admin.firestore().getAll(...userRefs);
+
+//         const notificationPromises = userDocs
+//             .filter((userDoc) => userDoc.exists && userDoc.data().token)
+//             .map((userDoc) => {
+//               const userData = userDoc.data();
+//               const notificationMessage = {
+//                 notification: {title, body},
+//                 android: {notification: {channel_id: "high_importance_channel"}},
+//                 data: {
+//                   ...data,
+//                   collectionPath: context.params.collectionPath,
+//                   groupID: context.params.groupID,
+//                   itemID: context.params.itemID,
+//                   notificationType: "CHAT_NOTIFICATION",
+//                 },
+//                 token: userData.token,
+//               };
+//               return admin.messaging().send(notificationMessage);
+//             });
+
+//         await Promise.all(notificationPromises);
+//       };
+
+//       // Handle different message types
+//       if (messageData.isAIMessage) {
+//         if (messageData.messageType === "quiz") {
+//           await sendNotification("New Quiz Available", "A new quiz has been posted in the group chat.", {messageType: "quiz"});
+//         } else if (messageData.messageType === "additional") {
+//           await sendNotification("New Additional Data", "New additional data has been posted in the group chat.", {messageType: "additional"});
+//         }
+//       } else if (messageData.messageType === "quizAnswer") {
+//         await sendNotification("Quiz Answer Submitted", `${messageData.senderName} has submitted their quiz answers.`, {messageType: "quizAnswer"});
+
+//         // Handle points system for quiz answers
+//         await handleQuizPoints(senderUID, messageData.quizData, messageData.quizResults);
+
+//         // Clean up old quiz results
+//         await cleanupQuizResults(snapshot, context);
+//       } else {
+//         // Normal chat message
+//         await sendNotification("New Chat Message", `${messageData.senderName} sent a message in the group chat.`, {messageType: "chat"});
+//       }
+//     });
 
 /**
      * Sends a notification to all users in the group chat with the given title and body.
@@ -348,7 +408,7 @@ async function handleQuizPoints(userUID, quizData, quizResults) {
 
   // Get the user's answers and the correct answers
   const userAnswers = quizResults[userUID].answers;
-  const correctAnswers = quizData.questions.map(q => q.correctAnswer);
+  const correctAnswers = quizData.questions.map((q) => q.correctAnswer);
 
   // Calculate points
   let pointsEarned = 0;
@@ -378,43 +438,237 @@ async function handleQuizPoints(userUID, quizData, quizResults) {
 
   console.log(`User ${userUID} earned ${pointsEarned} safety points.`);
 }
+/**
+ * @param {*} snap The snapshot of the document that triggered the function.
+ * @param {*} context The context of the event that triggered the function.
+ */
+async function cleanupQuizResults(snap, context) {
+  const newMessage = snap.data();
+  const {groupID, collectionPath, itemID} = context.params;
 
-exports.cleanupQuizResults = functions.firestore
-    .document('groups/{groupId}/{collectionName}/{itemId}/chatMessages/{messageId}')
-    .onCreate(async (snap, context) => {
-        const newMessage = snap.data();
-        const { groupId, collectionName, itemId } = context.params;
+  try {
+    const chatMessagesRef = admin.firestore().collection("groups").doc(groupID)
+        .collection(collectionPath).doc(itemID)
+        .collection("chatMessages");
 
-        // Check if the new message is a quiz result
-        if (newMessage.messageType !== 'quizAnswer') {
-            return null; // Exit if not a quiz result
-        }
+    // Query for previous quiz results with the same title
+    const query = chatMessagesRef
+        .where("messageType", "==", "quizAnswer")
+        .where("quizData.title", "==", newMessage.quizData.title)
+        .where("messageID", "!=", snap.id)
+        .orderBy("messageID")
+        .orderBy("timeSent", "desc");
+
+    const querySnapshot = await query.get();
+
+    // Delete all but the most recent (which is the one we just added)
+    const deletePromises = querySnapshot.docs.map((doc) => doc.ref.delete());
+    await Promise.all(deletePromises);
+
+    console.log(`Deleted ${deletePromises.length} outdated quiz results for quiz: ${newMessage.quizData.title}`);
+  } catch (error) {
+    console.error("Error cleaning up quiz results:", error);
+  }
+}
+
+/**
+ * @param {*} title The title of the quiz.
+ * @param {*} body The message to be sent.
+ * @param {*} data The data to be sent with the notification.
+ * @param {*} membersUIDs The UIDs of the members to be notified.
+ * @param {*} senderUID The UID of the sender.
+ */
+async function sendNotifications(title, body, data, membersUIDs, senderUID) {
+  const db = admin.firestore();
+  const batch = db.batch();
+
+  // Get user documents for all members except the sender
+  const userRefs = membersUIDs
+      .filter((uid) => uid !== senderUID)
+      .map((uid) => db.doc(`users/${uid}`));
+
+  const userDocs = await db.getAll(...userRefs);
+
+  const notificationPromises = userDocs
+      .filter((userDoc) => userDoc.exists && userDoc.data().token)
+      .map(async (userDoc) => {
+        const userData = userDoc.data();
+        const notificationMessage = {
+          notification: {title, body},
+          android: {notification: {channel_id: "high_importance_channel"}},
+          data: {
+            ...data,
+            notificationType: "CHAT_NOTIFICATION",
+          },
+          token: userData.token,
+        };
 
         try {
-            const chatMessagesRef = db.collection('groups').doc(groupId)
-                .collection(collectionName).doc(itemId)
-                .collection('chatMessages');
-
-            // Query for previous quiz results with the same title
-            const query = chatMessagesRef
-                .where('messageType', '==', 'quizAnswer')
-                .where('quizData.title', '==', newMessage.quizData.title)
-                .where('messageID', '!=', snap.id)
-                .orderBy('messageID')
-                .orderBy('timeSent', 'desc');
-
-            const querySnapshot = await query.get();
-
-            // Delete all but the most recent (which is the one we just added)
-            const deletePromises = querySnapshot.docs.map(doc => doc.ref.delete());
-            await Promise.all(deletePromises);
-
-            log(`Deleted ${deletePromises.length} outdated quiz results for quiz: ${newMessage.quizData.title}`);
-            return null;
+          await admin.messaging().send(notificationMessage);
+          return {success: true, uid: userDoc.id};
         } catch (error) {
-            log('Error cleaning up quiz results:', error);
-            return null;
+          console.error(`Failed to send notification to user ${userDoc.id}:`, error);
+
+          if (error.code === "messaging/invalid-registration-token" ||
+            error.code === "messaging/registration-token-not-registered") {
+          // Token is invalid or not registered, remove it
+            batch.update(userDoc.ref, {token: admin.firestore.FieldValue.delete()});
+          }
+
+          return {success: false, uid: userDoc.id, error};
         }
-    });
+      });
+
+  const results = await Promise.all(notificationPromises);
+
+  // Commit the batch to remove invalid tokens
+  await batch.commit();
+
+  // Log results
+  const successCount = results.filter((r) => r.success).length;
+  console.log(`Successfully sent ${successCount} out of ${results.length} notifications`);
+
+  return results;
+}
+
+
+// exports.onCreateChatMessage = functions.firestore
+//     .document("groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}")
+//     .onCreate(async (snapshot, context) => {
+//       const messageData = snapshot.data();
+//       const groupID = context.params.groupID;
+//       const senderUID = messageData.senderUID;
+
+//       // Get group members
+//       const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
+//       const groupData = groupDoc.data();
+//       const membersUIDs = groupData.membersUIDs || [];
+
+//       // Function to send notifications
+//       const sendNotification = async (title, body, data) => {
+//         const userRefs = membersUIDs
+//             .filter((uid) => uid !== senderUID)
+//             .map((uid) => admin.firestore().doc(`users/${uid}`));
+//         const userDocs = await admin.firestore().getAll(...userRefs);
+
+//         const notificationPromises = userDocs
+//             .filter((userDoc) => userDoc.exists && userDoc.data().token)
+//             .map((userDoc) => {
+//               const userData = userDoc.data();
+//               const notificationMessage = {
+//                 notification: {title, body},
+//                 android: {notification: {channel_id: "high_importance_channel"}},
+//                 data: {
+//                   ...data,
+//                   collectionPath: context.params.collectionPath,
+//                   groupID: context.params.groupID,
+//                   itemID: context.params.itemID,
+//                   notificationType: "CHAT_NOTIFICATION",
+//                 },
+//                 token: userData.token,
+//               };
+//               return admin.messaging().send(notificationMessage);
+//             });
+
+//         await Promise.all(notificationPromises);
+//       };
+
+//       // Handle different message types
+//       if (messageData.isAIMessage) {
+//         if (messageData.messageType === "quiz") {
+//           await sendNotification("New Quiz Available", "A new quiz has been posted in the group chat.", {messageType: "quiz"});
+//         } else if (messageData.messageType === "additional") {
+//           await sendNotification("New Additional Data", "New additional data has been posted in the group chat.", {messageType: "additional"});
+//         }
+//       } else if (messageData.messageType === "quizAnswer") {
+//         await sendNotification("Quiz Answer Submitted", `${messageData.senderName} has submitted their quiz answers.`, {messageType: "quizAnswer"});
+
+//         // Handle points system for quiz answers
+//   await handleQuizPoints(senderUID, messageData.quizData, messageData.quizResults);
+//       } else {
+//         // Normal chat message
+//         await sendNotification("New Chat Message", `${messageData.senderName} sent a message in the group chat.`, {messageType: "chat"});
+//       }
+//     });
+
+// /**
+//      * Sends a notification to all users in the group chat with the given title and body.
+//      * @param {*} userUID The UID of the sender.
+//      * @param {*} quizData The quiz data.
+//      * @param {*} quizResults The results of the quiz.
+//      */
+// async function handleQuizPoints(userUID, quizData, quizResults) {
+//   const userRef = admin.firestore().doc(`users/${userUID}`);
+
+//   // Get the user's answers and the correct answers
+//   const userAnswers = quizResults[userUID].answers;
+//   const correctAnswers = quizData.questions.map(q => q.correctAnswer);
+
+//   // Calculate points
+//   let pointsEarned = 0;
+//   let correctCount = 0;
+
+//   for (let i = 0; i < correctAnswers.length; i++) {
+//     if (userAnswers[i] === correctAnswers[i]) {
+//       pointsEarned += 10; // 10 points per correct answer
+//       correctCount++;
+//     }
+//   }
+
+//   // Bonus points for all correct
+//   if (correctCount === correctAnswers.length) {
+//     pointsEarned += 20; // 20 bonus points for all correct
+//   }
+
+//   // Update user's safety points
+//   await admin.firestore().runTransaction(async (transaction) => {
+//     const userDoc = await transaction.get(userRef);
+//     const userData = userDoc.data();
+//     const currentPoints = userData.safetyPoints || 0;
+//     const newPoints = currentPoints + pointsEarned;
+
+//     transaction.update(userRef, {safetyPoints: newPoints});
+//   });
+
+//   console.log(`User ${userUID} earned ${pointsEarned} safety points.`);
+// }
+
+// exports.cleanupQuizResults = functions.firestore
+//     .document('groups/{groupId}/{collectionName}/{itemId}/chatMessages/{messageId}')
+//     .onCreate(async (snap, context) => {
+//         const newMessage = snap.data();
+//         const { groupId, collectionName, itemId } = context.params;
+
+//         // Check if the new message is a quiz result
+//         if (newMessage.messageType !== 'quizAnswer') {
+//             return null; // Exit if not a quiz result
+//         }
+
+//         try {
+//             const chatMessagesRef = db.collection('groups').doc(groupId)
+//                 .collection(collectionName).doc(itemId)
+//                 .collection('chatMessages');
+
+//             // Query for previous quiz results with the same title
+//             const query = chatMessagesRef
+//                 .where('messageType', '==', 'quizAnswer')
+//                 .where('quizData.title', '==', newMessage.quizData.title)
+//                 .where('messageID', '!=', snap.id)
+//                 .orderBy('messageID')
+//                 .orderBy('timeSent', 'desc');
+
+//             const querySnapshot = await query.get();
+
+//             // Delete all but the most recent (which is the one we just added)
+//             const deletePromises = querySnapshot.docs.map(doc => doc.ref.delete());
+//             await Promise.all(deletePromises);
+
+//             log(`Deleted ${deletePromises.length} outdated quiz results for quiz: ${newMessage.quizData.title}`);
+//             return null;
+//         } catch (error) {
+//             log('Error cleaning up quiz results:', error);
+//             return null;
+//         }
+//     });
 
 

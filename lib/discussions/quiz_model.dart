@@ -27,6 +27,7 @@ class QuizModel {
     String creatorUID,
     String quizID,
     DateTime createdAt,
+    int quizCount,
   ) {
     assert(content.text != null);
 
@@ -36,7 +37,7 @@ class QuizModel {
     if (json is Map<String, dynamic>) {
       return QuizModel(
         creatorUID: creatorUID,
-        title: json[Constants.title],
+        title: '${json[Constants.title]} ($quizCount)',
         quizID: quizID,
         itemID: itemID,
         createdAt: createdAt,

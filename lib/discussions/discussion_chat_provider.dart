@@ -42,21 +42,33 @@ class DiscussionChatProvider extends ChangeNotifier {
     ToolModel? tool,
     required String groupID,
     required GenerationType generationType,
+    int numberOfQuestions = 3,
   }) async {
     try {
       _isLoadingQuiz = true;
       notifyListeners();
 
+      final collection = getCollectionRef(generationType);
+
       GenerateContentResponse content;
       final itemID = tool != null ? tool.id : assessment!.id;
 
       if (generationType != GenerationType.tool) {
-        content = await _modelManager.generateSafetyQuiz(assessment!);
+        content = await _modelManager.generateSafetyQuiz(
+            assessment!, numberOfQuestions);
       } else {
         content = await _modelManager.generateSafetyToolsQuiz(tool!);
       }
 
       final messageID = const Uuid().v4();
+
+      var quizCount = await FirebaseMethods.getQuizCount(
+        groupID: groupID,
+        itemID: itemID,
+        collection: collection,
+      );
+
+      log('count: $quizCount');
 
       final quiz = QuizModel.fromGeneratedContent(
         content,
@@ -64,6 +76,7 @@ class DiscussionChatProvider extends ChangeNotifier {
         userModel.uid,
         messageID,
         DateTime.now(),
+        quizCount + 1,
       );
 
       // get empty additional data
@@ -90,8 +103,6 @@ class DiscussionChatProvider extends ChangeNotifier {
         quizData: quiz,
         quizResults: {},
       );
-
-      final collection = getCollectionRef(generationType);
 
       // save the quiz to firestore
       await FirebaseMethods.groupsCollection
