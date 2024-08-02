@@ -487,28 +487,6 @@ class ChatProvider extends ChangeNotifier {
     _historyMessages.add(Content.text(message));
     _historyMessages.add(Content.model([TextPart(fullStreamedAnswer)]));
 
-    // Save the message to Firestore
-    // final messageModel = Message(
-    //   senderID: uid,
-    //   messageID: messageID,
-    //   chatID: chatID,
-    //   question: message,
-    //   answer: StringBuffer(fullStreamedAnswer),
-    //   imagesUrls: [],
-    //   reactions: [],
-    //   sentencesUrls: [],
-    //   finalWords: true,
-    //   timeSent: DateTime.now(),
-    // );
-
-    // await _usersCollection
-    //     .doc(uid)
-    //     .collection(collectionRef)
-    //     .doc(chatID)
-    //     .collection(Constants.chatMessagesCollection)
-    //     .doc(messageID)
-    //     .set(messageModel.toJson());
-    // Update the message model with the full answer
     final messageIndex =
         _messages.indexWhere((element) => element.messageID == messageID);
     if (messageIndex != -1) {

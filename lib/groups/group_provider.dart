@@ -19,9 +19,6 @@ class GroupProvider extends ChangeNotifier {
 
   List<String> _tempGroupMemberUIDs = [];
 
-  List<UserModel> _tempRemovedWaitingApprovalMembersList = [];
-  List<String> _tempRemovedWaitingApprovalMemberUIDs = [];
-
   List<String> _initialMemberUIDs = [];
   List<String> _initialAwaitingApprovalUIDs = [];
 
@@ -42,39 +39,8 @@ class GroupProvider extends ChangeNotifier {
   final CollectionReference _groupsCollection =
       FirebaseFirestore.instance.collection(Constants.groupsCollection);
 
-  final Map<String, ValueNotifier<bool>> _adminValueNotifiers = {};
   final Map<String, ValueNotifier<bool>> _awaitingApprovalValueNotifiers = {};
   final Map<String, ValueNotifier<bool>> _tempMemberValueNotifiers = {};
-  final Map<String, ValueNotifier<bool>> _memberValueNotifiers = {};
-
-  ValueNotifier<bool> getAdminValueNotifier(String uid) {
-    return _adminValueNotifiers.putIfAbsent(
-      uid,
-      () => ValueNotifier(_groupAdminsList.any((admin) => admin.uid == uid)),
-    );
-  }
-
-  // ValueNotifier<bool> getAwaitingApprovalValueNotifier(String uid) {
-  //   return _awaitingApprovalValueNotifiers.putIfAbsent(
-  //     uid,
-  //     () => ValueNotifier(_awaitApprovalList.contains(uid)),
-  //   );
-  // }
-
-  // ValueNotifier<bool> getTempMemberValueNotifier(String uid) {
-  //   return _tempMemberValueNotifiers.putIfAbsent(
-  //     uid,
-  //     () => ValueNotifier(_tempGroupMemberUIDs.contains(uid) ||
-  //         _awaitApprovalList.contains(uid)),
-  //   );
-  // }
-
-  ValueNotifier<bool> getMemberValueNotifier(String uid) {
-    return _memberValueNotifiers.putIfAbsent(
-      uid,
-      () => ValueNotifier(_groupMembersList.any((member) => member.uid == uid)),
-    );
-  }
 
   // Update these methods to use ValueNotifiers
   void addToWaitingApproval({required UserModel groupMember}) {
@@ -300,15 +266,6 @@ class GroupProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // add a group member
-  // void addToWaitingApproval({required UserModel groupMember}) {
-  //   _awaitApprovalList.add(groupMember.uid);
-  //   _groupModel.awaitingApprovalUIDs.add(groupMember.uid);
-  //   // add data to temp lists
-  //   _tempWaitingApprovalMembersList.add(groupMember);
-  //   notifyListeners();
-  // }
-
   // add member to group
   Future<void> addMemberToGroup({
     required String uid,
@@ -368,61 +325,6 @@ class GroupProvider extends ChangeNotifier {
       notifyListeners();
     });
   }
-
-  // // add member to temp list for saving changes later
-  // void addMemberToTempGroup({
-  //   required String memberUID,
-  // }) {
-  //   _tempGroupMemberUIDs.add(memberUID);
-  //   notifyListeners();
-  // }
-
-  // remove member from temp list for saving changes later
-  // void removeMemberFromTempGroup({
-  //   required String memberUID,
-  // }) {
-  //   _tempGroupMemberUIDs.removeWhere((element) => element == memberUID);
-  //   notifyListeners();
-  // }
-
-  // Future<void> removeWaitingApproval({required UserModel groupMember}) async {
-  //   _awaitApprovalList.remove(groupMember.uid);
-  //   // also remove this member from group model
-  //   _groupModel.awaitingApprovalUIDs.remove(groupMember.uid);
-
-  //   // remove from temp lists
-  //   _tempWaitingApprovalMembersList.remove(groupMember);
-
-  //   // add  this member to the list of removed members
-  //   _tempRemovedWaitingApprovalMembersList.add(groupMember);
-  //   _tempRemovedWaitingApprovalMemberUIDs.add(groupMember.uid);
-
-  //   notifyListeners();
-  // }
-
-  // update group settings in firestore
-  // Future<bool> updategroupDataInFireStore() async {
-  //   if (_tempGroupMemberUIDs == _groupModel.membersUIDs) {
-  //     return false;
-  //   }
-
-  //   // remove all membersUIDs who are already in the groupModel.membersUIDs list
-  //   _tempGroupMemberUIDs.removeWhere(
-  //       (element) => _groupModel.membersUIDs.contains(element));
-
-  //   try {
-  //     await _groupCollection
-  //         .doc(_groupModel.groupID)
-  //         .update({
-  //       Constants.awaitingApprovalUIDs: _tempGroupMemberUIDs,
-  //     });
-  //     notifyListeners();
-  //     return true;
-  //   } catch (e) {
-  //     print(e.toString());
-  //     return false;
-  //   }
-  // }
 
   // get a list of goup members data from firestore
   Future<List<UserModel>> getMembersDataFromFirestore({

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,7 +7,6 @@ import 'package:gemini_risk_assessor/authentication/change_password.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
-import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
@@ -80,9 +78,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isAnonymous = authProvider.isUserAnonymous();
     bool isMyProfile = uid == authProvider.uid;
     return Scaffold(
-      appBar: const MyAppBar(
+      appBar: MyAppBar(
         leading: BackButton(),
         title: 'Profile',
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await FirebaseMethods.generateAndSaveDummyAssessments(uid);
+              },
+              icon: Icon(Icons.edit)),
+        ],
       ),
       body: StreamBuilder(
         stream: FirebaseMethods.userStream(userID: uid),

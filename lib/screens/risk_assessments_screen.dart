@@ -102,8 +102,6 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.read<AuthenticationProvider>().userModel!.uid;
-
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
@@ -129,118 +127,6 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
         ),
       ),
     );
-
-    // Scaffold(
-    //   body: SafeArea(
-    //     child: StreamBuilder<QuerySnapshot>(
-    //       stream: FirebaseMethods.ristAssessmentsStream(
-    //         userId: uid,
-    //         groupID: widget.groupID,
-    //       ),
-    //       builder:
-    //           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    //         if (snapshot.hasError) {
-    //           return const Center(child: Text('Something went wrong'));
-    //         }
-
-    //         if (snapshot.connectionState == ConnectionState.waiting) {
-    //           return const Center(child: CircularProgressIndicator());
-    //         }
-
-    //         if (snapshot.data!.docs.isEmpty) {
-    //           return Scaffold(
-    //             appBar: widget.groupID.isNotEmpty
-    //                 ? const MyAppBar(
-    //                     leading: BackButton(),
-    //                     title: Constants.riskAssessments,
-    //                   )
-    //                 : null,
-    //             body: const Center(
-    //               child: Padding(
-    //                 padding: EdgeInsets.all(20.0),
-    //                 child: Text('No Risk Assessments Yet!',
-    //                     textAlign: TextAlign.center,
-    //                     style: AppTheme.textStyle18w500),
-    //               ),
-    //             ),
-    //           );
-    //         }
-
-    //         return StatefulBuilder(
-    //           builder: (BuildContext context, StateSetter setState) {
-    //             final results = snapshot.data!.docs.where(
-    //               (element) => element[Constants.title]
-    //                   .toString()
-    //                   .toLowerCase()
-    //                   .contains(
-    //                     _searchQuery.toLowerCase(),
-    //                   ),
-    //             );
-
-    //             return widget.groupID.isNotEmpty
-    //                 ? CustomScrollView(
-    //                     slivers: [
-    //                       SliverAppBar(
-    //                         leading: const BackButton(),
-    //                         title: const FittedBox(
-    //                           child: Text(
-    //                             Constants.riskAssessments,
-    //                           ),
-    //                         ),
-    //                         pinned: true,
-    //                         floating: true,
-    //                         snap: true,
-    //                         expandedHeight: 120.0,
-    //                         flexibleSpace: FlexibleSpaceBar(
-    //                           background: Padding(
-    //                             padding: const EdgeInsets.only(top: 56.0),
-    //                             child: MySearchBar(
-    //                               controller: _searchController,
-    //                               onChanged: (value) {
-    //                                 setState(() {
-    //                                   _searchQuery = value;
-    //                                 });
-    //                               },
-    //                             ),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                       SliverPadding(
-    //                         padding: const EdgeInsets.all(8.0),
-    //                         sliver: results.isEmpty
-    //                             ? const SliverFillRemaining(
-    //                                 child: Center(
-    //                                     child: Text('No matching results')),
-    //                               )
-    //                             : SliverList(
-    //                                 delegate: SliverChildBuilderDelegate(
-    //                                   (context, index) {
-    //                                     final doc = results.elementAt(index);
-    //                                     final data =
-    //                                         doc.data() as Map<String, dynamic>;
-    //                                     final item =
-    //                                         AssessmentModel.fromJson(data);
-    //                                     return ListItem(
-    //                                       docTitle: Constants.riskAssessment,
-    //                                       groupID: widget.groupID,
-    //                                       data: item,
-    //                                     );
-    //                                   },
-    //                                   childCount: results.length,
-    //                                 ),
-    //                               ),
-    //                       ),
-    //                     ],
-    //                   )
-    //                 : const MyDataStream(
-    //                     generationType: GenerationType.riskAssessment,
-    //                   );
-    //           },
-    //         );
-    //       },
-    //     ),
-    //   ),
-    // );
   }
 
   Widget _buildContent() {

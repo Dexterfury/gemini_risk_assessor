@@ -85,6 +85,7 @@ dependencies:
   board_datetime_picker: ^2.0.0
   url_launcher: ^6.3.0
   pull_to_refresh: ^2.0.0
+  firebase_pagination: ^4.0.1
 
 
 dev_dependencies:
@@ -120,7 +121,6 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - assets/lottie/
     - assets/sounds/
     - .env
 

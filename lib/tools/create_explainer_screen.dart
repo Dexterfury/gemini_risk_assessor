@@ -47,7 +47,6 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
     final toolProvider = context.watch<ToolsProvider>();
     final images = _getImages(toolProvider);
     final bool isViewOnly = widget.tool != null;
-    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(

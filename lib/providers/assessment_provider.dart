@@ -14,7 +14,6 @@ import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -131,27 +130,6 @@ class AssessmentProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // // create pdf assessment file
-  // Future<void> createPdfAndSave() async {
-  //   // set loading
-  //   _isLoading = true;
-  //   notifyListeners();
-  //   final creatorName = await getCreatorName(_assessmentModel.createdBy);
-  //   final file = await PdfApi.generatePdf(
-  //     assessmentModel: _assessmentModel,
-  //     heading: _pdfHeading,
-  //     creatorName: creatorName,
-  //   );
-
-  //   _pdfAssessmentFile = file;
-
-  //   if (file.existsSync()) {
-  //     await OpenFile.open((file.path));
-  //   } else {
-  //     throw FileSystemException("PDF file does not exist", file.path);
-  //   }
-  // }
 
   Future<String> getCreatorName(String creatorId) async {
     final userDoc = await _firestore
