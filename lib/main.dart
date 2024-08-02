@@ -16,7 +16,6 @@ import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
-import 'package:gemini_risk_assessor/providers/search_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/theme_provider.dart';
 import 'package:gemini_risk_assessor/tools/tool_provider.dart';
@@ -55,7 +54,6 @@ void main() async {
       ChangeNotifierProvider(create: (context) => GroupProvider()),
       ChangeNotifierProvider(create: (context) => TabProvider()),
       ChangeNotifierProvider(create: (context) => ChatProvider()),
-      ChangeNotifierProvider(create: (context) => SearchProvider()),
       ChangeNotifierProvider(create: (context) => DiscussionChatProvider()),
       ChangeNotifierProvider(create: (context) => NearMissProvider()),
     ], child: const MyApp()),
