@@ -40,43 +40,6 @@ class AssessmentModel {
     required this.createdAt,
   });
 
-  factory AssessmentModel.fromTestString(
-    String testString,
-    String assessmentId,
-    String creatorID,
-    String groupID,
-    String weather,
-    List<String> testppe,
-    List<String> testImages,
-    DateTime createdAt,
-  ) {
-    final validJson = cleanJson(testString);
-    final json = jsonDecode(validJson);
-
-    if (json is Map<String, dynamic>) {
-      return AssessmentModel(
-        id: assessmentId,
-        title: json[Constants.title] ?? '',
-        taskToAchieve: json[Constants.taskToAchieve] ?? '',
-        images: testImages,
-        equipments: List<String>.from(json[Constants.equipments] ?? []),
-        hazards: List<String>.from(json[Constants.hazards] ?? []),
-        risks: List<String>.from(json[Constants.risks] ?? []),
-        ppe: testppe,
-        control: List<String>.from(json[Constants.control] ?? []),
-        reactions: List<String>.from(json[Constants.reactions] ?? []),
-        sharedWith: List<String>.from(json[Constants.sharedWith] ?? []),
-        weather: weather,
-        summary: json[Constants.summary] ?? '',
-        createdBy: creatorID,
-        groupID: groupID,
-        createdAt: createdAt,
-      );
-    }
-
-    throw JsonUnsupportedObjectError(json);
-  }
-
   factory AssessmentModel.fromGeneratedContent(
     GenerateContentResponse content,
     String assessmentId,

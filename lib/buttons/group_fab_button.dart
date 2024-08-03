@@ -44,34 +44,5 @@ class GroupFabButton extends StatelessWidget {
             closedElevation: AppTheme.cardElevation,
             openElevation: 4,
           );
-
-    // OpenContainer(
-    //   transitionType: ContainerTransitionType.fadeThrough,
-    //   transitionDuration: const Duration(milliseconds: 500),
-    //   openBuilder: (BuildContext context, VoidCallback _) {
-    //     return const CreateGroupScreen();
-    //   },
-    //   closedElevation: cardElevation,
-    //   closedShape: const RoundedRectangleBorder(
-    //     borderRadius: BorderRadius.all(
-    //       Radius.circular(15),
-    //     ),
-    //   ),
-    //   closedColor: Theme.of(context).colorScheme.primary,
-    //   closedBuilder: (BuildContext context, VoidCallback openContainer) {
-    //     return FloatingActionButton(onPressed: onPressed)
-
-    //     SizedBox(
-    //       height: 56.0,
-    //       width: 56.0,
-    //       child: Center(
-    //         child: Icon(
-    //           Icons.add,
-    //           color: Theme.of(context).colorScheme.onPrimary,
-    //         ),
-    //       ),
-    //     );
-    //   },
-    // );
   }
 }

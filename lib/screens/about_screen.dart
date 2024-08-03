@@ -68,8 +68,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 'This app utilizes the power of AI to help you identify and manage potential risks, promoting a safer environment. Whether you\'re at work, home, or on-the-go, this app provides the insights you need to stay safe.'),
             _buildInfoSection(
                 'Key Features',
-                '• AI-powered Daily Safety Task Instructions (DSTI)\n'
-                    '• Intelligent Risk Assessments\n'
+                '• Intelligent Risk Assessments\n'
                     '• Comprehensive Tools Management\n'
                     '• Collaborative Group Features with AI'),
             _buildInfoSection('Developed by Raphael Daka',
@@ -77,8 +76,8 @@ class _AboutScreenState extends State<AboutScreen> {
             const SizedBox(height: 20),
             //Optional: Add social media links if you have
             ElevatedButton(
-              onPressed: () => _launchURL(
-                  'https://www.youtube.com/@dexterfury538'), // Replace with your website
+              onPressed: () =>
+                  _launchURL('https://www.youtube.com/@dexterfury538'),
               child: const Text('Visit My Channel'),
             ),
             // const SizedBox(height: 10),

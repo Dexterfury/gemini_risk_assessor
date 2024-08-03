@@ -32,7 +32,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
   bool _isLoading = false;
   bool _hasMore = true;
   DocumentSnapshot? _lastDocument;
-  Stream<QuerySnapshot>? _dstiStream;
+  Stream<QuerySnapshot>? _assessmentStream;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
 
   void _initializeStream() {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
-    _dstiStream = FirebaseMethods.paginatedAssessmentStream(
+    _assessmentStream = FirebaseMethods.paginatedAssessmentStream(
       userId: uid,
       groupID: widget.groupID,
       limit: _pageSize,
@@ -105,7 +105,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: _dstiStream,
+          stream: _assessmentStream,
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
