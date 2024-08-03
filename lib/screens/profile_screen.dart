@@ -76,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final authProvider = context.watch<AuthenticationProvider>();
     bool isAnonymous = authProvider.isUserAnonymous();
-    bool isMyProfile = uid == authProvider.uid;
+    bool isMyProfile = uid == authProvider.userModel?.uid;
     return Scaffold(
       appBar: MyAppBar(
         leading: BackButton(),

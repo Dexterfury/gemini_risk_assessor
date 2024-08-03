@@ -25,7 +25,7 @@ class AuthenticationProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isSuccessful = false;
   int? _resendToken;
-  String? _uid;
+  //String? _uid;
   String? _phoneNumber;
   Timer? _timer;
   int _secondsRemaining = 60;
@@ -41,7 +41,7 @@ class AuthenticationProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isSuccessful => _isSuccessful;
   int? get resendToken => _resendToken;
-  String? get uid => _uid;
+  //String? get uid => _uid;
   String? get phoneNumber => _phoneNumber;
   Timer? get timer => _timer;
   int get secondsRemaining => _secondsRemaining;
@@ -59,13 +59,15 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<AuthStatus> checkAuthenticationState() async {
+  Future<AuthStatus> checkAuthenticationState({
+    required String? uid,
+  }) async {
     await Future.delayed(const Duration(seconds: 2));
-    if (_auth.currentUser != null) {
-      _uid = _auth.currentUser!.uid;
+    if (uid != null) {
+      //_uid = _auth.currentUser!.uid;
 
       // Check if user exists in Firestore
-      if (await checkUserExistsInFirestore()) {
+      if (await checkUserExistsInFirestore(uid: uid)) {
         // Get user data from Firestore
         await getUserDataFromFireStore();
         // Save user data to shared preferences
@@ -108,7 +110,7 @@ class AuthenticationProvider extends ChangeNotifier {
     String userModelString =
         sharedPreferences.getString(Constants.userModel) ?? '';
     _userModel = UserModel.fromJson(jsonDecode(userModelString));
-    _uid = _userModel!.uid;
+    //_uid = _userModel!.uid;
     notifyListeners();
   }
 
@@ -131,7 +133,7 @@ class AuthenticationProvider extends ChangeNotifier {
     userModel.createdAt = DateTime.now().microsecondsSinceEpoch.toString();
 
     _userModel = userModel;
-    _uid = userModel.uid;
+    //_uid = userModel.uid;
 
     // save user data to firestore
     await _firestore
@@ -144,11 +146,10 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   // check if user exists in firestore
-  Future<bool> checkUserExistsInFirestore() async {
-    log('userID: $_uid');
+  Future<bool> checkUserExistsInFirestore({required String uid}) async {
     try {
       final DocumentSnapshot documentSnapshot =
-          await _usersCollection.doc(_uid).get();
+          await _usersCollection.doc(uid).get();
       if (documentSnapshot.exists) {
         return true;
       } else {
@@ -217,7 +218,7 @@ class AuthenticationProvider extends ChangeNotifier {
           context,
         );
         if (user != null) {
-          _uid = user.uid;
+          //_uid = user.uid;
           _phoneNumber = user.phoneNumber;
           _isLoading = false;
           notifyListeners();
@@ -313,7 +314,7 @@ class AuthenticationProvider extends ChangeNotifier {
     required String verificationId,
     required String otpCode,
     required BuildContext context,
-    required Function() onSuccess,
+    required Function(String) onSuccess,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -326,7 +327,7 @@ class AuthenticationProvider extends ChangeNotifier {
           await _handlePhoneAuthCredential(credential, context);
 
       if (user != null) {
-        _uid = user.uid;
+        //_uid = user.uid;
         _phoneNumber = user.phoneNumber;
         _isSuccessful = true;
         _isLoading = false;
@@ -349,7 +350,7 @@ class AuthenticationProvider extends ChangeNotifier {
         });
         return;
       }
-      onSuccess();
+      onSuccess(user!.uid);
     } catch (e) {
       _handleAuthError(e, context);
     }
@@ -434,7 +435,7 @@ class AuthenticationProvider extends ChangeNotifier {
         phoneNumber: phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
           await _auth.signInWithCredential(credential).then((value) async {
-            _uid = value.user!.uid;
+            //_uid = value.user!.uid;
             _phoneNumber = value.user!.phoneNumber;
             _isSuccessful = true;
             _isLoading = false;
@@ -503,7 +504,7 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
-    _uid = userCredential.user!.uid;
+    //_uid = userCredential.user!.uid;
     notifyListeners();
 
     return userCredential;
@@ -518,7 +519,7 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
-    _uid = userCredential.user!.uid;
+    //_uid = userCredential.user!.uid;
     notifyListeners();
 
     return userCredential;

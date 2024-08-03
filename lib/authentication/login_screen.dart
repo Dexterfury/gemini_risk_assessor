@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,10 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
         // Handle successful authentication
-        bool userExists = await authProvider.checkUserExistsInFirestore();
+        bool userExists = await authProvider.checkUserExistsInFirestore(
+            uid: userCredential.user!.uid);
         bool wasAnonymous = authProvider.isUserAnonymous();
 
         if (userExists && !wasAnonymous) {
+          log('here');
           await authProvider.getUserDataFromFireStore();
           await authProvider.saveUserDataToSharedPreferences();
         } else {

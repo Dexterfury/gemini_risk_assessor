@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -22,7 +23,10 @@ class _LandingScreenState extends State<LandingScreen> {
   void checkAuthentication() async {
     final authProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    AuthStatus authStatus = await authProvider.checkAuthenticationState();
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    AuthStatus authStatus = await authProvider.checkAuthenticationState(
+      uid: _auth.currentUser?.uid,
+    );
     navigate(authStatus: authStatus);
   }
 

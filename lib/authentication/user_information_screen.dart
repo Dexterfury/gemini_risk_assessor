@@ -107,7 +107,8 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
   // save user data to firestore
   void saveUserDataToFireStore() async {
     final authProvider = context.read<AuthenticationProvider>();
-    final uid = widget.uid.isNotEmpty ? widget.uid : authProvider.uid!;
+    final uid =
+        widget.uid.isNotEmpty ? widget.uid : authProvider.userModel!.uid;
 
     MyDialogs.showMyAnimatedDialog(
       context: context,

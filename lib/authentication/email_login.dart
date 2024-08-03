@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -51,7 +50,8 @@ class _LoginScreenState extends State<EmailLogin> {
 
           if (isVerified) {
             // 1. check if this user exist in firestore
-            bool userExist = await authProvider.checkUserExistsInFirestore();
+            bool userExist = await authProvider.checkUserExistsInFirestore(
+                uid: userCredential.user!.uid);
 
             if (userExist) {
               // 2. get user data from firestore

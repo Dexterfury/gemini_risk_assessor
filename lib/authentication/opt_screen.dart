@@ -164,9 +164,10 @@ class _OTPScreenState extends State<OTPScreen> {
       verificationId: verificationId,
       otpCode: otpCode,
       context: context,
-      onSuccess: () async {
+      onSuccess: (uid) async {
         // 1. check if user exists in firestore
-        bool userExists = await authProvider.checkUserExistsInFirestore();
+        bool userExists =
+            await authProvider.checkUserExistsInFirestore(uid: uid);
 
         if (userExists) {
           // 2. if user exists,
