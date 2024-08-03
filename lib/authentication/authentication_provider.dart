@@ -25,7 +25,6 @@ class AuthenticationProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isSuccessful = false;
   int? _resendToken;
-  //String? _uid;
   String? _phoneNumber;
   Timer? _timer;
   int _secondsRemaining = 60;
@@ -41,7 +40,6 @@ class AuthenticationProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isSuccessful => _isSuccessful;
   int? get resendToken => _resendToken;
-  //String? get uid => _uid;
   String? get phoneNumber => _phoneNumber;
   Timer? get timer => _timer;
   int get secondsRemaining => _secondsRemaining;
@@ -327,7 +325,6 @@ class AuthenticationProvider extends ChangeNotifier {
           await _handlePhoneAuthCredential(credential, context);
 
       if (user != null) {
-        //_uid = user.uid;
         _phoneNumber = user.phoneNumber;
         _isSuccessful = true;
         _isLoading = false;
@@ -435,7 +432,6 @@ class AuthenticationProvider extends ChangeNotifier {
         phoneNumber: phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
           await _auth.signInWithCredential(credential).then((value) async {
-            //_uid = value.user!.uid;
             _phoneNumber = value.user!.phoneNumber;
             _isSuccessful = true;
             _isLoading = false;
