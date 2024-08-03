@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/message_widget.dart';
@@ -9,10 +9,10 @@ import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
+import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
-import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:grouped_list/grouped_list.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ChatList extends StatefulWidget {
@@ -23,6 +23,7 @@ class ChatList extends StatefulWidget {
     this.tool,
     required this.generationType,
   });
+
   final String groupID;
   final AssessmentModel? assessment;
   final ToolModel? tool;
@@ -35,65 +36,114 @@ class ChatList extends StatefulWidget {
 class _ChatListState extends State<ChatList> {
   // scroll controller
   final ScrollController _scrollController = ScrollController();
+  final int _pageSize = 20;
   List<DiscussionMessage> _messages = [];
   bool _isLoading = false;
   DocumentSnapshot? _lastDocument;
-  static const int _pageSize = 20;
+  bool _hasMore = true;
+  StreamSubscription<QuerySnapshot>? _newMessagesSubscription;
 
   @override
   void initState() {
     super.initState();
-    _loadMessages();
+    _loadMoreMessages();
     _scrollController.addListener(_scrollListener);
+    _setupNewMessagesStream();
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+    _newMessagesSubscription?.cancel();
     super.dispose();
+  }
+
+  void _setupNewMessagesStream() {
+    final itemID =
+        widget.tool != null ? widget.tool!.id : widget.assessment!.id;
+    _newMessagesSubscription = FirebaseMethods.getMessagesStream(
+      groupID: widget.groupID,
+      itemID: itemID,
+      generationType: widget.generationType,
+      limit: _pageSize,
+    ).listen((snapshot) {
+      List<DiscussionMessage> liveMessages = snapshot.docs
+          .map((doc) =>
+              DiscussionMessage.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      setState(() {
+        _messages = _mergeMessages(_messages, liveMessages);
+      });
+    });
+  }
+
+  List<DiscussionMessage> _mergeMessages(List<DiscussionMessage> oldMessages,
+      List<DiscussionMessage> newMessages) {
+    final allMessageIds = Set<String>.from(oldMessages.map((m) => m.messageID));
+    for (var message in newMessages) {
+      if (!allMessageIds.contains(message.messageID)) {
+        oldMessages.add(message);
+        allMessageIds.add(message.messageID);
+      }
+    }
+    oldMessages.sort((a, b) => b.timeSent.compareTo(a.timeSent));
+    return oldMessages;
   }
 
   void _scrollListener() {
     if (_scrollController.offset >=
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
-      _loadMessages();
+      _loadMoreMessages();
     }
   }
 
-  Future<void> _loadMessages() async {
-    if (_isLoading) return;
+  Future<void> _loadMoreMessages() async {
+    if (_isLoading || !_hasMore) return;
 
     setState(() {
       _isLoading = true;
     });
 
-    final itemID =
-        widget.tool != null ? widget.tool!.id : widget.assessment!.id;
-
     try {
-      final newMessages = await FirebaseMethods.getMessages(
+      final itemID =
+          widget.tool != null ? widget.tool!.id : widget.assessment!.id;
+      final query = FirebaseMethods.getMessagesQuery(
         groupID: widget.groupID,
         itemID: itemID,
         generationType: widget.generationType,
-        asStream: false,
-        limit: _pageSize,
-        startAfter: _lastDocument,
       );
 
+      QuerySnapshot querySnapshot;
+      if (_lastDocument == null) {
+        querySnapshot = await query.limit(_pageSize).get();
+      } else {
+        querySnapshot = await query
+            .startAfterDocument(_lastDocument!)
+            .limit(_pageSize)
+            .get();
+      }
+
+      final newMessages = querySnapshot.docs
+          .map((doc) =>
+              DiscussionMessage.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
       setState(() {
-        _messages.addAll(newMessages);
+        _messages = _mergeMessages(_messages, newMessages);
         _isLoading = false;
-        if (newMessages.isNotEmpty) {
-          _lastDocument = newMessages.last as DocumentSnapshot;
+        if (querySnapshot.docs.isNotEmpty) {
+          _lastDocument = querySnapshot.docs.last;
         }
+        _hasMore = querySnapshot.docs.length == _pageSize;
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      log('Error loading messages: $e');
+      print('Error loading messages: $e');
     }
   }
 
@@ -102,88 +152,120 @@ class _ChatListState extends State<ChatList> {
     // current user uid
     final userModel = context.read<AuthenticationProvider>().userModel!;
     final discussionChatProvider = context.read<DiscussionChatProvider>();
-    final itemID =
-        widget.tool != null ? widget.tool!.id : widget.assessment!.id;
-    return _messages.isEmpty && _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : _messages.isEmpty
-            ? Center(
-                child: Text(
-                  'Send the first message',
-                  textAlign: TextAlign.center,
-                  style: AppTheme.textStyle18Bold,
-                ),
-              )
-            : GroupedListView<DiscussionMessage, DateTime>(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                reverse: true,
-                controller: _scrollController,
-                elements: _messages,
-                groupBy: (element) => DateTime(
-                  element.timeSent.year,
-                  element.timeSent.month,
-                  element.timeSent.day,
-                ),
-                groupHeaderBuilder: (dynamic groupedByValue) =>
-                    SizedBox(height: 40, child: buildDateTime(groupedByValue)),
-                itemBuilder: (context, DiscussionMessage message) {
-                  final isMe = message.senderUID == userModel.uid;
-                  final deletedByCurrentUser =
-                      message.deletedBy.contains(userModel.uid);
+    if (_messages.isEmpty && !_isLoading) {
+      return Center(
+        child: Text(
+          'No messages yet. Start the conversation!',
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: _messages.length + 1, // +1 for the loading indicator
+      reverse: true,
+      itemBuilder: (context, index) {
+        // if (index == _messages.length) {
+        //   return _isLoading
+        //       ? const Center(child: CircularProgressIndicator())
+        //       : _hasMore
+        //           ? const SizedBox.shrink()
+        //           : const Center(child: Text('No more messages'));
+        // }
 
-                  FirebaseMethods.setMessageStatus(
-                    currentUserId: userModel.uid,
-                    groupID: widget.groupID,
-                    messageID: message.messageID,
-                    itemID: itemID,
-                    isSeenByList: message.seenBy,
-                    generationType: widget.generationType,
-                  );
+        if (index == _messages.length) {
+          return _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : const SizedBox.shrink();
+        }
 
-                  return deletedByCurrentUser
-                      ? const SizedBox.shrink()
-                      : GestureDetector(
-                          onTap: () {},
-                          child: Hero(
-                            tag: message.messageID,
-                            child: MessageWidget(
-                              message: message,
-                              isMe: isMe,
-                              currentUserUID: userModel.uid,
-                              onRightSwipe: () {
-                                final messageReply = MessageReplyModel(
-                                  message: message.message,
-                                  senderUID: message.senderUID,
-                                  senderName: message.senderName,
-                                  senderImage: message.senderImage,
-                                  messageType: message.messageType,
-                                );
-                                context
-                                    .read<DiscussionChatProvider>()
-                                    .setMessageReplyModel(messageReply);
-                              },
-                              onSubmitQuizResult: (messageID, results) async {
-                                discussionChatProvider.updateQuiz(
-                                  currentUser: userModel,
-                                  groupID: widget.groupID,
-                                  messageID: messageID,
-                                  itemID: itemID,
-                                  generationType: widget.generationType,
-                                  quizData: message.quizData,
-                                  quizResults: results,
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                },
-                groupComparator: (value1, value2) => value2.compareTo(value1),
-                itemComparator: (item1, item2) =>
-                    item2.timeSent.compareTo(item1.timeSent!),
-                useStickyGroupSeparators: true,
-                floatingHeader: true,
-                order: GroupedListOrder.ASC,
-              );
+        final message = _messages[index];
+        final previousMessage =
+            index < _messages.length - 1 ? _messages[index + 1] : null;
+
+        final isDateSeparator = previousMessage == null ||
+            !isSameDay(message.timeSent, previousMessage.timeSent);
+
+        return Column(
+          children: [
+            if (isDateSeparator) _buildDateSeparator(message.timeSent),
+            _buildMessageItem(message, userModel, discussionChatProvider),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildMessageItem(DiscussionMessage message, UserModel userModel,
+      DiscussionChatProvider discussionChatProvider) {
+    final isMe = message.senderUID == userModel.uid;
+    final deletedByCurrentUser = message.deletedBy.contains(userModel.uid);
+
+    if (deletedByCurrentUser) return const SizedBox.shrink();
+
+    FirebaseMethods.setMessageStatus(
+      currentUserId: userModel.uid,
+      groupID: widget.groupID,
+      messageID: message.messageID,
+      itemID: widget.tool != null ? widget.tool!.id : widget.assessment!.id,
+      isSeenByList: message.seenBy,
+      generationType: widget.generationType,
+    );
+
+    return GestureDetector(
+      onTap: () {},
+      child: Hero(
+        tag: message.messageID,
+        child: MessageWidget(
+          message: message,
+          isMe: isMe,
+          currentUserUID: userModel.uid,
+          onRightSwipe: () {
+            final messageReply = MessageReplyModel(
+              message: message.message,
+              senderUID: message.senderUID,
+              senderName: message.senderName,
+              senderImage: message.senderImage,
+              messageType: message.messageType,
+            );
+            discussionChatProvider.setMessageReplyModel(messageReply);
+          },
+          onSubmitQuizResult: (messageID, results) async {
+            discussionChatProvider.updateQuiz(
+              currentUser: userModel,
+              groupID: widget.groupID,
+              messageID: messageID,
+              itemID:
+                  widget.tool != null ? widget.tool!.id : widget.assessment!.id,
+              generationType: widget.generationType,
+              quizData: message.quizData,
+              quizResults: results,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateSeparator(DateTime date) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          DateFormat('MMMM dd, yyyy').format(date),
+          style: AppTheme.textStyle16w600,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 }

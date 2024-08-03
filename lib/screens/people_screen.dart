@@ -55,7 +55,8 @@ class _PeopleScreenState extends State<PeopleScreen> {
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseMethods.allUsersStream(),
+          stream:
+              FirebaseMethods.allUsersStream(searchQuery: _searchQuery.value),
           builder: (context, snapshot) {
             return CustomScrollView(
               slivers: [

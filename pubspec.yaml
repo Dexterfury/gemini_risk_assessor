@@ -74,7 +74,6 @@ dependencies:
   sign_in_with_apple: ^6.1.1
   flutter_pw_validator: ^1.6.0
   flutter_launcher_icons: ^0.13.1
-  grouped_list: ^6.0.0
   date_format: ^2.0.7
   swipe_to: 1.0.6
   cached_video_player: ^2.0.4
@@ -84,6 +83,7 @@ dependencies:
   url_launcher: ^6.3.0
   pull_to_refresh: ^2.0.0
   firebase_pagination: ^4.0.1
+  flutter_sticky_header: ^0.6.5
 
 
 dev_dependencies:

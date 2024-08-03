@@ -16,8 +16,9 @@ class GroupsSearchStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     return Consumer<GroupProvider>(builder: (context, groupProvider, child) {
+      final searchQuery = groupProvider.searchQuery.toLowerCase();
       return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseMethods.groupsQuery(
+        stream: FirebaseMethods.groupsStream(
           userId: uid,
           groupID: '',
           fromShare: false,
@@ -51,29 +52,41 @@ class GroupsSearchStream extends StatelessWidget {
               .where(
                 (element) =>
                     element[Constants.name].toString().toLowerCase().contains(
-                          groupProvider.searchQuery.toLowerCase(),
+                          searchQuery,
                         ),
               )
               .toList();
 
-          if (results.isEmpty) {
-            return const Center(child: Text('No matching results'));
-          }
-
-          return GridView.builder(
-              itemCount: results.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1,
-              ),
-              itemBuilder: (context, index) {
-                final doc = results[index];
-                final groupData = doc.data() as Map<String, dynamic>;
-                final group = GroupModel.fromJson(groupData);
-                return GroupGridItem(
-                  groupModel: group,
-                );
-              });
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: results.isEmpty
+                ? const Center(
+                    child: Text(
+                    'No matching results',
+                    style: AppTheme.textStyle18Bold,
+                  ))
+                : GridView.builder(
+                    itemCount: results.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      final doc = results[index];
+                      final groupData = doc.data() as Map<String, dynamic>;
+                      final group = GroupModel.fromJson(groupData);
+                      return GroupGridItem(
+                        groupModel: group,
+                      );
+                    }),
+          );
         },
       );
     });

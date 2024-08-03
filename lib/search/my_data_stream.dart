@@ -21,64 +21,60 @@ class MyDataStream extends StatelessWidget {
 
   final GenerationType generationType;
   final String groupID;
-  final int limit = 20;
 
   @override
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     final query = getQuery(uid, groupID, generationType);
     final title = getAppBarTitle(generationType);
+    final int limit = 20;
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Consumer<TabProvider>(
-        builder: (context, tabProvider, child) {
-          final searchQuery = getSearchQuery(tabProvider, generationType);
+    return Consumer<TabProvider>(
+      builder: (context, tabProvider, child) {
+        final searchQuery = getSearchQuery(tabProvider, generationType);
 
-          return FirestorePagination(
-            query: query,
-            limit: limit, // query limit
-            isLive: true,
-            viewType: ViewType.list,
-            onEmpty: const Center(
-              child: Text('No data available'),
-            ),
-            bottomLoader: const Center(
-              child: CircularProgressIndicator(),
-            ),
-            initialLoader: const Center(
-              child: CircularProgressIndicator(),
-            ),
-            itemBuilder: (context, documentSnapshot, index) {
-              final data =
-                  documentSnapshot[index].data() as Map<String, dynamic>;
+        return FirestorePagination(
+          query: query,
+          limit: limit, // query limit
+          isLive: true,
+          viewType: ViewType.list,
+          onEmpty: const Center(
+            child: Text('No data available'),
+          ),
+          bottomLoader: const Center(
+            child: CircularProgressIndicator(),
+          ),
+          initialLoader: const Center(
+            child: CircularProgressIndicator(),
+          ),
+          itemBuilder: (context, documentSnapshot, index) {
+            final data = documentSnapshot[index].data() as Map<String, dynamic>;
 
-              // Apply search filter
-              if (!data[Constants.title]
-                  .toString()
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase())) {
-                return const SizedBox.shrink();
-              }
+            // Apply search filter
+            if (!data[Constants.title]
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase())) {
+              return const SizedBox.shrink();
+            }
 
-              if (generationType == GenerationType.tool) {
-                final tool = ToolModel.fromJson(data);
-                return ToolItem(
-                  toolModel: tool,
-                  groupID: groupID,
-                );
-              } else {
-                final assessment = AssessmentModel.fromJson(data);
-                return ListItem(
-                  docTitle: title,
-                  groupID: '',
-                  data: assessment,
-                );
-              }
-            },
-          );
-        },
-      ),
+            if (generationType == GenerationType.tool) {
+              final tool = ToolModel.fromJson(data);
+              return ToolItem(
+                toolModel: tool,
+                groupID: groupID,
+              );
+            } else {
+              final assessment = AssessmentModel.fromJson(data);
+              return ListItem(
+                docTitle: title,
+                groupID: '',
+                data: assessment,
+              );
+            }
+          },
+        );
+      },
     );
   }
 

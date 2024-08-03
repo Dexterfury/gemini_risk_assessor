@@ -88,10 +88,24 @@ class FirebaseMethods {
   }
 
   // get all users stream
-  static Stream<QuerySnapshot> allUsersStream() {
-    return usersCollection
-        .where(Constants.isAnonymous, isEqualTo: false)
-        .snapshots();
+  // static Stream<QuerySnapshot> allUsersStream() {
+  //   return usersCollection
+  //       .where(Constants.isAnonymous, isEqualTo: false)
+  //       .snapshots();
+  // }
+  static Stream<QuerySnapshot> allUsersStream({String? searchQuery}) {
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      // Use startAt and endAt for prefix search
+      return usersCollection
+          .where(Constants.name,
+              isGreaterThanOrEqualTo: searchQuery.toLowerCase())
+          .where(Constants.name,
+              isLessThan: searchQuery.toLowerCase() +
+                  'z') // 'z' is for lexicographic ordering
+          .snapshots();
+    } else {
+      return usersCollection.snapshots();
+    }
   }
 
   // stream risk assessments from firestore
@@ -164,31 +178,34 @@ class FirebaseMethods {
       {required String userId,
       required String groupID,
       required bool fromShare}) {
-    if (fromShare) {
-      if (groupID.isNotEmpty) {
-        return groupsCollection
-            .where(Constants.membersUIDs, arrayContains: userId)
-            .where(Constants.groupID, isNotEqualTo: groupID)
-            .orderBy(
-              Constants.createdAt,
-              descending: true,
-            );
-      } else {
-        return groupsCollection
-            .where(Constants.membersUIDs, arrayContains: userId)
-            .orderBy(
-              Constants.createdAt,
-              descending: true,
-            );
-      }
-    } else {
-      return groupsCollection
-          .where(Constants.membersUIDs, arrayContains: userId)
-          .orderBy(
-            Constants.createdAt,
-            descending: true,
-          );
+    Query query = groupsCollection
+        .where(Constants.membersUIDs, arrayContains: userId)
+        .orderBy(Constants.createdAt, descending: true);
+
+    if (fromShare && groupID.isNotEmpty) {
+      query = query.where(Constants.groupID, isNotEqualTo: groupID);
     }
+
+    return query;
+  }
+
+  static Stream<QuerySnapshot> groupsStream({
+    required String userId,
+    required String groupID,
+    required bool fromShare,
+  }) {
+    var snapshot = groupsCollection
+        .where(Constants.membersUIDs, arrayContains: userId)
+        .orderBy(
+          Constants.createdAt,
+          descending: true,
+        );
+
+    if (fromShare && groupID.isNotEmpty) {
+      snapshot = snapshot.where(Constants.groupID, isNotEqualTo: groupID);
+    }
+
+    return snapshot.snapshots();
   }
 
   // stream notifications from firestore
@@ -549,32 +566,51 @@ class FirebaseMethods {
         .snapshots();
   }
 
-  // get messages
+  static Query<Map<String, dynamic>> getMessagesQuery({
+    required String groupID,
+    required String itemID,
+    required GenerationType generationType,
+  }) {
+    final collection = getCollectionRef(generationType);
+    return groupsCollection
+        .doc(groupID)
+        .collection(collection)
+        .doc(itemID)
+        .collection(Constants.chatMessagesCollection)
+        .orderBy(Constants.timeSent, descending: true);
+  }
+
+  static Stream<QuerySnapshot> getMessagesStream({
+    required String groupID,
+    required String itemID,
+    required GenerationType generationType,
+    required int limit,
+  }) {
+    final collection = getCollectionRef(generationType);
+    return groupsCollection
+        .doc(groupID)
+        .collection(collection)
+        .doc(itemID)
+        .collection(Constants.chatMessagesCollection)
+        .orderBy(Constants.timeSent, descending: true)
+        .limit(limit)
+        .snapshots();
+  }
+
+// get messages
   static dynamic getMessages({
     required String groupID,
     required String itemID,
     required GenerationType generationType,
     bool asStream = false,
-    int limit = 20,
-    DocumentSnapshot? startAfter,
   }) {
     try {
       final collection = getCollectionRef(generationType);
-      var query = groupsCollection
+      final query = groupsCollection
           .doc(groupID)
           .collection(collection)
           .doc(itemID)
-          .collection(Constants.chatMessagesCollection)
-          .orderBy(Constants.timeSent, descending: true);
-
-      if (startAfter != null) {
-        query = query.startAfterDocument(startAfter);
-      }
-
-      // Apply limit only if it's a stream
-      if (asStream) {
-        query = query.limit(limit);
-      }
+          .collection(Constants.chatMessagesCollection);
 
       if (asStream) {
         return query.snapshots().map((snapshot) {
