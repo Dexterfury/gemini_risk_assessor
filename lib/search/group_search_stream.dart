@@ -17,7 +17,7 @@ class GroupsSearchStream extends StatelessWidget {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     return Consumer<GroupProvider>(builder: (context, groupProvider, child) {
       return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseMethods.groupsStream(
+        stream: FirebaseMethods.groupsQuery(
           userId: uid,
           groupID: '',
           fromShare: false,

@@ -21,6 +21,7 @@ class MyDataStream extends StatelessWidget {
 
   final GenerationType generationType;
   final String groupID;
+  final int limit = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class MyDataStream extends StatelessWidget {
 
           return FirestorePagination(
             query: query,
-            limit: 20, // Adjust this value based on your needs
+            limit: limit, // query limit
             isLive: true,
             viewType: ViewType.list,
             onEmpty: const Center(

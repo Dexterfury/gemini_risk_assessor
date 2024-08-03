@@ -124,7 +124,7 @@ class _ShareScreenState extends State<ShareScreen> {
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseMethods.groupsStream(
+          stream: FirebaseMethods.groupsQuery(
             userId: uid,
             groupID: widget.groupID,
             fromShare: true,

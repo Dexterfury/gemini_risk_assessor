@@ -160,7 +160,7 @@ class FirebaseMethods {
   }
 
   // stream groups from firestore
-  static Stream<QuerySnapshot> groupsStream(
+  static Query groupsQuery(
       {required String userId,
       required String groupID,
       required bool fromShare}) {
@@ -172,16 +172,14 @@ class FirebaseMethods {
             .orderBy(
               Constants.createdAt,
               descending: true,
-            )
-            .snapshots();
+            );
       } else {
         return groupsCollection
             .where(Constants.membersUIDs, arrayContains: userId)
             .orderBy(
               Constants.createdAt,
               descending: true,
-            )
-            .snapshots();
+            );
       }
     } else {
       return groupsCollection
@@ -189,8 +187,7 @@ class FirebaseMethods {
           .orderBy(
             Constants.createdAt,
             descending: true,
-          )
-          .snapshots();
+          );
     }
   }
 
@@ -558,14 +555,26 @@ class FirebaseMethods {
     required String itemID,
     required GenerationType generationType,
     bool asStream = false,
+    int limit = 20,
+    DocumentSnapshot? startAfter,
   }) {
     try {
       final collection = getCollectionRef(generationType);
-      final query = groupsCollection
+      var query = groupsCollection
           .doc(groupID)
           .collection(collection)
           .doc(itemID)
-          .collection(Constants.chatMessagesCollection);
+          .collection(Constants.chatMessagesCollection)
+          .orderBy(Constants.timeSent, descending: true);
+
+      if (startAfter != null) {
+        query = query.startAfterDocument(startAfter);
+      }
+
+      // Apply limit only if it's a stream
+      if (asStream) {
+        query = query.limit(limit);
+      }
 
       if (asStream) {
         return query.snapshots().map((snapshot) {
@@ -585,6 +594,38 @@ class FirebaseMethods {
       return asStream ? Stream.empty() : Future.value([]);
     }
   }
+  // static dynamic getMessages({
+  //   required String groupID,
+  //   required String itemID,
+  //   required GenerationType generationType,
+  //   bool asStream = false,
+  // }) {
+  //   try {
+  //     final collection = getCollectionRef(generationType);
+  //     final query = groupsCollection
+  //         .doc(groupID)
+  //         .collection(collection)
+  //         .doc(itemID)
+  //         .collection(Constants.chatMessagesCollection);
+
+  //     if (asStream) {
+  //       return query.snapshots().map((snapshot) {
+  //         return snapshot.docs.map((doc) {
+  //           return DiscussionMessage.fromMap(doc.data());
+  //         }).toList();
+  //       });
+  //     } else {
+  //       return query.get().then((snapshot) {
+  //         return snapshot.docs.map((doc) {
+  //           return DiscussionMessage.fromMap(doc.data());
+  //         }).toList();
+  //       });
+  //     }
+  //   } catch (e) {
+  //     log('error loading messages: $e');
+  //     return asStream ? Stream.empty() : Future.value([]);
+  //   }
+  // }
 
   // set message status
   static Future<void> setMessageStatus({
