@@ -1,4 +1,3 @@
-import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/widgets/stacked_reactions.dart';
 import 'package:gemini_risk_assessor/discussions/display_message_type.dart';
@@ -7,6 +6,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class MyDiscussionMessage extends StatelessWidget {
@@ -21,7 +21,7 @@ class MyDiscussionMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final time = formatDate(message.timeSent, [hh, ':', nn, ' ', am]);
+    final time = DateFormat('hh:mm a').format(message.timeSent);
     final isReplying = message.repliedTo.isNotEmpty;
     // get the reations from the list
     final messageReations =

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
@@ -64,21 +63,6 @@ getCollectionRef(GenerationType generationType) {
   } else {
     return Constants.assessmentCollection;
   }
-}
-
-Center buildDateTime(groupedByValue) {
-  return Center(
-    child: Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          formatDate(groupedByValue.timeSent, [dd, ' ', M, ', ', yyyy]),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    ),
-  );
 }
 
 Widget messageToShow({

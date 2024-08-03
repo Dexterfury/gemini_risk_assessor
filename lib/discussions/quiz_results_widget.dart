@@ -1,10 +1,10 @@
-import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_reply_preview.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
+import 'package:intl/intl.dart';
 
 class QuizResultsWidget extends StatelessWidget {
   final DiscussionMessage message;
@@ -55,7 +55,7 @@ class QuizResultsWidget extends StatelessWidget {
     final createdAtTimestamp = participantData[Constants.createdAt];
     final createdAtDateTime =
         DateTime.fromMillisecondsSinceEpoch(createdAtTimestamp);
-    final time = formatDate(createdAtDateTime, [hh, ':', nn, ' ', am]);
+    final time = DateFormat('hh:mm a').format(message.timeSent);
 
     quizData.questions.asMap().forEach((index, question) {
       final userAnswer = answers[index.toString()];
