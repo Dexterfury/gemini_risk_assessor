@@ -81,13 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: MyAppBar(
         leading: BackButton(),
         title: 'Profile',
-        actions: [
-          IconButton(
-              onPressed: () async {
-                await FirebaseMethods.generateAndSaveDummyAssessments(uid);
-              },
-              icon: Icon(Icons.edit)),
-        ],
+        actions: [],
       ),
       body: StreamBuilder(
         stream: FirebaseMethods.userStream(userID: uid),
