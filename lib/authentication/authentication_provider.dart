@@ -631,66 +631,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  // Future<UserCredential?> _signInWithApple({bool link = false}) async {
-  //   try {
-  //     final appleIdCredential = await SignInWithApple.getAppleIDCredential(
-  //       scopes: [
-  //         AppleIDAuthorizationScopes.email,
-  //         AppleIDAuthorizationScopes.fullName,
-  //       ],
-  //       webAuthenticationOptions: Platform.isAndroid
-  //           ? WebAuthenticationOptions(
-  //               clientId: 'com.raphaeldaka.geminiriskassessor.signin',
-  //               redirectUri: Uri.parse(
-  //                 'https://gemini-risk-assessor.firebaseapp.com/__/auth/handler',
-  //               ),
-  //             )
-  //           : null,
-  //     );
-
-  //     final oAuthCredential = OAuthProvider('apple.com');
-  //     final credential = oAuthCredential.credential(
-  //       idToken: appleIdCredential.identityToken,
-  //       accessToken: appleIdCredential.authorizationCode,
-  //     );
-
-  //     UserCredential userCredential;
-  //     if (link && isUserAnonymous() == true) {
-  //       userCredential = await FirebaseAuth.instance.currentUser!
-  //           .linkWithCredential(credential);
-  //     } else {
-  //       userCredential =
-  //           await FirebaseAuth.instance.signInWithCredential(credential);
-  //     }
-
-  //     // Determine the display name
-  //     String displayName;
-  //     if (appleIdCredential.givenName != null &&
-  //         appleIdCredential.familyName != null) {
-  //       displayName =
-  //           '${appleIdCredential.givenName} ${appleIdCredential.familyName}';
-  //     } else {
-  //       displayName = 'Apple User';
-  //     }
-
-  //     // Update the user's display name
-  //     await userCredential.user?.updateDisplayName(displayName);
-
-  //     // Fetch the user again to ensure we have the updated information
-  //     await userCredential.user?.reload();
-
-  //     return userCredential;
-  //   } on SignInWithAppleAuthorizationException catch (e) {
-  //     log('User cancelled the authorization flow: $e');
-  //     setLoading(false);
-  //     return null;
-  //   } catch (e) {
-  //     log('error Apple Sign In : ${e.toString()}');
-  //     setLoading(false);
-  //     return null;
-  //   }
-  // }
-
   // send verification email
   Future<void> sendEmailVerification() async {
     await _auth.currentUser!.sendEmailVerification();
@@ -916,8 +856,6 @@ class AuthenticationProvider extends ChangeNotifier {
       try {
         final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
         String? token = await firebaseMessaging.getToken();
-
-        log('Token: $token');
 
         // save token to firestore for authenticated users, not anonymous users
         if (!_userModel!.isAnonymous) {

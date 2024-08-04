@@ -82,7 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
         bool wasAnonymous = authProvider.isUserAnonymous();
 
         if (userExists && !wasAnonymous) {
-          log('here');
           await authProvider.getUserDataFromFireStore();
           await authProvider.saveUserDataToSharedPreferences();
         } else {
