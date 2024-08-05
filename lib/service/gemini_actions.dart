@@ -63,7 +63,12 @@ class _GeminiActionsState extends State<GeminiActions> {
           groupID: widget.groupID,
           generationType: widget.generationType,
         )
-            .whenComplete(() {
+            .whenComplete(() async {
+          final qTitle = widget.assessment != null
+              ? widget.assessment!.title
+              : widget.tool!.title;
+
+          await AnalyticsHelper.logGenerateAIQuiz(qTitle);
           // pop the loading dialog
           Navigator.pop(context);
 

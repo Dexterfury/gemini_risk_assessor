@@ -681,7 +681,9 @@ class _GroupDetailsState extends State<GroupDetails>
                     .addMemberToGroup(
                   uid: uid,
                 )
-                    .whenComplete(() {
+                    .whenComplete(() async {
+                  await AnalyticsHelper.logJoinGroup(
+                      groupProvider.groupModel.name);
                   showSnackBar(
                     context: context,
                     message:

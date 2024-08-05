@@ -220,7 +220,8 @@ class _CreateNearMissState extends State<CreateNearMiss> {
       groupID: widget.groupID,
       description: desc,
       dateTime: _dateTime,
-      onSuccess: () {
+      onSuccess: () async {
+        await AnalyticsHelper.logReportNearMiss();
         Navigator.pop(context);
         Future.delayed(const Duration(milliseconds: 500)).whenComplete(() {
           action();
