@@ -13,6 +13,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
+import 'package:gemini_risk_assessor/utilities/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -118,7 +119,8 @@ class AssessmentProvider extends ChangeNotifier {
         // Open the generated PDF
         await PDFHandler.openPDF(pdfFile.path, fileName);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error creating PDF');
       // Reset loading state
       _isLoading = false;
       notifyListeners();
@@ -190,10 +192,9 @@ class AssessmentProvider extends ChangeNotifier {
   }) async {
     try {
       await PDFHandler.openPDF(pdfUrl, fileName);
-    } catch (e) {
-      print("Error opening PDF: $e");
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error creating PDF');
       onError(e.toString());
-      // Handle error (e.g., show an error message to the user)
     } finally {
       onSuccess();
     }
@@ -579,15 +580,11 @@ class AssessmentProvider extends ChangeNotifier {
         notifyListeners();
         onSuccess();
       }
-    } catch (error) {
-      // geminiFailureResponse = 'Failed to reach Gemini. \n\n$error';
-      log('just error: $error');
-      if (kDebugMode) {
-        print(error);
-      }
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error generating content');
       _isLoading = false;
       notifyListeners();
-      onError(error.toString());
+      onError(e.toString());
     }
   }
 

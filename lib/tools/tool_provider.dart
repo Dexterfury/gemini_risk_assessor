@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
+import 'package:gemini_risk_assessor/utilities/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -69,9 +69,9 @@ class ToolsProvider extends ChangeNotifier {
             );
 
         return true; // Indicate successful save
-      } catch (e) {
-        print("Error saving tool: $e");
-        return false; // Indicate failed save
+      } catch (e, stack) {
+        ErrorHandler.recordError(e, stack, reason: 'Error saving tool: $e');
+        return false;
       }
     }
     return false; // No tool model to save
@@ -80,61 +80,6 @@ class ToolsProvider extends ChangeNotifier {
   // Add a method to clear the entered data
   void clearImages() {
     _imagesFileList = [];
-    notifyListeners();
-  }
-
-  setMacTestToolsList() {
-    final Map<String, dynamic> dataMap = {
-      Constants.id: '774b4250-0628-4381-a921-636009b3941c',
-      Constants.name: 'Brick Trowel Set',
-      Constants.description:
-          'This set of three brick trowels is perfect for any masonry project. The largest trowel is ideal for spreading mortar and leveling bricks, while the smaller trowels are perfect for finishing work and applying grout. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles. To use the trowels, simply dip the blade into the mortar and spread it evenly onto the surface. Then, use the trowel to level the mortar and place the bricks. Once the bricks are in place, use the trowel to apply grout to the joints. When using the trowels, be sure to wear safety glasses and gloves to protect yourself from debris and mortar. Always use a firm grip on the handle and avoid using excessive force.',
-      Constants.summary:
-          'This set of three brick trowels is perfect for any masonry project. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles.',
-      Constants.toolPdf: '',
-      Constants.images: [
-        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000019.jpg'
-      ],
-      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
-      Constants.createdAt: 1718868958685,
-    };
-
-    _toolModel = ToolModel.fromJson(dataMap);
-
-    _toolsList = [];
-
-    // make alist of 10 tools
-    for (int i = 0; i < 10; i++) {
-      _toolsList.add(_toolModel!);
-    }
-    log('testTools');
-    notifyListeners();
-  }
-
-  setWindowsTestToolsList() {
-    final Map<String, dynamic> dataMap = {
-      Constants.id: 'd9320635-5a71-4437-a526-172957038b92',
-      Constants.name: 'Claw Hammer',
-      Constants.description:
-          'A claw hammer is a versatile tool used for driving nails and removing them. It consists of a wooden or fiberglass handle attached to a metal head with a hammer face on one side and a claw on the other. To drive a nail, hold the hammer near the end of the handle for more force or closer to the head for more control. Swing the hammer in a smooth arc, striking the nail head squarely. To remove a nail, place the claw under the nail head and rock the hammer back and forth until the nail is loose. Be careful not to damage the surrounding material when removing nails. ',
-      Constants.summary:
-          'A claw hammer is a common tool used for driving and removing nails in various applications, from construction and carpentry to home repairs.',
-      Constants.toolPdf: '',
-      Constants.images: [
-        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000033.jpg'
-      ],
-      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
-      Constants.createdAt: 1718868958685,
-    };
-
-    _toolModel = ToolModel.fromJson(dataMap);
-
-    _toolsList = [];
-
-    // make alist of 10 tools
-    for (int i = 0; i < 10; i++) {
-      _toolsList.add(_toolModel!);
-    }
     notifyListeners();
   }
 
@@ -263,46 +208,6 @@ class ToolsProvider extends ChangeNotifier {
   void resetPromptData() {
     _imagesFileList = [];
     _maxImages = 10;
-    notifyListeners();
-  }
-
-  Future<void> macTestPrompt() async {
-    final Map<String, dynamic> dataMap = {
-      Constants.id: '774b4250-0628-4381-a921-636009b3941c',
-      Constants.name: 'Brick Trowel Set',
-      Constants.description:
-          'This set of three brick trowels is perfect for any masonry project. The largest trowel is ideal for spreading mortar and leveling bricks, while the smaller trowels are perfect for finishing work and applying grout. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles. To use the trowels, simply dip the blade into the mortar and spread it evenly onto the surface. Then, use the trowel to level the mortar and place the bricks. Once the bricks are in place, use the trowel to apply grout to the joints. When using the trowels, be sure to wear safety glasses and gloves to protect yourself from debris and mortar. Always use a firm grip on the handle and avoid using excessive force.',
-      Constants.summary:
-          'This set of three brick trowels is perfect for any masonry project. The trowels are made of high-quality stainless steel with comfortable, ergonomic handles.',
-      Constants.toolPdf: '',
-      Constants.images: [
-        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000019.jpg'
-      ],
-      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
-      Constants.createdAt: 1718868958685,
-    };
-
-    _toolModel = ToolModel.fromJson(dataMap);
-    notifyListeners();
-  }
-
-  Future<void> windowstestPrompt() async {
-    final Map<String, dynamic> dataMap = {
-      Constants.id: 'd9320635-5a71-4437-a526-172957038b92',
-      Constants.name: 'Claw Hammer',
-      Constants.description:
-          'A claw hammer is a versatile tool used for driving nails and removing them. It consists of a wooden or fiberglass handle attached to a metal head with a hammer face on one side and a claw on the other. To drive a nail, hold the hammer near the end of the handle for more force or closer to the head for more control. Swing the hammer in a smooth arc, striking the nail head squarely. To remove a nail, place the claw under the nail head and rock the hammer back and forth until the nail is loose. Be careful not to damage the surrounding material when removing nails. ',
-      Constants.summary:
-          'A claw hammer is a common tool used for driving and removing nails in various applications, from construction and carpentry to home repairs.',
-      Constants.toolPdf: '',
-      Constants.images: [
-        '/data/user/0/com.raphaeldaka.geminiriskassessor/cache/scaled_1000000033.jpg'
-      ],
-      Constants.createdBy: 'bl5Beci5pcfsuvwtU11XgFUv29X2',
-      Constants.createdAt: 1718868958685,
-    };
-
-    _toolModel = ToolModel.fromJson(dataMap);
     notifyListeners();
   }
 

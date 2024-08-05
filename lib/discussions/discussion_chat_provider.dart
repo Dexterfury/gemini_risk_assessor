@@ -11,6 +11,7 @@ import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
+import 'package:gemini_risk_assessor/utilities/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:uuid/uuid.dart';
@@ -68,8 +69,6 @@ class DiscussionChatProvider extends ChangeNotifier {
         collection: collection,
       );
 
-      log('count: $quizCount');
-
       final quiz = QuizModel.fromGeneratedContent(
         content,
         itemID,
@@ -114,8 +113,8 @@ class DiscussionChatProvider extends ChangeNotifier {
           .set(discussionMessage.toMap());
       _isLoadingQuiz = false;
       notifyListeners();
-    } catch (e) {
-      log('Error generating quiz: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error generating quiz');
       _isLoadingQuiz = false;
       notifyListeners();
     }
@@ -215,8 +214,8 @@ class DiscussionChatProvider extends ChangeNotifier {
       }
       _isLoadingAnswer = false;
       notifyListeners();
-    } catch (e) {
-      log('Error updating quiz: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error updating quiz');
       _isLoadingAnswer = false;
       notifyListeners();
     }
@@ -271,10 +270,10 @@ class DiscussionChatProvider extends ChangeNotifier {
       _isLoadingQuiz = false;
       notifyListeners();
       return additionalDataMessage;
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error updating quiz');
       _isLoadingAdditionalData = false;
       notifyListeners();
-      return null;
     }
   }
 
@@ -306,7 +305,9 @@ class DiscussionChatProvider extends ChangeNotifier {
         return content.text!;
       }
       return '';
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack,
+          reason: 'Error summarizing chat messages');
       _isSummarizing = false;
       notifyListeners();
       return e.toString();
@@ -381,9 +382,8 @@ class DiscussionChatProvider extends ChangeNotifier {
       onSucess();
       // set message reply model to null
       setMessageReplyModel(null);
-    } catch (e) {
-      // set loading to false
-      log('erro message: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error sending message');
       _isLoading = false;
       onError(e.toString());
     }

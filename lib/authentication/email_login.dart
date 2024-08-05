@@ -88,8 +88,6 @@ class _LoginScreenState extends State<EmailLogin> {
           FirebaseAuthErrorHandler.showErrorSnackBar(context, e);
         });
       } catch (e) {
-        log('signIn error: $e');
-
         Future.delayed(const Duration(milliseconds: 200), () {
           showSnackBar(
               context: context, message: 'An unexpected error occurred: $e');

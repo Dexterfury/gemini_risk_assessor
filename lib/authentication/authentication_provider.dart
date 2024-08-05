@@ -1,18 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
+import 'package:gemini_risk_assessor/utilities/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -153,20 +151,9 @@ class AuthenticationProvider extends ChangeNotifier {
       } else {
         return false;
       }
-    } on FirebaseException catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-      return false;
-    } on PlatformException catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-      return false;
-    } catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack,
+          reason: 'Error checking user existence');
       return false;
     }
   }
@@ -249,8 +236,7 @@ class AuthenticationProvider extends ChangeNotifier {
         try {
           userCredential = await currentUser.linkWithCredential(credential);
           wasAnonymouse = true;
-        } on FirebaseAuthException catch (e) {
-          log('sign out: ${e.code}');
+        } on FirebaseAuthException catch (e, stack) {
           if (e.code == 'credential-already-in-use') {
             // If the credential is already associated with an account,
             // sign out the anonymous user and sign in with the credential
@@ -258,7 +244,7 @@ class AuthenticationProvider extends ChangeNotifier {
             userCredential = await _auth.signInWithCredential(credential);
             wasAnonymouse = true;
           } else {
-            log('ERROR: $e');
+            ErrorHandler.recordError(e, stack, reason: 'Error signing in');
             throw e;
           }
         }
@@ -270,43 +256,11 @@ class AuthenticationProvider extends ChangeNotifier {
 
       //await _postSignInActions(context, userCredential.user!);
       return (userCredential.user, wasAnonymouse);
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error signing in');
       return (null, false);
-      //_handleAuthError(e, context);
     }
   }
-
-  // Future<void> _postSignInActions(BuildContext context, User user) async {
-  //   _uid = user.uid;
-  //   _phoneNumber = user.phoneNumber;
-  //   _isSuccessful = true;
-  //   _isLoading = false;
-  //   notifyListeners();
-
-  //   bool userExists = await checkUserExistsInFirestore(user.uid);
-  //   if (userExists) {
-  //     await getUserDataFromFireStore(user.uid);
-  //     await saveUserDataToSharedPreferences();
-  //     navigationController(
-  //         context: context, route: Constants.screensControllerRoute);
-  //   } else {
-  //     // If the user doesn't exist in Firestore, we need to save their data
-  //     UserModel userModel = UserModel(
-  //       uid: user.uid,
-  //       name: user.displayName ??
-  //           "User${(1000 + (DateTime.now().millisecondsSinceEpoch % 9000))}",
-  //       phone: user.phoneNumber ?? '',
-  //       imageUrl: user.photoURL ?? '',
-  //       token: '',
-  //       aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
-  //       createdAt: DateTime.now().toIso8601String(),
-  //     );
-  //     await saveUserDataToFireStore(userModel: userModel);
-  //     await saveUserDataToSharedPreferences();
-  //     navigationController(
-  //         context: context, route: Constants.screensControllerRoute);
-  //   }
-  // }
 
   Future<void> verifyOTPCode({
     required String verificationId,
@@ -391,7 +345,6 @@ class AuthenticationProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
     showSnackBar(context: context, message: error.toString());
-    log('Error: ${error.toString()}');
   }
 
   void _startTimer() {
@@ -521,31 +474,6 @@ class AuthenticationProvider extends ChangeNotifier {
     return userCredential;
   }
 
-  // sign in with google
-  // Future<UserCredential?> _signInWithGoogle() async {
-  //   _isLoading = true;
-  //   notifyListeners();
-  //   final GoogleSignInAccount? googleSignInAccount =
-  //       await GoogleSignIn().signIn();
-
-  //   if (googleSignInAccount == null) {
-  //     return null;
-  //   }
-
-  //   final GoogleSignInAuthentication googleSignInAuthentication =
-  //       await googleSignInAccount.authentication;
-  //   final AuthCredential credential = GoogleAuthProvider.credential(
-  //     accessToken: googleSignInAuthentication.accessToken,
-  //     idToken: googleSignInAuthentication.idToken,
-  //   );
-
-  //   final UserCredential userCredential =
-  //       await _auth.signInWithCredential(credential);
-  //   _uid = userCredential.user!.uid;
-  //   notifyListeners();
-  //   return userCredential;
-  // }
-
   Future<UserCredential?> _signInWithGoogle({bool link = false}) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -562,10 +490,8 @@ class AuthenticationProvider extends ChangeNotifier {
       } else {
         return await _auth.signInWithCredential(credential);
       }
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      log('Error in _signInWithGoogle: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error in _signInWithGoogle');
       return null;
     }
   }
@@ -618,14 +544,8 @@ class AuthenticationProvider extends ChangeNotifier {
       await userCredential.user?.reload();
 
       return userCredential;
-    } on SignInWithAppleAuthorizationException catch (e) {
-      log('User cancelled the authorization flow: $e');
-      print("SignInWithAppleAuthorizationException: ${e.toString()}");
-      setLoading(false);
-      return null;
-    } catch (e) {
-      log('error Apple Sign In : ${e.toString()}');
-      print("Unexpected error in Apple Sign In: ${e.toString()}");
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error in _signInWithApple');
       setLoading(false);
       return null;
     }
@@ -775,7 +695,6 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   static Future<void> sendPasswordResetEmail({
-    required BuildContext context,
     required String email,
     required Function() onSuccess,
     required Function(String) onError,
@@ -784,12 +703,15 @@ class AuthenticationProvider extends ChangeNotifier {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
       onSuccess();
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack,
+          reason: 'Error during sending password reset email');
       onError(e.toString());
     }
   }
 
   static Future<bool> checkOldPassword({
+    required BuildContext context,
     required String email,
     required String password,
   }) async {
@@ -801,7 +723,13 @@ class AuthenticationProvider extends ChangeNotifier {
           .reauthenticateWithCredential(authCredential);
 
       return credentialResult.user != null;
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error during password check');
+      // We show snackBar to our user
+      await showSnackBar(
+        context: context,
+        message: 'Error during updating password, please try again later',
+      );
       return false;
     }
   }
@@ -815,13 +743,20 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       await user.updatePassword(newPassword);
       return true;
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack,
+          reason: 'Error during password change');
+      // We show snackBar to our user
+      await showSnackBar(
+        context: context,
+        message: 'Error during updating password, please try again later',
+      );
       return false;
     }
   }
 
   // sign out
-  Future<void> signOut() async {
+  Future<void> signOut({required BuildContext context}) async {
     try {
       // clear user token from firestore
       await _usersCollection.doc(_userModel!.uid).update({
@@ -835,18 +770,14 @@ class AuthenticationProvider extends ChangeNotifier {
       // remove user data from shared preferences
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.remove(Constants.userModel);
-    } on FirebaseException catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-    } on PlatformException catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        log('Error occured: $e');
-      }
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error during sign out');
+      // We show snackBar to our user
+      await showSnackBar(
+        context: context,
+        message:
+            'We encountered an issue while signing you out. Please try again later. If the problem persists, please contact support.',
+      );
     }
   }
 
@@ -863,8 +794,9 @@ class AuthenticationProvider extends ChangeNotifier {
             Constants.token: token,
           });
         }
-      } catch (e) {
-        log('FCM TOKEN ERROR: ${e.toString()}');
+      } catch (e, stack) {
+        ErrorHandler.recordError(e, stack,
+            reason: 'FCM TOKEN GENERATION ERROR');
       }
     }
   }

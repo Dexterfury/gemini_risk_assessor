@@ -75,7 +75,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     onTap: () {
                       if (formKey.currentState!.validate()) {
                         AuthenticationProvider.sendPasswordResetEmail(
-                            context: context,
                             email: _emailController.text,
                             onSuccess: () {
                               showSnackBar(

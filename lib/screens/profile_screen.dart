@@ -320,7 +320,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 context
                                                     .read<
                                                         AuthenticationProvider>()
-                                                    .signOut()
+                                                    .signOut(context: context)
                                                     .whenComplete(() {
                                                   // remove all routes and navigateo to loging screen
                                                   Navigator.pushAndRemoveUntil(

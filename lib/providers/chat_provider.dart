@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/message.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
+import 'package:gemini_risk_assessor/utilities/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
@@ -299,7 +300,8 @@ class ChatProvider extends ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-    } on FirebaseException catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error generating content');
       _isLoading = false;
       notifyListeners();
     }
@@ -386,10 +388,11 @@ class ChatProvider extends ChangeNotifier {
       }
 
       onSuccess();
-    } catch (error) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error sending message');
       _isLoading = false;
       notifyListeners();
-      onError(error.toString());
+      onError(e.toString());
     }
   }
 
@@ -559,7 +562,8 @@ class ChatProvider extends ChangeNotifier {
         tool: toolModel,
         generationType: generationType,
       );
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error clearing chat');
       _isLoading = false;
       notifyListeners();
     }
