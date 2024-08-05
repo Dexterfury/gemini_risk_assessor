@@ -1,16 +1,55 @@
-# gemini_risk_assessor
+# Gemini Risk Assessor
 
-A new Flutter project.
+## Overview
 
-## Getting Started
+Gemini Risk Assessor is an innovative AI-powered mobile application designed to revolutionize workplace safety management. Built with Flutter and Firebase, this app leverages artificial intelligence to provide intelligent risk assessments, safety task instructions, and collaborative safety management tools.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- AI-powered risk assessments
+- Smart tools explainer
+- Near miss reporting
+- Group management
+- Interactive AI quizzes
+- AI-powered group chats
+- PDF report generation
+- Real-time notifications
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Documentation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This repository contains the public documentation for the Gemini Risk Assessor app. The main app code is not hosted here.
+
+### Contents
+
+1. [Marketing Page](index.md)
+   - Overview of app features and benefits
+   - Contact information
+
+2. [Privacy Policy](privacy-policy.md)
+   - Details on data collection and usage
+   - User rights and contact information
+
+## Getting the App
+
+Gemini Risk Assessor is currently in development and will be available on the App Store soon. Stay tuned for updates!
+
+## Contact
+
+For any inquiries about Gemini Risk Assessor, please contact:
+
+Raphael Daka
+- Email: raphaelsquared@gmail.com or dexterfury101@icloud.com
+
+## License
+
+This documentation is licensed under the [Creative Commons Attribution 4.0 International License](LICENSE.md).
+
+## Acknowledgments
+
+- Thanks to all beta testers and early adopters
+- Powered by Flutter, Firebase, and Gemini AI
+
+---
+
+© 2024 Raphael Daka. All Rights Reserved.
+

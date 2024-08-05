@@ -81,9 +81,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: MyAppBar(
         leading: BackButton(),
         title: 'Profile',
-        actions: [
-          IconButton(onPressed: () => throw Exception(), icon: Icon(Icons.add)),
-        ],
       ),
       body: StreamBuilder(
         stream: FirebaseMethods.userStream(userID: uid),
