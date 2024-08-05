@@ -6,14 +6,14 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
+import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
+import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:provider/provider.dart';
 
 navigationControler({
   required BuildContext context,
   required RemoteMessage message,
 }) async {
-  //if (context == null) return;
-
   switch (message.data[Constants.notificationType]) {
     case Constants.groupInvitation:
       // navigate to groups tab
@@ -38,9 +38,27 @@ navigationControler({
       break;
     case Constants.assessmentNotification:
       // navigate to friend requests screen
+      final String groupID = message.data[Constants.groupID];
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RiskAssessmentsScreen(
+            groupID: groupID,
+          ),
+        ),
+      );
 
       break;
     case Constants.toolsNotification:
+      final String groupID = message.data[Constants.groupID];
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ToolsScreen(
+            groupID: groupID,
+          ),
+        ),
+      );
       break;
 
     case Constants.chatNotification:

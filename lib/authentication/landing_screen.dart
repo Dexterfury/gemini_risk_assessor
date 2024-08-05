@@ -70,9 +70,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 width: 150,
                 child: Image.asset(
                   AssetsManager.appLogo,
-                )
-                //Lottie.asset(AssetsManager.clipboardAnimation),
-                ),
+                )),
             const Text(
               'Gemini Risk Assessor',
               style: TextStyle(

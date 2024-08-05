@@ -16,6 +16,7 @@ import 'package:gemini_risk_assessor/providers/theme_provider.dart';
 import 'package:gemini_risk_assessor/screens/about_screen.dart';
 import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
+import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
@@ -170,6 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const SizedBox(height: 10),
 
                               // show safety points here
+                              _buildSafetyPoints(userModel),
                             ],
                           ),
                         )
@@ -365,6 +367,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  _buildSafetyPoints(UserModel userModel) {
+    if (userModel.safetyPoints == 0) {
+      return const SizedBox();
+    }
+    int points = int.parse(userModel.safetyPoints.toStringAsFixed(0));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        SizedBox(
+            height: 18,
+            width: 18,
+            child: Image.asset(
+              AssetsManager.appLogo,
+            )),
+        const SizedBox(width: 5),
+        Text(getFormatedCount(points),
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            )),
+      ],
     );
   }
 
