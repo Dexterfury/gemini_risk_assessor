@@ -21,6 +21,13 @@ extension WeatherExtension on Weather {
   }
 }
 
+enum ErrorSeverity {
+  low,
+  medium,
+  high,
+  critical,
+}
+
 // data title enum
 enum ListHeader {
   equipments,

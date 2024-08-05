@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/authentication/change_password.dart';
 import 'package:gemini_risk_assessor/authentication/login_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/help/help_screen.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
@@ -65,6 +66,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Profile Screen',
+      screenClass: 'ProfileScreen',
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
     bool canChangePassword = user != null &&
@@ -96,255 +106,264 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final userModel =
               UserModel.fromJson(snapshot.data!.data() as Map<String, dynamic>);
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10.0,
-                vertical: 20,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Card(
-                    color: Theme.of(context).cardColor,
-                    elevation: AppTheme.cardElevation,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return _buildProfileContent(
+            isMyProfile,
+            userModel,
+            isAnonymous,
+            uid,
+            canChangePassword,
+            themeProvider,
+          );
+        },
+      ),
+    );
+  }
+
+  _buildProfileContent(bool isMyProfile, UserModel userModel, bool isAnonymous,
+      String uid, bool canChangePassword, ThemeProvider themeProvider) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 20,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              color: Theme.of(context).cardColor,
+              elevation: AppTheme.cardElevation,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildImageView(
+                          context,
+                          isMyProfile,
+                          userModel,
+                          isAnonymous,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              _buildImageView(
-                                context,
-                                isMyProfile,
+                              _buildNameView(
                                 userModel,
+                                isMyProfile,
+                                context,
+                                uid,
                                 isAnonymous,
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    _buildNameView(
-                                      userModel,
-                                      isMyProfile,
-                                      context,
-                                      uid,
-                                      isAnonymous,
-                                    ),
-                                    // display phone number
-                                    if (isMyProfile && !isAnonymous)
-                                      Text(
-                                          userModel.phone.isNotEmpty
-                                              ? userModel.phone
-                                              : userModel.email,
-                                          style: AppTheme.textStyle16w600),
+                              // display phone number
+                              if (isMyProfile && !isAnonymous)
+                                Text(
+                                    userModel.phone.isNotEmpty
+                                        ? userModel.phone
+                                        : userModel.email,
+                                    style: AppTheme.textStyle16w600),
 
-                                    const SizedBox(height: 10),
+                              const SizedBox(height: 10),
 
-                                    // show safety points here
-                                  ],
-                                ),
-                              )
+                              // show safety points here
                             ],
                           ),
-                          const Divider(
-                            color: Colors.grey,
-                            thickness: 1,
-                          ),
-                          _buildAboutMe(
-                            isMyProfile,
-                            context,
-                            userModel,
-                            uid,
-                            isAnonymous,
-                          ),
-                          AnimatedReadMoreText(
-                            userModel.aboutMe,
-                            maxLines: 3,
-                            // Set a custom text style for the main block of text
-                            textStyle: const TextStyle(
-                              fontSize: 16,
-                            ),
-                            // Set a custom text style for the expand/collapse button
-                            buttonTextStyle: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                        )
+                      ],
+                    ),
+                    const Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
+                    _buildAboutMe(
+                      isMyProfile,
+                      context,
+                      userModel,
+                      uid,
+                      isAnonymous,
+                    ),
+                    AnimatedReadMoreText(
+                      userModel.aboutMe,
+                      maxLines: 3,
+                      // Set a custom text style for the main block of text
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                      ),
+                      // Set a custom text style for the expand/collapse button
+                      buttonTextStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  !isMyProfile
-                      ? const SizedBox()
-                      : Column(
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            !isMyProfile
+                ? const SizedBox()
+                : Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          'Settings',
+                          style: AppTheme.textStyle18w500,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Card(
+                        color: Theme.of(context).cardColor,
+                        elevation: AppTheme.cardElevation,
+                        child: Column(
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                'Settings',
-                                style: AppTheme.textStyle18w500,
-                              ),
+                            SettingsListTile(
+                              title: 'Notifications',
+                              icon: Icons.notifications,
+                              iconContainerColor: Colors.red,
+                              onTap: () {
+                                // navigate to account settings
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const NotificationsScreen(),
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Card(
-                              color: Theme.of(context).cardColor,
-                              elevation: AppTheme.cardElevation,
-                              child: Column(
-                                children: [
-                                  SettingsListTile(
-                                    title: 'Notifications',
-                                    icon: Icons.notifications,
-                                    iconContainerColor: Colors.red,
-                                    onTap: () {
-                                      // navigate to account settings
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const NotificationsScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  SettingsListTile(
-                                    title: 'Help',
-                                    icon: Icons.help,
-                                    iconContainerColor: Colors.yellow,
-                                    onTap: () async {
-                                      // navigate to help center
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const HelpScreen()));
-                                    },
-                                  ),
-                                  SettingsListTile(
-                                    title: 'About',
-                                    icon: Icons.info,
-                                    iconContainerColor: Colors.blue,
-                                    onTap: () {
-                                      // navigate to about screen
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AboutScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  if (canChangePassword)
-                                    SettingsListTile(
-                                      title: 'Change Password',
-                                      icon: Icons.lock,
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ChangePassword(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ListTile(
-                                    contentPadding: const EdgeInsets.only(
-                                      left: 8.0,
-                                      right: 8.0,
-                                    ),
-                                    leading: IconContainer(
-                                      icon: themeProvider.isDarkMode
-                                          ? Icons.wb_sunny
-                                          : Icons.nightlight_round,
-                                    ),
-                                    title: const Text('Change theme'),
-                                    trailing: Switch(
-                                      value: themeProvider.isDarkMode,
-                                      onChanged: (value) {
-                                        themeProvider.toggleTheme();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            SettingsListTile(
+                              title: 'Help',
+                              icon: Icons.help,
+                              iconContainerColor: Colors.yellow,
+                              onTap: () async {
+                                // navigate to help center
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const HelpScreen()));
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Card(
-                              color: Theme.of(context).cardColor,
-                              elevation: AppTheme.cardElevation,
-                              child: Column(
-                                children: [
-                                  SettingsListTile(
-                                    title: isAnonymous ? 'Sign In' : 'Log Out',
-                                    icon: Icons.logout_outlined,
-                                    iconContainerColor: Colors.red,
-                                    onTap: () async {
-                                      if (isAnonymous) {
-                                        navigationController(
-                                          context: context,
-                                          route: Constants.logingRoute,
-                                        );
-                                        return;
-                                      }
-                                      MyDialogs.showMyAnimatedDialog(
-                                          context: context,
-                                          title: 'Log Out',
-                                          content:
-                                              'Are you sure you want to logout?',
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text(
-                                                'Cancel',
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                // logout
-                                                context
-                                                    .read<
-                                                        AuthenticationProvider>()
-                                                    .signOut(context: context)
-                                                    .whenComplete(() {
-                                                  // remove all routes and navigateo to loging screen
-                                                  Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const LoginScreen(),
-                                                    ),
-                                                    (route) => false,
-                                                  );
-                                                });
-                                              },
-                                              child: const Text(
-                                                'Yes',
-                                              ),
-                                            ),
-                                          ]);
-                                    },
+                            SettingsListTile(
+                              title: 'About',
+                              icon: Icons.info,
+                              iconContainerColor: Colors.blue,
+                              onTap: () {
+                                // navigate to about screen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AboutScreen(),
                                   ),
-                                ],
+                                );
+                              },
+                            ),
+                            if (canChangePassword)
+                              SettingsListTile(
+                                title: 'Change Password',
+                                icon: Icons.lock,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ChangePassword(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ListTile(
+                              contentPadding: const EdgeInsets.only(
+                                left: 8.0,
+                                right: 8.0,
+                              ),
+                              leading: IconContainer(
+                                icon: themeProvider.isDarkMode
+                                    ? Icons.wb_sunny
+                                    : Icons.nightlight_round,
+                              ),
+                              title: const Text('Change theme'),
+                              trailing: Switch(
+                                value: themeProvider.isDarkMode,
+                                onChanged: (value) {
+                                  themeProvider.toggleTheme();
+                                },
                               ),
                             ),
                           ],
                         ),
-                ],
-              ),
-            ),
-          );
-        },
+                      ),
+                      const SizedBox(height: 10),
+                      Card(
+                        color: Theme.of(context).cardColor,
+                        elevation: AppTheme.cardElevation,
+                        child: Column(
+                          children: [
+                            SettingsListTile(
+                              title: isAnonymous ? 'Sign In' : 'Log Out',
+                              icon: Icons.logout_outlined,
+                              iconContainerColor: Colors.red,
+                              onTap: () async {
+                                if (isAnonymous) {
+                                  navigationController(
+                                    context: context,
+                                    route: Constants.logingRoute,
+                                  );
+                                  return;
+                                }
+                                MyDialogs.showMyAnimatedDialog(
+                                    context: context,
+                                    title: 'Log Out',
+                                    content: 'Are you sure you want to logout?',
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // logout
+                                          context
+                                              .read<AuthenticationProvider>()
+                                              .signOut(context: context)
+                                              .whenComplete(() {
+                                            // remove all routes and navigateo to loging screen
+                                            Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const LoginScreen(),
+                                              ),
+                                              (route) => false,
+                                            );
+                                          });
+                                        },
+                                        child: const Text(
+                                          'Yes',
+                                        ),
+                                      ),
+                                    ]);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }

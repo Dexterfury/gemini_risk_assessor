@@ -27,6 +27,7 @@ import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
+import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -46,9 +47,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    ErrorHandler.recordError(details.exception, details.stack,
+        reason: details.context.toString());
+  };
   PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    ErrorHandler.recordError(error, stack, reason: 'PlatformDispatcher error');
     return true;
   };
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

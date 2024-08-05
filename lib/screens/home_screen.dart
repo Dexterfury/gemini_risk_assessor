@@ -3,10 +3,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
+import 'package:gemini_risk_assessor/firebase_methods/logger.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
@@ -27,6 +29,10 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    AnalyticsHelper.logScreenView(
+      screenName: 'Home Screen',
+      screenClass: 'HomeScreen',
+    );
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChange);
     requestNotificationPermissions();
@@ -120,12 +126,13 @@ class _HomeScreenState extends State<HomeScreen>
 
     if (notificationSettings.authorizationStatus ==
         AuthorizationStatus.authorized) {
-      print('User granted permission');
+      Logger.log('User granted permission', tag: 'NOTIFICATIONS');
     } else if (notificationSettings.authorizationStatus ==
         AuthorizationStatus.provisional) {
-      print('User granted provisional permission');
+      Logger.log('User granted provisional permission', tag: 'NOTIFICATIONS');
     } else {
-      print('User declined or has not accepted permission');
+      Logger.log('User declined or has not accepted permission',
+          tag: 'NOTIFICATIONS');
     }
   }
 

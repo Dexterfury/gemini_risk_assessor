@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 
 class RiskAssessmentHelpDetails extends StatelessWidget {
   const RiskAssessmentHelpDetails({super.key});
   @override
   Widget build(BuildContext context) {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Risk Assessment Help Details',
+      screenClass: 'RiskAssessmentHelpDetails',
+    );
     return Scaffold(
       appBar: const MyAppBar(leading: BackButton(), title: 'Risk Assessments'),
       body: SafeArea(

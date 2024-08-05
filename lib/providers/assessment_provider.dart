@@ -13,7 +13,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
-import 'package:gemini_risk_assessor/utilities/error_handler.dart';
+import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';

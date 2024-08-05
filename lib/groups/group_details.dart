@@ -8,6 +8,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/buttons/my_fab_button.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/groups/group_details_card.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
@@ -72,6 +73,10 @@ class _GroupDetailsState extends State<GroupDetails>
 
   @override
   void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Group Details',
+      screenClass: 'GroupDetails',
+    );
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(

@@ -30,7 +30,7 @@ class GroupsStream extends StatelessWidget {
       ),
       viewType: ViewType.grid,
       onEmpty: const Center(
-        child: Text('No data available'),
+        child: Text('You have no groups'),
       ),
       bottomLoader: const Center(
         child: CircularProgressIndicator(),

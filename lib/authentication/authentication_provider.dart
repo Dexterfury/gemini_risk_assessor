@@ -10,7 +10,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/utilities/error_handler.dart';
+import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -152,8 +152,12 @@ class AuthenticationProvider extends ChangeNotifier {
         return false;
       }
     } catch (e, stack) {
-      ErrorHandler.recordError(e, stack,
-          reason: 'Error checking user existence');
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error checking user existence',
+        severity: ErrorSeverity.critical,
+      );
       return false;
     }
   }

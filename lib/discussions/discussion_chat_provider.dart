@@ -11,7 +11,7 @@ import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
-import 'package:gemini_risk_assessor/utilities/error_handler.dart';
+import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:uuid/uuid.dart';

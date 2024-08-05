@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
@@ -33,6 +34,15 @@ class _ChatScreenState extends State<ChatScreen> {
   //SpeechToText _speechToText = SpeechToText();
 
   //String _spokenWords = '';
+
+  @override
+  void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Chat Screen',
+      screenClass: 'ChatScreen',
+    );
+    super.initState();
+  }
 
   @override
   void dispose() {

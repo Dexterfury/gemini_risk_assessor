@@ -6,6 +6,8 @@ import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
@@ -54,6 +56,9 @@ class _LoginScreenState extends State<EmailLogin> {
                 uid: userCredential.user!.uid);
 
             if (userExist) {
+              await AnalyticsHelper.logLogin(
+                SignInType.email.name,
+              );
               // 2. get user data from firestore
               await authProvider.getUserDataFromFireStore();
 

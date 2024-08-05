@@ -5,6 +5,8 @@ import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -74,6 +76,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
           userModel: userModel,
           fileImage: _finalFileImage,
           onSuccess: () async {
+            await AnalyticsHelper.logSignUp(SignInType.email.name);
             formKey.currentState!.reset();
             authProvider.setLoading(false);
 

@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
@@ -39,6 +40,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Assessment Details Screen',
+      screenClass: 'AssessmentDetailsScreen',
+    );
     // assessment provider de pendency injection
     final assessmentProvider = getProvider(
       context,

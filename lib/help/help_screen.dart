@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/help/help_item_card.dart';
 
 class HelpScreen extends StatelessWidget {
@@ -8,6 +9,10 @@ class HelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Help Screen',
+      screenClass: 'HelpScreen',
+    );
     return Scaffold(
       appBar: const MyAppBar(
         leading: BackButton(),

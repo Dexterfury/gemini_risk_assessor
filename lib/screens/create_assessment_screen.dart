@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
@@ -24,6 +25,15 @@ class CreateAssessmentScreen extends StatefulWidget {
 
 class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
   final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Create Assessment Screen',
+      screenClass: 'CreateAssessmentScreen',
+    );
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -195,7 +205,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
 
     final authProvider = context.read<AuthenticationProvider>();
     final creatorID = authProvider.userModel!.uid;
-
+    final stopwatch = Stopwatch()..start();
     // show my alert dialog for loading
     MyDialogs.showMyAnimatedDialog(
       context: context,
@@ -209,12 +219,22 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
       groupID: groupID,
       description: _descriptionController.text,
       docTitle: docTitle,
-      onSuccess: () {
+      onSuccess: () async {
+        stopwatch.stop();
+        await AnalyticsHelper.logCustomEvent('risk_assessment_generation_time',
+            parameters: {
+              'duration_ms': stopwatch.elapsedMilliseconds,
+            });
         // pop the loading dialog
         Navigator.pop(context);
         Future.delayed(const Duration(milliseconds: 500)).whenComplete(action);
       },
-      onError: (error) {
+      onError: (error) async {
+        stopwatch.stop();
+        await AnalyticsHelper.logCustomEvent('risk_assessment_generation_time',
+            parameters: {
+              'duration_ms': stopwatch.elapsedMilliseconds,
+            });
         // pop the loading dialog
         Navigator.pop(context);
         showSnackBar(

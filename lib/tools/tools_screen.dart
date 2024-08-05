@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
@@ -36,6 +37,10 @@ class _ToolsScreenState extends State<ToolsScreen> {
 
   @override
   void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Tool Screen',
+      screenClass: 'ToolsScreen',
+    );
     super.initState();
     _initializeStream();
   }

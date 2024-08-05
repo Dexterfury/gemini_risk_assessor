@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/widgets/preview_images.dart';
@@ -47,6 +48,9 @@ class _BottomChatFieldState extends State<BottomChatField> {
     required ChatProvider chatProvider,
     required bool isTextOnly,
   }) async {
+    await AnalyticsHelper.logCustomEvent('send_chat_message', parameters: {
+      'chat_type': 'chat with gemini',
+    });
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     try {
       await chatProvider.sendMessage(

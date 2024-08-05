@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/firebase_methods/notifications_stream.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -17,6 +18,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     setState(() {
       _paginatedStreamKey = UniqueKey();
     });
+  }
+
+  @override
+  void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Notifications Screen',
+      screenClass: 'NotificationsScreen',
+    );
+    super.initState();
   }
 
   @override

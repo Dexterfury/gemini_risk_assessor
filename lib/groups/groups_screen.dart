@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/search/group_search_stream.dart';
 import 'package:gemini_risk_assessor/firebase_methods/groups_stream.dart';
@@ -15,6 +16,10 @@ class GroupsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Groups Screen',
+      screenClass: 'GroupsScreen',
+    );
     bool isAnonymous = context.read<AuthenticationProvider>().isUserAnonymous();
     return Consumer<GroupProvider>(builder: (context, groupProvider, child) {
       handleSearch(String query) {

@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
@@ -33,6 +34,10 @@ class _PeopleScreenState extends State<PeopleScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsHelper.logScreenView(
+      screenName: 'People Screen',
+      screenClass: 'PeopleScreen',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GroupProvider>().setInitialMemberState();
     });

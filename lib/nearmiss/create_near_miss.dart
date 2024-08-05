@@ -6,6 +6,7 @@ import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_details_screen.dart';
 import 'package:gemini_risk_assessor/nearmiss/nm_text_input_field.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
@@ -44,6 +45,10 @@ class _CreateNearMissState extends State<CreateNearMiss> {
 
   @override
   void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Create Near Miss',
+      screenClass: 'CreateNearMiss',
+    );
     super.initState();
     initializeDate();
   }

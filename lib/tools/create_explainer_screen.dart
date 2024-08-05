@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/buttons/gemini_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
@@ -27,6 +28,14 @@ class CreateExplainerScreen extends StatefulWidget {
 class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final PageController _pageController = PageController();
+  @override
+  void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Create Explainer Screen',
+      screenClass: 'CreateExplainerScreen',
+    );
+    super.initState();
+  }
 
   @override
   void dispose() {

@@ -5,6 +5,7 @@ import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_actions.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
@@ -27,6 +28,15 @@ class ChatDiscussionScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatDiscussionScreen> {
+  @override
+  void initState() {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Chat Discussion Scree',
+      screenClass: 'ChatDiscussionScreen',
+    );
+    super.initState();
+  }
+
   void showGeminiActions() {
     Navigator.of(context).push(
       HeroDialogRoute(builder: (context) {

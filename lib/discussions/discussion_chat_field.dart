@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/message_reply_preview.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
@@ -58,7 +59,10 @@ class _BottomChatFieldState extends State<DiscussionChatField> {
   }
 
   // send text message to firestore
-  void sendTextMessage() {
+  void sendTextMessage() async {
+    await AnalyticsHelper.logCustomEvent('send_chat_message', parameters: {
+      'chat_type': 'group',
+    });
     if (_textEditingController.text.isNotEmpty) {
       final currentUser = context.read<AuthenticationProvider>().userModel!;
       final discussionChatProvider = context.read<DiscussionChatProvider>();

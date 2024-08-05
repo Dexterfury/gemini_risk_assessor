@@ -546,16 +546,14 @@ class FirebaseMethods {
     }
   }
 
-  // CHAT METHODS
-  // discussion stream from firestore
-  static Stream<QuerySnapshot> nearMissessStream({
+  // near miss query
+  static Query nearMissessQuery({
     required String groupID,
   }) {
     return groupsCollection
         .doc(groupID)
         .collection(Constants.nearMissesCollection)
-        .orderBy(Constants.createdAt, descending: true)
-        .snapshots();
+        .orderBy(Constants.createdAt, descending: true);
   }
 
   static Query<Map<String, dynamic>> getMessagesQuery({

@@ -9,6 +9,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
@@ -80,9 +81,15 @@ class _LoginScreenState extends State<LoginScreen> {
         bool wasAnonymous = authProvider.isUserAnonymous();
 
         if (userExists && !wasAnonymous) {
+          await AnalyticsHelper.logLogin(
+            authType.name,
+          );
           await authProvider.getUserDataFromFireStore();
           await authProvider.saveUserDataToSharedPreferences();
         } else {
+          await AnalyticsHelper.logSignUp(
+            authType.name,
+          );
           // Fetch the user again to ensure we have the updated information
           await userCredential.user?.reload();
           final updatedUser = FirebaseAuth.instance.currentUser;

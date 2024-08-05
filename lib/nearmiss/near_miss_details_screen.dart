@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/nearmiss/add_control_measure_dialog.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measures_card.dart';
@@ -25,8 +26,11 @@ class NearMissDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsHelper.logScreenView(
+      screenName: 'Near Miss Details Screen',
+      screenClass: 'NearMissDetailsScreen',
+    );
     if (dateTimeFocusNode != null) {
-      log('pop the date time focus node');
       dateTimeFocusNode!.unfocus();
     }
     return Scaffold(
