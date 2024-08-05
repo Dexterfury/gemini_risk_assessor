@@ -42,7 +42,6 @@ class ImagePickerHandler {
           }
         } catch (e) {
           completer.completeError(e);
-          log('message: $e');
         }
       },
     );

@@ -205,6 +205,8 @@ class AuthenticationProvider extends ChangeNotifier {
         if (user != null) {
           //_uid = user.uid;
           _phoneNumber = user.phoneNumber;
+          // update phone with firebase auth
+          //await _auth.currentUser!.updatePhoneNumber(credential);
           _isLoading = false;
           notifyListeners();
         }
@@ -235,6 +237,8 @@ class AuthenticationProvider extends ChangeNotifier {
         // If current user is anonymous, try to link the credential
         try {
           userCredential = await currentUser.linkWithCredential(credential);
+          // update phone with firebase auth
+          await _auth.currentUser!.updatePhoneNumber(credential);
           wasAnonymouse = true;
         } on FirebaseAuthException catch (e, stack) {
           if (e.code == 'credential-already-in-use') {
@@ -242,6 +246,8 @@ class AuthenticationProvider extends ChangeNotifier {
             // sign out the anonymous user and sign in with the credential
             await _auth.signOut();
             userCredential = await _auth.signInWithCredential(credential);
+            // update phone with firebase auth
+            await _auth.currentUser!.updatePhoneNumber(credential);
             wasAnonymouse = true;
           } else {
             ErrorHandler.recordError(e, stack, reason: 'Error signing in');

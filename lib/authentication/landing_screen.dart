@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
@@ -37,7 +38,14 @@ class _LandingScreenState extends State<LandingScreen> {
             context, Constants.screensControllerRoute);
         break;
       case AuthStatus.authenticatedButNoData:
-        Navigator.pushReplacementNamed(context, Constants.userInformationRoute);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserInformationScreen(
+              uid: FirebaseAuth.instance.currentUser!.uid,
+            ),
+          ),
+        );
         break;
       case AuthStatus.unauthenticated:
         Navigator.pushReplacementNamed(context, Constants.logingRoute);

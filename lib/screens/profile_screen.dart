@@ -136,13 +136,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     // display phone number
                                     if (isMyProfile && !isAnonymous)
-                                      FittedBox(
-                                        child: Text(
-                                            userModel.phone.isNotEmpty
-                                                ? userModel.phone
-                                                : userModel.email,
-                                            style: AppTheme.textStyle16w600),
-                                      ),
+                                      Text(
+                                          userModel.phone.isNotEmpty
+                                              ? userModel.phone
+                                              : userModel.email,
+                                          style: AppTheme.textStyle16w600),
 
                                     const SizedBox(height: 10),
 

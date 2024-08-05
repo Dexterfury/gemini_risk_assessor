@@ -120,7 +120,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     UserModel userModel = UserModel(
       uid: uid,
       name: _nameController.text.trim(),
-      phone: authProvider.phoneNumber!,
+      phone: authProvider.phoneNumber ?? '',
       email: '',
       imageUrl: '',
       token: '',
