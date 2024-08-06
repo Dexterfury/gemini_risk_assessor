@@ -155,6 +155,18 @@ class FirebaseMethods {
     }
   }
 
+  static Stream<QuerySnapshot> paginatedNearMissStream({
+    required String groupID,
+    required int limit,
+  }) {
+    return groupsCollection
+        .doc(groupID)
+        .collection(Constants.nearMissesCollection)
+        .orderBy(Constants.createdAt, descending: true)
+        .limit(limit)
+        .snapshots();
+  }
+
   static Query assessmentQuery({
     required String userId,
     required String groupID,

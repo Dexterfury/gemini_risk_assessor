@@ -30,11 +30,66 @@ class NearMissesScreen extends StatefulWidget {
 class _NearMissesScreenState extends State<NearMissesScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  final int _pageSize = 20;
+  List<DocumentSnapshot> _items = [];
+  bool _isLoading = false;
+  bool _hasMore = true;
+  DocumentSnapshot? _lastDocument;
+  Stream<QuerySnapshot>? _nearMissesStream;
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _initializeStream() {
+    _nearMissesStream = FirebaseMethods.paginatedNearMissStream(
+      groupID: widget.groupID,
+      limit: _pageSize,
+    );
+  }
+
+  Future<void> _loadMoreItems() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Query query = FirebaseMethods.nearMissessQuery(
+      groupID: widget.groupID,
+    );
+
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    query = query.limit(_pageSize);
+
+    final QuerySnapshot querySnapshot = await query.get();
+
+    if (querySnapshot.docs.length < _pageSize) {
+      _hasMore = false;
+    }
+
+    setState(() {
+      _items.addAll(querySnapshot.docs);
+      _lastDocument =
+          querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      _isLoading = false;
+    });
+  }
+
+  void _mergeStreamData(List<DocumentSnapshot> streamDocs) {
+    final Set<String> existingIds = _items.map((doc) => doc.id).toSet();
+    final List<DocumentSnapshot> newDocs =
+        streamDocs.where((doc) => !existingIds.contains(doc.id)).toList();
+
+    if (newDocs.isNotEmpty) {
+      _items = [...newDocs, ..._items];
+      _lastDocument = _items.isNotEmpty ? _items.last : null;
+    }
   }
 
   @override
@@ -43,6 +98,7 @@ class _NearMissesScreenState extends State<NearMissesScreen> {
       screenName: 'Near Misses Screen',
       screenClass: 'NearMissesScreen',
     );
+    _initializeStream();
     super.initState();
   }
 
@@ -50,114 +106,173 @@ class _NearMissesScreenState extends State<NearMissesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              leading: const BackButton(),
-              title: const FittedBox(
-                child: Text(Constants.nearMisses),
-              ),
-              pinned: true,
-              floating: true,
-              snap: true,
-              expandedHeight: 120.0,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: const EdgeInsets.only(top: 56.0),
-                  child: MySearchBar(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            CreateNearMiss(groupID: widget.groupID),
-                      ),
-                    );
-                  },
-                  icon: Icon(FontAwesomeIcons.plus),
-                )
-              ],
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.all(8.0),
-              sliver: SliverFillRemaining(
-                //hasScrollBody: true,
-                child: FirestorePagination(
-                  query:
-                      FirebaseMethods.nearMissessQuery(groupID: widget.groupID),
-                  itemBuilder: (context, documentSnapshot, index) {
-                    final data =
-                        documentSnapshot[index].data() as Map<String, dynamic>;
-                    final nearMiss = NearMissModel.fromJson(data);
+        child: StreamBuilder<QuerySnapshot>(
+          stream: _nearMissesStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Center(child: Text('Something went wrong'));
+            }
 
-                    if (_searchQuery.isNotEmpty &&
-                        !nearMiss.description
-                            .toLowerCase()
-                            .contains(_searchQuery.toLowerCase())) {
-                      return const SizedBox.shrink();
-                    }
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                _items.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-                    return NearMissItem(nearMiss: nearMiss);
-                  },
-                  isLive: true,
-                  onEmpty: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'No Near Misses Yet!',
-                            textAlign: TextAlign.center,
-                            style: AppTheme.textStyle18w500,
-                          ),
-                          const SizedBox(height: 10),
-                          OpenContainer(
-                            closedBuilder: (context, action) {
-                              return SizedBox(
-                                height: 50.0,
-                                child: MainAppButton(
-                                  label: ' Create a Near Miss',
-                                  borderRadius: 15.0,
-                                  onTap: action,
-                                ),
-                              );
-                            },
-                            openBuilder: (context, action) {
-                              return CreateNearMiss(groupID: widget.groupID);
-                            },
-                            closedShape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            transitionType: ContainerTransitionType.fadeThrough,
-                            transitionDuration:
-                                const Duration(milliseconds: 500),
-                            closedElevation: AppTheme.cardElevation,
-                            openElevation: 4,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  initialLoader:
-                      const Center(child: CircularProgressIndicator()),
-                ),
-              ),
-            ),
-          ],
+            // Merge stream data with existing items
+            if (snapshot.hasData) {
+              _mergeStreamData(snapshot.data!.docs);
+            }
+
+            return _buildContent();
+          },
         ),
       ),
     );
+  }
+
+  Widget _buildContent() {
+    if (_items.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final results = _items
+        .where(
+          (element) =>
+              element[Constants.description].toString().toLowerCase().contains(
+                    _searchQuery.toLowerCase(),
+                  ),
+        )
+        .toList();
+
+    return _buildGroupView(results);
+  }
+
+  Widget _buildEmptyState() {
+    return Scaffold(
+      appBar: MyAppBar(
+        leading: BackButton(),
+        title: Constants.nearMisses,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'No Near Misses Yet!',
+                textAlign: TextAlign.center,
+                style: AppTheme.textStyle18w500,
+              ),
+              const SizedBox(height: 10),
+              OpenContainer(
+                closedBuilder: (context, action) {
+                  return SizedBox(
+                    height: 50.0,
+                    child: MainAppButton(
+                      label: ' Create a Near Miss',
+                      borderRadius: 15.0,
+                      onTap: action,
+                    ),
+                  );
+                },
+                openBuilder: (context, action) {
+                  return CreateNearMiss(groupID: widget.groupID);
+                },
+                closedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                transitionType: ContainerTransitionType.fadeThrough,
+                transitionDuration: const Duration(milliseconds: 500),
+                closedElevation: AppTheme.cardElevation,
+                openElevation: 4,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupView(List<DocumentSnapshot> results) {
+    return CustomScrollView(
+      slivers: [
+        _buildSliverAppBar(),
+        SliverPadding(
+          padding: const EdgeInsets.all(8.0),
+          sliver: results.isEmpty
+              ? const SliverFillRemaining(
+                  child: Center(child: Text('No matching results')),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index == results.length) {
+                        return _buildLoadMoreButton();
+                      }
+                      final doc = results[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      final nearMiss = NearMissModel.fromJson(data);
+
+                      return NearMissItem(nearMiss: nearMiss);
+                    },
+                    childCount: results.length + 1,
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      leading: const BackButton(),
+      title: const FittedBox(
+        child: Text(Constants.nearMisses),
+      ),
+      pinned: true,
+      floating: true,
+      snap: true,
+      expandedHeight: 120.0,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 56.0),
+          child: MySearchBar(
+            controller: _searchController,
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
+          ),
+        ),
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CreateNearMiss(groupID: widget.groupID),
+              ),
+            );
+          },
+          icon: Icon(FontAwesomeIcons.plus),
+        )
+      ],
+    );
+  }
+
+  Widget _buildLoadMoreButton() {
+    if (!_hasMore) {
+      return const SizedBox.shrink();
+    }
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : ElevatedButton(
+            onPressed: _loadMoreItems,
+            child: const Text('Load More'),
+          );
   }
 }
 

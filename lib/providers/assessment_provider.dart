@@ -144,8 +144,6 @@ class AssessmentProvider extends ChangeNotifier {
   // save assement to firetore
   Future<void> saveDataToFirestore() async {
     final id = _groupID.isNotEmpty ? _groupID : _uid;
-    // get folder directory
-    final folderName = 'RiskAssessments';
 
     if (_assessmentModel.images.isNotEmpty) {
       List<String> imagesUrls = [];
@@ -153,7 +151,7 @@ class AssessmentProvider extends ChangeNotifier {
         final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
           file: File(image),
           reference:
-              '${Constants.images}/$folderName/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
+              '${Constants.images}/${Constants.assessmentCollection}/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
         );
         imagesUrls.add(imageUrl);
       }
@@ -534,10 +532,7 @@ class AssessmentProvider extends ChangeNotifier {
 
     // get model to use text or vision
     //var model = await GeminiService.getModel(images: _maxImages);
-    var model = await _modelManager.getModel(
-      isVision: _maxImages < 10,
-      isDocumentSpecific: true,
-    );
+    var model = await _modelManager.createModel();
 
     // set description to use in prompt
     await setDocData(

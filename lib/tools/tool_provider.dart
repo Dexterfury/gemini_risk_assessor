@@ -52,7 +52,7 @@ class ToolsProvider extends ChangeNotifier {
             final imageUrl = await FileUploadHandler.uploadFileAndGetUrl(
               file: File(image),
               reference:
-                  '${Constants.images}/tools/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
+                  '${Constants.images}/${Constants.toolsCollection}/$id/${DateTime.now().toIso8601String()}${path.extension(image)}',
             );
             imagesUrls.add(imageUrl);
           }
@@ -222,10 +222,7 @@ class ToolsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      var model = await _modelManager.getModel(
-        isVision: _maxImages < 10,
-        isDocumentSpecific: true,
-      );
+      var model = await _modelManager.createModel();
 
       await setToolData(
         description,

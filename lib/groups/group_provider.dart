@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
@@ -32,12 +33,6 @@ class GroupProvider extends ChangeNotifier {
   List<String> get awaitApprovalsList => _awaitApprovalList;
   GroupModel get groupModel => _groupModel;
   List<String> get tempGroupMemberUIDs => _tempGroupMemberUIDs;
-
-  final CollectionReference _usersCollection =
-      FirebaseFirestore.instance.collection(Constants.usersCollection);
-
-  final CollectionReference _groupsCollection =
-      FirebaseFirestore.instance.collection(Constants.groupsCollection);
 
   final Map<String, ValueNotifier<bool>> _awaitingApprovalValueNotifiers = {};
   final Map<String, ValueNotifier<bool>> _tempMemberValueNotifiers = {};
@@ -120,7 +115,7 @@ class GroupProvider extends ChangeNotifier {
     required String groupID,
   }) async {
     // add the membeer to adminslist
-    await _groupsCollection.doc(groupID).update({
+    await FirebaseMethods.groupsCollection.doc(groupID).update({
       Constants.adminsUIDs: FieldValue.arrayUnion([memberData.uid]),
     });
     // to to locally update the list
@@ -134,7 +129,7 @@ class GroupProvider extends ChangeNotifier {
     required String groupID,
   }) async {
     // remove the member from adminslist
-    await _groupsCollection.doc(groupID).update({
+    await FirebaseMethods.groupsCollection.doc(groupID).update({
       Constants.adminsUIDs: FieldValue.arrayRemove([memberData.uid]),
     });
     // to update the local list
@@ -186,7 +181,7 @@ class GroupProvider extends ChangeNotifier {
 
   Future<void> updateGroupSettings(DataSettings settings) async {
     // updates settings in firestore
-    await _groupsCollection.doc(_groupModel.groupID).update({
+    await FirebaseMethods.groupsCollection.doc(_groupModel.groupID).update({
       Constants.groupTerms: settings.groupTerms,
       Constants.allowSharing: settings.allowSharing,
       Constants.requestToReadTerms: settings.requestToReadTerms,
@@ -211,7 +206,7 @@ class GroupProvider extends ChangeNotifier {
       final addedMembers = _tempGroupMemberUIDs
           .where((uid) => !_initialMemberUIDs.contains(uid));
 
-      await _groupsCollection.doc(_groupModel.groupID).update({
+      await FirebaseMethods.groupsCollection.doc(_groupModel.groupID).update({
         Constants.membersUIDs: FieldValue.arrayRemove(removedMembers.toList()),
         Constants.awaitingApprovalUIDs:
             FieldValue.arrayUnion(addedMembers.toList()),
@@ -272,7 +267,7 @@ class GroupProvider extends ChangeNotifier {
   }) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final DocumentReference groupRef =
-        _groupsCollection.doc(groupModel.groupID);
+        FirebaseMethods.groupsCollection.doc(groupModel.groupID);
 
     return firestore.runTransaction((transaction) async {
       _isLoading = true;
@@ -335,14 +330,14 @@ class GroupProvider extends ChangeNotifier {
 
       // get the list of membersUIDs
       List<String> membersUIDs = [];
-      await _groupsCollection.doc(groupID).get().then((value) {
+      await FirebaseMethods.groupsCollection.doc(groupID).get().then((value) {
         if (value.exists) {
           membersUIDs = List<String>.from(value[Constants.membersUIDs]);
         }
       });
 
       for (var uid in membersUIDs) {
-        var user = await _usersCollection.doc(uid).get();
+        var user = await FirebaseMethods.usersCollection.doc(uid).get();
         membersData
             .add(UserModel.fromJson(user.data()! as Map<String, dynamic>));
       }
@@ -352,6 +347,27 @@ class GroupProvider extends ChangeNotifier {
       return [];
     }
   }
+
+  // Stream<List<UserModel>> getMembersStream({required String groupID}) {
+  //   return FirebaseMethods.groupsCollection
+  //       .doc(groupID)
+  //       .snapshots()
+  //       .asyncMap((snapshot) async {
+  //     final groupData = snapshot.data() as Map<String, dynamic>;
+  //     final memberUIDs =
+  //         List<String>.from(groupData[Constants.membersUIDs] ?? []);
+
+  //     final membersData = await Future.wait(
+  //       memberUIDs.map((uid) => FirebaseFirestore.instance
+  //           .collection(Constants.usersCollection)
+  //           .doc(uid)
+  //           .get()
+  //           .then((doc) => UserModel.fromJson(doc.data()!))),
+  //     );
+
+  //     return membersData;
+  //   });
+  // }
 
   // create group
   Future<void> createGroup({
@@ -395,7 +411,9 @@ class GroupProvider extends ChangeNotifier {
       setGroupModel(groupModel: newgroupModel);
 
       // add group to firebase
-      await _groupsCollection.doc(groupID).set(groupModel.toJson());
+      await FirebaseMethods.groupsCollection
+          .doc(groupID)
+          .set(groupModel.toJson());
 
       // reset the lists
       await setEmptyLists();
@@ -419,17 +437,18 @@ class GroupProvider extends ChangeNotifier {
     try {
       if (isAdmin) {
         // get group data from firestore
-        DocumentSnapshot doc = await _groupsCollection.doc(groupID).get();
+        DocumentSnapshot doc =
+            await FirebaseMethods.groupsCollection.doc(groupID).get();
         GroupModel groupModel =
             GroupModel.fromJson(doc.data() as Map<String, dynamic>);
         // check if there are other admins left
         if (groupModel.adminsUIDs.length > 1) {
           // remove the admin from admins list
-          await _groupsCollection.doc(groupID).update({
+          await FirebaseMethods.groupsCollection.doc(groupID).update({
             Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
           });
           // remove the admin from group members list
-          await _groupsCollection.doc(groupID).update({
+          await FirebaseMethods.groupsCollection.doc(groupID).update({
             Constants.membersUIDs: FieldValue.arrayRemove([uid]),
           });
 
@@ -437,29 +456,29 @@ class GroupProvider extends ChangeNotifier {
         } else {
           // if there are no other admins check if there are other members left
           if (groupModel.membersUIDs.length > 1) {
-            await _groupsCollection.doc(groupID).update({
+            await FirebaseMethods.groupsCollection.doc(groupID).update({
               Constants.adminsUIDs: FieldValue.arrayRemove([uid]),
             });
 
             // remove the admin from group members list
-            await _groupsCollection.doc(groupID).update({
+            await FirebaseMethods.groupsCollection.doc(groupID).update({
               Constants.membersUIDs: FieldValue.arrayRemove([uid]),
             });
             // pick up a new admin, get one member and make him admin
             String newAdminUID = groupModel.membersUIDs[0];
-            await _groupsCollection.doc(groupID).update({
+            await FirebaseMethods.groupsCollection.doc(groupID).update({
               Constants.adminsUIDs: FieldValue.arrayUnion([newAdminUID]),
             });
             return Constants.exitSuccessful;
           } else {
             // If there are no other admins and members left, delete the group from firestore
-            await _groupsCollection.doc(groupID).delete();
+            await FirebaseMethods.groupsCollection.doc(groupID).delete();
 
             return Constants.deletedSuccessfully;
           }
         }
       } else {
-        await _groupsCollection.doc(groupID).update({
+        await FirebaseMethods.groupsCollection.doc(groupID).update({
           Constants.membersUIDs: FieldValue.arrayRemove([uid]),
         });
 

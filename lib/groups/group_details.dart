@@ -157,7 +157,7 @@ class _GroupDetailsState extends State<GroupDetails>
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
           child: SingleChildScrollView(
             child: Column(
               children: [

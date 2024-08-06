@@ -18,16 +18,11 @@ class GeminiModelManager {
   // Private constructor for singleton pattern
   GeminiModelManager._internal();
 
-  // Cached instances of text and vision models
-  GenerativeModel? _textModel;
-  GenerativeModel? _visionModel;
-
   // Configuration for model generation
   final GenerationConfig _config = GenerationConfig(
     temperature: 0.4,
     topK: 32,
     topP: 1,
-    //maxOutputTokens: 4096, // Commented out, adjust if needed
   );
 
   // Safety settings to prevent harmful content
@@ -41,32 +36,10 @@ class GeminiModelManager {
   // Retrieve API key from environment variables
   String get _apiKey => dotenv.env['GEMINI_API_KEY'] ?? '';
 
-  // Get appropriate model based on task requirements
-  Future<GenerativeModel> getModel({
-    required bool isVision,
-    required bool isDocumentSpecific,
-  }) async {
-    if (isDocumentSpecific) {
-      // For document-specific tasks, always create a new 'gemini-1.5-flash' model
-      return _createModel('gemini-1.5-flash');
-    } else if (!isVision) {
-      // For non-vision tasks, use or create a cached 'gemini-1.5-flash' model
-      _textModel ??= _createModel('gemini-1.5-flash');
-      // '??=' is the null-aware assignment operator:
-      // It only creates a new model if _textModel is null
-      return _textModel!;
-    } else {
-      // For vision tasks, use or create a cached 'gemini-1.0-pro' model
-      _visionModel ??= _createModel('gemini-1.0-pro');
-      // Similar to above, create a new vision model only if it doesn't exist
-      return _visionModel!;
-    }
-  }
-
   // Create a new GenerativeModel instance
-  GenerativeModel _createModel(String modelName) {
+  GenerativeModel createModel() {
     return GenerativeModel(
-      model: modelName,
+      model: 'gemini-1.5-flash',
       apiKey: _apiKey,
       generationConfig: _config,
       safetySettings: _safetySettings,
@@ -125,7 +98,7 @@ class GeminiModelManager {
     String question,
     AssessmentModel assessment,
   ) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     final prompt = PromptDataModel(
       textInput: '''
@@ -156,7 +129,7 @@ Respond in a helpful, safety-focused manner, providing practical advice or clari
     AssessmentModel assessment,
     int numberOfQuestions,
   ) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     final prompt = PromptDataModel(
       textInput: '''
@@ -193,7 +166,7 @@ Format the response as a JSON object with the following structure:
 
   Future<GenerateContentResponse> generateSafetyToolsQuiz(
       ToolModel tool) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     final prompt = PromptDataModel(
       textInput: '''
@@ -227,7 +200,7 @@ Format the response as a JSON object with the following structure:
 
 // generate safety tip of the day using the generated content
   Future<String> generateSafetyTipOfTheDay(List<String> recentTopics) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     final prompt = PromptDataModel(
       textInput: '''
@@ -249,7 +222,7 @@ Limit the response to 2-3 sentences.
 // generate a list of additional risks based on the given assessment
   Future<GenerateContentResponse> suggestAdditionalRisks(
       AssessmentModel assessment) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     final prompt = PromptDataModel(
       textInput: '''
@@ -281,7 +254,7 @@ all data should be of type List<String>
 // summerize the list of chat messages
   Future<GenerateContentResponse> summarizeChatMessages(
       List<DiscussionMessage> messages) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     // Extract relevant data from messages
     List<Map<String, String>> relevantData = messages
@@ -327,7 +300,7 @@ all data should be of type List<String>
 
   Future<GenerateContentResponse> generateNearMissReport(
       String nearMissDescription) async {
-    final model = await getModel(isVision: false, isDocumentSpecific: true);
+    final model = await createModel();
 
     final prompt = PromptDataModel(
       textInput: '''

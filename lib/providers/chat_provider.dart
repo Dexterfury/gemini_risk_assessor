@@ -139,10 +139,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> setModel() async {
-    _model = await _modelManager.getModel(
-      isVision: _imagesFileList?.isNotEmpty ?? false,
-      isDocumentSpecific: _currentAssessment != null || _toolModel != null,
-    );
+    _model = await _modelManager.createModel();
     notifyListeners();
   }
 
