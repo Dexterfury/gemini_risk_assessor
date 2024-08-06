@@ -17,9 +17,11 @@ class RiskAssessmentsScreen extends StatefulWidget {
   const RiskAssessmentsScreen({
     super.key,
     this.groupID = '',
+    this.isAdmin = false,
   });
 
   final String groupID;
+  final bool isAdmin;
 
   @override
   State<RiskAssessmentsScreen> createState() => _RiskAssessmentsScreenState();
@@ -199,6 +201,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                         docTitle: Constants.riskAssessment,
                         groupID: widget.groupID,
                         data: item,
+                        isAdmin: widget.isAdmin,
                       );
                     },
                     childCount: results.length + 1,

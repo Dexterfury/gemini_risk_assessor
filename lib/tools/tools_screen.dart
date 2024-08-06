@@ -17,9 +17,11 @@ class ToolsScreen extends StatefulWidget {
   const ToolsScreen({
     super.key,
     this.groupID = '',
+    this.isAdmin = false,
   });
 
   final String groupID;
+  final bool isAdmin;
 
   @override
   State<ToolsScreen> createState() => _ToolsScreenState();
@@ -198,6 +200,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
                       return ToolItem(
                         toolModel: tool,
                         groupID: widget.groupID,
+                        isAdmin: widget.isAdmin,
                       );
                     },
                     childCount: results.length + 1,

@@ -31,11 +31,13 @@ class AssessmentDetailsScreen extends StatelessWidget {
     super.key,
     required this.appBarTitle,
     required this.groupID,
+    required this.isAdmin,
     this.currentModel,
   });
 
   final String appBarTitle;
   final String groupID;
+  final bool isAdmin;
   final AssessmentModel? currentModel;
 
   @override
@@ -210,7 +212,12 @@ class AssessmentDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  pdfAndShareButtons(context, assessmentModel, generationType),
+                  pdfAndShareButtons(
+                    context,
+                    assessmentModel,
+                    generationType,
+                    isAdmin,
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -253,11 +260,10 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   : const SizedBox(
                       height: 20,
                     ),
-              currentModel == null
+              currentModel == null && !isAdmin
                   ? const SizedBox()
                   : DeleteButton(
                       groupID: groupID,
-                      docID: id,
                       generationType: generationType,
                       assessment: assessmentModel,
                     ),
@@ -272,6 +278,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
     BuildContext context,
     AssessmentModel assessmentModel,
     generationType,
+    bool isAdminn,
   ) {
     return Row(
       children: [
@@ -315,7 +322,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        currentModel == null
+        currentModel == null && !isAdminn
             ? const SizedBox()
             : OpenContainer(
                 closedBuilder: (context, action) {
@@ -465,13 +472,11 @@ class DeleteButton extends StatelessWidget {
   const DeleteButton({
     super.key,
     required this.groupID,
-    required this.docID,
     required this.generationType,
     required this.assessment,
   });
 
   final String groupID;
-  final String docID;
   final GenerationType generationType;
   final AssessmentModel assessment;
 
@@ -479,123 +484,51 @@ class DeleteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
     Widget buttonWidget() {
-      if (groupID.isEmpty) {
-        return MainAppButton(
-          icon: FontAwesomeIcons.deleteLeft,
-          label: ' Delete ',
-          contanerColor: Colors.red,
-          borderRadius: 15.0,
-          onTap: () async {
-            // show my alert dialog for loading
-            MyDialogs.showMyAnimatedDialog(
-              context: context,
-              title: 'Deleting...',
-              loadingIndicator: const SizedBox(
-                height: 100,
-                width: 100,
-                child: LoadingPPEIcons(),
-              ),
-            );
+      return MainAppButton(
+        icon: FontAwesomeIcons.deleteLeft,
+        label: ' Delete ',
+        contanerColor: Colors.red,
+        borderRadius: 15.0,
+        onTap: () async {
+          // show my alert dialog for loading
+          MyDialogs.showMyAnimatedDialog(
+            context: context,
+            title: 'Deleting...',
+            loadingIndicator: const SizedBox(
+              height: 100,
+              width: 100,
+              child: LoadingPPEIcons(),
+            ),
+          );
 
-            await FirebaseMethods.deleteAssessment(
-              docID: assessment.id,
-              ownerID: uid,
-              groupID: groupID,
-              assessment: assessment,
-              onSuccess: () {
-                // pop the loading dialog
-                Navigator.pop(context);
-                Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-                  showSnackBar(
-                    context: context,
-                    message: 'Successful Deleted',
-                  );
-                  // pop the screen
-                  Navigator.pop(context);
-                });
-              },
-              onError: (error) {
+          await FirebaseMethods.deleteAssessment(
+            docID: assessment.id,
+            currentUserID: uid,
+            groupID: groupID,
+            assessment: assessment,
+            onSuccess: () {
+              // pop the loading dialog
+              Navigator.pop(context);
+              Future.delayed(const Duration(seconds: 1)).whenComplete(() {
                 showSnackBar(
                   context: context,
-                  message: error.toString(),
+                  message: 'Successful Deleted',
                 );
-              },
-            );
-          },
-        );
-      } else {
-        final uid = context.read<AuthenticationProvider>().userModel!.uid;
-        return FutureBuilder<DocumentSnapshot>(
-          future: FirebaseMethods.getGroupSnapShot(groupID: groupID),
-          builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return const SizedBox.shrink();
-            }
-
-            if (snapshot.hasData && !snapshot.data!.exists) {
-              return const SizedBox.shrink();
-            }
-
-            if (snapshot.connectionState == ConnectionState.done) {
-              // Map<String, dynamic> data =
-              //     snapshot.data!.data() as Map<String, dynamic>;
-              final groupModel = GroupModel.fromJson(
-                  snapshot.data!.data() as Map<String, dynamic>);
-
-              final isAdmin = groupModel.adminsUIDs.contains(uid);
-              return isAdmin
-                  ? MainAppButton(
-                      icon: FontAwesomeIcons.deleteLeft,
-                      label: ' Delete ',
-                      contanerColor: Colors.red,
-                      borderRadius: 15.0,
-                      onTap: () async {
-                        // show my alert dialog for loading
-                        MyDialogs.showMyAnimatedDialog(
-                          context: context,
-                          title: 'Deleting...',
-                          loadingIndicator: const SizedBox(
-                            height: 100,
-                            width: 100,
-                            child: LoadingPPEIcons(),
-                          ),
-                        );
-
-                        await FirebaseMethods.deleteAssessment(
-                          docID: assessment.id,
-                          ownerID: assessment.createdBy,
-                          groupID: groupID,
-                          assessment: assessment,
-                          onSuccess: () {
-                            // pop the loading dialog
-                            Navigator.pop(context);
-                            Future.delayed(const Duration(seconds: 1))
-                                .whenComplete(() {
-                              showSnackBar(
-                                context: context,
-                                message: 'Successful Deleted',
-                              );
-                              // pop the screen
-                              Navigator.pop(context);
-                            });
-                          },
-                          onError: (error) {
-                            showSnackBar(
-                              context: context,
-                              message: error.toString(),
-                            );
-                          },
-                        );
-                      },
-                    )
-                  : const SizedBox.shrink();
-            }
-
-            return const SizedBox.shrink();
-          },
-        );
-      }
+                // pop the screen
+                Navigator.pop(context);
+              });
+            },
+            onError: (error) {
+              // pop the loading dialog
+              Navigator.pop(context);
+              showSnackBar(
+                context: context,
+                message: error.toString(),
+              );
+            },
+          );
+        },
+      );
     }
 
     return buttonWidget();

@@ -172,6 +172,7 @@ class _CreateExplainerScreenState extends State<CreateExplainerScreen> {
             openBuilder: (context, action) {
               // navigate to details screen
               return ExplainerDetailsScreen(
+                isAdmin: true,
                 onSave: (value) {
                   if (value) {
                     // clear data

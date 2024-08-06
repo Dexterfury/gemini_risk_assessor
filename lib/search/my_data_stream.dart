@@ -61,6 +61,7 @@ class MyDataStream extends StatelessWidget {
             if (generationType == GenerationType.tool) {
               final tool = ToolModel.fromJson(data);
               return ToolItem(
+                isAdmin: true,
                 toolModel: tool,
                 groupID: groupID,
               );
@@ -70,6 +71,7 @@ class MyDataStream extends StatelessWidget {
                 docTitle: title,
                 groupID: '',
                 data: assessment,
+                isAdmin: true,
               );
             }
           },

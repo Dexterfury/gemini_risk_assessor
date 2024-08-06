@@ -19,10 +19,12 @@ import '../appBars/my_app_bar.dart';
 class ExplainerDetailsScreen extends StatelessWidget {
   ExplainerDetailsScreen({
     super.key,
+    required this.isAdmin,
     this.currentModel,
     this.onSave,
   }) : _scrollController = ScrollController();
 
+  final bool isAdmin;
   final ToolModel? currentModel;
   final Function(bool)? onSave;
   final ScrollController _scrollController;
@@ -147,7 +149,7 @@ class ExplainerDetailsScreen extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-              currentModel != null
+              currentModel != null && isAdmin
                   ? Align(
                       alignment: Alignment.centerRight,
                       child: OpenContainer(

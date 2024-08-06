@@ -137,10 +137,11 @@ Widget _navigateToScreen(
 ) {
   switch (icon) {
     case Icons.assignment_late_outlined:
-      return RiskAssessmentsScreen(groupID: orgID);
+      return RiskAssessmentsScreen(groupID: orgID, isAdmin: isAdmin);
     case Icons.handyman:
       return ToolsScreen(
         groupID: orgID,
+        isAdmin: isAdmin,
       );
     default:
       return NearMissesScreen(

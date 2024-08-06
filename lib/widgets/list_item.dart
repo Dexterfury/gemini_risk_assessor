@@ -18,10 +18,12 @@ class ListItem extends StatelessWidget {
     required this.docTitle,
     required this.groupID,
     required this.data,
+    required this.isAdmin,
   });
   final String docTitle;
   final String groupID;
   final AssessmentModel data;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +104,7 @@ class ListItem extends StatelessWidget {
             appBarTitle: docTitle,
             groupID: groupID,
             currentModel: data,
+            isAdmin: isAdmin,
           );
         },
         transitionType: ContainerTransitionType.fadeThrough,

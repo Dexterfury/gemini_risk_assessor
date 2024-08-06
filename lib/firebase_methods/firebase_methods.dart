@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
@@ -296,7 +298,7 @@ class FirebaseMethods {
     required AssessmentModel itemModel,
     required String groupID,
   }) async {
-    final orgRef = groupsCollection
+    final groupRef = groupsCollection
         .doc(groupID)
         .collection(Constants.assessmentCollection)
         .doc(itemModel.id);
@@ -314,7 +316,7 @@ class FirebaseMethods {
 
     // we perform both operations in parallel
     await Future.wait([
-      orgRef.set(updatedAssessment.toJson()),
+      groupRef.set(updatedAssessment.toJson()),
       userRef.update({
         Constants.sharedWith: FieldValue.arrayUnion([groupID])
       }),
@@ -401,7 +403,7 @@ class FirebaseMethods {
 
   static Future<void> deleteAssessment({
     required String docID,
-    required String ownerID,
+    required String currentUserID,
     required String groupID,
     required AssessmentModel assessment,
     required Function() onSuccess,
@@ -412,9 +414,10 @@ class FirebaseMethods {
         : Constants.usersCollection;
 
     try {
+      // get doc ref
       final docRef = firestore
           .collection(rootCollection)
-          .doc(ownerID)
+          .doc(assessment.id)
           .collection(Constants.assessmentCollection)
           .doc(docID);
 
@@ -422,16 +425,18 @@ class FirebaseMethods {
       final WriteBatch batch = firestore.batch();
 
       if (groupID.isNotEmpty) {
-        // If it's an group deleting a shared document, remove org from user's sharedWith
-        if (assessment.sharedWith.contains(ownerID)) {
-          final userRef = usersCollection
+        // If it's a group deleting a shared document, remove group from assessments shared sharedWith
+        if (assessment.sharedWith.contains(groupID)) {
+          final docRef = usersCollection
               .doc(assessment.createdBy)
               .collection(Constants.assessmentCollection)
-              .doc(groupID);
-          batch.update(userRef, {
+              .doc(assessment.id);
+          batch.update(docRef, {
             Constants.sharedWith: FieldValue.arrayRemove([groupID])
           });
         }
+
+        // we also delete this assessments from this group usding cloud functions trigger
       } else {
         // If it's a user deleting their own document
         if (assessment.sharedWith.isEmpty) {
@@ -454,11 +459,16 @@ class FirebaseMethods {
       // Commit the batch
       await batch.commit();
 
-      print('Assessment successfully deleted and related documents updated');
+      AnalyticsHelper.logDeletingAssessment();
       onSuccess();
-    } catch (e) {
-      print('Error deleting assessment: $e');
+    } catch (e, stack) {
       onError(e.toString());
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error deleting assessment',
+        severity: ErrorSeverity.critical,
+      );
     }
   }
 

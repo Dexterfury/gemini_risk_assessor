@@ -17,10 +17,12 @@ class ToolItem extends StatelessWidget {
     super.key,
     required this.toolModel,
     required this.groupID,
+    required this.isAdmin,
   });
 
   final ToolModel toolModel;
   final String groupID;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +99,7 @@ class ToolItem extends StatelessWidget {
         },
         openBuilder: (context, action) {
           return ExplainerDetailsScreen(
+            isAdmin: isAdmin,
             currentModel: toolModel,
           );
         },
