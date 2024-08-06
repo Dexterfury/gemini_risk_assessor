@@ -62,6 +62,35 @@ class UserModel {
     };
   }
 
+  // copy with method
+  UserModel copyWith({
+    String? uid,
+    String? name,
+    String? phone,
+    String? email,
+    String? imageUrl,
+    String? token,
+    String? aboutMe,
+    double? rating,
+    double? safetyPoints,
+    bool? isAnonymous,
+    String? createdAt,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      imageUrl: imageUrl ?? this.imageUrl,
+      token: token ?? this.token,
+      aboutMe: aboutMe ?? this.aboutMe,
+      rating: rating ?? this.rating,
+      safetyPoints: safetyPoints ?? this.safetyPoints,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

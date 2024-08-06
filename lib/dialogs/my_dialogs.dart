@@ -19,6 +19,7 @@ class MyDialogs {
       context: context,
       barrierDismissible: false,
       barrierLabel: '',
+      barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, animation1, animation2) {
         return Container();
@@ -200,7 +201,6 @@ class MyDialogs {
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation1, animation2) => Container(),
       transitionBuilder: (context, animation1, animation2, child) {
@@ -284,7 +284,7 @@ class MyDialogs {
     required String textAction,
     required Function(bool, String) onActionTap,
   }) {
-    final controller = TextEditingController();
+    final controller = TextEditingController(text: hintText);
 
     showGeneralDialog(
       context: context,

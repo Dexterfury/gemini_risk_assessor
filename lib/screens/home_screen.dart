@@ -7,6 +7,7 @@ import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
+import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/firebase_methods/logger.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
@@ -69,10 +70,13 @@ class _HomeScreenState extends State<HomeScreen>
   ) {
     return GestureDetector(
       onTap: () {
-        navigationController(
-          context: context,
-          route: Constants.profileRoute,
-          titleArg: context.read<AuthenticationProvider>().userModel!.uid,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfileScreen(
+              uid: context.read<AuthenticationProvider>().userModel!.uid,
+            ),
+          ),
         );
       },
       child: DisplayUserImage(

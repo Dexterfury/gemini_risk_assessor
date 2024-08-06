@@ -28,7 +28,12 @@ import 'package:gemini_risk_assessor/widgets/settings_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({
+    super.key,
+    required this.uid,
+  });
+
+  final String uid;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -36,6 +41,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File? _finalFileImage;
+  late Future<UserModel> _userFuture;
+  UserModel? _currentUserModel;
 
   // set new image from file and update provider
   Future<void> setNewImageInProvider(String imageUrl) async {
@@ -76,52 +83,137 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _userFuture = _loadUserData();
+  }
+
+  Future<UserModel> _loadUserData() async {
+    final doc = await FirebaseMethods.usersCollection.doc(widget.uid).get();
+    return UserModel.fromJson(doc.data() as Map<String, dynamic>);
+  }
+
+  void _updateUserModel(UserModel updatedModel) {
+    setState(() {
+      _currentUserModel = updatedModel;
+    });
+  }
+
+  void _handleNameEdit(UserModel userModel) {
+    MyDialogs.showMyEditAnimatedDialog(
+      context: context,
+      title: Constants.changeName,
+      hintText: userModel.name,
+      textAction: "Change",
+      onActionTap: (value, updatedText) async {
+        if (value) {
+          final authProvider = context.read<AuthenticationProvider>();
+          await authProvider.updateName(
+            isUser: true,
+            id: widget.uid,
+            newName: updatedText,
+            oldName: userModel.name,
+          );
+          _updateUserModel(userModel.copyWith(name: updatedText));
+        }
+      },
+    );
+  }
+
+  void _handleAboutMeEdit(
+    UserModel userModel,
+  ) {
+    MyDialogs.showMyEditAnimatedDialog(
+      context: context,
+      title: 'About Me',
+      maxLength: 500,
+      hintText: userModel.aboutMe,
+      textAction: "Change",
+      onActionTap: (value, updatedText) async {
+        if (value) {
+          final authProvider = context.read<AuthenticationProvider>();
+          await authProvider.updateDescription(
+            isUser: true,
+            id: widget.uid,
+            newDesc: updatedText,
+            oldDesc: userModel.aboutMe,
+          );
+          _updateUserModel(userModel.copyWith(aboutMe: updatedText));
+        }
+      },
+    );
+  }
+
+  Future<void> _handleImageChange(UserModel userModel) async {
+    final file =
+        await ImagePickerHandler.showImagePickerDialog(context: context);
+    if (file != null) {
+      setState(() {
+        _finalFileImage = file;
+      });
+      showLoadingDialog(title: 'Saving Image');
+
+      final imageUrl = await FileUploadHandler.updateImage(
+        file: file,
+        isUser: true,
+        id: userModel.uid,
+        reference: '${Constants.userImages}/${userModel.uid}.jpg',
+      );
+
+      await setNewImageInProvider(imageUrl);
+      _updateUserModel(userModel.copyWith(imageUrl: imageUrl));
+
+      popDialog();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
     bool canChangePassword = user != null &&
         user.providerData
             .any((userInfo) => userInfo.providerId == Constants.password);
-    final themeProvider = context.watch<ThemeProvider>();
-    // get profile data from arguments
-    final uid = ModalRoute.of(context)!.settings.arguments as String;
 
-    final authProvider = context.watch<AuthenticationProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     bool isAnonymous = authProvider.isUserAnonymous();
-    bool isMyProfile = uid == authProvider.userModel?.uid;
+    bool isMyProfile = widget.uid == authProvider.userModel?.uid;
     return Scaffold(
       appBar: MyAppBar(
         leading: BackButton(),
         title: 'Profile',
       ),
-      body: StreamBuilder(
-        stream: FirebaseMethods.userStream(userID: uid),
-        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return const Center(child: Text('Something went wrong'));
-          }
-
+      body: FutureBuilder<UserModel>(
+        future: _userFuture,
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final userModel =
-              UserModel.fromJson(snapshot.data!.data() as Map<String, dynamic>);
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          final userModel = _currentUserModel ?? snapshot.data!;
 
           return _buildProfileContent(
             isMyProfile,
             userModel,
             isAnonymous,
-            uid,
+            widget.uid,
             canChangePassword,
-            themeProvider,
           );
         },
       ),
     );
   }
 
-  _buildProfileContent(bool isMyProfile, UserModel userModel, bool isAnonymous,
-      String uid, bool canChangePassword, ThemeProvider themeProvider) {
+  _buildProfileContent(
+    bool isMyProfile,
+    UserModel userModel,
+    bool isAnonymous,
+    String uid,
+    bool canChangePassword,
+  ) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -279,24 +371,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 },
                               ),
-                            ListTile(
-                              contentPadding: const EdgeInsets.only(
-                                left: 8.0,
-                                right: 8.0,
-                              ),
-                              leading: IconContainer(
-                                icon: themeProvider.isDarkMode
-                                    ? Icons.wb_sunny
-                                    : Icons.nightlight_round,
-                              ),
-                              title: const Text('Change theme'),
-                              trailing: Switch(
-                                value: themeProvider.isDarkMode,
-                                onChanged: (value) {
-                                  themeProvider.toggleTheme();
-                                },
-                              ),
-                            ),
+                            Consumer<ThemeProvider>(
+                                builder: (context, themeProvider, child) {
+                              return ListTile(
+                                  contentPadding: const EdgeInsets.only(
+                                    left: 8.0,
+                                    right: 8.0,
+                                  ),
+                                  leading: IconContainer(
+                                    icon: themeProvider.isDarkMode
+                                        ? Icons.wb_sunny
+                                        : Icons.nightlight_round,
+                                  ),
+                                  title: const Text('Change theme'),
+                                  trailing: Switch(
+                                    value: themeProvider.isDarkMode,
+                                    onChanged: (value) {
+                                      themeProvider.toggleTheme();
+                                    },
+                                  ));
+                            }),
                           ],
                         ),
                       ),
@@ -413,24 +507,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (isMyProfile && !isAnonymous)
           GestureDetector(
             onTap: () {
-              MyDialogs.showMyEditAnimatedDialog(
-                context: context,
-                title: 'About Me',
-                maxLength: 500,
-                hintText: userModel.aboutMe,
-                textAction: "Change",
-                onActionTap: (value, updatedText) async {
-                  final authProvider = context.read<AuthenticationProvider>();
-                  if (value) {
-                    await authProvider.updateDescription(
-                      isUser: true,
-                      id: uid,
-                      newDesc: updatedText,
-                      oldDesc: userModel.aboutMe,
-                    );
-                  }
-                },
-              );
+              _handleAboutMeEdit(userModel);
             },
             child: Text(
               'Edit',
@@ -464,23 +541,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (isMyProfile && !isAnonymous)
           GestureDetector(
             onTap: () {
-              MyDialogs.showMyEditAnimatedDialog(
-                context: context,
-                title: Constants.changeName,
-                hintText: userModel.name,
-                textAction: "Change",
-                onActionTap: (value, updatedText) async {
-                  final authProvider = context.read<AuthenticationProvider>();
-                  if (value) {
-                    await authProvider.updateName(
-                      isUser: true,
-                      id: uid,
-                      newName: updatedText,
-                      oldName: userModel.name,
-                    );
-                  }
-                },
-              );
+              _handleNameEdit(userModel);
             },
             child: Text(
               'Edit',
@@ -523,31 +584,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
           return;
         }
-        final file = await ImagePickerHandler.showImagePickerDialog(
-          context: context,
-        );
-        if (file != null) {
-          setState(() {
-            _finalFileImage = file;
-          });
-          // show loading dialog
-          showLoadingDialog(
-            title: 'Saving Image',
-          );
-
-          final imageUrl = await FileUploadHandler.updateImage(
-            file: file,
-            isUser: true,
-            id: userModel.uid,
-            reference: '${Constants.userImages}/${userModel.uid}.jpg',
-          );
-
-          // set newimage in provider
-          await setNewImageInProvider(imageUrl);
-
-          // pop loading dialog
-          popDialog();
-        }
+        _handleImageChange(userModel);
       },
     );
   }

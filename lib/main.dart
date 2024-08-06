@@ -25,7 +25,6 @@ import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/tools/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
-import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
 import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
@@ -99,7 +98,6 @@ class MyApp extends StatelessWidget {
                 const CreateAssessmentScreen(),
             Constants.createToolRoute: (context) =>
                 const CreateExplainerScreen(),
-            Constants.profileRoute: (context) => const ProfileScreen(),
             Constants.createGroupRoute: (context) => const CreateGroupScreen(),
             Constants.emailSignInRoute: (context) => const EmailLogin(),
             Constants.emailSignUpRoute: (context) => const EmailSignUp(),
