@@ -468,3 +468,57 @@ async function sendNotifications(title, body, data, membersUIDs, senderUID) {
 
   return results;
 }
+
+exports.onDeleteGroupAssessment = functions.firestore
+    .document("groups/{groupId}/assessments/{assessmentId}")
+    .onDelete(async (snapshot, context) => {
+      const deletedAssessment = snapshot.data();
+      const {groupId, assessmentId} = context.params;
+
+      // Get all users
+      const usersSnapshot = await admin.firestore().collection("users").get();
+
+      const batch = admin.firestore().batch();
+
+      for (const userDoc of usersSnapshot.docs) {
+        const userAssessmentRef = userDoc.ref.collection("assessments").doc(assessmentId);
+        const userAssessmentDoc = await userAssessmentRef.get();
+
+        if (userAssessmentDoc.exists) {
+          const userData = userAssessmentDoc.data();
+          if (userData.sharedWith && userData.sharedWith.includes(groupId)) {
+            // Remove the groupId from the sharedWith array
+            batch.update(userAssessmentRef, {
+              sharedWith: admin.firestore.FieldValue.arrayRemove(groupId),
+            });
+          }
+        }
+      }
+
+      // If the assessment was created in the group (not shared from a user),
+      // we should delete it entirely and clean up any associated resources
+      if (deletedAssessment.createdBy === groupId) {
+        // Delete images if any
+        if (deletedAssessment.images && deletedAssessment.images.length > 0) {
+          const deletePromises = deletedAssessment.images.map((imageUrl) => {
+            const decodedUrl = decodeURIComponent(imageUrl);
+            const startIndex = decodedUrl.indexOf("/o/") + 3;
+            const endIndex = decodedUrl.indexOf("?");
+            const filePath = decodedUrl.substring(startIndex, endIndex);
+            return admin.storage().bucket().file(filePath).delete();
+          });
+          await Promise.all(deletePromises);
+        }
+
+        // Delete the assessment from all users who have it shared
+        for (const userDoc of usersSnapshot.docs) {
+          const userAssessmentRef = userDoc.ref.collection("assessments").doc(assessmentId);
+          batch.delete(userAssessmentRef);
+        }
+      }
+
+      // Commit all the batched writes
+      await batch.commit();
+
+      console.log(`Cleaned up assessment ${assessmentId} from group ${groupId}`);
+    });

@@ -373,8 +373,13 @@ class FirebaseMethods {
       } else {
         throw Exception('Document does not exist');
       }
-    } catch (e) {
-      print('Error fetching item data: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error fetching item data',
+        severity: ErrorSeverity.critical,
+      );
       rethrow;
     }
   }
@@ -395,8 +400,13 @@ class FirebaseMethods {
       } else {
         throw Exception('Document does not exist');
       }
-    } catch (e) {
-      print('Error fetching item data: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error fetching item data',
+        severity: ErrorSeverity.critical,
+      );
       rethrow;
     }
   }
@@ -412,52 +422,30 @@ class FirebaseMethods {
     final String rootCollection = groupID.isNotEmpty
         ? Constants.groupsCollection
         : Constants.usersCollection;
+    final String parentDocID = groupID.isNotEmpty ? groupID : currentUserID;
 
     try {
-      // get doc ref
+      // Get doc ref
       final docRef = firestore
           .collection(rootCollection)
-          .doc(assessment.id)
+          .doc(parentDocID)
           .collection(Constants.assessmentCollection)
           .doc(docID);
 
-      // Start a batch write
-      final WriteBatch batch = firestore.batch();
-
-      if (groupID.isNotEmpty) {
-        // If it's a group deleting a shared document, remove group from assessments shared sharedWith
-        if (assessment.sharedWith.contains(groupID)) {
-          final docRef = usersCollection
-              .doc(assessment.createdBy)
-              .collection(Constants.assessmentCollection)
-              .doc(assessment.id);
-          batch.update(docRef, {
-            Constants.sharedWith: FieldValue.arrayRemove([groupID])
-          });
-        }
-
-        // we also delete this assessments from this group usding cloud functions trigger
-      } else {
-        // If it's a user deleting their own document
-        if (assessment.sharedWith.isEmpty) {
-          // If not shared, delete images from storage
-          await Future.wait(
-            assessment.images.map(
-              (url) => _deleteImage(
-                imageUrl: url,
-                onError: onError,
-              ),
+      if (groupID.isEmpty && assessment.sharedWith.isEmpty) {
+        // If it's a personal assessment and not shared, delete images from storage
+        await Future.wait(
+          assessment.images.map(
+            (url) => _deleteImage(
+              imageUrl: url,
+              onError: onError,
             ),
-          );
-        }
-        // Note: We're not removing the document from shared group so they can still see it
+          ),
+        );
       }
 
       // Delete the document
-      batch.delete(docRef);
-
-      // Commit the batch
-      await batch.commit();
+      await docRef.delete();
 
       AnalyticsHelper.logDeletingAssessment();
       onSuccess();
@@ -479,12 +467,13 @@ class FirebaseMethods {
     try {
       final ref = storage.refFromURL(imageUrl);
       await ref.delete();
-      print('Deleted image: $imageUrl');
-    } catch (e) {
-      print('Error deleting image: $e');
-      // You might want to handle this error according to your app's requirements
-      onError(
-        e.toString(),
+    } catch (e, stack) {
+      onError(e.toString());
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error deleting image',
+        severity: ErrorSeverity.critical,
       );
     }
   }
