@@ -1,7 +1,13 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
+import 'package:gemini_risk_assessor/constants.dart';
+import 'package:gemini_risk_assessor/discussions/contact_discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/message_widget.dart';
+import 'package:gemini_risk_assessor/discussions/my_discussion_message.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -12,8 +18,10 @@ import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_chat_reactions/flutter_chat_reactions.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({
@@ -68,15 +76,44 @@ class _ChatListState extends State<ChatList> {
       generationType: widget.generationType,
       limit: _pageSize,
     ).listen((snapshot) {
-      List<DiscussionMessage> liveMessages = snapshot.docs
-          .map((doc) =>
-              DiscussionMessage.fromMap(doc.data() as Map<String, dynamic>))
-          .toList();
+      for (var change in snapshot.docChanges) {
+        final messageData = change.doc.data() as Map<String, dynamic>;
+        final message = DiscussionMessage.fromMap(messageData);
 
-      setState(() {
-        _messages = _mergeMessages(_messages, liveMessages);
-      });
+        setState(() {
+          switch (change.type) {
+            case DocumentChangeType.added:
+              _handleAddedMessage(message);
+              break;
+            case DocumentChangeType.modified:
+              _handleModifiedMessage(message);
+              break;
+            case DocumentChangeType.removed:
+              _handleRemovedMessage(message);
+              break;
+          }
+        });
+      }
     });
+  }
+
+  void _handleAddedMessage(DiscussionMessage message) {
+    if (!_messages.any((m) => m.messageID == message.messageID)) {
+      _messages.insert(0, message);
+      _messages.sort((a, b) => b.timeSent.compareTo(a.timeSent));
+    }
+  }
+
+  void _handleModifiedMessage(DiscussionMessage updatedMessage) {
+    final index =
+        _messages.indexWhere((m) => m.messageID == updatedMessage.messageID);
+    if (index != -1) {
+      _messages[index] = updatedMessage;
+    }
+  }
+
+  void _handleRemovedMessage(DiscussionMessage message) {
+    _messages.removeWhere((m) => m.messageID == message.messageID);
   }
 
   List<DiscussionMessage> _mergeMessages(List<DiscussionMessage> oldMessages,
@@ -143,15 +180,111 @@ class _ChatListState extends State<ChatList> {
       setState(() {
         _isLoading = false;
       });
-      print('Error loading messages: $e');
     }
   }
+
+  // void showDeletBottomSheet({
+  //   required DiscussionMessage message,
+  //   required String currentUserId,
+  //   required bool isSenderOrAdmin,
+  // }) {
+  //   showModalBottomSheet(
+  //       context: context,
+  //       isDismissible: false,
+  //       builder: (context) {
+  //         return Consumer<ChatProvider>(
+  //             builder: (context, chatProvider, child) {
+  //           return SizedBox(
+  //             width: double.infinity,
+  //             child: Padding(
+  //               padding: const EdgeInsets.symmetric(
+  //                 vertical: 20.0,
+  //                 horizontal: 20.0,
+  //               ),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   if (chatProvider.isLoading) const LinearProgressIndicator(),
+  //                   ListTile(
+  //                     leading: const Icon(Icons.delete),
+  //                     title: const Text('Delete for me'),
+  //                     onTap: chatProvider.isLoading
+  //                         ? null
+  //                         : () async {
+  //                             await chatProvider
+  //                                 .deleteMessage(
+  //                               currentUserId: currentUserId,
+  //                               contactUID: widget.contactUID,
+  //                               messageId: message.messageId,
+  //                               messageType: message.messageType.name,
+  //                               isGroupChat: widget.groupId.isNotEmpty,
+  //                               deleteForEveryone: false,
+  //                             )
+  //                                 .whenComplete(() {
+  //                               Navigator.pop(context);
+  //                             });
+  //                           },
+  //                   ),
+  //                   isSenderOrAdmin
+  //                       ? ListTile(
+  //                           leading: const Icon(Icons.delete_forever),
+  //                           title: const Text('Delete for everyone'),
+  //                           onTap: chatProvider.isLoading
+  //                               ? null
+  //                               : () async {
+  //                                   await chatProvider
+  //                                       .deleteMessage(
+  //                                     currentUserId: currentUserId,
+  //                                     contactUID: widget.contactUID,
+  //                                     messageId: message.messageId,
+  //                                     messageType: message.messageType.name,
+  //                                     isGroupChat: widget.groupId.isNotEmpty,
+  //                                     deleteForEveryone: true,
+  //                                   )
+  //                                       .whenComplete(() {
+  //                                     Navigator.pop(context);
+  //                                   });
+  //                                 },
+  //                         )
+  //                       : const SizedBox.shrink(),
+  //                   ListTile(
+  //                     leading: const Icon(Icons.cancel),
+  //                     title: const Text('cancel'),
+  //                     onTap: chatProvider.isLoading
+  //                         ? null
+  //                         : () {
+  //                             Navigator.pop(context);
+  //                           },
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         });
+  //       });
+  // }
+
+  // void sendReactionToMessage(
+  //     {required String reaction, required String messageId}) {
+  //   // get the sender uid
+  //   final senderUID = context.read<AuthenticationProvider>().userModel!.uid;
+
+  //   context.read<ChatProvider>().sendReactionToMessage(
+  //         senderUID: senderUID,
+  //         contactUID: widget.contactUID,
+  //         messageId: messageId,
+  //         reaction: reaction,
+  //         groupId: widget.groupId.isNotEmpty,
+  //       );
+  // }
 
   @override
   Widget build(BuildContext context) {
     // current user uid
     final userModel = context.read<AuthenticationProvider>().userModel!;
     final discussionChatProvider = context.read<DiscussionChatProvider>();
+    final itemID =
+        widget.tool != null ? widget.tool!.id : widget.assessment!.id;
     if (_messages.isEmpty && !_isLoading) {
       return Center(
         child: Text(
@@ -164,17 +297,9 @@ class _ChatListState extends State<ChatList> {
     }
     return ListView.builder(
       controller: _scrollController,
-      itemCount: _messages.length + 1, // +1 for the loading indicator
+      itemCount: _messages.length + 1,
       reverse: true,
       itemBuilder: (context, index) {
-        // if (index == _messages.length) {
-        //   return _isLoading
-        //       ? const Center(child: CircularProgressIndicator())
-        //       : _hasMore
-        //           ? const SizedBox.shrink()
-        //           : const Center(child: Text('No more messages'));
-        // }
-
         if (index == _messages.length) {
           return _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -191,15 +316,24 @@ class _ChatListState extends State<ChatList> {
         return Column(
           children: [
             if (isDateSeparator) _buildDateSeparator(message.timeSent),
-            _buildMessageItem(message, userModel, discussionChatProvider),
+            _buildMessageItem(
+              message,
+              userModel,
+              discussionChatProvider,
+              itemID,
+            ),
           ],
         );
       },
     );
   }
 
-  Widget _buildMessageItem(DiscussionMessage message, UserModel userModel,
-      DiscussionChatProvider discussionChatProvider) {
+  Widget _buildMessageItem(
+    DiscussionMessage message,
+    UserModel userModel,
+    DiscussionChatProvider discussionChatProvider,
+    String itemID,
+  ) {
     final isMe = message.senderUID == userModel.uid;
     final deletedByCurrentUser = message.deletedBy.contains(userModel.uid);
 
@@ -215,7 +349,19 @@ class _ChatListState extends State<ChatList> {
     );
 
     return GestureDetector(
-      onTap: () {},
+      onLongPress: () {
+        if (message.senderName == Constants.gemini) {
+          return;
+        }
+        _openReactionsMenu(
+          context,
+          message,
+          userModel,
+          widget.groupID,
+          itemID,
+          isMe,
+        );
+      },
       child: Hero(
         tag: message.messageID,
         child: MessageWidget(
@@ -223,7 +369,7 @@ class _ChatListState extends State<ChatList> {
           isMe: isMe,
           currentUserUID: userModel.uid,
           onRightSwipe: () {
-            final messageReply = MessageReplyModel(
+            final messageReply = MessageReply(
               message: message.message,
               senderUID: message.senderUID,
               senderName: message.senderName,
@@ -268,4 +414,156 @@ class _ChatListState extends State<ChatList> {
         date1.month == date2.month &&
         date1.day == date2.day;
   }
+}
+
+void _openReactionsMenu(
+  BuildContext context,
+  DiscussionMessage message,
+  UserModel userModel,
+  String groupID,
+  String itemID,
+  bool isMe,
+) {
+  Navigator.of(context).push(
+    HeroDialogRoute(builder: (context) {
+      return ReactionsDialogWidget(
+        id: message.messageID,
+        messageWidget: isMe
+            ? MyDiscussionMessage(
+                message: message,
+              )
+            : ContactDiscussionMessage(
+                message: message,
+              ),
+        onReactionTap: (reaction) {
+          if (reaction == '➕') {
+            showEmojiContainer(
+              uid: userModel.uid,
+              groupID: groupID,
+              itemID: itemID,
+              context: context,
+              message: message,
+            );
+          } else {
+            sendReactionToMessage(
+              senderUID: userModel.uid,
+              groupID: groupID,
+              itemID: itemID,
+              reaction: reaction,
+              message: message,
+            );
+          }
+        },
+        onContextMenuTap: (item) {
+          onContextMenyClicked(
+            context: context,
+            item: item.label,
+            message: message,
+          );
+        },
+        widgetAlignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      );
+    }),
+  );
+}
+
+void onContextMenyClicked({
+  required BuildContext context,
+  required String item,
+  required DiscussionMessage message,
+}) {
+  switch (item) {
+    case 'Reply':
+      final discussionChatProvider =
+          Provider.of<DiscussionChatProvider>(context, listen: false);
+      // set the message reply to true
+      final messageReply = MessageReply(
+        message: message.message,
+        senderUID: message.senderUID,
+        senderName: message.senderName,
+        senderImage: message.senderImage,
+        messageType: message.messageType,
+      );
+      discussionChatProvider.setMessageReplyModel(messageReply);
+      break;
+    case 'Copy':
+      // copy message to clipboard
+      Clipboard.setData(ClipboardData(text: message.message));
+      showSnackBar(context: context, message: 'Message copied');
+      break;
+    case 'Delete':
+      // final currentUserId =
+      //     context.read<AuthenticationProvider>().userModel!.uid;
+      // final groupProvider = context.read<GroupProvider>();
+
+      // if (widget.groupId.isNotEmpty) {
+      //   if (groupProvider.isSenderOrAdmin(
+      //       message: message, uid: currentUserId)) {
+      //     showDeletBottomSheet(
+      //       message: message,
+      //       currentUserId: currentUserId,
+      //       isSenderOrAdmin: true,
+      //     );
+      //     return;
+      //   } else {
+      //     showDeletBottomSheet(
+      //       message: message,
+      //       currentUserId: currentUserId,
+      //       isSenderOrAdmin: false,
+      //     );
+      //     return;
+      //   }
+      // }
+      // showDeletBottomSheet(
+      //   message: message,
+      //   currentUserId: currentUserId,
+      //   isSenderOrAdmin: true,
+      // );
+      break;
+  }
+}
+
+void showEmojiContainer({
+  required String uid,
+  required String groupID,
+  required String itemID,
+  required BuildContext context,
+  required DiscussionMessage message,
+}) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) => SizedBox(
+      height: 300,
+      child: EmojiPicker(
+        onEmojiSelected: (category, emoji) {
+          Navigator.pop(context);
+          // add emoji to message
+          sendReactionToMessage(
+            senderUID: uid,
+            groupID: groupID,
+            itemID: itemID,
+            reaction: emoji.emoji,
+            message: message,
+          );
+        },
+      ),
+    ),
+  );
+}
+
+void sendReactionToMessage({
+  required String senderUID,
+  required String groupID,
+  required String itemID,
+  required String reaction,
+  required DiscussionMessage message,
+}) {
+  FirebaseMethods.addReactionToMessage(
+    senderUID: senderUID,
+    reaction: reaction,
+    groupID: groupID,
+    itemID: itemID,
+    message: message,
+    generationType: GenerationType.riskAssessment,
+  );
 }

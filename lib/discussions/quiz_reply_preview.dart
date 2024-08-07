@@ -58,7 +58,7 @@ class QuizReplyPreview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          message.repliedTo,
+          message.repliedMessage.senderName,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.blue,
@@ -67,7 +67,7 @@ class QuizReplyPreview extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          message.repliedMessage,
+          message.repliedMessage.message,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             //fontSize: 12,

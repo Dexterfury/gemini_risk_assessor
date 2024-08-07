@@ -793,4 +793,72 @@ class FirebaseMethods {
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
   }
+
+  // send reaction to message
+  static Future<void> addReactionToMessage({
+    required String senderUID,
+    required String reaction,
+    required String groupID,
+    required String itemID,
+    required DiscussionMessage message,
+    required GenerationType generationType,
+  }) async {
+    // a reaction is saved as senderUID=reaction
+    String reactionToAdd = '$senderUID=$reaction';
+
+    try {
+      // 1. check if its a group message
+      if (groupID.isNotEmpty) {
+        // 2. check if the reaction list is empty
+        if (message.reactions.isEmpty) {
+          // 3. add the reaction to the message
+          await groupsCollection
+              .doc(groupID)
+              .collection(getCollectionRef(generationType))
+              .doc(itemID)
+              .collection(Constants.chatMessagesCollection)
+              .doc(message.messageID)
+              .update({
+            Constants.reactions: FieldValue.arrayUnion([reactionToAdd]),
+          });
+        } else {
+          // 4. get UIDs list from reactions list
+          final uids = message.reactions.map((e) => e.split('=')[0]).toList();
+
+          // 5. check if this user has already reacted so we replace it
+          if (uids.contains(senderUID)) {
+            // 6. get the index of the reaction
+            final index = uids.indexOf(senderUID);
+            // 7. replace the reaction
+            message.reactions[index] = reactionToAdd;
+            // 8. update the message
+            await groupsCollection
+                .doc(groupID)
+                .collection(getCollectionRef(generationType))
+                .doc(itemID)
+                .collection(Constants.chatMessagesCollection)
+                .doc(message.messageID)
+                .update({
+              Constants.reactions: message.reactions,
+            });
+          } else {
+            // 7. add the reaction to the message
+            await groupsCollection
+                .doc(groupID)
+                .collection(getCollectionRef(generationType))
+                .doc(itemID)
+                .collection(Constants.chatMessagesCollection)
+                .doc(message.messageID)
+                .update({
+              Constants.reactions: FieldValue.arrayUnion([reactionToAdd]),
+            });
+          }
+        }
+      } else {
+        // handle one to one message coming soon
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

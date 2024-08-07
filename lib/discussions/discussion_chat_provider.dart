@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/additional_data_model.dart';
@@ -23,16 +22,16 @@ class DiscussionChatProvider extends ChangeNotifier {
   bool _isLoadingAnswer = false;
   bool _isLoadingAdditionalData = false;
   bool _isSummarizing = true;
-  MessageReplyModel? _messageReplyModel;
+  MessageReply? _messageReplyModel;
 
   bool get isLoading => _isLoading;
   bool get isLoadingQuiz => _isLoadingQuiz;
   bool get isLoadingAnswer => _isLoadingAnswer;
   bool get isLoadingAdditionalData => _isLoadingAdditionalData;
   bool get isSummarizing => _isSummarizing;
-  MessageReplyModel? get messageReplyModel => _messageReplyModel;
+  MessageReply? get messageReplyModel => _messageReplyModel;
 
-  void setMessageReplyModel(MessageReplyModel? messageReply) {
+  void setMessageReplyModel(MessageReply? messageReply) {
     _messageReplyModel = messageReply;
     notifyListeners();
   }
@@ -82,9 +81,9 @@ class DiscussionChatProvider extends ChangeNotifier {
       final additionalData = AdditionalDataModel.empty();
 
       final discussionMessage = DiscussionMessage(
-        senderUID: userModel.uid,
-        senderName: userModel.name,
-        senderImage: userModel.imageUrl,
+        senderUID: Constants.geminiModel,
+        senderName: Constants.gemini,
+        senderImage: '',
         groupID: groupID,
         message: 'New safety quiz available! Tap to participate.',
         messageType: MessageType.quiz,
@@ -92,9 +91,7 @@ class DiscussionChatProvider extends ChangeNotifier {
         messageID: messageID,
         isSeen: false,
         isAIMessage: true,
-        repliedMessage: '',
-        repliedTo: '',
-        repliedMessageType: MessageType.text,
+        repliedMessage: MessageReply.empty,
         reactions: [],
         seenBy: [userModel.uid],
         deletedBy: [],
@@ -181,10 +178,19 @@ class DiscussionChatProvider extends ChangeNotifier {
         // get empty additional data
         final additionalData = AdditionalDataModel.empty();
 
+        // get messageReply
+        final messageReply = MessageReply(
+          message: quizData.title,
+          senderUID: Constants.gemini,
+          senderName: 'Safety Quiz Results',
+          senderImage: '',
+          messageType: MessageType.quizAnswer,
+        );
+
         final answerMessage = DiscussionMessage(
-          senderUID: currentUser.uid,
-          senderName: currentUser.name,
-          senderImage: currentUser.imageUrl,
+          senderUID: Constants.geminiModel,
+          senderName: Constants.gemini,
+          senderImage: '',
           groupID: groupID,
           message: 'Results',
           messageType: MessageType.quizAnswer,
@@ -192,9 +198,7 @@ class DiscussionChatProvider extends ChangeNotifier {
           messageID: answerMessageID,
           isSeen: false,
           isAIMessage: false,
-          repliedMessage: quizData.title,
-          repliedTo: 'Safety Quiz Results',
-          repliedMessageType: MessageType.quizAnswer,
+          repliedMessage: messageReply,
           reactions: [],
           seenBy: [currentUser.uid],
           deletedBy: [],
@@ -246,9 +250,9 @@ class DiscussionChatProvider extends ChangeNotifier {
       final quiz = QuizModel.empty;
 
       final additionalDataMessage = DiscussionMessage(
-        senderUID: userModel.uid,
-        senderName: userModel.name,
-        senderImage: userModel.imageUrl,
+        senderUID: Constants.geminiModel,
+        senderName: Constants.gemini,
+        senderImage: '',
         groupID: groupID,
         message: 'Additional Data',
         messageType: MessageType.additional,
@@ -256,9 +260,7 @@ class DiscussionChatProvider extends ChangeNotifier {
         messageID: messageID,
         isSeen: false,
         isAIMessage: true,
-        repliedMessage: '',
-        repliedTo: '',
-        repliedMessageType: MessageType.text,
+        repliedMessage: MessageReply.empty,
         reactions: [],
         seenBy: [userModel.uid],
         deletedBy: [],
@@ -274,6 +276,7 @@ class DiscussionChatProvider extends ChangeNotifier {
       ErrorHandler.recordError(e, stack, reason: 'Error updating quiz');
       _isLoadingAdditionalData = false;
       notifyListeners();
+      return null;
     }
   }
 
@@ -333,11 +336,7 @@ class DiscussionChatProvider extends ChangeNotifier {
       var messageID = const Uuid().v4();
 
       // 1. check if its a message reply and add the replied message to the message
-      String repliedMessage = _messageReplyModel?.message ?? '';
-      String repliedTo =
-          _messageReplyModel == null ? '' : messageReplyModel!.senderUID;
-      MessageType repliedMessageType =
-          _messageReplyModel?.messageType ?? MessageType.text;
+      final repliedMessage = _messageReplyModel ?? MessageReply.empty;
 
       // craete an empty quiz model if it is an AI generated message
       QuizModel quiz = QuizModel.empty;
@@ -358,8 +357,6 @@ class DiscussionChatProvider extends ChangeNotifier {
         isSeen: false,
         isAIMessage: isAIMessage,
         repliedMessage: repliedMessage,
-        repliedTo: repliedTo,
-        repliedMessageType: repliedMessageType,
         reactions: [],
         seenBy: [sender.uid],
         deletedBy: [],

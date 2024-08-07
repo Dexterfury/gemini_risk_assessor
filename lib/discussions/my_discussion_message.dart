@@ -22,7 +22,7 @@ class MyDiscussionMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final time = DateFormat('hh:mm a').format(message.timeSent);
-    final isReplying = message.repliedTo.isNotEmpty;
+    final isReplying = message.repliedMessage.message.isNotEmpty;
     // get the reations from the list
     final messageReations =
         message.reactions.map((e) => e.split('=')[1]).toList();

@@ -577,3 +577,45 @@ exports.onDeleteGroupTool = functions.firestore
 
       console.log(`Cleaned up tool ${toolId} from group ${groupId}`);
     });
+
+    exports.updateUserMessages = functions.firestore
+    .document('users/{userId}')
+    .onUpdate(async (change, context) => {
+        const userId = context.params.userId;
+        const newData = change.after.data();
+        const oldData = change.before.data();
+
+        // Check if name or image has changed
+        if (newData.name === oldData.name && newData.imageUrl === oldData.imageUrl) {
+            log('No relevant changes detected. Exiting function.');
+            return null;
+        }
+
+        const db = admin.firestore();
+        const batch = db.batch();
+
+        // Function to update messages in a specific collection
+        const updateMessagesInCollection = async (collectionPath) => {
+            const snapshot = await db.collectionGroup('chatMessages')
+                .where('senderUID', '==', userId)
+                .get();
+
+            snapshot.docs.forEach((doc) => {
+                const docRef = db.doc(doc.ref.path);
+                batch.update(docRef, {
+                    senderName: newData.name,
+                    senderImage: newData.imageUrl
+                });
+            });
+        };
+
+        // Update messages in both collections
+        await updateMessagesInCollection('groups/{groupId}/assessments/{assessmentId}/chatMessages');
+        await updateMessagesInCollection('groups/{groupId}/tools/{toolId}/chatMessages');
+
+        // Commit the batch
+        await batch.commit();
+
+        log(`Updated ${batch.size} messages for user ${userId}`);
+        return null;
+    });

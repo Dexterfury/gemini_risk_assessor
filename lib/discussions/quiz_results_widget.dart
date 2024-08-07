@@ -18,7 +18,7 @@ class QuizResultsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> quizResults = message.quizResults;
-    final isReplying = message.repliedTo.isNotEmpty;
+    final isReplying = message.repliedMessage.message.isNotEmpty;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(

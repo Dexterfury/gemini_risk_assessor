@@ -214,6 +214,9 @@ class Constants {
   static const String wasClicked = 'wasClicked';
   static const String notificationDate = 'notificationDate';
 
+  static const String gemini = 'Gemini';
+  static const String geminiModel = 'gemini-1.5-flash';
+
   // notification types
   static const String notificationID = 'notificationID';
   static const String assessmentNotification = 'ASSESSMENT_NOTIFICATION';

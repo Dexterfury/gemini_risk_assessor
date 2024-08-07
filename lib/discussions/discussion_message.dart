@@ -2,6 +2,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/additional_data_model.dart';
 import 'package:gemini_risk_assessor/discussions/quiz_model.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/models/message_reply_model.dart';
 
 class DiscussionMessage {
   final String senderUID;
@@ -14,9 +15,7 @@ class DiscussionMessage {
   final String messageID;
   final bool isSeen;
   final bool isAIMessage;
-  final String repliedMessage;
-  final String repliedTo;
-  final MessageType repliedMessageType;
+  final MessageReply repliedMessage;
   final List<String> reactions;
   final List<String> seenBy;
   final List<String> deletedBy;
@@ -36,8 +35,6 @@ class DiscussionMessage {
     required this.isSeen,
     required this.isAIMessage,
     required this.repliedMessage,
-    required this.repliedTo,
-    required this.repliedMessageType,
     required this.reactions,
     required this.seenBy,
     required this.deletedBy,
@@ -59,9 +56,7 @@ class DiscussionMessage {
       Constants.messageID: messageID,
       Constants.isSeen: isSeen,
       Constants.isAIMessage: isAIMessage,
-      Constants.repliedMessage: repliedMessage,
-      Constants.repliedTo: repliedTo,
-      Constants.repliedMessageType: repliedMessageType.name,
+      Constants.repliedMessage: repliedMessage.toMap(),
       Constants.reactions: reactions,
       Constants.seenBy: seenBy,
       Constants.deletedBy: deletedBy,
@@ -84,10 +79,7 @@ class DiscussionMessage {
       messageID: map[Constants.messageID] ?? '',
       isSeen: map[Constants.isSeen] ?? false,
       isAIMessage: map[Constants.isAIMessage] ?? false,
-      repliedMessage: map[Constants.repliedMessage] ?? '',
-      repliedTo: map[Constants.repliedTo] ?? '',
-      repliedMessageType:
-          map[Constants.repliedMessageType].toString().toMessageType(),
+      repliedMessage: MessageReply.fromMap(map[Constants.repliedMessage] ?? {}),
       reactions: List<String>.from(map[Constants.reactions] ?? []),
       seenBy: List<String>.from(map[Constants.seenBy] ?? []),
       deletedBy: List<String>.from(map[Constants.deletedBy] ?? []),
@@ -110,9 +102,7 @@ class DiscussionMessage {
     String? messageID,
     bool? isSeen,
     bool? isAIMessage,
-    String? repliedMessage,
-    String? repliedTo,
-    MessageType? repliedMessageType,
+    MessageReply? repliedMessage,
     List<String>? reactions,
     List<String>? seenBy,
     List<String>? deletedBy,
@@ -132,8 +122,6 @@ class DiscussionMessage {
       isSeen: isSeen ?? this.isSeen,
       isAIMessage: isAIMessage ?? this.isAIMessage,
       repliedMessage: repliedMessage ?? this.repliedMessage,
-      repliedTo: repliedTo ?? this.repliedTo,
-      repliedMessageType: repliedMessageType ?? this.repliedMessageType,
       reactions: reactions ?? this.reactions,
       seenBy: seenBy ?? this.seenBy,
       deletedBy: deletedBy ?? this.deletedBy,

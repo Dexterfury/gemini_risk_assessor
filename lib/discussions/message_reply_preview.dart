@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/display_message_type.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -16,7 +18,7 @@ class MessageReplyPreview extends StatelessWidget {
     this.viewOnly = false,
   });
 
-  final MessageReplyModel? replyMessageModel;
+  final MessageReply? replyMessageModel;
   final DiscussionMessage? message;
   final bool viewOnly;
 
@@ -106,8 +108,8 @@ class MessageReplyPreview extends StatelessWidget {
                 message: replyMessageModel!.message,
               )
             : DisplayMessageType(
-                message: message!.repliedMessage,
-                type: message!.repliedMessageType,
+                message: message!.repliedMessage.message,
+                type: message!.repliedMessage.messageType,
                 color: Colors.white,
                 isReply: true,
                 maxLines: 2,
@@ -130,8 +132,9 @@ class MessageReplyPreview extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       );
     } else {
+      final isMe = message!.repliedMessage.senderUID == uid;
       return Text(
-        message!.repliedTo,
+        isMe ? 'You' : message!.repliedMessage.senderName,
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.blue,
