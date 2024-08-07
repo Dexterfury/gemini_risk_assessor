@@ -178,7 +178,10 @@ class _CreateNearMissState extends State<CreateNearMiss> {
           );
         },
         openBuilder: (context, action) {
-          return NearMissDetailsScreen(dateTimeFocusNode: _dateTimeFocusNode);
+          return NearMissDetailsScreen(
+            dateTimeFocusNode: _dateTimeFocusNode,
+            isAdmin: true,
+          );
         },
         closedShape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

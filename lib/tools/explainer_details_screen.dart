@@ -189,8 +189,9 @@ class ExplainerDetailsScreen extends StatelessWidget {
               currentModel == null || !isAdmin
                   ? const SizedBox()
                   : Align(
-                      alignment: Alignment.centerRight,
+                      alignment: Alignment.center,
                       child: DeleteButton(
+                        label: ' Delete Tool ',
                         groupID: groupID,
                         generationType: GenerationType.tool,
                         tool: currentModel,

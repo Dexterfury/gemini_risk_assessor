@@ -41,6 +41,11 @@ class AnalyticsHelper {
     await logCustomEvent('deleting_assessment');
   }
 
+  // Log when deleting assessment for group
+  static Future logDeletingNearMiss() async {
+    await logCustomEvent('deleting_near_miss');
+  }
+
   // Log when a user completes a risk assessment
   static Future logCompleteRiskAssessment({int? timeSpentSeconds}) async {
     Map<String, Object> parameters = {};

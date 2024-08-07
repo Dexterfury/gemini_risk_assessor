@@ -81,15 +81,38 @@ class _NearMissesScreenState extends State<NearMissesScreen> {
     });
   }
 
-  void _mergeStreamData(List<DocumentSnapshot> streamDocs) {
-    final Set<String> existingIds = _items.map((doc) => doc.id).toSet();
-    final List<DocumentSnapshot> newDocs =
-        streamDocs.where((doc) => !existingIds.contains(doc.id)).toList();
+  bool _mergeStreamData(List<DocumentSnapshot> streamDocs) {
+    bool hasChanged = false;
+    final Set<String> streamDocIds = streamDocs.map((doc) => doc.id).toSet();
+    final Set<String> localDocIds = _items.map((doc) => doc.id).toSet();
 
-    if (newDocs.isNotEmpty) {
-      _items = [...newDocs, ..._items];
+    // Find deleted documents
+    final Set<String> deletedDocIds = localDocIds.difference(streamDocIds);
+
+    // Remove deleted documents from _items
+    if (deletedDocIds.isNotEmpty) {
+      _items.removeWhere((doc) => deletedDocIds.contains(doc.id));
+      hasChanged = true;
+    }
+
+    // Add new documents
+    for (final doc in streamDocs) {
+      if (!localDocIds.contains(doc.id)) {
+        _items.insert(0, doc); // Insert at the beginning to maintain order
+        hasChanged = true;
+      }
+    }
+
+    if (hasChanged) {
+      // Sort _items by createdAt in descending order
+      _items.sort((a, b) => (b.data()
+              as Map<String, dynamic>)[Constants.createdAt]
+          .compareTo((a.data() as Map<String, dynamic>)[Constants.createdAt]));
+
       _lastDocument = _items.isNotEmpty ? _items.last : null;
     }
+
+    return hasChanged;
   }
 
   @override
@@ -121,7 +144,11 @@ class _NearMissesScreenState extends State<NearMissesScreen> {
 
             // Merge stream data with existing items
             if (snapshot.hasData) {
-              _mergeStreamData(snapshot.data!.docs);
+              final hasChanged = _mergeStreamData(snapshot.data!.docs);
+              if (hasChanged) {
+                // Use Future.microtask to schedule a rebuild after this frame
+                Future.microtask(() => setState(() {}));
+              }
             }
 
             return _buildContent();
@@ -214,7 +241,11 @@ class _NearMissesScreenState extends State<NearMissesScreen> {
                       final data = doc.data() as Map<String, dynamic>;
                       final nearMiss = NearMissModel.fromJson(data);
 
-                      return NearMissItem(nearMiss: nearMiss);
+                      return NearMissItem(
+                        nearMiss: nearMiss,
+                        isAdmin: widget.isAdmin,
+                        groupID: widget.groupID,
+                      );
                     },
                     childCount: results.length + 1,
                   ),

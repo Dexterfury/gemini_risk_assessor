@@ -262,8 +262,9 @@ class AssessmentDetailsScreen extends StatelessWidget {
               currentModel == null || !isAdmin
                   ? const SizedBox()
                   : Align(
-                      alignment: Alignment.centerRight,
+                      alignment: Alignment.center,
                       child: DeleteButton(
+                        label: ' Delete Assessment ',
                         groupID: groupID,
                         generationType: generationType,
                         assessment: assessmentModel,

@@ -459,7 +459,43 @@ class FirebaseMethods {
         e,
         stack,
         reason: 'Error deleting assessment',
-        severity: ErrorSeverity.critical,
+        severity: ErrorSeverity.medium,
+      );
+    }
+  }
+
+  static Future<void> deleteNearMissReport({
+    required String currentUserID,
+    required String groupID,
+    required NearMissModel nearMiss,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
+    final String rootCollection = groupID.isNotEmpty
+        ? Constants.groupsCollection
+        : Constants.usersCollection;
+    final String parentDocID = groupID.isNotEmpty ? groupID : currentUserID;
+
+    try {
+      // Get doc ref
+      final docRef = firestore
+          .collection(rootCollection)
+          .doc(parentDocID)
+          .collection(Constants.nearMissesCollection)
+          .doc(nearMiss.id);
+
+      // Delete the document
+      await docRef.delete();
+
+      AnalyticsHelper.logDeletingNearMiss();
+      onSuccess();
+    } catch (e, stack) {
+      onError(e.toString());
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error deleting near miss',
+        severity: ErrorSeverity.medium,
       );
     }
   }
@@ -506,8 +542,8 @@ class FirebaseMethods {
       ErrorHandler.recordError(
         e,
         stack,
-        reason: 'Error deleting assessment',
-        severity: ErrorSeverity.critical,
+        reason: 'Error deleting tool',
+        severity: ErrorSeverity.medium,
       );
     }
   }

@@ -14,9 +14,13 @@ class NearMissItem extends StatelessWidget {
   const NearMissItem({
     Key? key,
     required this.nearMiss,
+    required this.isAdmin,
+    this.groupID = '',
   }) : super(key: key);
 
   final NearMissModel nearMiss;
+  final bool isAdmin;
+  final String groupID;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +30,11 @@ class NearMissItem extends StatelessWidget {
       child: OpenContainer(
         closedBuilder: (context, action) =>
             _buildClosedContainer(context, currentUserID, action),
-        openBuilder: (context, action) =>
-            NearMissDetailsScreen(isViewOnly: true),
+        openBuilder: (context, action) => NearMissDetailsScreen(
+          isViewOnly: true,
+          isAdmin: isAdmin,
+          groupID: groupID,
+        ),
         transitionType: ContainerTransitionType.fadeThrough,
         transitionDuration: const Duration(milliseconds: 500),
         closedElevation: 2,
@@ -63,21 +70,6 @@ class NearMissItem extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  // Row(
-                  //   children: [
-                  //     Icon(Icons.warning_amber_rounded,
-                  //         color: theme.colorScheme.error),
-                  //     const SizedBox(width: 8),
-                  //     Text(
-                  //       'Near Miss Report',
-                  //       style: textTheme.titleMedium
-                  //           ?.copyWith(fontWeight: FontWeight.bold),
-                  //     ),
-                  //     const Spacer(),
-                  //     _buildDateChip(context),
-                  //   ],
-                  // ),
-                  //const SizedBox(height: 8),
                   Text(
                     nearMiss.description,
                     style: textTheme.bodyMedium,
@@ -95,25 +87,6 @@ class NearMissItem extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDateChip(BuildContext context) {
-    // Define the format of the incoming date string
-    final dateFormat = DateFormat('yyyy/MM/dd HH:mm');
-    final date = dateFormat.parse(nearMiss.dateTime);
-
-    // Format the parsed date to your desired output format
-    final formattedDate = DateFormat('MMM d, y').format(date);
-    return Chip(
-      label: Text(
-        formattedDate,
-        style: TextStyle(
-          fontSize: 12,
-        ),
-      ),
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      padding: EdgeInsets.zero,
     );
   }
 
@@ -176,45 +149,3 @@ Widget getCreatorName(BuildContext context, String createdBy) {
     },
   );
 }
-// class NearMissItem extends StatelessWidget {
-//   const NearMissItem({
-//     super.key,
-//     required this.nearMiss,
-//   });
-//   final NearMissModel nearMiss;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       color: Theme.of(context).cardColor,
-//       elevation: AppTheme.cardElevation,
-//       child: OpenContainer(
-//         closedBuilder: (context, action) {
-//           return ListTile(
-//             title: Text(nearMiss.description),
-//             subtitle: Text(nearMiss.dateTime),
-//             onTap: () async {
-//               await context
-//                   .read<NearMissProvider>()
-//                   .updateNearMiss(nearMiss)
-//                   .whenComplete(action);
-//             },
-//           );
-//         },
-//         openBuilder: (context, action) {
-//           return NearMissDetailsScreen(
-//             isViewOnly: true,
-//           );
-//         },
-//         transitionType: ContainerTransitionType.fadeThrough,
-//         transitionDuration: const Duration(milliseconds: 500),
-//         closedElevation: 0,
-//         openElevation: 4,
-//         closedColor: Theme.of(context).cardColor,
-//         closedShape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(10),
-//         ),
-//       ),
-//     );
-//   }
-// }

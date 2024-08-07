@@ -2,8 +2,12 @@ import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/buttons/delete_button.dart';
+import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/nearmiss/add_control_measure_dialog.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measures_card.dart';
@@ -16,10 +20,14 @@ class NearMissDetailsScreen extends StatelessWidget {
   const NearMissDetailsScreen({
     Key? key,
     this.isViewOnly = false,
+    required this.isAdmin,
+    this.groupID = '',
     this.dateTimeFocusNode,
   }) : super(key: key);
 
   final bool isViewOnly;
+  final bool isAdmin;
+  final String groupID;
   final BoardDateTimeInputFocusNode? dateTimeFocusNode;
 
   @override
@@ -57,6 +65,15 @@ class NearMissDetailsScreen extends StatelessWidget {
                       context, nearMissProvider, nearMiss),
                   const SizedBox(height: 20),
                   if (!isViewOnly) _buildSaveButton(context, nearMissProvider),
+                  const SizedBox(height: 10),
+                  if (isAdmin && isViewOnly)
+                    Align(
+                      alignment: Alignment.center,
+                      child: _buildDeletNearMissButton(
+                        context,
+                        nearMiss,
+                      ),
+                    )
                 ],
               ),
             ),
@@ -169,6 +186,43 @@ class NearMissDetailsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDeletNearMissButton(
+      BuildContext context, NearMissModel nearMiss) {
+    return MainAppButton(
+      icon: FontAwesomeIcons.eraser,
+      label: 'Delete Near Miss Report',
+      contanerColor: Colors.red,
+      borderRadius: 15.0,
+      onTap: () async {
+        // show dialog if sure to delete
+        MyDialogs.showMyAnimatedDialog(
+            context: context,
+            title: 'Delete Near Miss Report',
+            content: 'Are you sure you want to delete this Near Miss Report?',
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // pop dialog
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // pop dialog
+                  Navigator.pop(context);
+                  _handleDetionateNearMiss(context, nearMiss, groupID);
+                },
+                child: Text('Yes'),
+              ),
+            ]);
+      },
+    );
+  }
+
   void _showAddControlMeasureDialog(
     BuildContext context,
     NearMissProvider provider,
@@ -229,4 +283,48 @@ class NearMissDetailsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+void _handleDetionateNearMiss(
+  BuildContext context,
+  NearMissModel nearMiss,
+  String groupID,
+) async {
+  final uid = context.read<AuthenticationProvider>().userModel!.uid;
+  // show my alert dialog for loading
+  MyDialogs.showMyAnimatedDialog(
+    context: context,
+    title: 'Deleting...',
+    loadingIndicator: const SizedBox(
+      height: 100,
+      width: 100,
+      child: LoadingPPEIcons(),
+    ),
+  );
+
+  await FirebaseMethods.deleteNearMissReport(
+    currentUserID: uid,
+    groupID: groupID,
+    nearMiss: nearMiss,
+    onSuccess: () {
+      // pop the loading dialog
+      Navigator.pop(context);
+      Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+        showSnackBar(
+          context: context,
+          message: 'Successful Deleted',
+        );
+        // pop the screen
+        Navigator.pop(context);
+      });
+    },
+    onError: (error) {
+      // pop the loading dialog
+      Navigator.pop(context);
+      showSnackBar(
+        context: context,
+        message: error.toString(),
+      );
+    },
+  );
 }
