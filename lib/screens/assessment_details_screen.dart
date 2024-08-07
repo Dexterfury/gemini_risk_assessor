@@ -1,8 +1,8 @@
 import 'package:animations/animations.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
+import 'package:gemini_risk_assessor/buttons/delete_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
@@ -10,7 +10,6 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
-import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
@@ -262,10 +261,13 @@ class AssessmentDetailsScreen extends StatelessWidget {
                     ),
               currentModel == null || !isAdmin
                   ? const SizedBox()
-                  : DeleteButton(
-                      groupID: groupID,
-                      generationType: generationType,
-                      assessment: assessmentModel,
+                  : Align(
+                      alignment: Alignment.centerRight,
+                      child: DeleteButton(
+                        groupID: groupID,
+                        generationType: generationType,
+                        assessment: assessmentModel,
+                      ),
                     ),
             ],
           ),
@@ -432,105 +434,5 @@ class AssessmentDetailsScreen extends StatelessWidget {
     } else {
       return context.watch<AssessmentProvider>().ppeModelList;
     }
-  }
-
-  // List<PpeModel> getPPEList(
-  //     BuildContext context, AssessmentModel? currentModel) {
-  //   // Check if we have a current assessment model
-  //   if (currentModel != null) {
-  //     // Get the full list of PPE icons
-  //     List<PpeModel> allPpeIcons = Constants.getPPEIcons();
-  //     // Initialize an empty list to store selected PPE items
-  //     List<PpeModel> selectedPpeList = [];
-
-  //     // Iterate through each selected PPE label in the current model
-  //     for (var selectedLabel in currentModel.ppe) {
-  //       // Find the matching PpeModel in the full list of PPE icons
-  //       var matchingPpe = allPpeIcons.firstWhere(
-  //         (ppe) => ppe.label == selectedLabel,
-  //         // If no match is found, return a default PpeModel
-  //         orElse: () =>
-  //             PpeModel(id: 0, label: 'Not Found', icon: const CircleAvatar()),
-  //       );
-
-  //       // If a matching PPE item was found (id != 0), add it to the selected list
-  //       if (matchingPpe.id != 0) {
-  //         selectedPpeList.add(matchingPpe);
-  //       }
-  //     }
-
-  //     // Return the list of selected PPE items
-  //     return selectedPpeList;
-  //   } else {
-  //     // If no current model is available, return the default PPE list from the provider
-  //     return context.watch<AssessmentProvider>().ppeModelList;
-  //   }
-  // }
-}
-
-class DeleteButton extends StatelessWidget {
-  const DeleteButton({
-    super.key,
-    required this.groupID,
-    required this.generationType,
-    required this.assessment,
-  });
-
-  final String groupID;
-  final GenerationType generationType;
-  final AssessmentModel assessment;
-
-  @override
-  Widget build(BuildContext context) {
-    final uid = context.read<AuthenticationProvider>().userModel!.uid;
-    Widget buttonWidget() {
-      return MainAppButton(
-        icon: FontAwesomeIcons.deleteLeft,
-        label: ' Delete ',
-        contanerColor: Colors.red,
-        borderRadius: 15.0,
-        onTap: () async {
-          // show my alert dialog for loading
-          MyDialogs.showMyAnimatedDialog(
-            context: context,
-            title: 'Deleting...',
-            loadingIndicator: const SizedBox(
-              height: 100,
-              width: 100,
-              child: LoadingPPEIcons(),
-            ),
-          );
-
-          await FirebaseMethods.deleteAssessment(
-            docID: assessment.id,
-            currentUserID: uid,
-            groupID: groupID,
-            assessment: assessment,
-            onSuccess: () {
-              // pop the loading dialog
-              Navigator.pop(context);
-              Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-                showSnackBar(
-                  context: context,
-                  message: 'Successful Deleted',
-                );
-                // pop the screen
-                Navigator.pop(context);
-              });
-            },
-            onError: (error) {
-              // pop the loading dialog
-              Navigator.pop(context);
-              showSnackBar(
-                context: context,
-                message: error.toString(),
-              );
-            },
-          );
-        },
-      );
-    }
-
-    return buttonWidget();
   }
 }

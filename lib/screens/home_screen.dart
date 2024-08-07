@@ -7,11 +7,9 @@ import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/push_notification/navigation_controller.dart';
 import 'package:gemini_risk_assessor/push_notification/notification_services.dart';
-import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/tools/tools_screen.dart';
 import 'package:gemini_risk_assessor/firebase_methods/logger.dart';
-import 'package:gemini_risk_assessor/utilities/navigation.dart';
-import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
+import 'package:gemini_risk_assessor/widgets/build_user_image.dart';
 import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';
 import 'package:provider/provider.dart';
@@ -63,30 +61,6 @@ class _HomeScreenState extends State<HomeScreen>
       // Implement your search logic here
       tabProvider.setSearchQuery(query);
     }
-  }
-
-  GestureDetector _buildUserImage(
-    BuildContext context,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProfileScreen(
-              uid: context.read<AuthenticationProvider>().userModel!.uid,
-            ),
-          ),
-        );
-      },
-      child: DisplayUserImage(
-        radius: 20,
-        isViewOnly: true,
-        imageUrl:
-            context.watch<AuthenticationProvider>().userModel?.imageUrl ?? '',
-        onPressed: () {},
-      ),
-    );
   }
 
   List<Tab> _buildTabs() {
@@ -188,9 +162,9 @@ class _HomeScreenState extends State<HomeScreen>
         return Scaffold(
           appBar: MyAppBar(
             title: '',
-            onSearch: _handleSearch, // Pass the search function
+            onSearch: _handleSearch,
             actions: [
-              _buildUserImage(context),
+              BuildUserImage(),
             ],
             bottom: TabBar(
               controller: _tabController,

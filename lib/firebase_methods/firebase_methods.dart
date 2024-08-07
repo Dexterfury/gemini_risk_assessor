@@ -412,7 +412,6 @@ class FirebaseMethods {
   }
 
   static Future<void> deleteAssessment({
-    required String docID,
     required String currentUserID,
     required String groupID,
     required AssessmentModel assessment,
@@ -430,7 +429,7 @@ class FirebaseMethods {
           .collection(rootCollection)
           .doc(parentDocID)
           .collection(Constants.assessmentCollection)
-          .doc(docID);
+          .doc(assessment.id);
 
       if (groupID.isEmpty && assessment.sharedWith.isEmpty) {
         // If it's a personal assessment and not shared, delete images from storage
@@ -461,7 +460,6 @@ class FirebaseMethods {
   }
 
   static Future<void> deleteTool({
-    required String docID,
     required String currentUserID,
     required String groupID,
     required ToolModel tool,
@@ -479,7 +477,7 @@ class FirebaseMethods {
           .collection(rootCollection)
           .doc(parentDocID)
           .collection(Constants.toolsCollection)
-          .doc(docID);
+          .doc(tool.id);
 
       if (groupID.isEmpty && tool.sharedWith.isEmpty) {
         // If it's a personal assessment and not shared, delete images from storage

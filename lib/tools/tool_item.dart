@@ -100,6 +100,7 @@ class ToolItem extends StatelessWidget {
         openBuilder: (context, action) {
           return ExplainerDetailsScreen(
             isAdmin: isAdmin,
+            groupID: groupID,
             currentModel: toolModel,
           );
         },

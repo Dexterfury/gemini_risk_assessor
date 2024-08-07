@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
+import 'package:gemini_risk_assessor/buttons/delete_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
@@ -20,11 +21,13 @@ class ExplainerDetailsScreen extends StatelessWidget {
   ExplainerDetailsScreen({
     super.key,
     required this.isAdmin,
+    this.groupID = '',
     this.currentModel,
     this.onSave,
   }) : _scrollController = ScrollController();
 
   final bool isAdmin;
+  final String groupID;
   final ToolModel? currentModel;
   final Function(bool)? onSave;
   final ScrollController _scrollController;
@@ -178,6 +181,21 @@ class ExplainerDetailsScreen extends StatelessWidget {
                       ),
                     )
                   : const SizedBox(),
+
+              const SizedBox(
+                height: 20,
+              ),
+
+              currentModel == null || !isAdmin
+                  ? const SizedBox()
+                  : Align(
+                      alignment: Alignment.centerRight,
+                      child: DeleteButton(
+                        groupID: groupID,
+                        generationType: GenerationType.tool,
+                        tool: currentModel,
+                      ),
+                    ),
             ],
           ),
         ),
