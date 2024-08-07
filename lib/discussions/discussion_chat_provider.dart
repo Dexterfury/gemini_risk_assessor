@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/additional_data_model.dart';
@@ -383,6 +384,7 @@ class DiscussionChatProvider extends ChangeNotifier {
       ErrorHandler.recordError(e, stack, reason: 'Error sending message');
       _isLoading = false;
       onError(e.toString());
+      notifyListeners();
     }
   }
 
@@ -406,5 +408,58 @@ class DiscussionChatProvider extends ChangeNotifier {
         .set(message.toMap());
     _isLoading = false;
     notifyListeners();
+  }
+
+  // delete message
+  Future<void> deleteMessage({
+    required String currentUID,
+    required DiscussionMessage message,
+    required String groupID,
+    required String itemID,
+    required bool deleteForEveryone,
+    required GenerationType generationType,
+  }) async {
+    // set loading
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // check if its group chat
+      if (groupID.isNotEmpty) {
+        // handle group message
+
+        if (deleteForEveryone) {
+          // delete for everyone
+          await FirebaseMethods.groupsCollection
+              .doc(groupID)
+              .collection(getCollectionRef(generationType))
+              .doc(itemID)
+              .collection(Constants.chatMessagesCollection)
+              .doc(message.messageID)
+              .delete();
+        } else {
+          // delete for sender only
+          await FirebaseMethods.groupsCollection
+              .doc(groupID)
+              .collection(getCollectionRef(generationType))
+              .doc(itemID)
+              .collection(Constants.chatMessagesCollection)
+              .doc(message.messageID)
+              .update({
+            Constants.deletedBy: FieldValue.arrayUnion([currentUID])
+          });
+        }
+      } else {
+        // handle one tone message coming soon
+      }
+
+      // stop loading
+      _isLoading = false;
+      notifyListeners();
+    } catch (e, stack) {
+      ErrorHandler.recordError(e, stack, reason: 'Error deleting message');
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

@@ -183,101 +183,6 @@ class _ChatListState extends State<ChatList> {
     }
   }
 
-  // void showDeletBottomSheet({
-  //   required DiscussionMessage message,
-  //   required String currentUserId,
-  //   required bool isSenderOrAdmin,
-  // }) {
-  //   showModalBottomSheet(
-  //       context: context,
-  //       isDismissible: false,
-  //       builder: (context) {
-  //         return Consumer<ChatProvider>(
-  //             builder: (context, chatProvider, child) {
-  //           return SizedBox(
-  //             width: double.infinity,
-  //             child: Padding(
-  //               padding: const EdgeInsets.symmetric(
-  //                 vertical: 20.0,
-  //                 horizontal: 20.0,
-  //               ),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   if (chatProvider.isLoading) const LinearProgressIndicator(),
-  //                   ListTile(
-  //                     leading: const Icon(Icons.delete),
-  //                     title: const Text('Delete for me'),
-  //                     onTap: chatProvider.isLoading
-  //                         ? null
-  //                         : () async {
-  //                             await chatProvider
-  //                                 .deleteMessage(
-  //                               currentUserId: currentUserId,
-  //                               contactUID: widget.contactUID,
-  //                               messageId: message.messageId,
-  //                               messageType: message.messageType.name,
-  //                               isGroupChat: widget.groupId.isNotEmpty,
-  //                               deleteForEveryone: false,
-  //                             )
-  //                                 .whenComplete(() {
-  //                               Navigator.pop(context);
-  //                             });
-  //                           },
-  //                   ),
-  //                   isSenderOrAdmin
-  //                       ? ListTile(
-  //                           leading: const Icon(Icons.delete_forever),
-  //                           title: const Text('Delete for everyone'),
-  //                           onTap: chatProvider.isLoading
-  //                               ? null
-  //                               : () async {
-  //                                   await chatProvider
-  //                                       .deleteMessage(
-  //                                     currentUserId: currentUserId,
-  //                                     contactUID: widget.contactUID,
-  //                                     messageId: message.messageId,
-  //                                     messageType: message.messageType.name,
-  //                                     isGroupChat: widget.groupId.isNotEmpty,
-  //                                     deleteForEveryone: true,
-  //                                   )
-  //                                       .whenComplete(() {
-  //                                     Navigator.pop(context);
-  //                                   });
-  //                                 },
-  //                         )
-  //                       : const SizedBox.shrink(),
-  //                   ListTile(
-  //                     leading: const Icon(Icons.cancel),
-  //                     title: const Text('cancel'),
-  //                     onTap: chatProvider.isLoading
-  //                         ? null
-  //                         : () {
-  //                             Navigator.pop(context);
-  //                           },
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         });
-  //       });
-  // }
-
-  // void sendReactionToMessage(
-  //     {required String reaction, required String messageId}) {
-  //   // get the sender uid
-  //   final senderUID = context.read<AuthenticationProvider>().userModel!.uid;
-
-  //   context.read<ChatProvider>().sendReactionToMessage(
-  //         senderUID: senderUID,
-  //         contactUID: widget.contactUID,
-  //         messageId: messageId,
-  //         reaction: reaction,
-  //         groupId: widget.groupId.isNotEmpty,
-  //       );
-  // }
-
   @override
   Widget build(BuildContext context) {
     // current user uid
@@ -321,6 +226,7 @@ class _ChatListState extends State<ChatList> {
               userModel,
               discussionChatProvider,
               itemID,
+              widget.generationType,
             ),
           ],
         );
@@ -333,6 +239,7 @@ class _ChatListState extends State<ChatList> {
     UserModel userModel,
     DiscussionChatProvider discussionChatProvider,
     String itemID,
+    GenerationType generationType,
   ) {
     final isMe = message.senderUID == userModel.uid;
     final deletedByCurrentUser = message.deletedBy.contains(userModel.uid);
@@ -360,6 +267,7 @@ class _ChatListState extends State<ChatList> {
           widget.groupID,
           itemID,
           isMe,
+          generationType,
         );
       },
       child: Hero(
@@ -423,6 +331,7 @@ void _openReactionsMenu(
   String groupID,
   String itemID,
   bool isMe,
+  GenerationType generationType,
 ) {
   Navigator.of(context).push(
     HeroDialogRoute(builder: (context) {
@@ -459,6 +368,10 @@ void _openReactionsMenu(
             context: context,
             item: item.label,
             message: message,
+            currentUID: userModel.uid,
+            groupID: groupID,
+            itemID: itemID,
+            generationType: generationType,
           );
         },
         widgetAlignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -471,7 +384,11 @@ void onContextMenyClicked({
   required BuildContext context,
   required String item,
   required DiscussionMessage message,
-}) {
+  required String currentUID,
+  required String groupID,
+  required String itemID,
+  required GenerationType generationType,
+}) async {
   switch (item) {
     case 'Reply':
       final discussionChatProvider =
@@ -492,35 +409,129 @@ void onContextMenyClicked({
       showSnackBar(context: context, message: 'Message copied');
       break;
     case 'Delete':
-      // final currentUserId =
-      //     context.read<AuthenticationProvider>().userModel!.uid;
-      // final groupProvider = context.read<GroupProvider>();
-
-      // if (widget.groupId.isNotEmpty) {
-      //   if (groupProvider.isSenderOrAdmin(
-      //       message: message, uid: currentUserId)) {
-      //     showDeletBottomSheet(
-      //       message: message,
-      //       currentUserId: currentUserId,
-      //       isSenderOrAdmin: true,
-      //     );
-      //     return;
-      //   } else {
-      //     showDeletBottomSheet(
-      //       message: message,
-      //       currentUserId: currentUserId,
-      //       isSenderOrAdmin: false,
-      //     );
-      //     return;
-      //   }
-      // }
-      // showDeletBottomSheet(
-      //   message: message,
-      //   currentUserId: currentUserId,
-      //   isSenderOrAdmin: true,
-      // );
+      if (groupID.isNotEmpty) {
+        final isAdmin = await FirebaseMethods.checkIsAdmin(groupID, currentUID);
+        final isSender = message.senderUID == currentUID;
+        if (isAdmin || isSender) {
+          showDeletBottomSheet(
+            context: context,
+            message: message,
+            groupID: groupID,
+            itemID: itemID,
+            currentUID: currentUID,
+            isSenderOrAdmin: true,
+            generationType: generationType,
+          );
+          return;
+        } else {
+          showDeletBottomSheet(
+            context: context,
+            message: message,
+            groupID: groupID,
+            itemID: itemID,
+            currentUID: currentUID,
+            isSenderOrAdmin: false,
+            generationType: generationType,
+          );
+          return;
+        }
+      }
+      showDeletBottomSheet(
+        context: context,
+        message: message,
+        groupID: groupID,
+        itemID: itemID,
+        currentUID: currentUID,
+        isSenderOrAdmin: true,
+        generationType: generationType,
+      );
       break;
   }
+}
+
+void showDeletBottomSheet({
+  required BuildContext context,
+  required DiscussionMessage message,
+  required String groupID,
+  required String itemID,
+  required String currentUID,
+  required bool isSenderOrAdmin,
+  required GenerationType generationType,
+}) {
+  showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      builder: (context) {
+        return Consumer<DiscussionChatProvider>(
+            builder: (context, chatProvider, child) {
+          return SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 20.0,
+                horizontal: 20.0,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (chatProvider.isLoading) const LinearProgressIndicator(),
+                  ListTile(
+                    leading: const Icon(Icons.delete),
+                    title: const Text('Delete for me'),
+                    onTap: chatProvider.isLoading
+                        ? null
+                        : () async {
+                            await chatProvider
+                                .deleteMessage(
+                              currentUID: currentUID,
+                              message: message,
+                              groupID: groupID,
+                              itemID: itemID,
+                              deleteForEveryone: false,
+                              generationType: generationType,
+                            )
+                                .whenComplete(() {
+                              Navigator.pop(context);
+                            });
+                          },
+                  ),
+                  isSenderOrAdmin
+                      ? ListTile(
+                          leading: const Icon(Icons.delete_forever),
+                          title: const Text('Delete for everyone'),
+                          onTap: chatProvider.isLoading
+                              ? null
+                              : () async {
+                                  await chatProvider
+                                      .deleteMessage(
+                                    currentUID: currentUID,
+                                    message: message,
+                                    groupID: groupID,
+                                    itemID: itemID,
+                                    deleteForEveryone: false,
+                                    generationType: generationType,
+                                  )
+                                      .whenComplete(() {
+                                    Navigator.pop(context);
+                                  });
+                                },
+                        )
+                      : const SizedBox.shrink(),
+                  ListTile(
+                    leading: const Icon(Icons.cancel),
+                    title: const Text('cancel'),
+                    onTap: chatProvider.isLoading
+                        ? null
+                        : () {
+                            Navigator.pop(context);
+                          },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+      });
 }
 
 void showEmojiContainer({

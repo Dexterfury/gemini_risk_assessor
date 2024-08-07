@@ -583,34 +583,6 @@ class FirebaseMethods {
     return snapshot.docs.length;
   }
 
-  // // delete assessment from o rganization and user
-  // static Future<void> deleteAssessment({
-  //   required String uid,
-  //   required String groupID
-  // ,
-  //   required String assessmentID,
-  //   required bool isDSTI,
-  // }) async {
-  //   // we get the database referrence for the group and the user
-  //   final String collectionName =
-  //       isDSTI ? Constants.dstiCollections : Constants.assessmentCollection;
-  //   final orgRef = _groupsCollection
-  //       .doc(groupID
-
-  //       .collection(collectionName)
-  //       .doc(assessmentID);
-  //   final userRef = _usersCollection
-  //       .doc(uid)
-  //       .collection(collectionName)
-  //       .doc(assessmentID);
-
-  //   // delete the assessment from both the group and user collections
-  //   await Future.wait([
-  //     orgRef.delete(),
-  //     // remove this assessment from sharedWith list
-  //   ]);
-  // }
-
   // set notification was clicked to true
   static Future<void> setNotificationClicked({
     required String uid,
@@ -639,8 +611,14 @@ class FirebaseMethods {
     try {
       DocumentSnapshot groupDoc = await groupsCollection.doc(groupID).get();
       return GroupModel.fromJson(groupDoc.data()! as Map<String, dynamic>);
-    } catch (e) {
-      print('Error fetching group data: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error fetching group data',
+        severity: ErrorSeverity.medium,
+      );
+
       return null;
     }
   }
@@ -714,9 +692,15 @@ class FirebaseMethods {
           }).toList();
         });
       }
-    } catch (e) {
-      log('error loading messages: $e');
-      return asStream ? Stream.empty() : Future.value([]);
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error loading messages',
+        severity: ErrorSeverity.medium,
+      );
+
+      asStream ? Stream.empty() : Future.value([]);
     }
   }
   // static dynamic getMessages({
@@ -857,8 +841,41 @@ class FirebaseMethods {
       } else {
         // handle one to one message coming soon
       }
-    } catch (e) {
-      print(e.toString());
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error adding reaction to message',
+        severity: ErrorSeverity.medium,
+      );
+    }
+  }
+
+  static Future<bool> checkIsAdmin(String groupID, String currentUID) async {
+    try {
+      // Reference to the group document
+      DocumentReference groupRef = groupsCollection.doc(groupID);
+
+      // Get the group document
+      DocumentSnapshot groupDoc = await groupRef.get();
+
+      if (groupDoc.exists) {
+        // Check if the currentUID is in the adminsUIDs list
+        List<String> adminsUIDs = groupDoc[Constants.adminsUIDs] ?? [];
+        return adminsUIDs.contains(currentUID);
+      } else {
+        // If the document does not exist, return false
+        return false;
+      }
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error loading messages',
+        severity: ErrorSeverity.medium,
+      );
+
+      return false;
     }
   }
 }
