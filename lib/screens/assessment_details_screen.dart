@@ -260,7 +260,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
                   : const SizedBox(
                       height: 20,
                     ),
-              currentModel == null && !isAdmin
+              currentModel == null || !isAdmin
                   ? const SizedBox()
                   : DeleteButton(
                       groupID: groupID,
@@ -322,7 +322,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        currentModel == null && !isAdminn
+        currentModel == null || !isAdminn
             ? const SizedBox()
             : OpenContainer(
                 closedBuilder: (context, action) {
