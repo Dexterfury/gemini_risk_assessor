@@ -282,8 +282,13 @@ class FirebaseMethods {
     try {
       DocumentSnapshot userDoc = await usersCollection.doc(creatorUid).get();
       return userDoc.get(Constants.name) as String;
-    } catch (e) {
-      print('Error fetching creator name: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error fetching creator name',
+        severity: ErrorSeverity.low,
+      );
       return 'Unknown Creator';
     }
   }

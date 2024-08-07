@@ -3,6 +3,7 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
+import 'package:gemini_risk_assessor/screens/profile_screen.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:provider/provider.dart';
 
@@ -34,12 +35,26 @@ class UserWidget extends StatelessWidget {
     return ListTile(
       minLeadingWidth: 0.0,
       contentPadding: EdgeInsets.zero,
-      leading: DisplayUserImage(
-        radius: 30,
-        imageUrl: userData.imageUrl,
-        isViewOnly: true,
-        onPressed: () {},
-        avatarPadding: 0.0,
+      leading: GestureDetector(
+        onTap: uid == userData.uid
+            ? null
+            : () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(
+                      uid: userData.uid,
+                    ),
+                  ),
+                );
+              },
+        child: DisplayUserImage(
+          radius: 30,
+          imageUrl: userData.imageUrl,
+          isViewOnly: true,
+          onPressed: () {},
+          avatarPadding: 0.0,
+        ),
       ),
       title: Text(name),
       subtitle: Text(

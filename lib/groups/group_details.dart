@@ -14,7 +14,7 @@ import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
-import 'package:gemini_risk_assessor/firebase_methods/members_card.dart';
+import 'package:gemini_risk_assessor/groups/members_card.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
