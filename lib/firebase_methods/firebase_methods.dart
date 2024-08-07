@@ -460,6 +460,55 @@ class FirebaseMethods {
     }
   }
 
+  static Future<void> deleteTool({
+    required String docID,
+    required String currentUserID,
+    required String groupID,
+    required ToolModel tool,
+    required Function() onSuccess,
+    required Function(String) onError,
+  }) async {
+    final String rootCollection = groupID.isNotEmpty
+        ? Constants.groupsCollection
+        : Constants.usersCollection;
+    final String parentDocID = groupID.isNotEmpty ? groupID : currentUserID;
+
+    try {
+      // Get doc ref
+      final docRef = firestore
+          .collection(rootCollection)
+          .doc(parentDocID)
+          .collection(Constants.toolsCollection)
+          .doc(docID);
+
+      if (groupID.isEmpty && tool.sharedWith.isEmpty) {
+        // If it's a personal assessment and not shared, delete images from storage
+        await Future.wait(
+          tool.images.map(
+            (url) => _deleteImage(
+              imageUrl: url,
+              onError: onError,
+            ),
+          ),
+        );
+      }
+
+      // Delete the document
+      await docRef.delete();
+
+      AnalyticsHelper.logDeletingAssessment();
+      onSuccess();
+    } catch (e, stack) {
+      onError(e.toString());
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error deleting assessment',
+        severity: ErrorSeverity.critical,
+      );
+    }
+  }
+
   static Future<void> _deleteImage({
     required String imageUrl,
     required Function(String) onError,

@@ -522,3 +522,58 @@ exports.onDeleteGroupAssessment = functions.firestore
 
       console.log(`Cleaned up assessment ${assessmentId} from group ${groupId}`);
     });
+
+
+exports.onDeleteGroupTool = functions.firestore
+    .document("groups/{groupId}/tools/{toolId}")
+    .onDelete(async (snapshot, context) => {
+      const deletedTool = snapshot.data();
+      const {groupId, assessmentId: toolId} = context.params;
+
+      // Get all users
+      const usersSnapshot = await admin.firestore().collection("users").get();
+
+      const batch = admin.firestore().batch();
+
+      for (const userDoc of usersSnapshot.docs) {
+        const userToolRef = userDoc.ref.collection("tools").doc(toolId);
+        const userToolDoc = await userToolRef.get();
+
+        if (userToolDoc.exists) {
+          const userData = userToolDoc.data();
+          if (userData.sharedWith && userData.sharedWith.includes(groupId)) {
+            // Remove the groupId from the sharedWith array
+            batch.update(userToolRef, {
+              sharedWith: admin.firestore.FieldValue.arrayRemove(groupId),
+            });
+          }
+        }
+      }
+
+      // If the assessment was created in the group (not shared from a user),
+      // we should delete it entirely and clean up any associated resources
+      if (deletedTool.createdBy === groupId) {
+        // Delete images if any
+        if (deletedTool.images && deletedTool.images.length > 0) {
+          const deletePromises = deletedTool.images.map((imageUrl) => {
+            const decodedUrl = decodeURIComponent(imageUrl);
+            const startIndex = decodedUrl.indexOf("/o/") + 3;
+            const endIndex = decodedUrl.indexOf("?");
+            const filePath = decodedUrl.substring(startIndex, endIndex);
+            return admin.storage().bucket().file(filePath).delete();
+          });
+          await Promise.all(deletePromises);
+        }
+
+        // Delete the assessment from all users who have it shared
+        for (const userDoc of usersSnapshot.docs) {
+          const userToolRef = userDoc.ref.collection("assessments").doc(toolId);
+          batch.delete(userToolRef);
+        }
+      }
+
+      // Commit all the batched writes
+      await batch.commit();
+
+      console.log(`Cleaned up tool ${toolId} from group ${groupId}`);
+    });
