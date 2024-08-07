@@ -113,7 +113,12 @@ class _ShareScreenState extends State<ShareScreen> {
         uid: uid,
         toolModel: widget.toolModel!,
         groupID: groupModel.groupID,
-      );
+      ).whenComplete(() {
+        showSnackBar(
+          context: context,
+          message: 'Shared Successfully',
+        );
+      });
     } else {
       await FirebaseMethods.shareWithGroup(
         uid: uid,
