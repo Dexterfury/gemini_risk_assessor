@@ -20,7 +20,7 @@ class ContactDiscussionMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final time = DateFormat('hh:mm a').format(message.timeSent);
-    final isReplying = message.repliedMessage.message.isEmpty;
+    final isReplying = message.repliedMessage.message.isNotEmpty;
     // get the reations from the list
     final messageReations =
         message.reactions.map((e) => e.split('=')[1]).toList();
@@ -53,12 +53,9 @@ class ContactDiscussionMessage extends StatelessWidget {
                     child: Card(
                       elevation: 5,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
-                          bottomRight: Radius.circular(15),
-                        ),
-                      ),
+                          borderRadius: BorderRadius.all(
+                        Radius.circular(10.0),
+                      )),
                       color: Colors.grey[isDarkMode ? 800 : 200],
                       child: Padding(
                         padding: message.messageType == MessageType.text

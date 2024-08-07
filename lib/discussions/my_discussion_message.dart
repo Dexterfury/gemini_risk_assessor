@@ -57,11 +57,7 @@ class MyDiscussionMessage extends StatelessWidget {
               child: Card(
                 elevation: AppTheme.cardElevation,
                 shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                    bottomLeft: Radius.circular(15),
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 color: AppTheme.getButtonColor(context),
                 child: Padding(

@@ -43,8 +43,8 @@ class MessageReplyPreview extends StatelessWidget {
         decoration: BoxDecoration(
           color: decorationColor,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
           ),
         ),
         child: Row(
