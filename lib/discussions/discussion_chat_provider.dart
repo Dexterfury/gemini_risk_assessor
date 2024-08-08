@@ -82,9 +82,9 @@ class DiscussionChatProvider extends ChangeNotifier {
       final additionalData = AdditionalDataModel.empty();
 
       final discussionMessage = DiscussionMessage(
-        senderUID: Constants.geminiModel,
-        senderName: Constants.gemini,
-        senderImage: '',
+        senderUID: userModel.uid,
+        senderName: userModel.name,
+        senderImage: userModel.imageUrl,
         groupID: groupID,
         message: 'New safety quiz available! Tap to participate.',
         messageType: MessageType.quiz,
@@ -182,16 +182,16 @@ class DiscussionChatProvider extends ChangeNotifier {
         // get messageReply
         final messageReply = MessageReply(
           message: quizData.title,
-          senderUID: Constants.gemini,
+          senderUID: currentUser.uid,
           senderName: 'Safety Quiz Results',
           senderImage: '',
           messageType: MessageType.quizAnswer,
         );
 
         final answerMessage = DiscussionMessage(
-          senderUID: Constants.geminiModel,
-          senderName: Constants.gemini,
-          senderImage: '',
+          senderUID: currentUser.uid,
+          senderName: currentUser.name,
+          senderImage: currentUser.imageUrl,
           groupID: groupID,
           message: 'Results',
           messageType: MessageType.quizAnswer,
@@ -251,9 +251,9 @@ class DiscussionChatProvider extends ChangeNotifier {
       final quiz = QuizModel.empty;
 
       final additionalDataMessage = DiscussionMessage(
-        senderUID: Constants.geminiModel,
-        senderName: Constants.gemini,
-        senderImage: '',
+        senderUID: userModel.uid,
+        senderName: userModel.name,
+        senderImage: userModel.imageUrl,
         groupID: groupID,
         message: 'Additional Data',
         messageType: MessageType.additional,

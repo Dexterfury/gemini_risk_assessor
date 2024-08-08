@@ -257,7 +257,8 @@ class _ChatListState extends State<ChatList> {
 
     return GestureDetector(
       onLongPress: () {
-        if (message.senderName == Constants.gemini) {
+        if (message.messageType == MessageType.quiz.name ||
+            message.messageType == MessageType.quizAnswer.name) {
           return;
         }
         _openReactionsMenu(
