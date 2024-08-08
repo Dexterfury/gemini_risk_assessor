@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
 import 'package:gemini_risk_assessor/api/pdf_handler.dart';
@@ -19,7 +17,6 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as path;
 
@@ -35,12 +32,9 @@ class AssessmentProvider extends ChangeNotifier {
   AssessmentModel _assessmentModel =
       AssessmentModel.fromJson(<String, dynamic>{});
   Weather _weather = Weather.sunny;
-  //File? _pdfAssessmentFile;
   bool _hasSigned = false;
-  Uint8List? _signatureImage;
   String _groupID = '';
   String _uid = '';
-  final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
@@ -51,12 +45,9 @@ class AssessmentProvider extends ChangeNotifier {
   String get description => _description;
   AssessmentModel get assessmentModel => _assessmentModel;
   Weather get weather => _weather;
-  //File? get pdfAssessmentFile => _pdfAssessmentFile;
   bool get hasSigned => _hasSigned;
-  Uint8List? get signatureImage => _signatureImage;
   String get groupID => _groupID;
   String get uid => _uid;
-  GlobalKey<SfSignaturePadState> get signatureGlobalKey => _signatureGlobalKey;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _usersCollection =
@@ -211,24 +202,6 @@ class AssessmentProvider extends ChangeNotifier {
   // set has signed
   void setHasSigned(bool hasSigned) {
     _hasSigned = hasSigned;
-    notifyListeners();
-  }
-
-  // save the signature image
-  Future<void> saveSignature() async {
-    final data =
-        await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
-    final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
-    _signatureImage = bytes!.buffer.asUint8List();
-    // return has signed back to false
-    _hasSigned = false;
-    notifyListeners();
-  }
-
-  void resetSignature() {
-    _signatureImage = null;
-    // return has signed back to false
-    _hasSigned = false;
     notifyListeners();
   }
 
