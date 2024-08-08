@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/discussions/display_message_type.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
