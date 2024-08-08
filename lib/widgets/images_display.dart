@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/my_image_cache_manager.dart';
 import 'package:gemini_risk_assessor/widgets/add_image.dart';
 import '../tools/tool_provider.dart';
@@ -26,10 +27,10 @@ class ImagesDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = getProvider(assessmentProvider, toolProvider);
-    return getImagesToShow(provider);
+    return getImagesToShow(context, provider);
   }
 
-  Container _toolViewImages() {
+  Container _toolViewImages(BuildContext context) {
     return Container(
       height: 120,
       decoration: BoxDecoration(
@@ -43,19 +44,26 @@ class ImagesDisplay extends StatelessWidget {
             for (var image in currentToolModel!.images)
               Padding(
                 padding: const EdgeInsets.all(8),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(15.0),
-                        child: SizedBox(
-                          height: 100,
-                          width: 100,
-                          child: MyImageCacheManager.showImage(
-                            imageUrl: image,
-                            isTool: false,
-                          ),
-                        )),
-                  ],
+                child: GestureDetector(
+                  onTap: () {
+                    showMyImageViewer(
+                      context,
+                      currentToolModel!.images,
+                      currentToolModel!.images.indexOf(image),
+                      true,
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: MyImageCacheManager.showImage(
+                        imageUrl: image,
+                        isTool: false,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -64,7 +72,7 @@ class ImagesDisplay extends StatelessWidget {
     );
   }
 
-  Container _assessmentViewImages() {
+  Container _assessmentViewImages(BuildContext context) {
     return Container(
       height: 120,
       decoration: BoxDecoration(
@@ -78,19 +86,26 @@ class ImagesDisplay extends StatelessWidget {
             for (var image in currentAssessmentModel!.images)
               Padding(
                 padding: const EdgeInsets.all(8),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(15.0),
-                        child: SizedBox(
-                          height: 100,
-                          width: 100,
-                          child: MyImageCacheManager.showImage(
-                            imageUrl: image,
-                            isTool: false,
-                          ),
-                        )),
-                  ],
+                child: GestureDetector(
+                  onTap: () {
+                    showMyImageViewer(
+                      context,
+                      currentAssessmentModel!.images,
+                      currentAssessmentModel!.images.indexOf(image),
+                      true,
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: MyImageCacheManager.showImage(
+                        imageUrl: image,
+                        isTool: false,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -99,11 +114,11 @@ class ImagesDisplay extends StatelessWidget {
     );
   }
 
-  getImagesToShow(dynamic provider) {
+  getImagesToShow(BuildContext context, dynamic provider) {
     if (isViewOnly && currentAssessmentModel != null) {
-      return _assessmentViewImages();
+      return _assessmentViewImages(context);
     } else if (isViewOnly && currentToolModel != null) {
-      return _toolViewImages();
+      return _toolViewImages(context);
       // }
       // if (isViewOnly && provider != null && provider.imagesFileList!.isEmpty) {
       //   return const Text('No images added');
@@ -173,13 +188,23 @@ class ProviderViewImages extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 child: Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.file(
-                        File(image.path),
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: () {
+                        showMyImageViewer(
+                          context,
+                          provider.imagesFileList!,
+                          provider.imagesFileList!.indexOf(image),
+                          isViewOnly,
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Image.file(
+                          File(image.path),
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     isViewOnly

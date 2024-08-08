@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
@@ -224,6 +226,7 @@ Widget previewImages({
   required bool isViewOnly,
 }) {
   final toolsProvider = context.read<ToolsProvider>();
+
   if (images.isNotEmpty) {
     return Stack(
       children: [
@@ -233,47 +236,56 @@ Widget previewImages({
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
             final image = images[index];
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.60,
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15.0),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: isViewOnly
-                            ? Image.file(
-                                File(image),
-                                fit: BoxFit.cover,
-                              )
-                            : Image.file(
-                                File(image.path),
-                                fit: BoxFit.cover,
+            return GestureDetector(
+              onTap: () {
+                showMyImageViewer(
+                  context,
+                  images,
+                  index,
+                  isViewOnly,
+                );
+              },
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.60,
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: isViewOnly
+                              ? Image.file(
+                                  File(image),
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(image.path),
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
+                        Positioned(
+                          right: 10,
+                          top: 10,
+                          child: GestureDetector(
+                            onTap: () {
+                              toolsProvider.removeFile(image: image);
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
                               ),
-                      ),
-                      Positioned(
-                        right: 10,
-                        top: 10,
-                        child: GestureDetector(
-                          onTap: () {
-                            // remove image from list
-                            toolsProvider.removeFile(image: image);
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.remove_circle,
-                              color: Colors.red.shade400,
+                              child: Icon(
+                                Icons.remove_circle,
+                                color: Colors.red.shade400,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -335,4 +347,35 @@ Widget previewImages({
       ),
     );
   }
+}
+
+void showMyImageViewer(
+  BuildContext context,
+  List<dynamic> images,
+  int initialIndex,
+  bool isViewOnly,
+) {
+  final List<ImageProvider> imageProviders = images
+      .map((image) {
+        if (image is XFile) {
+          return FileImage(File(image.path));
+        } else if (image is String && image.startsWith('http')) {
+          return NetworkImage(image);
+        } else {
+          return AssetImage('assets/placeholder_image.png');
+        }
+      })
+      .toList()
+      .cast<ImageProvider>();
+
+  MultiImageProvider multiImageProvider = MultiImageProvider(imageProviders);
+
+  showImageViewerPager(
+    context,
+    multiImageProvider,
+    onPageChanged: (page) {},
+    onViewerDismissed: (page) {},
+    swipeDismissible: true,
+    doubleTapZoomable: true,
+  );
 }
