@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/widgets/settings_switch_list_tile.dart';
 

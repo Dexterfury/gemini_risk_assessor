@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
+import 'package:gemini_risk_assessor/auth/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/widgets/display_user_image.dart';
 import 'package:gemini_risk_assessor/widgets/input_field.dart';
-import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class UserInformationScreen extends StatefulWidget {

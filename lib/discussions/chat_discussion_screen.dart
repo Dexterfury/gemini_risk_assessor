@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
-import 'package:gemini_risk_assessor/appBars/discussion_app_bar.dart';
+import 'package:gemini_risk_assessor/app_bars/discussion_app_bar.dart';
 import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/discussions/chat_list.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_field.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_actions.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';

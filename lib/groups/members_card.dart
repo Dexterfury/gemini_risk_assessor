@@ -3,7 +3,7 @@ import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';

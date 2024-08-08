@@ -3,17 +3,17 @@ import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/authentication/email_login.dart';
-import 'package:gemini_risk_assessor/authentication/email_sign_up.dart';
-import 'package:gemini_risk_assessor/authentication/forgot_password.dart';
-import 'package:gemini_risk_assessor/authentication/landing_screen.dart';
-import 'package:gemini_risk_assessor/authentication/login_screen.dart';
-import 'package:gemini_risk_assessor/authentication/opt_screen.dart';
-import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
+import 'package:gemini_risk_assessor/auth/email_login.dart';
+import 'package:gemini_risk_assessor/auth/email_sign_up.dart';
+import 'package:gemini_risk_assessor/auth/forgot_password.dart';
+import 'package:gemini_risk_assessor/auth/landing_screen.dart';
+import 'package:gemini_risk_assessor/auth/login_screen.dart';
+import 'package:gemini_risk_assessor/auth/opt_screen.dart';
+import 'package:gemini_risk_assessor/auth/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
@@ -26,11 +26,10 @@ import 'package:gemini_risk_assessor/tools/create_explainer_screen.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/screens/home_screen.dart';
 import 'package:gemini_risk_assessor/screens/screens_controller.dart';
-import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
+import 'package:gemini_risk_assessor/firebase/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,

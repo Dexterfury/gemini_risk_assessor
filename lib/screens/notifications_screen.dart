@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
-import 'package:gemini_risk_assessor/firebase_methods/notifications_stream.dart';
+import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/notifications_stream.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({Key? key}) : super(key: key);

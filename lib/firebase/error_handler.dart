@@ -1,8 +1,8 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
-import 'package:gemini_risk_assessor/firebase_methods/logger.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/logger.dart';
 
 class ErrorHandler {
   static void recordError(dynamic exception, StackTrace? stack,

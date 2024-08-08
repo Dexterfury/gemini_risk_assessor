@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';

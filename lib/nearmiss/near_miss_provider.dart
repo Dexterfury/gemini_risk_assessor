@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';

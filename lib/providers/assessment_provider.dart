@@ -11,7 +11,7 @@ import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
-import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
+import 'package:gemini_risk_assessor/firebase/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -25,7 +25,7 @@ class AssessmentProvider extends ChangeNotifier {
   List<PpeModel> _ppeModelList = [];
   List<XFile>? _imagesFileList = [];
   bool _isLoading = false;
-  int _maxImages = 10;
+  int _maxImages = 5;
   int _numberOfPeople = 1;
   String _description = '';
   String _pdfHeading = '';
@@ -366,7 +366,7 @@ class AssessmentProvider extends ChangeNotifier {
   // remove all images from imagesFileList
   void removeAllImages() {
     _imagesFileList!.clear();
-    _maxImages = 10;
+    _maxImages = 5;
     notifyListeners();
   }
 
@@ -486,7 +486,7 @@ class AssessmentProvider extends ChangeNotifier {
   // reset prompt data
   void resetPromptData() {
     _imagesFileList = [];
-    _maxImages = 10;
+    _maxImages = 5;
     _numberOfPeople = 1;
     _ppeModelList = [];
     notifyListeners();

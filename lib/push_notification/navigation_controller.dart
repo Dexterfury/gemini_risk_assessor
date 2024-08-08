@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/chat_discussion_screen.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_details.dart';
 import 'package:gemini_risk_assessor/screens/risk_assessments_screen.dart';

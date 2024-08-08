@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/authentication/user_information_screen.dart';
+import 'package:gemini_risk_assessor/auth/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:provider/provider.dart';
 

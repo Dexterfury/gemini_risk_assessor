@@ -8,11 +8,11 @@ import 'package:gemini_risk_assessor/discussions/contact_discussion_message.dart
 import 'package:gemini_risk_assessor/discussions/message_widget.dart';
 import 'package:gemini_risk_assessor/discussions/my_discussion_message.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/models/message_reply_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_chat_provider.dart';
 import 'package:gemini_risk_assessor/models/user_model.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';

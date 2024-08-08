@@ -1,13 +1,13 @@
 import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/buttons/delete_button.dart';
 import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/nearmiss/add_control_measure_dialog.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measure.dart';
 import 'package:gemini_risk_assessor/nearmiss/control_measures_card.dart';

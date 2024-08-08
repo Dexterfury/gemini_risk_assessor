@@ -5,17 +5,17 @@ import 'package:gemini_risk_assessor/buttons/main_app_button.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/data_settings.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:gemini_risk_assessor/widgets/display_group_image.dart';
-import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class CreateGroupScreen extends StatefulWidget {

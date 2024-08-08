@@ -5,17 +5,17 @@ import 'package:gemini_risk_assessor/buttons/animated_chat_button.dart';
 import 'package:gemini_risk_assessor/buttons/delete_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
 import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:provider/provider.dart';
 import '../widgets/images_display.dart';
-import '../appBars/my_app_bar.dart';
+import '../app_bars/my_app_bar.dart';
 
 class ExplainerDetailsScreen extends StatelessWidget {
   ExplainerDetailsScreen({

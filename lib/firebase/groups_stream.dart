@@ -1,8 +1,8 @@
 import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/groups/group_grid_item.dart';
 import 'package:provider/provider.dart';
 

@@ -1,6 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/create_group_screen.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';

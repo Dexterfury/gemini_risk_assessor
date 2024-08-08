@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
-import 'package:gemini_risk_assessor/firebase_methods/analytics_helper.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/search/group_search_stream.dart';
-import 'package:gemini_risk_assessor/firebase_methods/groups_stream.dart';
+import 'package:gemini_risk_assessor/firebase/groups_stream.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/build_user_image.dart';
-import 'package:gemini_risk_assessor/appBars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class GroupsScreen extends StatelessWidget {

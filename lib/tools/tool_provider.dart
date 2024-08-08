@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
-import 'package:gemini_risk_assessor/firebase_methods/error_handler.dart';
+import 'package:gemini_risk_assessor/firebase/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -18,7 +18,7 @@ import 'package:path/path.dart' as path;
 class ToolsProvider extends ChangeNotifier {
   final GeminiModelManager _modelManager = GeminiModelManager();
   bool _isLoading = false;
-  int _maxImages = 10;
+  int _maxImages = 5;
   String _description = '';
   File? _pdfToolFile;
   String _uid = '';
@@ -207,7 +207,7 @@ class ToolsProvider extends ChangeNotifier {
   // reset prompt data
   void resetPromptData() {
     _imagesFileList = [];
-    _maxImages = 10;
+    _maxImages = 5;
     notifyListeners();
   }
 

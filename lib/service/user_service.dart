@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gemini_risk_assessor/authentication/firebase_auth_error_handler.dart';
+import 'package:gemini_risk_assessor/auth/firebase_auth_error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class UserService {

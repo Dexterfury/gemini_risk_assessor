@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 
 class InputField extends StatelessWidget {

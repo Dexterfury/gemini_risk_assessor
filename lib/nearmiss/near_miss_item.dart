@@ -1,8 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gemini_risk_assessor/authentication/authentication_provider.dart';
-import 'package:gemini_risk_assessor/firebase_methods/firebase_methods.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
+import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_details_screen.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
