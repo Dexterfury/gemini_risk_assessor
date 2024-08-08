@@ -52,9 +52,6 @@ class QuizResultsWidget extends StatelessWidget {
         participantData[Constants.answers] as Map<String, dynamic>);
     final participantName = participantData[Constants.name];
     final participantImage = participantData[Constants.imageUrl];
-    final createdAtTimestamp = participantData[Constants.createdAt];
-    final createdAtDateTime =
-        DateTime.fromMillisecondsSinceEpoch(createdAtTimestamp);
     final time = DateFormat('hh:mm a').format(message.timeSent);
 
     quizData.questions.asMap().forEach((index, question) {

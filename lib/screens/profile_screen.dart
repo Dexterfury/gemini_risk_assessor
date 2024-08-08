@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/authentication/change_password.dart';

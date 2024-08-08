@@ -4,7 +4,6 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
-import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/contact_discussion_message.dart';
 import 'package:gemini_risk_assessor/discussions/message_widget.dart';
 import 'package:gemini_risk_assessor/discussions/my_discussion_message.dart';
@@ -410,12 +409,7 @@ void onContextMenuClicked({
       }
       break;
     case 'Delete':
-      bool isAdmin = false;
-      if (groupID.isNotEmpty) {
-        isAdmin = await FirebaseMethods.checkIsAdmin(groupID, currentUID);
-      }
       final isSender = message.senderUID == currentUID;
-      final isSenderOrAdmin = isAdmin || isSender;
 
       if (context.mounted) {
         showDeleteBottomSheet(
@@ -424,7 +418,7 @@ void onContextMenuClicked({
           groupID: groupID,
           itemID: itemID,
           currentUID: currentUID,
-          isSenderOrAdmin: isSenderOrAdmin,
+          isSender: isSender,
           generationType: generationType,
         );
       }
@@ -440,7 +434,7 @@ void showDeleteBottomSheet({
   required String groupID,
   required String itemID,
   required String currentUID,
-  required bool isSenderOrAdmin,
+  required bool isSender,
   required GenerationType generationType,
 }) {
   showModalBottomSheet(
@@ -478,7 +472,7 @@ void showDeleteBottomSheet({
                                 generationType,
                               ),
                     ),
-                    if (isSenderOrAdmin)
+                    if (isSender)
                       ListTile(
                         leading: const Icon(Icons.delete_forever),
                         title: const Text('Delete for everyone'),
@@ -525,22 +519,20 @@ Future<void> _handleDelete(
   bool deleteForEveryone,
   GenerationType generationType,
 ) async {
-  try {
-    await chatProvider.deleteMessage(
-      currentUID: currentUID,
-      message: message,
-      groupID: groupID,
-      itemID: itemID,
-      deleteForEveryone: deleteForEveryone,
-      generationType: generationType,
-    );
-  } catch (e) {
-    print('Error deleting message: $e');
-  } finally {
+  await chatProvider
+      .deleteMessage(
+    currentUID: currentUID,
+    message: message,
+    groupID: groupID,
+    itemID: itemID,
+    deleteForEveryone: deleteForEveryone,
+    generationType: generationType,
+  )
+      .whenComplete(() {
     if (context.mounted) {
       Navigator.pop(context);
     }
-  }
+  });
 }
 
 void showEmojiContainer({

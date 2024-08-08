@@ -74,8 +74,6 @@ class AssessmentDetailsScreen extends StatelessWidget {
     final control = assessmentModel.control;
     // summary
     final summary = assessmentModel.summary;
-    // id
-    final id = assessmentModel.id;
 
     // get generationType
     final generationType = GenerationType.riskAssessment;
