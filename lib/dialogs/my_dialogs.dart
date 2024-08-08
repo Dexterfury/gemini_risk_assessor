@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class MyDialogs {
   // general dialog
@@ -168,6 +169,7 @@ class MyDialogs {
                     textAlign: TextAlign.center,
                   ),
                   content: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
                     width: double.maxFinite,
                     child: Scrollbar(
                       controller: scrollController,

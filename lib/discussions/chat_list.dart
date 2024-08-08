@@ -8,6 +8,7 @@ import 'package:gemini_risk_assessor/discussions/contact_discussion_message.dart
 import 'package:gemini_risk_assessor/discussions/message_widget.dart';
 import 'package:gemini_risk_assessor/discussions/my_discussion_message.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/firebase/error_handler.dart';
 import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
@@ -175,10 +176,19 @@ class _ChatListState extends State<ChatList> {
         }
         _hasMore = querySnapshot.docs.length == _pageSize;
       });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+    } catch (e, stack) {
+      ErrorHandler.recordError(
+        e,
+        stack,
+        reason: 'Error loading more messages',
+        severity: ErrorSeverity.medium,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -347,20 +357,20 @@ void _openReactionsMenu(
         onReactionTap: (reaction) {
           if (reaction == '➕') {
             showEmojiContainer(
-              uid: userModel.uid,
-              groupID: groupID,
-              itemID: itemID,
-              context: context,
-              message: message,
-            );
+                uid: userModel.uid,
+                groupID: groupID,
+                itemID: itemID,
+                context: context,
+                message: message,
+                generationType: generationType);
           } else {
             sendReactionToMessage(
-              senderUID: userModel.uid,
-              groupID: groupID,
-              itemID: itemID,
-              reaction: reaction,
-              message: message,
-            );
+                senderUID: userModel.uid,
+                groupID: groupID,
+                itemID: itemID,
+                reaction: reaction,
+                message: message,
+                generationType: generationType);
           }
         },
         onContextMenuTap: (item) {
@@ -541,6 +551,7 @@ void showEmojiContainer({
   required String itemID,
   required BuildContext context,
   required DiscussionMessage message,
+  required GenerationType generationType,
 }) {
   showModalBottomSheet(
     context: context,
@@ -556,6 +567,7 @@ void showEmojiContainer({
             itemID: itemID,
             reaction: emoji.emoji,
             message: message,
+            generationType: generationType,
           );
         },
       ),
@@ -569,6 +581,7 @@ void sendReactionToMessage({
   required String itemID,
   required String reaction,
   required DiscussionMessage message,
+  required GenerationType generationType,
 }) {
   FirebaseMethods.addReactionToMessage(
     senderUID: senderUID,
@@ -576,6 +589,6 @@ void sendReactionToMessage({
     groupID: groupID,
     itemID: itemID,
     message: message,
-    generationType: GenerationType.riskAssessment,
+    generationType: generationType,
   );
 }

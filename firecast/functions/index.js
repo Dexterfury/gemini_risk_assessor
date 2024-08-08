@@ -203,11 +203,11 @@ exports.onUpdateGroup = functions.firestore
  * @param {string} groupID - The organization ID.
  * @param {string} itemID - The ID of the created item.
  * @param {string} itemType - The type of the created item.
- * @param {string} itemTitle - The title of the created item.
+ * @param {object} itemData - The data of the created item.
  * @param {string} senderUID - The UID of the sender.
  * @return {Promise<void>}
  */
-async function createAndSendNotifications(groupID, itemID, itemType, itemTitle, senderUID) {
+async function createAndSendNotifications(groupID, itemID, itemType, itemData, senderUID) {
   const orgDoc = await admin.firestore().doc(`groups/${groupID}`).get();
   const groupData = orgDoc.data();
   const membersUIDs = groupData.membersUIDs || [];
@@ -220,11 +220,19 @@ async function createAndSendNotifications(groupID, itemID, itemType, itemTitle, 
       .filter((userDoc) => userDoc.exists && userDoc.id !== senderUID)
       .map((userDoc) => {
         const userData = userDoc.data();
+        let notificationBody;
+  if (itemType === "Near Miss") {
+    const shortDescription = itemData.description.substring(0, 20);
+    notificationBody = `Near Miss: ${shortDescription}...`;
+  } else {
+    notificationBody = `A new ${itemType} "${itemData.title}" has been created.`;
+  }
         if (userData.token) {
           const notificationMessage = {
+            
             notification: {
               title: `New ${itemType} Created`,
-              body: `A new ${itemType} "${itemTitle}" has been created.`,
+              body: notificationBody,
             },
             android: {
               notification: {
@@ -267,13 +275,12 @@ function createNotificationFunction(itemType, collectionPath) {
         const itemID = context.params.itemID;
         const senderUID = itemData.createdBy;
 
-        await createAndSendNotifications(groupID, itemID, itemType, itemData.title, senderUID);
+        await createAndSendNotifications(groupID, itemID, itemType, itemData, senderUID);
       });
 }
 
 // Create notification functions for different types
 exports.onCreateAssessment = createNotificationFunction("Assessment", "assessments");
-exports.onCreateDsti = createNotificationFunction("DSTI", "dsti");
 exports.onCreateTool = createNotificationFunction("Tool", "tools");
 exports.onCreateNearMiss = createNotificationFunction("Near Miss", "nearMisses");
 
@@ -333,6 +340,45 @@ exports.onCreateChatMessage = functions.firestore
         );
       }
     });
+
+    exports.onUpdateChatMessage = functions.firestore
+    .document("groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}")
+    .onUpdate(async (change, context) => {
+        const beforeData = change.before.data();
+        const afterData = change.after.data();
+        
+        const groupID = context.params.groupID;
+        const senderUID = afterData.senderUID;
+        
+        // Check if reactions have been updated
+        if (beforeData.reactions.length !== afterData.reactions.length) {
+            const newReaction = afterData.reactions.find(
+                (reaction) => !beforeData.reactions.includes(reaction)
+            );
+            
+            if (newReaction) {
+                const [reactorUID, reaction] = newReaction.split('=');
+                
+                // Get the name of the user who reacted
+                const userDoc = await admin.firestore().doc(`users/${reactorUID}`).get();
+                const reactorName = userDoc.data().name || 'Someone';
+                
+                // Send notification to all group members except the reactor
+                const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
+                const groupData = groupDoc.data();
+                const membersUIDs = groupData.membersUIDs || [];
+                
+                await sendNotifications(
+                    `${reactorName} reacted to a message`,
+                    `Reaction: ${reaction}`,
+                    { messageType: "reaction", ...context.params },
+                    membersUIDs,
+                    reactorUID,
+                );
+            }
+        }
+    });
+
 
 
 /**
