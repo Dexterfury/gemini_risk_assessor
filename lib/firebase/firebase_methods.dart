@@ -862,7 +862,6 @@ class FirebaseMethods {
       if (groupDoc.exists) {
         // Check if the currentUID is in the adminsUIDs list
         List<dynamic> adminsUIDs = groupDoc[Constants.adminsUIDs] ?? [];
-        log('admins: ${adminsUIDs}');
         return adminsUIDs.contains(currentUID);
       } else {
         // If the document does not exist, return false

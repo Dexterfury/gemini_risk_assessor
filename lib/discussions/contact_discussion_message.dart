@@ -69,6 +69,9 @@ class ContactDiscussionMessage extends StatelessWidget {
                                 MessageReplyPreview(
                                   message: message,
                                   viewOnly: viewOnly,
+                                  textColor: isDarkMode
+                                      ? Colors.white
+                                      : Colors.grey.shade800,
                                 )
                               ],
                               DisplayMessageType(

@@ -51,10 +51,10 @@ class _LoginScreenState extends State<EmailLogin> {
 
           if (isVerified) {
             // 1. check if this user exist in firestore
-            bool userExist = await authProvider.checkUserExistsInFirestore(
+            bool? userExist = await authProvider.checkUserExistsInFirestore(
                 uid: userCredential.user!.uid);
 
-            if (userExist) {
+            if (userExist == true) {
               await AnalyticsHelper.logLogin(
                 SignInType.email.name,
               );
@@ -72,9 +72,16 @@ class _LoginScreenState extends State<EmailLogin> {
 
               // 5. navigate to home screen
               navigate(isSignedIn: true);
-            } else {
+            } else if (userExist == false) {
               // navigate to user information
               navigate(isSignedIn: false);
+            } else {
+              // 6. there was an error
+              showSnackBar(
+                context: context,
+                message:
+                    'Error checking user data, Please check connection and try again',
+              );
             }
           } else {
             Future.delayed(const Duration(milliseconds: 200), () {

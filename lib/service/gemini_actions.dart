@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
@@ -16,11 +15,13 @@ import 'package:provider/provider.dart';
 class GeminiActions extends StatefulWidget {
   const GeminiActions(
       {super.key,
+      required this.isAdmin,
       this.assessment,
       this.tool,
       required this.groupID,
       required this.generationType});
 
+  final bool isAdmin;
   final AssessmentModel? assessment;
   final ToolModel? tool;
   final String groupID;
@@ -208,7 +209,6 @@ class _GeminiActionsState extends State<GeminiActions> {
         );
         break;
       case AiActions.identifyRisk:
-        log('generate a risk identification');
         break;
       default:
         break;
@@ -234,13 +234,14 @@ class _GeminiActionsState extends State<GeminiActions> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildActionButton(
-                    context: context,
-                    label: 'Generate Safety Quiz',
-                    onPressed: () {
-                      _selectAndPop(AiActions.safetyQuiz);
-                    },
-                  ),
+                  if (widget.isAdmin)
+                    _buildActionButton(
+                      context: context,
+                      label: 'Generate Safety Quiz',
+                      onPressed: () {
+                        _selectAndPop(AiActions.safetyQuiz);
+                      },
+                    ),
                   if (widget.generationType != GenerationType.tool)
                     _buildActionButton(
                       context: context,

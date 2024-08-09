@@ -136,6 +136,7 @@ bool validateEmail(String email) {
 showSnackBar({
   required BuildContext context,
   required String message,
+  Color backgroundColor = Colors.black,
 }) {
   final snackBar = SnackBar(
     content: Text(
@@ -143,6 +144,7 @@ showSnackBar({
       textAlign: TextAlign.center,
     ),
     duration: const Duration(seconds: 2),
+    backgroundColor: backgroundColor,
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

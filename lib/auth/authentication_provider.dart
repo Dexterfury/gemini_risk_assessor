@@ -61,17 +61,20 @@ class AuthenticationProvider extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 2));
     if (uid != null) {
       //_uid = _auth.currentUser!.uid;
+      bool? userExists = await checkUserExistsInFirestore(uid: uid);
 
       // Check if user exists in Firestore
-      if (await checkUserExistsInFirestore(uid: uid)) {
+      if (userExists == true) {
         // Get user data from Firestore
         await getUserDataFromFireStore();
         // Save user data to shared preferences
         await saveUserDataToSharedPreferences();
         notifyListeners();
         return AuthStatus.authenticated;
-      } else {
+      } else if (userExists == false) {
         return AuthStatus.authenticatedButNoData;
+      } else {
+        return AuthStatus.error;
       }
     } else {
       return AuthStatus.unauthenticated;
@@ -140,7 +143,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   // check if user exists in firestore
-  Future<bool> checkUserExistsInFirestore({required String uid}) async {
+  Future<bool?> checkUserExistsInFirestore({required String uid}) async {
     try {
       final DocumentSnapshot documentSnapshot =
           await _usersCollection.doc(uid).get();
@@ -156,7 +159,8 @@ class AuthenticationProvider extends ChangeNotifier {
         reason: 'Error checking user existence',
         severity: ErrorSeverity.critical,
       );
-      return false;
+
+      return null;
     }
   }
 
@@ -352,7 +356,8 @@ class AuthenticationProvider extends ChangeNotifier {
     _isSuccessful = false;
     _isLoading = false;
     notifyListeners();
-    showSnackBar(context: context, message: error.toString());
+    showSnackBar(
+        context: context, message: 'Error signing in, please try again');
   }
 
   void _startTimer() {

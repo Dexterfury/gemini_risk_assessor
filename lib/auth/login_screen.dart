@@ -76,17 +76,17 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
         // Handle successful authentication
-        bool userExists = await authProvider.checkUserExistsInFirestore(
+        bool? userExists = await authProvider.checkUserExistsInFirestore(
             uid: userCredential.user!.uid);
         bool wasAnonymous = authProvider.isUserAnonymous();
 
-        if (userExists && !wasAnonymous) {
+        if (userExists == true && !wasAnonymous) {
           await AnalyticsHelper.logLogin(
             authType.name,
           );
           await authProvider.getUserDataFromFireStore();
           await authProvider.saveUserDataToSharedPreferences();
-        } else {
+        } else if (userExists == false) {
           await AnalyticsHelper.logSignUp(
             authType.name,
           );
@@ -97,6 +97,13 @@ class _LoginScreenState extends State<LoginScreen> {
           await authProvider.createAndSaveNewUser(
             updatedUser!,
             wasAnonymous,
+          );
+        } else {
+          // 4. there was an error
+          showSnackBar(
+            context: context,
+            message:
+                'Error checking user data, Please check connection and try again',
           );
         }
 

@@ -28,7 +28,7 @@
 
 
     <application
-        android:label="gemini_risk_assessor"
+        android:label="Gemini Risk Assessor"
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/launcher_icon">

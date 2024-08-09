@@ -5,6 +5,7 @@ import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -49,6 +50,14 @@ class _LandingScreenState extends State<LandingScreen> {
         break;
       case AuthStatus.unauthenticated:
         Navigator.pushReplacementNamed(context, Constants.logingRoute);
+        break;
+      case AuthStatus.error:
+        Navigator.pushReplacementNamed(context, Constants.logingRoute);
+        showSnackBar(
+          context: context,
+          message: 'Error Checking Authentication, please try again later',
+          backgroundColor: Colors.red,
+        );
         break;
     }
   }
