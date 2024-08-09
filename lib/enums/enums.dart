@@ -81,6 +81,7 @@ enum AuthStatus {
   authenticated,
   authenticatedButNoData,
   unauthenticated,
+  error,
 }
 
 // message type

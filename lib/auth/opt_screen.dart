@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
+import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
 import 'package:pinput/pinput.dart';
@@ -166,32 +167,31 @@ class _OTPScreenState extends State<OTPScreen> {
       context: context,
       onSuccess: (uid) async {
         // 1. check if user exists in firestore
-        bool userExists =
+        bool? userExists =
             await authProvider.checkUserExistsInFirestore(uid: uid);
 
-        if (userExists) {
-          // 2. if user exists,
-
-          // * get user information from firestore
+        if (userExists == true) {
+          // 2. if user exists
           await authProvider.getUserDataFromFireStore();
-
-          // * save user information to provider / shared preferences
-          await authProvider.saveUserDataToSharedPreferences().whenComplete(() {
-            // * navigate to home screen
-            navigationController(
-              context: context,
-              route: Constants.screensControllerRoute,
-            );
-          });
+          await authProvider.saveUserDataToSharedPreferences();
+          navigationController(
+            context: context,
+            route: Constants.screensControllerRoute,
+          );
+        } else if (userExists == false) {
+          // 3. if user doesn't exist
+          await Future.delayed(const Duration(milliseconds: 200));
+          navigationController(
+            context: context,
+            route: Constants.userInformationRoute,
+          );
         } else {
-          // 3. if user doesn't exist, navigate to user information screen
-          await Future.delayed(const Duration(milliseconds: 200))
-              .whenComplete(() {
-            navigationController(
-              context: context,
-              route: Constants.userInformationRoute,
-            );
-          });
+          // 4. there was an error
+          showSnackBar(
+            context: context,
+            message:
+                'Error checking user data, Please check connection and try again',
+          );
         }
       },
     );
