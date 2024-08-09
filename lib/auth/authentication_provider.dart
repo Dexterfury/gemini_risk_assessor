@@ -354,7 +354,8 @@ class AuthenticationProvider extends ChangeNotifier {
     _isSuccessful = false;
     _isLoading = false;
     notifyListeners();
-    showSnackBar(context: context, message: error.toString());
+    showSnackBar(
+        context: context, message: 'Error signing in, please try again');
   }
 
   void _startTimer() {

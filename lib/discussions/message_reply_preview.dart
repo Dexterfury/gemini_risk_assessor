@@ -14,11 +14,13 @@ class MessageReplyPreview extends StatelessWidget {
     this.replyMessageModel,
     this.message,
     this.viewOnly = false,
+    this.textColor = Colors.white,
   });
 
   final MessageReply? replyMessageModel;
   final DiscussionMessage? message;
   final bool viewOnly;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +62,11 @@ class MessageReplyPreview extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: buildNameAndMessage(type, uid),
+              child: buildNameAndMessage(
+                type,
+                uid,
+                textColor,
+              ),
             ),
             replyMessageModel != null
                 ? closeButton(discussionChatProvider, context)
@@ -94,7 +100,7 @@ class MessageReplyPreview extends StatelessWidget {
     );
   }
 
-  Column buildNameAndMessage(MessageType type, String uid) {
+  Column buildNameAndMessage(MessageType type, String uid, Color textColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,7 +114,7 @@ class MessageReplyPreview extends StatelessWidget {
             : DisplayMessageType(
                 message: message!.repliedMessage.message,
                 type: message!.repliedMessage.messageType,
-                color: Colors.white,
+                color: textColor,
                 isReply: true,
                 maxLines: 2,
                 overFlow: TextOverflow.ellipsis,
