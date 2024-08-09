@@ -40,7 +40,7 @@ class FileUploadHandler {
         reason: 'Failed to upload file and get URL',
         severity: ErrorSeverity.medium,
       );
-      rethrow; // Optionally rethrow the error if you want the calling method to handle it
+      rethrow;
     }
   }
 

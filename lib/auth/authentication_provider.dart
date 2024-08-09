@@ -106,7 +106,6 @@ class AuthenticationProvider extends ChangeNotifier {
     String userModelString =
         sharedPreferences.getString(Constants.userModel) ?? '';
     _userModel = UserModel.fromJson(jsonDecode(userModelString));
-    //_uid = _userModel!.uid;
     notifyListeners();
   }
 
@@ -129,7 +128,6 @@ class AuthenticationProvider extends ChangeNotifier {
     userModel.createdAt = DateTime.now().microsecondsSinceEpoch.toString();
 
     _userModel = userModel;
-    //_uid = userModel.uid;
 
     // save user data to firestore
     await _firestore
