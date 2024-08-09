@@ -221,15 +221,15 @@ async function createAndSendNotifications(groupID, itemID, itemType, itemData, s
       .map((userDoc) => {
         const userData = userDoc.data();
         let notificationBody;
-  if (itemType === "Near Miss") {
-    const shortDescription = itemData.description.substring(0, 20);
-    notificationBody = `Near Miss: ${shortDescription}...`;
-  } else {
-    notificationBody = `A new ${itemType} "${itemData.title}" has been created.`;
-  }
+        if (itemType === "Near Miss") {
+          const shortDescription = itemData.description.substring(0, 20);
+          notificationBody = `Near Miss: ${shortDescription}...`;
+        } else {
+          notificationBody = `A new ${itemType} "${itemData.title}" has been created.`;
+        }
         if (userData.token) {
           const notificationMessage = {
-            
+
             notification: {
               title: `New ${itemType} Created`,
               body: notificationBody,
@@ -341,44 +341,42 @@ exports.onCreateChatMessage = functions.firestore
       }
     });
 
-    exports.onUpdateChatMessage = functions.firestore
+exports.onUpdateChatMessage = functions.firestore
     .document("groups/{groupID}/{collectionPath}/{itemID}/chatMessages/{messageID}")
     .onUpdate(async (change, context) => {
-        const beforeData = change.before.data();
-        const afterData = change.after.data();
-        
-        const groupID = context.params.groupID;
-        const senderUID = afterData.senderUID;
-        
-        // Check if reactions have been updated
-        if (beforeData.reactions.length !== afterData.reactions.length) {
-            const newReaction = afterData.reactions.find(
-                (reaction) => !beforeData.reactions.includes(reaction)
-            );
-            
-            if (newReaction) {
-                const [reactorUID, reaction] = newReaction.split('=');
-                
-                // Get the name of the user who reacted
-                const userDoc = await admin.firestore().doc(`users/${reactorUID}`).get();
-                const reactorName = userDoc.data().name || 'Someone';
-                
-                // Send notification to all group members except the reactor
-                const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
-                const groupData = groupDoc.data();
-                const membersUIDs = groupData.membersUIDs || [];
-                
-                await sendNotifications(
-                    `${reactorName} reacted to a message`,
-                    `Reaction: ${reaction}`,
-                    { messageType: "reaction", ...context.params },
-                    membersUIDs,
-                    reactorUID,
-                );
-            }
-        }
-    });
+      const beforeData = change.before.data();
+      const afterData = change.after.data();
 
+      const groupID = context.params.groupID;
+
+      // Check if reactions have been updated
+      if (beforeData.reactions.length !== afterData.reactions.length) {
+        const newReaction = afterData.reactions.find(
+            (reaction) => !beforeData.reactions.includes(reaction),
+        );
+
+        if (newReaction) {
+          const [reactorUID, reaction] = newReaction.split("=");
+
+          // Get the name of the user who reacted
+          const userDoc = await admin.firestore().doc(`users/${reactorUID}`).get();
+          const reactorName = userDoc.data().name || "Someone";
+
+          // Send notification to all group members except the reactor
+          const groupDoc = await admin.firestore().doc(`groups/${groupID}`).get();
+          const groupData = groupDoc.data();
+          const membersUIDs = groupData.membersUIDs || [];
+
+          await sendNotifications(
+              `${reactorName} reacted to a message`,
+              `Reaction: ${reaction}`,
+              {messageType: "reaction", ...context.params},
+              membersUIDs,
+              reactorUID,
+          );
+        }
+      }
+    });
 
 
 /**
@@ -624,44 +622,44 @@ exports.onDeleteGroupTool = functions.firestore
       console.log(`Cleaned up tool ${toolId} from group ${groupId}`);
     });
 
-    exports.updateUserMessages = functions.firestore
-    .document('users/{userId}')
+exports.updateUserMessages = functions.firestore
+    .document("users/{userId}")
     .onUpdate(async (change, context) => {
-        const userId = context.params.userId;
-        const newData = change.after.data();
-        const oldData = change.before.data();
+      const userId = context.params.userId;
+      const newData = change.after.data();
+      const oldData = change.before.data();
 
-        // Check if name or image has changed
-        if (newData.name === oldData.name && newData.imageUrl === oldData.imageUrl) {
-            log('No relevant changes detected. Exiting function.');
-            return null;
-        }
-
-        const db = admin.firestore();
-        const batch = db.batch();
-
-        // Function to update messages in a specific collection
-        const updateMessagesInCollection = async (collectionPath) => {
-            const snapshot = await db.collectionGroup('chatMessages')
-                .where('senderUID', '==', userId)
-                .get();
-
-            snapshot.docs.forEach((doc) => {
-                const docRef = db.doc(doc.ref.path);
-                batch.update(docRef, {
-                    senderName: newData.name,
-                    senderImage: newData.imageUrl
-                });
-            });
-        };
-
-        // Update messages in both collections
-        await updateMessagesInCollection('groups/{groupId}/assessments/{assessmentId}/chatMessages');
-        await updateMessagesInCollection('groups/{groupId}/tools/{toolId}/chatMessages');
-
-        // Commit the batch
-        await batch.commit();
-
-        log(`Updated ${batch.size} messages for user ${userId}`);
+      // Check if name or image has changed
+      if (newData.name === oldData.name && newData.imageUrl === oldData.imageUrl) {
+        log("No relevant changes detected. Exiting function.");
         return null;
+      }
+
+      const db = admin.firestore();
+      const batch = db.batch();
+
+      // Function to update messages in a specific collection
+      const updateMessagesInCollection = async (collectionPath) => {
+        const snapshot = await db.collectionGroup("chatMessages")
+            .where("senderUID", "==", userId)
+            .get();
+
+        snapshot.docs.forEach((doc) => {
+          const docRef = db.doc(doc.ref.path);
+          batch.update(docRef, {
+            senderName: newData.name,
+            senderImage: newData.imageUrl,
+          });
+        });
+      };
+
+      // Update messages in both collections
+      await updateMessagesInCollection("groups/{groupId}/assessments/{assessmentId}/chatMessages");
+      await updateMessagesInCollection("groups/{groupId}/tools/{toolId}/chatMessages");
+
+      // Commit the batch
+      await batch.commit();
+
+      log(`Updated ${batch.size} messages for user ${userId}`);
+      return null;
     });
