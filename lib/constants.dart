@@ -234,13 +234,9 @@ class Constants {
   // default description
   static const String defaultDescription = 'Group Description';
 
-  // static String getDoctTitle(String docTitle) {
-  //   if (docTitle == createAssessment) {
-  //     return riskAssessment;
-  //   } else {
-  //     return dailySafetyTaskInstructions;
-  //   }
-  // }
+  static const String safetyFileUrl = 'safetyFileUrl';
+  static const String safetyFileContent = 'safetyFileContent';
+  static const String useSafetyFile = 'useSafetyFile';
 
   // list of ppe icons
   static List<PpeModel> getPPEIcons({

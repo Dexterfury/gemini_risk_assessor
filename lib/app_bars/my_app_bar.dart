@@ -23,7 +23,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: leading,
       title: onSearch != null
           ? AnimatedSearchBar(onSearch: onSearch!)
-          : FittedBox(child: Text(title)),
+          : FittedBox(
+              child: Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )),
       centerTitle: onSearch != null ? false : true,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,

@@ -11,12 +11,15 @@ class GroupModel {
   String emailAddress;
   String websiteURL;
   String groupTerms;
+  String safetyFileContent;
+  String safetyFileUrl;
   List<String> awaitingApprovalUIDs;
   List<String> membersUIDs;
   List<String> adminsUIDs;
   bool requestToReadTerms;
   bool allowSharing;
   bool allowCreate;
+  bool useSafetyFile;
   DateTime createdAt;
 
   // Constructor with default values
@@ -31,12 +34,15 @@ class GroupModel {
     this.emailAddress = '',
     this.websiteURL = '',
     this.groupTerms = '',
+    this.safetyFileContent = '',
+    this.safetyFileUrl = '',
     List<String>? awaitingApprovalUIDs,
     List<String>? membersUIDs,
     List<String>? adminsUIDs,
     this.requestToReadTerms = false,
     this.allowSharing = false,
     this.allowCreate = false,
+    this.useSafetyFile = false,
     DateTime? createdAt,
   })  : awaitingApprovalUIDs = awaitingApprovalUIDs ?? [],
         membersUIDs = membersUIDs ?? [],
@@ -56,6 +62,8 @@ class GroupModel {
       emailAddress: json[Constants.emailAddress] ?? '',
       websiteURL: json[Constants.websiteURL] ?? '',
       groupTerms: json[Constants.groupTerms] ?? '',
+      safetyFileContent: json[Constants.safetyFileContent] ?? '',
+      safetyFileUrl: json[Constants.safetyFileUrl] ?? '',
       awaitingApprovalUIDs:
           List<String>.from(json[Constants.awaitingApprovalUIDs] ?? []),
       membersUIDs: List<String>.from(json[Constants.membersUIDs] ?? []),
@@ -63,6 +71,7 @@ class GroupModel {
       requestToReadTerms: json[Constants.requestToReadTerms] ?? false,
       allowSharing: json[Constants.allowSharing] ?? false,
       allowCreate: json[Constants.allowCreate] ?? false,
+      useSafetyFile: json[Constants.useSafetyFile] ?? false,
       createdAt: json[Constants.createdAt] != null
           ? DateTime.fromMillisecondsSinceEpoch(json[Constants.createdAt])
           : null,
@@ -82,12 +91,15 @@ class GroupModel {
       Constants.emailAddress: emailAddress,
       Constants.websiteURL: websiteURL,
       Constants.groupTerms: groupTerms,
+      Constants.safetyFileContent: safetyFileContent,
+      Constants.safetyFileUrl: safetyFileUrl,
       Constants.awaitingApprovalUIDs: awaitingApprovalUIDs,
       Constants.membersUIDs: membersUIDs,
       Constants.adminsUIDs: adminsUIDs,
       Constants.requestToReadTerms: requestToReadTerms,
       Constants.allowSharing: allowSharing,
       Constants.allowCreate: allowCreate,
+      Constants.useSafetyFile: useSafetyFile,
       Constants.createdAt: createdAt.millisecondsSinceEpoch,
     };
   }

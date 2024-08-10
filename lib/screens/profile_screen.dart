@@ -14,6 +14,7 @@ import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/theme_provider.dart';
 import 'package:gemini_risk_assessor/screens/about_screen.dart';
 import 'package:gemini_risk_assessor/screens/notifications_screen.dart';
+import 'package:gemini_risk_assessor/screens/safety_file_upload_widget.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
@@ -370,6 +371,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 },
                               ),
+                            SettingsListTile(
+                              title: 'Safety File',
+                              icon: Icons.health_and_safety_outlined,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        SafetyFileUploadWidget(
+                                      userID: uid,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             Consumer<ThemeProvider>(
                                 builder: (context, themeProvider, child) {
                               return ListTile(

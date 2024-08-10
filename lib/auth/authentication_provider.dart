@@ -55,6 +55,19 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // get use safety file
+  bool get useMySafetyFile => userModel!.useSafetyFile;
+
+  void toggleUseSafetyFile(bool value) async {
+    userModel!.useSafetyFile = value;
+    notifyListeners();
+    await FirebaseMethods.ToggleUseSafetyFileInFirestore(
+      collectionID: userModel!.uid,
+      isUser: true,
+      value: value,
+    );
+  }
+
   Future<AuthStatus> checkAuthenticationState({
     required String? uid,
   }) async {
@@ -591,6 +604,9 @@ class AuthenticationProvider extends ChangeNotifier {
       aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
       rating: 0,
       safetyPoints: 0,
+      safetyFileUrl: '',
+      safetyFileContent: '',
+      useSafetyFile: false,
       isAnonymous: wasAnonymous,
       createdAt: DateTime.now().toIso8601String(),
     );

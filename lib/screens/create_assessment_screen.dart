@@ -216,6 +216,7 @@ class _CreateAssessmentScreenState extends State<CreateAssessmentScreen> {
     );
 
     await assessmentProvider.submitPrompt(
+      context: context,
       creatorID: creatorID,
       groupID: groupID,
       description: _descriptionController.text,

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:animations/animations.dart';
@@ -120,6 +121,9 @@ class _GroupDetailsState extends State<GroupDetails>
       bool requestToReadTerms = groupProvider.groupModel.requestToReadTerms;
       bool allowSharing = groupProvider.groupModel.allowSharing;
       bool allowCreate = groupProvider.groupModel.allowCreate;
+      bool useSafetyFile = groupProvider.groupModel.useSafetyFile;
+      String safetyFileContent = groupProvider.groupModel.safetyFileContent;
+      String safetyFileUrl = groupProvider.groupModel.safetyFileUrl;
 
       //String membersCount = getMembersCount(groupProvider.groupModel);
       bool showAcceptBtn =
@@ -142,11 +146,15 @@ class _GroupDetailsState extends State<GroupDetails>
                           initialSettings: DataSettings(
                             requestToReadTerms: requestToReadTerms,
                             allowSharing: allowSharing,
+                            useSafetyFile: useSafetyFile,
+                            safetyFileContent: safetyFileContent,
+                            safetyFileUrl: safetyFileUrl,
                             groupTerms: groupTerms,
                           ),
                           onSave: (DataSettings settings) {
                             groupProvider.updateGroupSettings(settings);
                           },
+                          groupID: groupID,
                         ),
                       ),
                     );

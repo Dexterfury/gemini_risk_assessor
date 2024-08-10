@@ -217,10 +217,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       name: _nameController.text,
       aboutGroup: _descriptionController.text,
       groupID: '',
-      groupTerms: _dataSettings.groupTerms,
       requestToReadTerms: _dataSettings.requestToReadTerms,
       allowSharing: _dataSettings.allowSharing,
       allowCreate: _dataSettings.allowCreate,
+      useSafetyFile: _dataSettings.useSafetyFile,
+      safetyFileContent: _dataSettings.safetyFileContent,
+      safetyFileUrl: _dataSettings.safetyFileUrl,
+      groupTerms: _dataSettings.groupTerms,
     );
 
     _showLoadingDialog(context);

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/api/pdf_api.dart';
 import 'package:gemini_risk_assessor/api/pdf_handler.dart';
+import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
@@ -17,6 +18,7 @@ import 'package:gemini_risk_assessor/utilities/image_picker_handler.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as path;
 
@@ -35,6 +37,9 @@ class AssessmentProvider extends ChangeNotifier {
   bool _hasSigned = false;
   String _groupID = '';
   String _uid = '';
+
+  String? _safetyFileContent;
+  bool _useSafetyFile = false;
 
   // getters
   List<PpeModel> get ppeModelList => _ppeModelList;
@@ -493,6 +498,7 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   Future<void> submitPrompt({
+    required BuildContext context,
     required String creatorID,
     required String groupID,
     required String description,
@@ -500,6 +506,19 @@ class AssessmentProvider extends ChangeNotifier {
     required Function() onSuccess,
     required Function(String) onError,
   }) async {
+    if (groupID.isEmpty) {
+      // get user safety settings
+      final userProvider = context.read<AuthenticationProvider>().userModel!;
+      _useSafetyFile = userProvider.useSafetyFile;
+      _safetyFileContent = userProvider.safetyFileContent;
+    } else {
+      // // get group safety settings
+      // final groupProvider = context.read<GroupProvider>();
+      // final group = groupProvider.getGroup(groupID: groupID);
+      // _useSafetyFile = group.useMySafetyFile;
+      // _safetyFileContent = group.safetyFileContent;
+    }
+
     _isLoading = true;
     notifyListeners();
 
@@ -557,7 +576,7 @@ class AssessmentProvider extends ChangeNotifier {
   }
 
   String get mainPrompt {
-    return '''
+    String basePrompt = '''
 You are a Safety officer who ensures safe work practices.
 
 Generate a $_pdfHeading based on the data information provided below.
@@ -569,14 +588,49 @@ The number of people is: $_numberOfPeople
 The weather is: ${_weather.name}
 
 After providing the assessment, advice the equipment and tools to be used if required.
-Advise about the dangers that could injure people or harm the enviroment, the hazards and risks involved.
+Advise about the dangers that could injure people or harm the environment, the hazards and risks involved.
 Propose practical measures to eliminate or minimize each risk identified.
 Suggest use of proper personal protective equipment if not among these: ${getSelectedPpe.toString()}
 Provide a summary of this assessment.
 
 ${_description.isNotEmpty ? _description : ''}
 ''';
+
+    if (_useSafetyFile && _safetyFileContent != null) {
+      basePrompt += '''
+
+Please also consider the following safety guidelines provided by the user:
+
+$_safetyFileContent
+
+Incorporate these guidelines into your assessment where applicable, but still adhere to general safety standards and regulations.
+''';
+    }
+
+    return basePrompt;
   }
+
+//   String get mainPrompt {
+//     return '''
+// You are a Safety officer who ensures safe work practices.
+
+// Generate a $_pdfHeading based on the data information provided below.
+// The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
+// If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
+
+// Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
+// The number of people is: $_numberOfPeople
+// The weather is: ${_weather.name}
+
+// After providing the assessment, advice the equipment and tools to be used if required.
+// Advise about the dangers that could injure people or harm the enviroment, the hazards and risks involved.
+// Propose practical measures to eliminate or minimize each risk identified.
+// Suggest use of proper personal protective equipment if not among these: ${getSelectedPpe.toString()}
+// Provide a summary of this assessment.
+
+// ${_description.isNotEmpty ? _description : ''}
+// ''';
+//   }
 
   static String noRiskFound =
       "No risks identified based on information provided";

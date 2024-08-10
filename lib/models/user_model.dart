@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 
-class UserModel {
+class UserModel extends ChangeNotifier {
   String uid;
   String name;
   String phone;
@@ -10,6 +11,9 @@ class UserModel {
   String aboutMe;
   double rating;
   double safetyPoints;
+  String safetyFileUrl;
+  String safetyFileContent;
+  bool useSafetyFile;
   bool isAnonymous;
   String createdAt;
 
@@ -24,6 +28,9 @@ class UserModel {
     required this.aboutMe,
     required this.rating,
     required this.safetyPoints,
+    required this.safetyFileUrl,
+    required this.safetyFileContent,
+    required this.useSafetyFile,
     required this.isAnonymous,
     required this.createdAt,
   });
@@ -40,6 +47,9 @@ class UserModel {
       aboutMe: json[Constants.aboutMe] ?? '',
       rating: (json[Constants.rating] ?? 0).toDouble(),
       safetyPoints: (json[Constants.safetyPoints] ?? 0).toDouble(),
+      safetyFileUrl: json[Constants.safetyFileUrl] ?? '',
+      safetyFileContent: json[Constants.safetyFileContent] ?? '',
+      useSafetyFile: json[Constants.useSafetyFile] ?? false,
       isAnonymous: json[Constants.isAnonymous] ?? false,
       createdAt: json[Constants.createdAt] ?? '',
     );
@@ -57,6 +67,9 @@ class UserModel {
       Constants.aboutMe: aboutMe,
       Constants.rating: rating,
       Constants.safetyPoints: safetyPoints,
+      Constants.safetyFileUrl: safetyFileUrl,
+      Constants.safetyFileContent: safetyFileContent,
+      Constants.useSafetyFile: useSafetyFile,
       Constants.isAnonymous: isAnonymous,
       Constants.createdAt: createdAt,
     };
@@ -73,6 +86,9 @@ class UserModel {
     String? aboutMe,
     double? rating,
     double? safetyPoints,
+    String? safetyFileUrl,
+    String? safetyFileContent,
+    bool? useSafetyFile,
     bool? isAnonymous,
     String? createdAt,
   }) {
@@ -86,6 +102,9 @@ class UserModel {
       aboutMe: aboutMe ?? this.aboutMe,
       rating: rating ?? this.rating,
       safetyPoints: safetyPoints ?? this.safetyPoints,
+      safetyFileUrl: safetyFileUrl ?? this.safetyFileUrl,
+      safetyFileContent: safetyFileContent ?? this.safetyFileContent,
+      useSafetyFile: useSafetyFile ?? this.useSafetyFile,
       isAnonymous: isAnonymous ?? this.isAnonymous,
       createdAt: createdAt ?? this.createdAt,
     );

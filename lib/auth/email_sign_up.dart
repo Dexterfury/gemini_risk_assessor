@@ -67,6 +67,9 @@ class _EmailSignUpState extends State<EmailSignUp> {
           aboutMe: 'Hey there, I\'m using Gemini Risk Assessor',
           rating: 0,
           safetyPoints: 0,
+          safetyFileUrl: '',
+          safetyFileContent: '',
+          useSafetyFile: false,
           isAnonymous: false,
           createdAt: DateTime.now().toIso8601String(),
         );

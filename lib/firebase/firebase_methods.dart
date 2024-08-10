@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
@@ -11,6 +13,7 @@ import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
+import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class FirebaseMethods {
@@ -877,5 +880,29 @@ class FirebaseMethods {
 
       return false;
     }
+  }
+
+  static Future<void> saveSafetyFile({
+    required String collectionID,
+    required bool isUser,
+    required String safetyFileUrl,
+    required String safetyFileContent,
+  }) async {
+    final collection = isUser ? usersCollection : groupsCollection;
+    await collection.doc(collectionID).update({
+      Constants.safetyFileUrl: safetyFileUrl,
+      Constants.safetyFileContent: safetyFileContent,
+    });
+  }
+
+  static Future<void> ToggleUseSafetyFileInFirestore({
+    required String collectionID,
+    required bool isUser,
+    required bool value,
+  }) async {
+    final collection = isUser ? usersCollection : groupsCollection;
+    await collection.doc(collectionID).update({
+      Constants.useSafetyFile: value,
+    });
   }
 }
