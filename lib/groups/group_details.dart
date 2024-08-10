@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:animated_read_more_text/animated_read_more_text.dart';
 import 'package:animations/animations.dart';
