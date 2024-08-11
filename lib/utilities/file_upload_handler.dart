@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -198,7 +197,7 @@ class FileUploadHandler {
       _safetyFileContent = pdfTextExtractor.extractText();
       pdfDocument.dispose();
 
-      if (_safetyFileContent!.length > _maxSafetyFileChars) {
+      if (_safetyFileContent.length > _maxSafetyFileChars) {
         showSnackBar(
           context: context,
           message:
@@ -220,7 +219,7 @@ class FileUploadHandler {
       }
 
       // Validate safety content
-      if (!_containsSafetyContent(_safetyFileContent!)) {
+      if (!_containsSafetyContent(_safetyFileContent)) {
         showSnackBar(
           context: context,
           message:

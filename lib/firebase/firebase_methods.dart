@@ -1,9 +1,6 @@
-import 'dart:developer';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
@@ -13,7 +10,6 @@ import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/nearmiss/near_miss_model.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
-import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 
 class FirebaseMethods {
@@ -25,32 +21,6 @@ class FirebaseMethods {
       FirebaseFirestore.instance.collection(Constants.usersCollection);
   static final CollectionReference groupsCollection =
       FirebaseFirestore.instance.collection(Constants.groupsCollection);
-
-  // stream my tools from firestore
-  // static Stream<QuerySnapshot> toolsStream({
-  //   required String userId,
-  //   required String groupID,
-  // }) {
-  //   if (groupID.isNotEmpty) {
-  //     return groupsCollection
-  //         .doc(groupID)
-  //         .collection(Constants.toolsCollection)
-  //         .orderBy(
-  //           Constants.createdAt,
-  //           descending: true,
-  //         )
-  //         .snapshots();
-  //   } else {
-  //     return usersCollection
-  //         .doc(userId)
-  //         .collection(Constants.toolsCollection)
-  //         .orderBy(
-  //           Constants.createdAt,
-  //           descending: true,
-  //         )
-  //         .snapshots();
-  //   }
-  // }
 
   static Stream<QuerySnapshot> paginatedToolStream({
     required String userId,
@@ -91,12 +61,6 @@ class FirebaseMethods {
     }
   }
 
-  // get all users stream
-  // static Stream<QuerySnapshot> allUsersStream() {
-  //   return usersCollection
-  //       .where(Constants.isAnonymous, isEqualTo: false)
-  //       .snapshots();
-  // }
   static Stream<QuerySnapshot> allUsersStream({String? searchQuery}) {
     if (searchQuery != null && searchQuery.isNotEmpty) {
       // Use startAt and endAt for prefix search
@@ -111,32 +75,6 @@ class FirebaseMethods {
       return usersCollection.snapshots();
     }
   }
-
-  // stream risk assessments from firestore
-  // static Stream<QuerySnapshot> ristAssessmentsStream({
-  //   required String userId,
-  //   required String groupID,
-  // }) {
-  //   if (groupID.isNotEmpty) {
-  //     return groupsCollection
-  //         .doc(groupID)
-  //         .collection(Constants.assessmentCollection)
-  //         .orderBy(
-  //           Constants.createdAt,
-  //           descending: true,
-  //         )
-  //         .snapshots();
-  //   } else {
-  //     return usersCollection
-  //         .doc(userId)
-  //         .collection(Constants.assessmentCollection)
-  //         .orderBy(
-  //           Constants.createdAt,
-  //           descending: true,
-  //         )
-  //         .snapshots();
-  //   }
-  // }
 
   static Stream<QuerySnapshot> paginatedAssessmentStream({
     required String userId,
@@ -706,38 +644,6 @@ class FirebaseMethods {
       asStream ? Stream.empty() : Future.value([]);
     }
   }
-  // static dynamic getMessages({
-  //   required String groupID,
-  //   required String itemID,
-  //   required GenerationType generationType,
-  //   bool asStream = false,
-  // }) {
-  //   try {
-  //     final collection = getCollectionRef(generationType);
-  //     final query = groupsCollection
-  //         .doc(groupID)
-  //         .collection(collection)
-  //         .doc(itemID)
-  //         .collection(Constants.chatMessagesCollection);
-
-  //     if (asStream) {
-  //       return query.snapshots().map((snapshot) {
-  //         return snapshot.docs.map((doc) {
-  //           return DiscussionMessage.fromMap(doc.data());
-  //         }).toList();
-  //       });
-  //     } else {
-  //       return query.get().then((snapshot) {
-  //         return snapshot.docs.map((doc) {
-  //           return DiscussionMessage.fromMap(doc.data());
-  //         }).toList();
-  //       });
-  //     }
-  //   } catch (e) {
-  //     log('error loading messages: $e');
-  //     return asStream ? Stream.empty() : Future.value([]);
-  //   }
-  // }
 
   // set message status
   static Future<void> setMessageStatus({

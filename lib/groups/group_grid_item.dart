@@ -18,7 +18,6 @@ class GroupGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String title = groupModel.name;
-    String subtitle = groupModel.aboutGroup;
     String imageUrl = groupModel.groupImage!;
     ;
 

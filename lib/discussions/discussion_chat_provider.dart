@@ -19,11 +19,6 @@ import 'package:uuid/uuid.dart';
 class DiscussionChatProvider extends ChangeNotifier {
   final GeminiModelManager _modelManager = GeminiModelManager();
 
-  String? _safetyFileContent;
-  bool _useSafetyFile = false;
-
-  bool get useSafetyFile => _useSafetyFile;
-
   bool _isLoading = false;
   bool _isLoadingQuiz = false;
   bool _isLoadingAnswer = false;
@@ -37,11 +32,6 @@ class DiscussionChatProvider extends ChangeNotifier {
   bool get isLoadingAdditionalData => _isLoadingAdditionalData;
   bool get isSummarizing => _isSummarizing;
   MessageReply? get messageReplyModel => _messageReplyModel;
-
-  void toggleUseSafetyFile(bool value) {
-    _useSafetyFile = value;
-    notifyListeners();
-  }
 
   void setMessageReplyModel(MessageReply? messageReply) {
     _messageReplyModel = messageReply;
