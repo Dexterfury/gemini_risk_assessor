@@ -8,6 +8,7 @@ import 'package:gemini_risk_assessor/api/pdf_handler.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
+import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
@@ -512,11 +513,11 @@ class AssessmentProvider extends ChangeNotifier {
       _useSafetyFile = userProvider.useSafetyFile;
       _safetyFileContent = userProvider.safetyFileContent;
     } else {
-      // // get group safety settings
-      // final groupProvider = context.read<GroupProvider>();
-      // final group = groupProvider.getGroup(groupID: groupID);
-      // _useSafetyFile = group.useMySafetyFile;
-      // _safetyFileContent = group.safetyFileContent;
+      // get group safety settings
+      final groupProvider = context.read<GroupProvider>();
+      final group = groupProvider.groupModel;
+      _useSafetyFile = group.useSafetyFile;
+      _safetyFileContent = group.safetyFileContent;
     }
 
     _isLoading = true;
@@ -577,60 +578,60 @@ class AssessmentProvider extends ChangeNotifier {
 
   String get mainPrompt {
     String basePrompt = '''
-You are a Safety officer who ensures safe work practices.
+You are a highly experienced Safety Officer specializing in comprehensive risk assessments across various industries. Your task is to generate a detailed $_pdfHeading based on the provided information. Follow these guidelines:
 
-Generate a $_pdfHeading based on the data information provided below.
-The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
-If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
+1. Risk Identification:
+   - If no images are provided or if the information does not contain any identifiable risks, respond exactly with: $noRiskFound
+   - Focus solely on real, practical risks directly related to the described scenario
+   - Consider risks to personnel, equipment, and the environment
 
-Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
-The number of people is: $_numberOfPeople
-The weather is: ${_weather.name}
+2. Assessment Components:
+   - Task Description: Clearly define the task or activity being assessed
+   - Hazard Identification: List all potential hazards associated with the task
+   - Risk Analysis: Evaluate the likelihood and potential severity of each hazard
+   - Control Measures: Propose specific, practical mitigation strategies for each identified risk
 
-After providing the assessment, advice the equipment and tools to be used if required.
-Advise about the dangers that could injure people or harm the environment, the hazards and risks involved.
-Propose practical measures to eliminate or minimize each risk identified.
-Suggest use of proper personal protective equipment if not among these: ${getSelectedPpe.toString()}
-Provide a summary of this assessment.
+3. Contextual Factors:
+   - Number of people involved: $_numberOfPeople
+   - Weather conditions: ${_weather.name}
+   - Consider how these factors might influence or exacerbate potential risks
 
-${_description.isNotEmpty ? _description : ''}
+4. Equipment and Tools:
+   - Recommend necessary equipment and tools for safe task completion
+   - Highlight any specific safety features or requirements for recommended equipment
+
+5. Personal Protective Equipment (PPE):
+   - Suggest appropriate PPE beyond what's already listed: ${getSelectedPpe.toString()}
+   - Explain the importance of each suggested PPE item in relation to identified risks
+
+6. Environmental Considerations:
+   - Assess potential environmental impacts of the task
+   - Propose measures to minimize environmental harm
+
+7. Regulatory Compliance:
+   - Reference relevant safety standards, regulations, or industry best practices
+   - Ensure all recommendations align with current safety guidelines
+
+8. Summary:
+   - Provide a concise overview of key risks and critical control measures
+   - Emphasize the most crucial safety points for the assessed task
+
+Additional Context:
+${_description.isNotEmpty ? _description : 'No additional context provided.'}
+
+Remember to focus on practical, relevant risks and mitigation strategies. Avoid generic statements or risks not directly applicable to the described scenario.
 ''';
 
     if (_useSafetyFile && _safetyFileContent != null) {
       basePrompt += '''
-
-Please also consider the following safety guidelines provided by the user:
-
+Incorporate the following user-provided safety guidelines into your assessment:
 $_safetyFileContent
-
-Incorporate these guidelines into your assessment where applicable, but still adhere to general safety standards and regulations.
+Integrate these guidelines where applicable, ensuring they complement and do not contradict general safety standards and regulations.
 ''';
     }
 
     return basePrompt;
   }
-
-//   String get mainPrompt {
-//     return '''
-// You are a Safety officer who ensures safe work practices.
-
-// Generate a $_pdfHeading based on the data information provided below.
-// The assessment should only contain real practical risks identified and mitigation measures proposed without any unnecessary information.
-// If there are no images attached, or if the image does not contain any identifiable risks, respond exactly with: $noRiskFound.
-
-// Adhere to Safety standards and regulations. Identify any potential risks and propose practical mitigation measures.
-// The number of people is: $_numberOfPeople
-// The weather is: ${_weather.name}
-
-// After providing the assessment, advice the equipment and tools to be used if required.
-// Advise about the dangers that could injure people or harm the enviroment, the hazards and risks involved.
-// Propose practical measures to eliminate or minimize each risk identified.
-// Suggest use of proper personal protective equipment if not among these: ${getSelectedPpe.toString()}
-// Provide a summary of this assessment.
-
-// ${_description.isNotEmpty ? _description : ''}
-// ''';
-//   }
 
   static String noRiskFound =
       "No risks identified based on information provided";

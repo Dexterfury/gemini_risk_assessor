@@ -1,14 +1,29 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/discussions/discussion_message.dart';
+import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/models/prompt_data_model.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 
 class GeminiModelManager {
   // Singleton instance
   static final GeminiModelManager _instance = GeminiModelManager._internal();
+
+  // Initialize Firebase and App Check
+  Future<void> initializeFirebaseAndAppCheck() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.appAttest,
+    );
+  }
 
   // Factory constructor to return the singleton instance
   factory GeminiModelManager() {
@@ -33,14 +48,10 @@ class GeminiModelManager {
     SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
   ];
 
-  // Retrieve API key from environment variables
-  String get _apiKey => dotenv.env['GEMINI_API_KEY'] ?? '';
-
   // Create a new GenerativeModel instance
   GenerativeModel createModel() {
-    return GenerativeModel(
+    return FirebaseVertexAI.instance.generativeModel(
       model: 'gemini-1.5-flash',
-      apiKey: _apiKey,
       generationConfig: _config,
       safetySettings: _safetySettings,
     );

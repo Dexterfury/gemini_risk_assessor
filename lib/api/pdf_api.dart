@@ -45,30 +45,46 @@ class PdfApi {
     }
 
     // Add first page
-    final firstPage = document.pages.add();
-    addHeaderAndSignature(firstPage);
+    PdfPage currentPage = document.pages.add();
+    addHeaderAndSignature(currentPage);
 
     // Draw table on the first page
-    drawGrid(
+    double yOffset = await drawGrid(
       heading,
       assessmentModel,
-      firstPage,
+      currentPage,
       logo,
       ppeImages,
       selectedPPEImages,
     );
 
+    // Check if content has overflowed to next page
+    if (yOffset > currentPage.getClientSize().height) {
+      // Content has overflowed, add a new page
+      currentPage = document.pages.add();
+      addHeaderAndSignature(currentPage);
+      // Redraw the grid on the new page
+      yOffset = await drawGrid(
+        heading,
+        assessmentModel,
+        currentPage,
+        logo,
+        ppeImages,
+        selectedPPEImages,
+      );
+    }
+
     if (images.isNotEmpty) {
       // Add a new page for images
-      final imagePage = document.pages.add();
-      addHeaderAndSignature(imagePage);
-      await addImagesOnNewPage(images, imagePage);
+      currentPage = document.pages.add();
+      addHeaderAndSignature(currentPage);
+      await addImagesOnNewPage(images, currentPage);
     }
 
     // Add a new page for names
-    final namesPage = document.pages.add();
-    addHeaderAndSignature(namesPage);
-    addNamesPage(namesPage);
+    currentPage = document.pages.add();
+    addHeaderAndSignature(currentPage);
+    addNamesPage(currentPage);
 
     return saveFile(
       document,
@@ -146,7 +162,7 @@ class PdfApi {
     }
   }
 
-  static Future<void> drawGrid(
+  static Future<double> drawGrid(
     String heading,
     AssessmentModel assessmentModel,
     PdfPage page,
@@ -294,6 +310,8 @@ class PdfApi {
         currentOffsetY += result.bounds.height + 10;
       }
     }
+
+    return currentOffsetY;
   }
 
   static void drawHeader(PdfPage page, String title, String documentId,

@@ -55,6 +55,12 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // update use safety file
+  void updateUserSafetyFile(bool value) {
+    _userModel!.useSafetyFile = value;
+    notifyListeners();
+  }
+
   // get use safety file
   bool get useMySafetyFile => userModel!.useSafetyFile;
 
@@ -100,8 +106,24 @@ class AuthenticationProvider extends ChangeNotifier {
         .collection(Constants.usersCollection)
         .doc(_auth.currentUser!.uid)
         .get();
-    _userModel =
-        UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+    Map<String, dynamic> userData =
+        documentSnapshot.data() as Map<String, dynamic>;
+    // Check if the user data needs updating
+    if (!userData.containsKey(Constants.safetyFileUrl) ||
+        !userData.containsKey(Constants.safetyFileContent) ||
+        !userData.containsKey(Constants.useSafetyFile)) {
+      // Update the user document with the new field
+      await documentSnapshot.reference.update({
+        Constants.safetyFileUrl: '',
+        Constants.safetyFileContent: '',
+        Constants.useSafetyFile: false,
+      });
+
+      // Fetch the updated document
+      documentSnapshot = await documentSnapshot.reference.get();
+      userData = documentSnapshot.data() as Map<String, dynamic>;
+    }
+    _userModel = UserModel.fromJson(userData);
     notifyListeners();
   }
 

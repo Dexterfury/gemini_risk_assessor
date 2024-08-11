@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/auth/email_login.dart';
@@ -11,7 +9,6 @@ import 'package:gemini_risk_assessor/auth/login_screen.dart';
 import 'package:gemini_risk_assessor/auth/opt_screen.dart';
 import 'package:gemini_risk_assessor/auth/user_information_screen.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:gemini_risk_assessor/firebase_options.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
@@ -20,6 +17,7 @@ import 'package:gemini_risk_assessor/nearmiss/near_miss_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/providers/tab_provider.dart';
 import 'package:gemini_risk_assessor/providers/theme_provider.dart';
+import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/tools/tool_provider.dart';
 import 'package:gemini_risk_assessor/screens/create_assessment_screen.dart';
 import 'package:gemini_risk_assessor/tools/create_explainer_screen.dart';
@@ -29,22 +27,16 @@ import 'package:gemini_risk_assessor/screens/screens_controller.dart';
 import 'package:gemini_risk_assessor/firebase/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-
-  print("Handling a background message: ${message.messageId}");
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  final geminiModelManager = GeminiModelManager();
+  await geminiModelManager.initializeFirebaseAndAppCheck();
+
   FlutterError.onError = (FlutterErrorDetails details) {
     ErrorHandler.recordError(details.exception, details.stack,
         reason: details.context.toString());

@@ -905,4 +905,14 @@ class FirebaseMethods {
       Constants.useSafetyFile: value,
     });
   }
+
+  static Future<void> updateGroupData({
+    required String groupID,
+  }) async {
+    await groupsCollection.doc(groupID).update({
+      Constants.safetyFileUrl: '',
+      Constants.safetyFileContent: '',
+      Constants.useSafetyFile: false,
+    });
+  }
 }

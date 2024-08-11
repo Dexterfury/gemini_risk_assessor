@@ -81,6 +81,13 @@ class GroupsSearchStream extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final doc = results[index];
                       final groupData = doc.data() as Map<String, dynamic>;
+                      // updates group data if not present - new updates
+                      if (!groupData.containsKey(Constants.safetyFileUrl) ||
+                          !groupData.containsKey(Constants.safetyFileContent) ||
+                          !groupData.containsKey(Constants.useSafetyFile)) {
+                        FirebaseMethods.updateGroupData(
+                            groupID: groupData[Constants.groupID]);
+                      }
                       final group = GroupModel.fromJson(groupData);
                       return GroupGridItem(
                         groupModel: group,

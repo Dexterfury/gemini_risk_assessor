@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 
 class QuizModel {
   final String creatorUID;

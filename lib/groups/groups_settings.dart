@@ -199,7 +199,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         : ' Edit Terms and Conditions ';
     final safetyBtnTitle = _currentSettings.safetyFileContent.length < 1000
         ? ' Add Safety File '
-        : ' Edit Safety File ';
+        : ' Udate Safety File ';
     return PopScope(
       canPop: true,
       onPopInvoked: (didPop) {

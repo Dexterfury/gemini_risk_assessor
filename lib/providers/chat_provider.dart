@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
@@ -9,7 +10,6 @@ import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/service/gemini_model_manager.dart';
 import 'package:gemini_risk_assessor/firebase/error_handler.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,9 +45,6 @@ class ChatProvider extends ChangeNotifier {
 
   bool _isFirstUserMessage = true;
 
-  // current mode
-  String _modelType = 'gemini-1.0-pro';
-
   // loading bool
   bool _isLoading = false;
 
@@ -70,7 +67,6 @@ class ChatProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   List<XFile>? get imagesFileList => _imagesFileList;
   GenerativeModel? get model => _model;
-  String get modelType => _modelType;
 
   final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection(Constants.usersCollection);
@@ -570,13 +566,6 @@ class ChatProvider extends ChangeNotifier {
   void setImagesFileList({required List<XFile> listValue}) {
     _imagesFileList = listValue;
     notifyListeners();
-  }
-
-  // set the current model
-  String setCurrentModel({required String newModel}) {
-    _modelType = newModel;
-    notifyListeners();
-    return newModel;
   }
 
   // get y=the imagesUrls

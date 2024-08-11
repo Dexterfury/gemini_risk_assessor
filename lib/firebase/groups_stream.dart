@@ -1,5 +1,6 @@
 import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/groups/group_model.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
@@ -41,6 +42,13 @@ class GroupsStream extends StatelessWidget {
       itemBuilder: (context, documentSnapshot, index) {
         final doc = documentSnapshot[index].data();
         final groupData = doc as Map<String, dynamic>;
+        // updates group data if not present - new updates to group data
+        if (!groupData.containsKey(Constants.safetyFileUrl) ||
+            !groupData.containsKey(Constants.safetyFileContent) ||
+            !groupData.containsKey(Constants.useSafetyFile)) {
+          FirebaseMethods.updateGroupData(
+              groupID: groupData[Constants.groupID]);
+        }
         final group = GroupModel.fromJson(groupData);
         return GroupGridItem(
           groupModel: group,

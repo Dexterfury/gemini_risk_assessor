@@ -374,6 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             SettingsListTile(
                               title: 'Safety File',
                               icon: Icons.health_and_safety_outlined,
+                              iconContainerColor: Colors.green.shade700,
                               onTap: () {
                                 Navigator.push(
                                   context,

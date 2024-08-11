@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:gemini_risk_assessor/constants.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import '../utilities/global.dart';
 
 class ToolModel {
