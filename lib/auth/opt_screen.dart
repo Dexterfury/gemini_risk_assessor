@@ -5,6 +5,7 @@ import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
+import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 
@@ -29,11 +30,9 @@ class _OTPScreenState extends State<OTPScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // get the arguments
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     final verificationId = args[Constants.verificationId] as String;
     final phoneNumber = args[Constants.phoneNumber] as String;
-
     final authProvider = context.watch<AuthenticationProvider>();
 
     return Scaffold(
@@ -42,47 +41,111 @@ class _OTPScreenState extends State<OTPScreen> {
         title: 'Verification',
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 20.0,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 50),
+        child: ResponsiveLayoutHelper.responsiveBuilder(
+          context: context,
+          mobile: _buildMobileLayout(verificationId, phoneNumber, authProvider),
+          tablet: _buildTabletLayout(verificationId, phoneNumber, authProvider),
+          desktop:
+              _buildDesktopLayout(verificationId, phoneNumber, authProvider),
+        ),
+      ),
+    );
+  }
 
-                const Text(
-                  'Enter the 6-digit code sent the number',
-                  textAlign: TextAlign.center,
-                  style: AppTheme.textStyle18w500,
-                ),
+  Widget _buildMobileLayout(String verificationId, String phoneNumber,
+      AuthenticationProvider authProvider) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            _buildInstructions(phoneNumber),
+            const SizedBox(height: 30),
+            pinPutField(verificationId),
+            const SizedBox(height: 30),
+            resendCodeField(authProvider, phoneNumber),
+          ],
+        ),
+      ),
+    );
+  }
 
-                const SizedBox(height: 10),
-
-                // phone number text
-                Text(
-                  phoneNumber,
-                  textAlign: TextAlign.center,
-                  style: AppTheme.textStyle18w500,
-                ),
-
-                const SizedBox(height: 30),
-
-                // pinPutField
-                pinPutField(verificationId),
-
-                const SizedBox(height: 30), // loading indicator
-
-                // resend CodeField
-                resendCodeField(authProvider, phoneNumber),
-
-                const SizedBox(height: 10),
-              ],
-            ),
+  Widget _buildTabletLayout(String verificationId, String phoneNumber,
+      AuthenticationProvider authProvider) {
+    return Center(
+      child: SingleChildScrollView(
+        child: SizedBox(
+          width: ResponsiveLayoutHelper.widthPercent(context, 0.7),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 60),
+              _buildInstructions(phoneNumber),
+              const SizedBox(height: 40),
+              pinPutField(verificationId),
+              const SizedBox(height: 40),
+              resendCodeField(authProvider, phoneNumber),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopLayout(String verificationId, String phoneNumber,
+      AuthenticationProvider authProvider) {
+    return Center(
+      child: SingleChildScrollView(
+        child: SizedBox(
+          width: ResponsiveLayoutHelper.widthPercent(context, 0.5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 80),
+              _buildInstructions(phoneNumber),
+              const SizedBox(height: 50),
+              pinPutField(verificationId),
+              const SizedBox(height: 50),
+              resendCodeField(authProvider, phoneNumber),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInstructions(String phoneNumber) {
+    return Column(
+      children: [
+        Text(
+          'Enter the 6-digit code sent to the number',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: ResponsiveLayoutHelper.responsiveFontSize(
+              context,
+              mobile: AppTheme.textStyle18w500.fontSize!,
+              tablet: 20,
+              desktop: 22,
+            ),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          phoneNumber,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: ResponsiveLayoutHelper.responsiveFontSize(
+              context,
+              mobile: AppTheme.textStyle18w500.fontSize!,
+              tablet: 20,
+              desktop: 22,
+            ),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 
@@ -107,24 +170,38 @@ class _OTPScreenState extends State<OTPScreen> {
     } else {
       return Column(
         children: [
-          const Text(
+          Text(
             'Didn\'t receive the code?',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontSize: ResponsiveLayoutHelper.responsiveFontSize(
+                context,
+                mobile: 16,
+                tablet: 18,
+                desktop: 20,
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           TextButton(
             onPressed: authProvider.secondsRemaining == 0
                 ? () {
-                    // reset the code to send again
                     authProvider.resendCode(
                       context: context,
                       phone: phoneNumber,
                     );
                   }
                 : null,
-            child: const Text(
+            child: Text(
               'Resend Code',
-              style: AppTheme.textStyle18w500,
+              style: TextStyle(
+                fontSize: ResponsiveLayoutHelper.responsiveFontSize(
+                  context,
+                  mobile: AppTheme.textStyle18w500.fontSize!,
+                  tablet: 20,
+                  desktop: 22,
+                ),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -134,7 +211,12 @@ class _OTPScreenState extends State<OTPScreen> {
 
   Widget pinPutField(String verificationId) {
     return SizedBox(
-      height: 68,
+      height: ResponsiveLayoutHelper.responsiveFontSize(
+        context,
+        mobile: 68,
+        tablet: 80,
+        desktop: 90,
+      ),
       child: Pinput(
         length: 6,
         controller: controller,
@@ -144,7 +226,6 @@ class _OTPScreenState extends State<OTPScreen> {
           setState(() {
             otpCode = pin;
           });
-          // verify otp code
           verifyOTPCode(
             verificationId: verificationId,
             otpCode: otpCode!,
