@@ -25,37 +25,39 @@ class ButtonsRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: IntrinsicHeight(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            buildButton(
-              Icons.assignment_late_outlined,
-              groupID,
-              'Assessments',
-              isAdmin,
-              isMember,
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            buildButton(
-              Icons.handyman,
-              groupID,
-              Constants.toolsExplainer,
-              isAdmin,
-              isMember,
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            buildButton(
-              FontAwesomeIcons.circleExclamation,
-              groupID,
-              Constants.nearMisses,
-              isAdmin,
-              isMember,
-            ),
-          ],
+        child: FittedBox(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              buildButton(
+                Icons.assignment_late_outlined,
+                groupID,
+                'Assessments',
+                isAdmin,
+                isMember,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              buildButton(
+                Icons.handyman,
+                groupID,
+                Constants.toolsExplainer,
+                isAdmin,
+                isMember,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              buildButton(
+                FontAwesomeIcons.circleExclamation,
+                groupID,
+                Constants.nearMisses,
+                isAdmin,
+                isMember,
+              ),
+            ],
+          ),
         ),
       ),
     );
