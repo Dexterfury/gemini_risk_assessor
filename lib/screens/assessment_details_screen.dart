@@ -196,18 +196,15 @@ class AssessmentDetailsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.50,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getCreatedBy(
-                          context,
-                          currentModel,
-                        ),
-                        Text(formattedTime),
-                      ],
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      getCreatedBy(
+                        context,
+                        currentModel,
+                      ),
+                      Text(formattedTime),
+                    ],
                   ),
                   pdfAndShareButtons(
                     context,

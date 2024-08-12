@@ -19,11 +19,13 @@ class ListItem extends StatelessWidget {
     required this.groupID,
     required this.data,
     required this.isAdmin,
+    this.onTap,
   });
   final String docTitle;
   final String groupID;
   final AssessmentModel data;
   final bool isAdmin;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class ListItem extends StatelessWidget {
                   imageUrl: image,
                   title: data.title,
                   summary: data.summary,
-                  onTap: action,
+                  onTap: onTap ?? action,
                 )
               : StreamBuilder<int>(
                   stream: FirebaseMethods.getMessageCountStream(

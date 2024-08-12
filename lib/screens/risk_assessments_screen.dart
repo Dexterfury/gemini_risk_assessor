@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
@@ -6,10 +8,12 @@ import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/models/assessment_model.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
+import 'package:gemini_risk_assessor/screens/assessment_details_screen.dart';
 import 'package:gemini_risk_assessor/search/my_data_stream.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
+import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
 import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
 
@@ -36,6 +40,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
   bool _hasMore = true;
   DocumentSnapshot? _lastDocument;
   Stream<QuerySnapshot>? _assessmentStream;
+  AssessmentModel? _selectedAssessment;
 
   @override
   void initState() {
@@ -147,28 +152,84 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            // Merge stream data with existing items
             if (snapshot.hasData) {
               final hasChanged = _mergeStreamData(snapshot.data!.docs);
               if (hasChanged) {
-                // Use Future.microtask to schedule a rebuild after this frame
                 Future.microtask(() => setState(() {}));
               }
             }
 
-            return _buildContent();
+            return _buildResponsiveContent();
           },
         ),
       ),
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildResponsiveContent() {
+    return ResponsiveLayoutHelper.responsiveBuilder(
+      context: context,
+      mobile: _buildMobileContent(),
+      tablet: _buildTabletContent(),
+      desktop: _buildDesktopContent(),
+    );
+  }
+
+  Widget _buildMobileContent() {
     if (_items.isEmpty) {
       return _buildEmptyState();
     }
 
-    final results = _items
+    final results = _filterResults();
+
+    return widget.groupID.isNotEmpty
+        ? _buildGroupView(results)
+        : const MyDataStream(
+            generationType: GenerationType.riskAssessment,
+          );
+  }
+
+  Widget _buildTabletContent() {
+    if (_items.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final results = _filterResults();
+
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: widget.groupID.isNotEmpty
+              ? _buildGroupView(results, isTabletOrDesktop: true)
+              : MyDataStream(
+                  generationType: GenerationType.riskAssessment,
+                  onItemSelected: _onAssessmentSelected,
+                ),
+        ),
+        Expanded(
+          flex: 1,
+          child: _selectedAssessment != null
+              ? AssessmentDetailsScreen(
+                  appBarTitle: Constants.riskAssessment,
+                  groupID: widget.groupID,
+                  isAdmin: widget.isAdmin,
+                  currentModel: _selectedAssessment,
+                )
+              : const Center(
+                  child: Text('Select an assessment to view details')),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopContent() {
+    // For desktop, we can use the same layout as tablet
+    return _buildTabletContent();
+  }
+
+  List<DocumentSnapshot> _filterResults() {
+    return _items
         .where(
           (element) =>
               element[Constants.title].toString().toLowerCase().contains(
@@ -176,12 +237,52 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                   ),
         )
         .toList();
+  }
 
-    return widget.groupID.isNotEmpty
-        ? _buildGroupView(results)
-        : const MyDataStream(
-            generationType: GenerationType.riskAssessment,
-          );
+  Widget _buildGroupView(List<DocumentSnapshot> results,
+      {bool isTabletOrDesktop = false}) {
+    return CustomScrollView(
+      slivers: [
+        _buildSliverAppBar(),
+        SliverPadding(
+          padding: const EdgeInsets.all(8.0),
+          sliver: results.isEmpty
+              ? const SliverFillRemaining(
+                  child: Center(child: Text('No matching results')),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index == results.length) {
+                        return _buildLoadMoreButton();
+                      }
+                      final doc = results[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      final item = AssessmentModel.fromJson(data);
+                      log('here');
+                      return ListItem(
+                        docTitle: Constants.riskAssessment,
+                        groupID: widget.groupID,
+                        data: item,
+                        isAdmin: widget.isAdmin,
+                        onTap: isTabletOrDesktop
+                            ? () => _onAssessmentSelected(item)
+                            : null,
+                      );
+                    },
+                    childCount: results.length + 1,
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+
+  void _onAssessmentSelected(AssessmentModel assessment) {
+    log('here');
+    setState(() {
+      _selectedAssessment = assessment;
+    });
   }
 
   Widget _buildEmptyState() {
@@ -202,40 +303,6 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildGroupView(List<DocumentSnapshot> results) {
-    return CustomScrollView(
-      slivers: [
-        _buildSliverAppBar(),
-        SliverPadding(
-          padding: const EdgeInsets.all(8.0),
-          sliver: results.isEmpty
-              ? const SliverFillRemaining(
-                  child: Center(child: Text('No matching results')),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == results.length) {
-                        return _buildLoadMoreButton();
-                      }
-                      final doc = results[index];
-                      final data = doc.data() as Map<String, dynamic>;
-                      final item = AssessmentModel.fromJson(data);
-                      return ListItem(
-                        docTitle: Constants.riskAssessment,
-                        groupID: widget.groupID,
-                        data: item,
-                        isAdmin: widget.isAdmin,
-                      );
-                    },
-                    childCount: results.length + 1,
-                  ),
-                ),
-        ),
-      ],
     );
   }
 

@@ -17,10 +17,12 @@ class MyDataStream extends StatelessWidget {
     Key? key,
     required this.generationType,
     this.groupID = '',
+    this.onItemSelected,
   }) : super(key: key);
 
   final GenerationType generationType;
   final String groupID;
+  final void Function(AssessmentModel)? onItemSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +70,15 @@ class MyDataStream extends StatelessWidget {
             } else {
               final assessment = AssessmentModel.fromJson(data);
               return ListItem(
-                docTitle: title,
-                groupID: '',
-                data: assessment,
-                isAdmin: true,
-              );
+                  docTitle: title,
+                  groupID: '',
+                  data: assessment,
+                  isAdmin: true,
+                  onTap: () {
+                    if (onItemSelected != null) {
+                      onItemSelected!(assessment);
+                    }
+                  });
             }
           },
         );
