@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/search/group_search_stream.dart';
 import 'package:gemini_risk_assessor/firebase/groups_stream.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
-import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:gemini_risk_assessor/widgets/anonymouse_view.dart';
 import 'package:gemini_risk_assessor/widgets/build_user_image.dart';
 import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';

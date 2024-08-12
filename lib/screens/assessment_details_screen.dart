@@ -14,6 +14,7 @@ import 'package:gemini_risk_assessor/models/ppe_model.dart';
 import 'package:gemini_risk_assessor/providers/assessment_provider.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/providers/chat_provider.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:gemini_risk_assessor/screens/chat_screen.dart';
 import 'package:gemini_risk_assessor/screens/share_screen.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
@@ -90,7 +91,9 @@ class AssessmentDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: MyAppBar(
         title: appBarTitle,
-        leading: const BackButton(),
+        leading: ResponsiveLayoutHelper.isMobile(context)
+            ? const BackButton()
+            : null,
         actions: [
           currentModel != null
               ? Padding(

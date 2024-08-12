@@ -12,7 +12,7 @@ import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/utilities/assets_manager.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
-import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {

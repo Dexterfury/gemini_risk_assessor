@@ -16,6 +16,7 @@ import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/groups/members_card.dart';
 import 'package:gemini_risk_assessor/groups/groups_settings.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:gemini_risk_assessor/screens/people_screen.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/file_upload_handler.dart';
@@ -29,9 +30,11 @@ class GroupDetails extends StatefulWidget {
   const GroupDetails({
     super.key,
     this.groupModel,
+    this.onNavigate,
   });
 
   final GroupModel? groupModel;
+  final Function(Widget)? onNavigate;
 
   @override
   State<GroupDetails> createState() => _GroupDetailsState();
@@ -133,33 +136,61 @@ class _GroupDetailsState extends State<GroupDetails>
       return Scaffold(
         appBar: MyAppBar(
           title: 'Group Details',
-          leading: const BackButton(),
+          leading: ResponsiveLayoutHelper.isMobile(context)
+              ? const BackButton()
+              : null,
           actions: [
             if (isAdmin)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: IconButton(
                   onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GroupSettingsScreen(
-                          isNew: false,
-                          initialSettings: DataSettings(
-                            requestToReadTerms: requestToReadTerms,
-                            allowSharing: allowSharing,
-                            useSafetyFile: useSafetyFile,
-                            safetyFileContent: safetyFileContent,
-                            safetyFileUrl: safetyFileUrl,
-                            groupTerms: groupTerms,
-                          ),
-                          onSave: (DataSettings settings) {
-                            groupProvider.updateGroupSettings(settings);
-                          },
-                          groupID: groupID,
-                        ),
+                    final newContent = GroupSettingsScreen(
+                      isNew: false,
+                      initialSettings: DataSettings(
+                        requestToReadTerms: requestToReadTerms,
+                        allowSharing: allowSharing,
+                        useSafetyFile: useSafetyFile,
+                        safetyFileContent: safetyFileContent,
+                        safetyFileUrl: safetyFileUrl,
+                        groupTerms: groupTerms,
                       ),
+                      onSave: (DataSettings settings) {
+                        groupProvider.updateGroupSettings(settings);
+                        if (widget.onNavigate != null) {
+                          widget.onNavigate!(GroupDetails(
+                              groupModel: widget.groupModel,
+                              onNavigate: widget.onNavigate));
+                        }
+                      },
+                      groupID: groupID,
                     );
+                    if (widget.onNavigate != null) {
+                      widget.onNavigate!(newContent);
+                    } else {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => newContent));
+                    }
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => GroupSettingsScreen(
+                    //       isNew: false,
+                    //       initialSettings: DataSettings(
+                    //         requestToReadTerms: requestToReadTerms,
+                    //         allowSharing: allowSharing,
+                    //         useSafetyFile: useSafetyFile,
+                    //         safetyFileContent: safetyFileContent,
+                    //         safetyFileUrl: safetyFileUrl,
+                    //         groupTerms: groupTerms,
+                    //       ),
+                    //       onSave: (DataSettings settings) {
+                    //         groupProvider.updateGroupSettings(settings);
+                    //       },
+                    //       groupID: groupID,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   icon: const Icon(FontAwesomeIcons.gear, size: 20),
                 ),

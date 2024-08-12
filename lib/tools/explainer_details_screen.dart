@@ -6,6 +6,7 @@ import 'package:gemini_risk_assessor/buttons/delete_button.dart';
 import 'package:gemini_risk_assessor/dialogs/my_dialogs.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
@@ -53,7 +54,9 @@ class ExplainerDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: MyAppBar(
         title: 'Details',
-        leading: const BackButton(),
+        leading: ResponsiveLayoutHelper.isMobile(context)
+            ? const BackButton()
+            : null,
         actions: [
           currentModel != null
               ? Padding(

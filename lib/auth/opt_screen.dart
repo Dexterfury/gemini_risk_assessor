@@ -5,7 +5,7 @@ import 'package:gemini_risk_assessor/themes/app_theme.dart';
 import 'package:gemini_risk_assessor/utilities/global.dart';
 import 'package:gemini_risk_assessor/utilities/navigation.dart';
 import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
-import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 

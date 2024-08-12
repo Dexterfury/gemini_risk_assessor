@@ -7,7 +7,7 @@ import 'package:gemini_risk_assessor/groups/group_provider.dart';
 import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/groups/group_grid_item.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
-import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
+import 'package:gemini_risk_assessor/responsive/responsive_layout_helper.dart';
 import 'package:provider/provider.dart';
 
 class GroupsSearchStream extends StatelessWidget {
