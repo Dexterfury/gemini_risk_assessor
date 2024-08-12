@@ -259,7 +259,6 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
                       final doc = results[index];
                       final data = doc.data() as Map<String, dynamic>;
                       final item = AssessmentModel.fromJson(data);
-                      log('here');
                       return ListItem(
                         docTitle: Constants.riskAssessment,
                         groupID: widget.groupID,

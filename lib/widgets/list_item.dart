@@ -64,7 +64,7 @@ class ListItem extends StatelessWidget {
                       imageUrl: image,
                       title: data.title,
                       summary: data.summary,
-                      onTap: action,
+                      onTap: onTap ?? action,
                       messageCount: messageCount,
                       onMessageTap: () {
                         Navigator.push(
