@@ -11,9 +11,11 @@ class GroupGridItem extends StatelessWidget {
   const GroupGridItem({
     super.key,
     required this.groupModel,
+    this.onTap,
   });
 
   final GroupModel groupModel;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,10 @@ class GroupGridItem extends StatelessWidget {
                     .read<GroupProvider>()
                     .setGroupModel(groupModel: groupModel)
                     .whenComplete(() {
+                  if (onTap != null) {
+                    onTap!();
+                    return;
+                  }
                   action();
                 });
               },

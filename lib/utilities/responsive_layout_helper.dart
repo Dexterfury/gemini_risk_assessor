@@ -64,4 +64,14 @@ class ResponsiveLayoutHelper {
       return mobile;
     }
   }
+
+  static int getColumnCount(BuildContext context) {
+    if (isDesktop(context)) {
+      return 4;
+    } else if (isTablet(context)) {
+      return 2;
+    } else {
+      return 2;
+    }
+  }
 }

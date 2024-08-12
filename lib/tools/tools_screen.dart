@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_risk_assessor/app_bars/my_app_bar.dart';
 import 'package:gemini_risk_assessor/constants.dart';
 import 'package:gemini_risk_assessor/enums/enums.dart';
 import 'package:gemini_risk_assessor/firebase/analytics_helper.dart';
 import 'package:gemini_risk_assessor/themes/app_theme.dart';
+import 'package:gemini_risk_assessor/tools/explainer_details_screen.dart';
 import 'package:gemini_risk_assessor/tools/tool_model.dart';
 import 'package:gemini_risk_assessor/auth/authentication_provider.dart';
 import 'package:gemini_risk_assessor/search/my_data_stream.dart';
 import 'package:gemini_risk_assessor/search/my_search_bar.dart';
 import 'package:gemini_risk_assessor/firebase/firebase_methods.dart';
 import 'package:gemini_risk_assessor/tools/tool_item.dart';
+import 'package:gemini_risk_assessor/utilities/responsive_layout_helper.dart';
+import 'package:gemini_risk_assessor/widgets/list_item.dart';
 import 'package:provider/provider.dart';
 
 class ToolsScreen extends StatefulWidget {
@@ -36,6 +40,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
   bool _hasMore = true;
   DocumentSnapshot? _lastDocument;
   Stream<QuerySnapshot>? _dstiStream;
+  ToolModel? _selectedTool;
 
   @override
   void initState() {
@@ -156,19 +161,75 @@ class _ToolsScreenState extends State<ToolsScreen> {
               }
             }
 
-            return _buildContent();
+            return _buildResponsiveContent();
           },
         ),
       ),
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildResponsiveContent() {
+    return ResponsiveLayoutHelper.responsiveBuilder(
+      context: context,
+      mobile: _buildMobileContent(),
+      tablet: _buildTabletContent(),
+      desktop: _buildDesktopContent(),
+    );
+  }
+
+  Widget _buildMobileContent() {
     if (_items.isEmpty) {
       return _buildEmptyState();
     }
 
-    final results = _items
+    final results = _filterResults();
+
+    return widget.groupID.isNotEmpty
+        ? _buildGroupView(results)
+        : const MyDataStream(
+            generationType: GenerationType.riskAssessment,
+          );
+  }
+
+  Widget _buildTabletContent() {
+    if (_items.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final results = _filterResults();
+
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: widget.groupID.isNotEmpty
+              ? _buildGroupView(results, isTabletOrDesktop: true)
+              : MyDataStream(
+                  generationType: GenerationType.tool,
+                  onToolSelected: _onToolSelected,
+                ),
+        ),
+        Expanded(
+          flex: 1,
+          child: _selectedTool != null
+              ? ExplainerDetailsScreen(
+                  isAdmin: widget.isAdmin,
+                  groupID: widget.groupID,
+                  currentModel: _selectedTool,
+                )
+              : const Center(child: Text('Select a tool to view details')),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopContent() {
+    // For desktop, we can use the same layout as tablet
+    return _buildTabletContent();
+  }
+
+  List<DocumentSnapshot> _filterResults() {
+    return _items
         .where(
           (element) =>
               element[Constants.title].toString().toLowerCase().contains(
@@ -176,36 +237,10 @@ class _ToolsScreenState extends State<ToolsScreen> {
                   ),
         )
         .toList();
-
-    return widget.groupID.isNotEmpty
-        ? _buildGroupView(results)
-        : const MyDataStream(
-            generationType: GenerationType.tool,
-          );
   }
 
-  Widget _buildEmptyState() {
-    return Scaffold(
-      appBar: widget.groupID.isNotEmpty
-          ? const MyAppBar(
-              leading: BackButton(),
-              title: Constants.toolsExplainer,
-            )
-          : null,
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text(
-            'You did not create any tools yet',
-            textAlign: TextAlign.center,
-            style: AppTheme.textStyle18w500,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGroupView(List<DocumentSnapshot> results) {
+  Widget _buildGroupView(List<DocumentSnapshot> results,
+      {bool isTabletOrDesktop = false}) {
     return CustomScrollView(
       slivers: [
         _buildSliverAppBar(),
@@ -223,11 +258,14 @@ class _ToolsScreenState extends State<ToolsScreen> {
                       }
                       final doc = results[index];
                       final data = doc.data() as Map<String, dynamic>;
-                      final tool = ToolModel.fromJson(data);
+                      final item = ToolModel.fromJson(data);
                       return ToolItem(
-                        toolModel: tool,
+                        toolModel: item,
                         groupID: widget.groupID,
                         isAdmin: widget.isAdmin,
+                        onTap: isTabletOrDesktop
+                            ? () => _onToolSelected(item)
+                            : null,
                       );
                     },
                     childCount: results.length + 1,
@@ -235,6 +273,33 @@ class _ToolsScreenState extends State<ToolsScreen> {
                 ),
         ),
       ],
+    );
+  }
+
+  void _onToolSelected(ToolModel tool) {
+    setState(() {
+      _selectedTool = tool;
+    });
+  }
+
+  Widget _buildEmptyState() {
+    return Scaffold(
+      appBar: widget.groupID.isNotEmpty
+          ? const MyAppBar(
+              leading: BackButton(),
+              title: Constants.riskAssessments,
+            )
+          : null,
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            'You did not create any tool',
+            textAlign: TextAlign.center,
+            style: AppTheme.textStyle18w500,
+          ),
+        ),
+      ),
     );
   }
 

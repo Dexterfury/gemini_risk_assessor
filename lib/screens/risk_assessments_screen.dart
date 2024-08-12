@@ -204,7 +204,7 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
               ? _buildGroupView(results, isTabletOrDesktop: true)
               : MyDataStream(
                   generationType: GenerationType.riskAssessment,
-                  onItemSelected: _onAssessmentSelected,
+                  onAssessmentSelected: _onAssessmentSelected,
                 ),
         ),
         Expanded(
@@ -278,7 +278,6 @@ class _RiskAssessmentsScreenState extends State<RiskAssessmentsScreen> {
   }
 
   void _onAssessmentSelected(AssessmentModel assessment) {
-    log('here');
     setState(() {
       _selectedAssessment = assessment;
     });

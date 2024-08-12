@@ -18,11 +18,13 @@ class ToolItem extends StatelessWidget {
     required this.toolModel,
     required this.groupID,
     required this.isAdmin,
+    this.onTap,
   });
 
   final ToolModel toolModel;
   final String groupID;
   final bool isAdmin;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,7 @@ class ToolItem extends StatelessWidget {
                   imageUrl: imageUrl,
                   title: title,
                   summary: summary,
-                  onTap: action,
+                  onTap: onTap ?? action,
                 )
               : StreamBuilder<int>(
                   stream: FirebaseMethods.getMessageCountStream(
@@ -61,7 +63,7 @@ class ToolItem extends StatelessWidget {
                       imageUrl: imageUrl,
                       title: title,
                       summary: summary,
-                      onTap: action,
+                      onTap: onTap ?? action,
                       messageCount: messageCount,
                       onMessageTap: () {
                         Navigator.push(

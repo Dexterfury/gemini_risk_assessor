@@ -28,7 +28,10 @@ import 'package:provider/provider.dart';
 class GroupDetails extends StatefulWidget {
   const GroupDetails({
     super.key,
+    this.groupModel,
   });
+
+  final GroupModel? groupModel;
 
   @override
   State<GroupDetails> createState() => _GroupDetailsState();
@@ -112,7 +115,7 @@ class _GroupDetailsState extends State<GroupDetails>
     final uid = context.read<AuthenticationProvider>().userModel!.uid;
 
     return Consumer<GroupProvider>(builder: (context, groupProvider, child) {
-      final groupModel = groupProvider.groupModel;
+      final groupModel = widget.groupModel ?? groupProvider.groupModel;
       bool isAdmin = groupModel.adminsUIDs.contains(uid);
       bool isMember = groupModel.membersUIDs.contains(uid);
       String groupID = groupModel.groupID;
