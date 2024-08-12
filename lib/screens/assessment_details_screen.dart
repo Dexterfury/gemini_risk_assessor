@@ -87,6 +87,19 @@ class AssessmentDetailsScreen extends StatelessWidget {
     // Format the datetime using Intl package
     String formattedTime = DateFormat.yMMMEd().format(time);
 
+    var sizedBox = SizedBox(
+      width: MediaQuery.of(context).size.width * 0.50,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          getCreatedBy(
+            context,
+            currentModel,
+          ),
+          Text(formattedTime),
+        ],
+      ),
+    );
     return Scaffold(
       appBar: MyAppBar(
         title: appBarTitle,
@@ -196,19 +209,7 @@ class AssessmentDetailsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.50,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getCreatedBy(
-                          context,
-                          currentModel,
-                        ),
-                        Text(formattedTime),
-                      ],
-                    ),
-                  ),
+                  sizedBox,
                   pdfAndShareButtons(
                     context,
                     assessmentModel,
